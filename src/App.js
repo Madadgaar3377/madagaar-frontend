@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import Navbar from "./compontents/Navbar";
+import TopBar from "./compontents/TopBar";
+import Footer from "./compontents/Footer";
+
+// Pages
+import HomePage from "./pages/clients/HomePages";
+import AboutPage from "./pages/clients/About";
+import LoginPage from "./Accounts/LoginPage";
+import SignupPage from "./Accounts/SignupPages";
+import OtpVerifyPage from "./Accounts/OtpVerifications";
+// import AboutPage from "./pages/AboutPage";
+// import ContactPage from "./pages/ContactPage";
+// Add more pages as needed
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <TopBar />
+      <Navbar />
+
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/about" element={<AboutPage />} />
+
+        {/* account login */}
+        <Route path="/account" element={<LoginPage />} />
+        <Route path="/account/register" element={<SignupPage />} />
+        <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
+
+        
+
+      </Routes>
+
+      <Footer />
+    </Router>
   );
 }
 
