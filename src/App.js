@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./compontents/Navbar";
 import TopBar from "./compontents/TopBar";
@@ -11,33 +11,52 @@ import LoginPage from "./Accounts/LoginPage";
 import SignupPage from "./Accounts/SignupPages";
 import OtpVerifyPage from "./Accounts/OtpVerifications";
 import DashboardHomePage from "./pages/clients/Dashboard/Dashboars.jsx";
-// import AboutPage from "./pages/AboutPage";
-// import ContactPage from "./pages/ContactPage";
-// Add more pages as needed
+
+import ProtectedRoute from "./ProtectedRoute";
+
+function LayoutWrapper({ children }) {
+  const location = useLocation();
+
+  // Hide Navbar + Topbar + Footer on dashboard ONLY
+  const hideLayout = location.pathname.startsWith("/dashboard");
+
+  return (
+    <>
+      {!hideLayout && <TopBar />}
+      {!hideLayout && <Navbar />}
+
+      {children}
+
+      {!hideLayout && <Footer />}
+    </>
+  );
+}
 
 function App() {
   return (
     <Router>
-      <TopBar />
-      <Navbar />
+      <LayoutWrapper>
+        <Routes>
+          {/* Public pages */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
 
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
+          {/* account login */}
+          <Route path="/account" element={<LoginPage />} />
+          <Route path="/account/register" element={<SignupPage />} />
+          <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
 
-        {/* account login */}
-        <Route path="/account" element={<LoginPage />} />
-        <Route path="/account/register" element={<SignupPage />} />
-        <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
-
-        {/* dashboard */}
-        <Route path="/dashboard" element={<DashboardHomePage />} />
-
-        
-
-      </Routes>
-
-      <Footer />
+          {/* dashboard protected */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardHomePage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </LayoutWrapper>
     </Router>
   );
 }
