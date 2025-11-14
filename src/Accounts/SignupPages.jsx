@@ -54,7 +54,9 @@ export default function SignupPage() {
       setMessage(data?.message || "Signup successful! Check your email for OTP.");
 
       // redirect to OTP verify page and pass the email in location state
-      navigate("/account/verify-otp", { state: { email: formData.email } });
+      
+      // navigate("/account/verify-otp", { state: { email: formData.email } });
+      navigate("/account", { state: { email: formData.email } });
     } catch (err) {
       console.error("Signup error:", err);
       setMessage("Network error — please try again.");

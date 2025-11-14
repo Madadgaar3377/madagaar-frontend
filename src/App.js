@@ -10,6 +10,7 @@ import AboutPage from "./pages/clients/About";
 import LoginPage from "./Accounts/LoginPage";
 import SignupPage from "./Accounts/SignupPages";
 import OtpVerifyPage from "./Accounts/OtpVerifications";
+import DashboardHomePage from "./pages/clients/Dashboard/Dashboars.jsx";
 // import AboutPage from "./pages/AboutPage";
 // import ContactPage from "./pages/ContactPage";
 // Add more pages as needed
@@ -28,6 +29,9 @@ function App() {
         <Route path="/account" element={<LoginPage />} />
         <Route path="/account/register" element={<SignupPage />} />
         <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
+
+        {/* dashboard */}
+        <Route path="/dashboard" element={<DashboardHomePage />} />
 
         
 
