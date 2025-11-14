@@ -22,7 +22,7 @@ function LayoutWrapper({ children }) {
 
   return (
     <>
-      {!hideLayout && <TopBar />}
+      {/* {!hideLayout && <TopBar />} */}
       {!hideLayout && <Navbar />}
 
       {children}

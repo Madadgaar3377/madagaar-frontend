@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
+import { isAuthenticated } from "../utils/auth";
 
 export default function LoginPage() {
-  const apiUrl = backendBaseUrl.replace(/\/$/, "");
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
+
+  useEffect(() => {
+    // If the user already has a token, redirect to dashboard
+    if (isAuthenticated()) {
+      window.location.href = "/dashboard";
+    }
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -57,7 +65,13 @@ export default function LoginPage() {
       // success
       const token = data?.access_token || data?.token || data?.accessToken;
       if (token) {
+        // Keep backward-compatible key and a more explicit key
         localStorage.setItem("authToken", token);
+        localStorage.setItem("access_token", token);
+      }
+      // optional refresh token
+      if (data?.refresh_token || data?.refreshToken) {
+        localStorage.setItem("refresh_token", data?.refresh_token || data?.refreshToken);
       }
       if (data?.user) {
         try { localStorage.setItem("user", JSON.stringify(data.user)); } catch {}
