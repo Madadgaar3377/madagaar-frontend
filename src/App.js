@@ -13,6 +13,8 @@ import OtpVerifyPage from "./Accounts/OtpVerifications";
 import DashboardHomePage from "./pages/clients/Dashboard/Dashboars.jsx";
 
 import ProtectedRoute from "./ProtectedRoute";
+import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
+import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -46,6 +48,11 @@ function App() {
           <Route path="/account/register" element={<SignupPage />} />
           <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
 
+          {/* installement router  */}
+          <Route path="/installments" element={<InstallmentPlans />} />
+
+          {/* blogs */}
+          <Route path="/blog" element={<BlogsPage />} />
           {/* dashboard protected */}
           <Route
             path="/dashboard"

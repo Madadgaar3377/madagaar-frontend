@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
+import {NavLink} from "react-router-dom";
 
 export default function Navbar({
   logoSrc = "/Media/Group%2033.png",
-  services = ["Insurance", "Properties", "Loans", "Installment"],
+  services = ["Insurance", "Properties", "Loans", "installments"],
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false); // Desktop dropdown
@@ -26,16 +27,16 @@ export default function Navbar({
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center gap-3">
+            <NavLink to="/" className="flex items-center gap-3">
               <img src={logoSrc} alt="logo" className="h-10 rounded-md object-cover" />
-            </a>
+            </NavLink>
           </div>
 
           {/* Desktop menu */}
           <div className="hidden md:flex items-center space-x-6">
-            <a href="/" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/" className="text-gray-700 hover:text-gray-900">
               Home
-            </a>
+            </NavLink>
 
             {/* Desktop dropdown */}
             <div
@@ -68,34 +69,34 @@ export default function Navbar({
                 }`}
               >
                 {services.map((s) => (
-                  <a
+                  <NavLink
                     key={s}
-                    href={`/#${s.replace(/\s+/g, "-").toLowerCase()}`}
+                    to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   >
                     {s}
-                  </a>
+                  </NavLink>
                 ))}
               </div>
             </div>
 
-            <a href="/about" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/about" className="text-gray-700 hover:text-gray-900">
               About Us
-            </a>
-            <a href="/blog" className="text-gray-700 hover:text-gray-900">
+            </NavLink>
+            <NavLink to="/blog" className="text-gray-700 hover:text-gray-900">
               Blog
-            </a>
+            </NavLink>
           </div>
 
           {/* Account & mobile button */}
           <div className="flex items-center gap-4">
-            <a
-              href="/account"
+            <NavLink
+              to="/account"
               className="hidden md:inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white"
               style={{ background: "rgb(183, 36, 42)" }}
             >
               Account
-            </a>
+            </NavLink>
 
             <button
               onClick={() => setMobileOpen(true)}
@@ -117,9 +118,9 @@ export default function Navbar({
         }`}
       >
         <div className="flex items-center justify-between px-4 py-4 border-b">
-          <a href="/" className="flex items-center gap-3">
+          <NavLink to="/" className="flex items-center gap-3">
             <img src={logoSrc} alt="logo" className="h-10 rounded-md object-cover" />
-          </a>
+          </NavLink>
           <button
             onClick={() => setMobileOpen(false)}
             className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
@@ -131,9 +132,9 @@ export default function Navbar({
         </div>
 
         <nav className="px-4 py-4 overflow-auto h-[calc(100%-80px)]">
-          <a href="/" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          <NavLink to="/" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
             Home
-          </a>
+          </NavLink>
 
           {/* Mobile Services collapsible */}
           <div className="mt-2 border-t pt-3">
@@ -149,29 +150,29 @@ export default function Navbar({
 
             <div className={`mt-1 px-1 overflow-hidden transition-all duration-300 ${mobileServicesOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
               {services.map((s) => (
-                <a
+                <NavLink
                   key={s}
-                  href={`/#${s.replace(/\s+/g, "-").toLowerCase()}`}
+                  to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
                   className="block px-4 py-2 text-gray-700 rounded-md hover:bg-gray-50"
                   onClick={() => setMobileOpen(false)}
                 >
                   {s}
-                </a>
+                </NavLink>
               ))}
             </div>
           </div>
 
-          <a href="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          <NavLink to="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
             About Us
-          </a>
-          <a href="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          </NavLink>
+          <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
             Blog
-          </a>
+          </NavLink>
 
           <div className="mt-6 px-3">
-            <a href="/account" className="block text-center px-4 py-2 border rounded-md bg-[rgb(183,36,42)] text-white font-medium" onClick={() => setMobileOpen(false)}>
+            <NavLink to="/account" className="block text-center px-4 py-2 border rounded-md bg-[rgb(183,36,42)] text-white font-medium" onClick={() => setMobileOpen(false)}>
               Account
-            </a>
+            </NavLink>
           </div>
         </nav>
       </aside>
