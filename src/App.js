@@ -15,6 +15,7 @@ import DashboardHomePage from "./pages/clients/Dashboard/Dashboars.jsx";
 import ProtectedRoute from "./ProtectedRoute";
 import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
+import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -53,6 +54,9 @@ function App() {
 
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
+
+          {/* PropertiesPage */}
+          <Route path="/properties" element={<PropertiesPage />} />
           {/* dashboard protected */}
           <Route
             path="/dashboard"
