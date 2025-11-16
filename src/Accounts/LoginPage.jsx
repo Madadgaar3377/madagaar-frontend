@@ -73,9 +73,35 @@ export default function LoginPage() {
       if (data?.refresh_token || data?.refreshToken) {
         localStorage.setItem("refresh_token", data?.refresh_token || data?.refreshToken);
       }
-      if (data?.user) {
-        try { localStorage.setItem("user", JSON.stringify(data.user)); } catch {}
-      }
+        // Store user and full auth data, but remove sensitive fields before saving
+        if (data) {
+          try {
+            const fullData = JSON.parse(JSON.stringify(data));
+            if (fullData.user && typeof fullData.user === "object") {
+              const safeUser = { ...fullData.user };
+              // remove sensitive fields from stored user copy
+              delete safeUser.password;
+              delete safeUser.verificationOtp;
+              delete safeUser.passwordResetOtp;
+              delete safeUser.verificationOtpExpiryTime;
+              // store sanitized user separately for quick access
+              localStorage.setItem("user", JSON.stringify(safeUser));
+
+              // also store full auth response but with sanitized user
+              fullData.user = safeUser;
+              localStorage.setItem("authData", JSON.stringify(fullData));
+            } else {
+              // no user object, store whatever we have
+              localStorage.setItem("authData", JSON.stringify(fullData));
+            }
+          } catch (err) {
+            // fallback: store raw pieces if JSON fails
+            if (data.user) {
+              try { localStorage.setItem("user", JSON.stringify(data.user)); } catch {}
+            }
+            try { localStorage.setItem("authData", JSON.stringify(data)); } catch {}
+          }
+        }
 
       // navigate to dashboard
       window.location.href = "/dashboard";

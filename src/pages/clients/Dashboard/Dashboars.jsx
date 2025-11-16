@@ -15,6 +15,7 @@ import {
   Line,
 } from "recharts";
 import CountUp from "react-countup";
+import NavbarDashboard from "./Navbar-Dashboard";
 
 /**
  * DashboardAnalytics.jsx
@@ -85,6 +86,7 @@ export default function DashboardAnalytics() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 lg:p-8">
+      <NavbarDashboard />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">

@@ -16,12 +16,13 @@ import ProtectedRoute from "./ProtectedRoute";
 import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
+import Loans from "./pages/clients/Loans/Loans.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
   // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard");
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/loan");
 
   return (
     <>
@@ -63,6 +64,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardHomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/loan"
+            element={
+              <ProtectedRoute>
+                <Loans />
               </ProtectedRoute>
             }
           />
