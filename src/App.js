@@ -18,6 +18,7 @@ import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import Loans from "./pages/clients/Loans/Loans.jsx";
 import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
+import InstallmentApplicationForm from "./pages/clients/Installment/Apply-Installements.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -54,6 +55,7 @@ function App() {
           {/* installement router  */}
           <Route path="/installments" element={<InstallmentPlans />} />
           <Route path="/installment/:id" element={<InstallmentDetail />} />
+          <Route path="installment/get-now/:id" element={<InstallmentApplicationForm />} />
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
 

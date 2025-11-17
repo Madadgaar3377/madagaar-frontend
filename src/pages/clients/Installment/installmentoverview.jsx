@@ -1,6 +1,6 @@
 // src/pages/InstallmentDetail.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 
 const PLACEHOLDER = "/placeholder.png";
@@ -241,9 +241,9 @@ export default function InstallmentDetail() {
             )}
             <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
                 <div className="flex items-center gap-3">
-                <a className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" href={`tel:${(plan.user && plan.user.number) || ""}`}>
-                  Call Seller
-                </a>
+                <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id)|| ""}`}>
+                  Get Now
+                </NavLink>
                 <a className="px-4 py-2 rounded-md border" href={`mailto:${(plan.user && plan.user.email) || ""}`}>
                   Email
                 </a>
