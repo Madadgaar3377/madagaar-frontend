@@ -17,6 +17,7 @@ import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import Loans from "./pages/clients/Loans/Loans.jsx";
+import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -52,7 +53,7 @@ function App() {
 
           {/* installement router  */}
           <Route path="/installments" element={<InstallmentPlans />} />
-
+          <Route path="/installment/:id" element={<InstallmentDetail />} />
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
 

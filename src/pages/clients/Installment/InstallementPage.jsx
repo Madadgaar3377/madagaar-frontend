@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import { Link } from "react-router-dom";
 
 /**
  * InstallmentPlans.jsx
@@ -221,7 +222,12 @@ export default function InstallmentPlans() {
                     </div>
 
                     <div className="flex items-center justify-between gap-2 mt-2">
-                      <button onClick={() => openDetails(plan)} className="flex-1 px-3 py-2 rounded-md bg-white border border-gray-200 hover:shadow-sm text-sm">Details</button>
+                      <Link
+                        to={`/installment/${plan._id}`}
+                        className="flex-1 px-3 py-2 rounded-md bg-white border border-gray-200 hover:shadow-sm text-sm text-center"
+                      >
+                        Details
+                      </Link>
                       <a href={`tel:${plan.user?.number || ""}`} className="px-3 py-2 rounded-md bg-[rgb(183,36,42)] text-white text-sm">Call</a>
                     </div>
                   </div>
