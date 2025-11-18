@@ -285,7 +285,7 @@ export default function InstallmentApplicationForm({
 
       {/* Product fields (disabled if productLocked === true) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Input label="Installment Plan ID" name="installmentPlanId" value={form.installmentPlanId} onChange={handleChange} error={errors.installmentPlanId} disabled={productLocked} />
+        <Input label="Installment Plan ID" name="installmentPlanId" value={form._id} onChange={handleChange} error={errors.installmentPlanId} disabled={productLocked} />
         <Input label="Product Name" name="productName" value={form.productName} onChange={handleChange} disabled={productLocked} />
       </div>
 

@@ -19,12 +19,14 @@ import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import Loans from "./pages/clients/Loans/Loans.jsx";
 import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
 import InstallmentApplicationForm from "./pages/clients/Installment/Apply-Installements.jsx";
+import InstallmentApplicationsPage from "./pages/clients/Installment/AllRequest.jsx";
+import ManageInstallmentsPage from "./pages/clients/Installment/Update-Status.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
   // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/loan");
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/loan") || location.pathname.startsWith("/dashboard/Installments") ;
 
   return (
     <>
@@ -75,6 +77,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Loans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/Installments"
+            element={
+              <ProtectedRoute>
+                <InstallmentApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/Installments/update"
+            element={
+              <ProtectedRoute>
+                <ManageInstallmentsPage />
               </ProtectedRoute>
             }
           />

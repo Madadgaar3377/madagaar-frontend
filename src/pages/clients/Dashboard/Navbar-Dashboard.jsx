@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { logout, getUser } from "../../../utils/auth";
+import { NavLink } from "react-router-dom";
 
 export default function NavbarDashboard({ onToggleSidebar }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -38,8 +39,8 @@ export default function NavbarDashboard({ onToggleSidebar }) {
           <div className="flex items-center gap-4">
             <div className="hidden sm:flex items-center gap-4">
               {/* Inline links with dropdowns on Properties and Loans */}
-              <a href="/dashboard" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Home</a>
-              <a href="/dashboard/analytics" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Analytics</a>
+              <NavLink to="/dashboard" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Home</NavLink>
+              <NavLink to="/dashboard" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Analytics</NavLink>
 
               <div className="relative">
                 <button
@@ -51,9 +52,9 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                 </button>
                 {propertiesOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
-                    <a href="/properties" className="block px-3 py-2 hover:bg-gray-50">View All</a>
-                    <a href="/properties/add" className="block px-3 py-2 hover:bg-gray-50">Add Property</a>
-                    <a href="/properties/manage" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</a>
+                    <NavLink to="/properties" className="block px-3 py-2 hover:bg-gray-50">View All</NavLink>
+                    <NavLink to="/properties/add" className="block px-3 py-2 hover:bg-gray-50">Add Property</NavLink>
+                    <NavLink to="/properties/manage" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</NavLink>
                   </div>
                 )}
               </div>
@@ -68,9 +69,9 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                 </button>
                 {loansOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
-                    <a href="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">View All</a>
-                    <a href="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Add Loan Plan</a>
-                    <a href="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</a>
+                    <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">View All</NavLink>
+                    <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Add Loan Plan</NavLink>
+                    <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</NavLink>
                   </div>
                 )}
               </div>
@@ -80,18 +81,18 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                   className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium"
                   aria-expanded={moreOpen}
                 >
-                  More
+                  Installments
                 </button>
                 {moreOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
-                    <a href="/dashboard/settings" className="block px-3 py-2 hover:bg-gray-50">Settings</a>
-                    <a href="/dashboard/notifications" className="block px-3 py-2 hover:bg-gray-50">Notifications</a>
-                    <a href="/support" className="block px-3 py-2 hover:bg-gray-50">Support</a>
+                    <NavLink to="/dashboard/Installments" className="block px-3 py-2 hover:bg-gray-50">All-Request</NavLink>
+                    <NavLink to="/dashboard/Installments/" className="block px-3 py-2 hover:bg-gray-50">Create-Installments</NavLink>
+                    <NavLink to="/dashboard/Installments/update" className="block px-3 py-2 hover:bg-gray-50">Update/Delete</NavLink>
                   </div>
                 )}
               </div>
 
-              <a href="/profile" className="flex items-center gap-3">
+              <a href="/" className="flex items-center gap-3">
                 <div className="h-9 w-9 rounded-full bg-gray-200 overflow-hidden">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="avatar" className="h-full w-full object-cover" />
