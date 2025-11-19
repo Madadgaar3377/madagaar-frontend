@@ -244,9 +244,9 @@ export default function InstallmentDetail() {
                 <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id)|| ""}`}>
                   Get Now
                 </NavLink>
-                <a className="px-4 py-2 rounded-md border" href={`mailto:${(plan.user && plan.user.email) || ""}`}>
-                  Email
-                </a>
+                <NavLink className="px-4 py-2 rounded-md border" to={`${(plan._id) ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
+                  /Compare
+                </NavLink>
                 
               </div>
             </div>

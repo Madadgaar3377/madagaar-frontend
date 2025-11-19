@@ -22,6 +22,7 @@ import InstallmentApplicationForm from "./pages/clients/Installment/Apply-Instal
 import InstallmentApplicationsPage from "./pages/clients/Installment/AllRequest.jsx";
 import ManageInstallmentsPage from "./pages/clients/Installment/Update-Status.jsx";
 import CreateInstallmentPlan from "./pages/clients/Installment/Create-Installments.jsx";
+import CompareProducts from "./pages/clients/CompareProduct/CompareProducts.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -58,6 +59,7 @@ function App() {
           {/* installement router  */}
           <Route path="/installments" element={<InstallmentPlans />} />
           <Route path="/installment/:id" element={<InstallmentDetail />} />
+          <Route path="/installment/product/CompareProduct/:id" element={<CompareProducts />} />
           <Route path="installment/get-now/:id" element={<InstallmentApplicationForm />} />
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
