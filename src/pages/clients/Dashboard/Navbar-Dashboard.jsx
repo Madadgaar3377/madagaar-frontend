@@ -86,7 +86,7 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                 {moreOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
                     <NavLink to="/dashboard/Installments" className="block px-3 py-2 hover:bg-gray-50">All-Request</NavLink>
-                    <NavLink to="/dashboard/Installments/" className="block px-3 py-2 hover:bg-gray-50">Create-Installments</NavLink>
+                    <NavLink to="/dashboard/Installments/create" className="block px-3 py-2 hover:bg-gray-50">Create-Installments</NavLink>
                     <NavLink to="/dashboard/Installments/update" className="block px-3 py-2 hover:bg-gray-50">Update/Delete</NavLink>
                   </div>
                 )}

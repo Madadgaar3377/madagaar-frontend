@@ -21,6 +21,7 @@ import InstallmentDetail from "./pages/clients/Installment/installmentoverview.j
 import InstallmentApplicationForm from "./pages/clients/Installment/Apply-Installements.jsx";
 import InstallmentApplicationsPage from "./pages/clients/Installment/AllRequest.jsx";
 import ManageInstallmentsPage from "./pages/clients/Installment/Update-Status.jsx";
+import CreateInstallmentPlan from "./pages/clients/Installment/Create-Installments.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -85,6 +86,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <InstallmentApplicationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/Installments/create"
+            element={
+              <ProtectedRoute>
+                <CreateInstallmentPlan />
               </ProtectedRoute>
             }
           />
