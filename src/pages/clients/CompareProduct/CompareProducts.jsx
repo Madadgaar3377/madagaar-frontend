@@ -17,19 +17,25 @@ export default function CompareProducts() {
   const [loadingSearch, setLoadingSearch] = useState(false);
 
   const [baseProduct, setBaseProduct] = useState(null);
-  const [compareList, setCompareList] = useState([]); // includes base as first item optionally
+  const [compareList, setCompareList] = useState([]); // base will be kept first if present
   const [related, setRelated] = useState([]);
   const [loadingProduct, setLoadingProduct] = useState(false);
   const [imgPreview, setImgPreview] = useState(null);
   const [error, setError] = useState("");
 
-  // debounce query
+  // helper to get unique id for product (consistent)
+  const getId = (p) => {
+    if (!p) return null;
+    return p._id || p.installmentPlanId || p.productName || JSON.stringify(p);
+  };
+
+  // debounce search query
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 350);
     return () => clearTimeout(t);
   }, [query]);
 
-  // search endpoint (no axios)
+  // search endpoint (native fetch)
   useEffect(() => {
     if (!debouncedQuery) {
       setSearchResults([]);
@@ -39,7 +45,9 @@ export default function CompareProducts() {
     (async () => {
       setLoadingSearch(true);
       try {
-        const url = `${API}/installmentplan/get/public?q=${encodeURIComponent(debouncedQuery)}&limit=12`;
+        const url = `${API}/installmentplan/get/public?q=${encodeURIComponent(
+          debouncedQuery
+        )}&limit=12`;
         const res = await fetch(url);
         const body = await res.json().catch(() => null);
         let items = (body && (body.data || body)) || [];
@@ -54,13 +62,15 @@ export default function CompareProducts() {
     return () => (cancelled = true);
   }, [debouncedQuery]);
 
-  // fetch a single product by id or slug
+  // fetch a single product by id
   async function fetchProduct(identifier) {
     if (!identifier) return null;
     setLoadingProduct(true);
     setError("");
     try {
-      const res = await fetch(`${API}/installmentplan/get/public/${encodeURIComponent(identifier)}`);
+      const res = await fetch(
+        `${API}/installmentplan/get/public/${encodeURIComponent(identifier)}`
+      );
       const body = await res.json().catch(() => null);
       let product = (body && (body.data || (body.success && body.data))) || body;
       if (Array.isArray(product)) product = product[0] || null;
@@ -85,19 +95,32 @@ export default function CompareProducts() {
       const p = await fetchProduct(routeId);
       if (!cancelled && p) {
         setBaseProduct(p);
-        // ensure compareList contains base as first (but keep other items)
-        setCompareList((cur) => {
-          const idKey = p._id || p.installmentPlanId || p.productName;
-          if (cur.some((c) => (c._id || c.installmentPlanId || c.productName) === idKey)) {
-            // move base to front
-            return [p, ...cur.filter((c) => (c._id || c.installmentPlanId || c.productName) !== idKey)].slice(0, MAX_COMPARE);
-          }
-          return [p, ...cur].slice(0, MAX_COMPARE);
-        });
       }
     })();
     return () => (cancelled = true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeId]);
+
+  // whenever baseProduct changes ensure compareList contains base as first and unique
+  useEffect(() => {
+    setCompareList((prev) => {
+      const baseId = getId(baseProduct);
+      // start with base if exists
+      const next = [];
+      if (baseProduct && baseId) next.push(baseProduct);
+      // append previous items that are not base and dedupe
+      const added = new Set(next.map(getId));
+      for (const p of prev) {
+        const id = getId(p);
+        if (!added.has(id)) {
+          added.add(id);
+          next.push(p);
+        }
+      }
+      // ensure length limit and return
+      return next.slice(0, MAX_COMPARE);
+    });
+  }, [baseProduct]);
 
   // load related (small list) for quick suggestions
   useEffect(() => {
@@ -107,8 +130,10 @@ export default function CompareProducts() {
     }
     let cancelled = false;
     (async () => {
-      const category = baseProduct.category || baseProduct.customCategory || "";
-      const company = baseProduct.companyName || baseProduct.companyNameOther || "";
+      const category =
+        (baseProduct.category || baseProduct.customCategory || "").toString();
+      const company = (baseProduct.companyName || baseProduct.companyNameOther || "")
+        .toString();
       const limit = 8;
       const hits = new Map();
 
@@ -117,15 +142,17 @@ export default function CompareProducts() {
           const res = await fetch(`${API}/installmentplan/get/public?${q}&limit=${limit}`);
           const body = await res.json().catch(() => null);
           const list = (body && (body.data || body)) || [];
-          if (Array.isArray(list)) list.forEach((p) => hits.set(p._id || p.installmentPlanId || JSON.stringify(p), p));
-        } catch (e) {}
+          if (Array.isArray(list)) list.forEach((p) => hits.set(getId(p), p));
+        } catch (e) {
+          // ignore
+        }
       }
 
       if (category) await tryFetch(`category=${encodeURIComponent(category)}`);
       if (company) await tryFetch(`companyName=${encodeURIComponent(company)}`);
       if (hits.size === 0) await tryFetch(`limit=${limit}`);
 
-      const remKey = baseProduct._id || baseProduct.installmentPlanId;
+      const remKey = getId(baseProduct);
       if (remKey && hits.has(remKey)) hits.delete(remKey);
 
       if (!cancelled) setRelated(Array.from(hits.values()).slice(0, limit));
@@ -133,31 +160,46 @@ export default function CompareProducts() {
     return () => (cancelled = true);
   }, [baseProduct]);
 
-  // add to compare (but keep base fixed)
+  // add to compare list (deduped and keeps base first)
   const addToCompare = (p) => {
     if (!p) return;
     setCompareList((cur) => {
-      const idKey = p._id || p.installmentPlanId || p.productName;
-      if (cur.some((c) => (c._id || c.installmentPlanId || c.productName) === idKey)) return cur;
-      // ensure baseProduct remains the first item if present
-      const baseKey = baseProduct ? (baseProduct._id || baseProduct.installmentPlanId || baseProduct.productName) : null;
-      let newList = [...cur, p].slice(0, MAX_COMPARE);
-      if (baseKey) {
-        // move base to front
-        newList = [ ...(newList.filter(item => (item._id || item.installmentPlanId || item.productName) === baseKey ? [item] : []).flat() ) , ...newList.filter(item => (item._id || item.installmentPlanId || item.productName) !== baseKey) ];
-        // simpler: ensure base is first by reordering:
-        newList = newList.sort((a,b) => (a._id === baseKey || a.installmentPlanId === baseKey ? -1 : 0));
+      const ids = new Set(cur.map(getId));
+      const id = getId(p);
+      if (ids.has(id)) return cur; // already present
+      // if base exists, keep it first
+      const baseId = getId(baseProduct);
+      const newList = [...cur, p].filter(Boolean);
+      // ensure unique by map
+      const dedup = [];
+      const seen = new Set();
+      for (const item of newList) {
+        const iid = getId(item);
+        if (!seen.has(iid)) {
+          seen.add(iid);
+          dedup.push(item);
+        }
       }
-      return newList.slice(0, MAX_COMPARE);
+      // move base to front if exists
+      if (baseId) {
+        const idx = dedup.findIndex((it) => getId(it) === baseId);
+        if (idx > 0) {
+          const [b] = dedup.splice(idx, 1);
+          dedup.unshift(b);
+        }
+      }
+      return dedup.slice(0, MAX_COMPARE);
     });
   };
 
+  // remove item
   const removeFromCompare = (p) => {
-    const idKey = p._id || p.installmentPlanId || p.productName || p;
-    setCompareList((cur) => cur.filter((c) => (c._id || c.installmentPlanId || c.productName) !== idKey));
-    if (baseProduct && ((baseProduct._id || baseProduct.installmentPlanId) === idKey)) {
+    const id = getId(p);
+    setCompareList((cur) => cur.filter((c) => getId(c) !== id));
+    // if removing base, also clear base
+    if (baseProduct && getId(baseProduct) === id) {
       setBaseProduct(null);
-      navigate("/compare", { replace: true });
+      navigate("/installments", { replace: true });
     }
   };
 
@@ -171,7 +213,7 @@ export default function CompareProducts() {
     navigate("/installments", { replace: true });
   };
 
-  // dynamic rows depending on categories in compareList (same as before)
+  // dynamic rows depending on categories in compareList
   const comparisonRows = useMemo(() => {
     const cats = new Set(compareList.map((p) => (p.category || p.customCategory || "").toString().toLowerCase()));
     const isMobile = [...cats].some((c) => /phone|mobile|smartphone|cell/i.test(c));
@@ -193,13 +235,13 @@ export default function CompareProducts() {
         { key: "performance.processor", label: "Processor" },
         { key: "display.screenSize", label: "Screen" },
         { key: "memory.internalMemory", label: "Storage" },
-        { key: "memory.ram", label: "RAM" },
+        { key: "memory.ram", label: "RAM" }
       );
     }
     if (isAC) {
       rows.push(
         { key: "airConditioner.brand", label: "AC Brand" },
-        { key: "airConditioner.capacityInTon", label: "Capacity" },
+        { key: "airConditioner.capacityInTon", label: "Capacity" }
       );
     }
     if (isBike) {
@@ -211,7 +253,7 @@ export default function CompareProducts() {
     return rows;
   }, [compareList]);
 
-  // helper get nested
+  // helper get nested value
   function getByPath(obj, path) {
     if (!obj) return null;
     if (path === "__paymentPlans") return null;
@@ -233,24 +275,23 @@ export default function CompareProducts() {
       if (!imgs.length) return <span className="text-xs text-gray-400">—</span>;
       return (
         <div className="flex gap-2">
-          {imgs.slice(0,3).map((s,i)=>(
-            <img key={i} src={s} alt="" className="w-16 h-12 object-cover rounded cursor-pointer" onClick={()=>setImgPreview(s)} />
+          {imgs.slice(0, 3).map((s, i) => (
+            <img key={i} src={s} alt="" className="w-16 h-12 object-cover rounded cursor-pointer" onClick={() => setImgPreview(s)} />
           ))}
         </div>
       );
     }
-    if (["price","downpayment","installment"].includes(key)) {
+    if (["price", "downpayment", "installment"].includes(key)) {
       if (v == null || v === "") return <span className="text-xs text-gray-400">—</span>;
       return <span className="font-semibold">Rs. {Number(v).toLocaleString("en-PK")}</span>;
     }
     if (key === "description") {
-      const txt = typeof v === "string" ? v.replace(/<\/?[^>]+(>|$)/g, "").slice(0,140) : "";
+      const txt = typeof v === "string" ? v.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 140) : "";
       return <div className="text-sm text-gray-700">{txt || <span className="text-xs text-gray-400">—</span>}</div>;
     }
     return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400">—</span>}</div>;
   }
 
-  // only show comparison table if more than 1 item (base + at least one)
   const showComparison = compareList.length > 1;
 
   return (
@@ -282,10 +323,13 @@ export default function CompareProducts() {
               <>
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-800">{baseProduct.productName}</h2>
+                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
+                      {baseProduct.productName}
+                      <span className="px-2 py-0.5 text-xs font-medium rounded bg-[rgba(183,36,42,0.12)] text-[rgb(183,36,42)]">Base</span>
+                    </h2>
                     <div className="text-sm text-gray-500 mt-1">{baseProduct.companyName} • {baseProduct.category} • {baseProduct.city}</div>
                     <div className="mt-4 text-lg text-gray-800 font-semibold">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</div>
-                    <div className="mt-2 text-sm text-gray-600">{(baseProduct.description || "").slice(0,220).replace(/<\/?[^>]+(>|$)/g, "")}</div>
+                    <div className="mt-2 text-sm text-gray-600">{(baseProduct.description || "").slice(0, 220).replace(/<\/?[^>]+(>|$)/g, "")}</div>
                   </div>
 
                   <div className="flex flex-col gap-2">
@@ -337,13 +381,31 @@ export default function CompareProducts() {
           {!loadingSearch && searchResults.length > 0 && (
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {searchResults.map((s) => (
-                <div key={s._id || s.installmentPlanId || s.productName} className="p-3 rounded-lg border bg-white flex gap-3 items-start">
+                <div key={getId(s)} className="p-3 rounded-lg border bg-white flex gap-3 items-start">
                   <img src={(s.productImages && s.productImages[0]) || ""} alt="" className="w-20 h-14 object-cover rounded" />
                   <div className="flex-1">
                     <div className="font-medium text-sm">{s.productName}</div>
                     <div className="text-xs text-gray-500 mt-1">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</div>
                     <div className="mt-3 flex gap-2">
-                      <button onClick={() => { const id = s._id || s.installmentPlanId; if (id) navigate(`/compare/${encodeURIComponent(id)}`); else addToCompare(s); }} className="px-3 py-1 rounded text-xs bg-[rgb(183,36,42)] text-white">Set base</button>
+                      <button
+                        onClick={async () => {
+                          const id = getId(s);
+                          if (id && id.length <= 24 && /^[0-9a-fA-F]+$/.test(id)) {
+                            navigate(`/compare/${encodeURIComponent(id)}`);
+                          } else if (s._id) {
+                            navigate(`/compare/${encodeURIComponent(s._id)}`);
+                          } else if (s.installmentPlanId) {
+                            navigate(`/compare/${encodeURIComponent(s.installmentPlanId)}`);
+                          } else {
+                            // fallback: set as base locally
+                            setBaseProduct(s);
+                          }
+                        }}
+                        className="px-3 py-1 rounded text-xs bg-[rgb(183,36,42)] text-white"
+                      >
+                        Set base
+                      </button>
+
                       <button onClick={() => addToCompare(s)} className="px-3 py-1 rounded text-xs border">Add to Compare</button>
                     </div>
                   </div>
@@ -362,13 +424,13 @@ export default function CompareProducts() {
               <div className="text-sm font-medium text-gray-700 mb-2">Suggested</div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {related.map((r) => (
-                  <div key={r._id || r.installmentPlanId} className="p-2 rounded-lg border bg-white">
+                  <div key={getId(r)} className="p-2 rounded-lg border bg-white">
                     <img src={(r.productImages && r.productImages[0]) || ""} alt="" className="w-full h-28 object-cover rounded" />
                     <div className="mt-2 text-xs font-medium">{r.productName}</div>
                     <div className="text-xs text-gray-500">Rs. {Number(r.price||0).toLocaleString("en-PK")}</div>
                     <div className="mt-2 flex gap-2">
                       <button onClick={() => addToCompare(r)} className="flex-1 text-xs py-1 rounded bg-[rgb(183,36,42)] text-white">Compare</button>
-                      <button onClick={() => navigate(`/compare/${encodeURIComponent(r._id || r.installmentPlanId)}`)} className="flex-1 text-xs py-1 rounded border">Open</button>
+                      <button onClick={() => navigate(`/compare/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1 rounded border">Open</button>
                     </div>
                   </div>
                 ))}
@@ -380,7 +442,7 @@ export default function CompareProducts() {
         {/* compact compare chips */}
         <div className="flex gap-2 flex-wrap items-center">
           {compareList.slice(0, MAX_COMPARE).map((p, idx) => (
-            <div key={p._id || p.installmentPlanId || p.productName} className={`flex items-center gap-2 bg-white px-3 py-1 rounded-full border ${idx===0 ? "ring-2 ring-[rgba(183,36,42,0.12)]" : ""}`}>
+            <div key={getId(p)} className={`flex items-center gap-2 bg-white px-3 py-1 rounded-full border ${idx===0 ? "ring-2 ring-[rgba(183,36,42,0.12)]" : ""}`}>
               <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-8 h-6 object-cover rounded" />
               <div className="text-sm font-medium">{p.productName}</div>
               {idx !== 0 && <button onClick={() => removeFromCompare(p)} className="text-xs px-2 py-0.5 rounded border">Remove</button>}
@@ -398,7 +460,7 @@ export default function CompareProducts() {
                 <tr>
                   <th className="text-left p-3 w-44 text-sm text-gray-600">Feature</th>
                   {compareList.map((p) => (
-                    <th key={p._id || p.installmentPlanId} className="p-3 text-left" style={{ minWidth: 220 }}>
+                    <th key={getId(p)} className="p-3 text-left" style={{ minWidth: 220 }}>
                       <div className="flex items-center gap-3">
                         <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-14 h-11 object-cover rounded" />
                         <div>
@@ -415,11 +477,11 @@ export default function CompareProducts() {
                   <tr key={row.key} className="">
                     <td className="p-3 text-sm font-medium text-gray-700 bg-gray-50 border-r">{row.label}</td>
                     {compareList.map((p) => (
-                      <td key={(p._id || p.installmentPlanId) + row.key} className="p-3 align-top">
+                      <td key={getId(p) + row.key} className="p-3 align-top">
                         {row.key === "__paymentPlans" ? (
                           Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
                             <ul className="text-sm space-y-1">
-                              {p.paymentPlans.map((pl,i)=>(
+                              {p.paymentPlans.map((pl, i) => (
                                 <li key={i}><div className="font-medium text-sm">{pl.planName || `Plan ${i+1}`}</div><div className="text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment||pl.installmentPrice||0).toLocaleString("en-PK")}</div></li>
                               ))}
                             </ul>
@@ -441,9 +503,9 @@ export default function CompareProducts() {
 
       {/* image preview modal */}
       {imgPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={()=>setImgPreview(null)}>
-          <div className="bg-white rounded-lg p-3 max-w-3xl w-full" onClick={(e)=>e.stopPropagation()}>
-            <div className="flex justify-end"><button onClick={()=>setImgPreview(null)} className="px-3 py-1 rounded border">Close</button></div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setImgPreview(null)}>
+          <div className="bg-white rounded-lg p-3 max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-end"><button onClick={() => setImgPreview(null)} className="px-3 py-1 rounded border">Close</button></div>
             <img src={imgPreview} alt="preview" className="w-full h-[60vh] object-contain mt-3" />
           </div>
         </div>

@@ -245,7 +245,7 @@ export default function InstallmentDetail() {
                   Get Now
                 </NavLink>
                 <NavLink className="px-4 py-2 rounded-md border" to={`${(plan._id) ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
-                  /Compare
+                  Compare
                 </NavLink>
                 
               </div>
