@@ -157,10 +157,15 @@ export default function InstallmentDetail() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
-      <div className="max-w-7xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-3">
+      <div className="max-w-8xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
+        <div className=" ">
           {/* left: carousel */}
-          <div className="lg:col-span-1 bg-gray-100">
+          {/* <div className=" bg-gray-100">
+            
+          </div> */}
+
+          {/* right: details */}
+          <div className="lg:col-span-2 p-6 flex flex-col gap-4">
             <div className="relative">
               <img
                 src={images[index]}
@@ -199,10 +204,7 @@ export default function InstallmentDetail() {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* right: details */}
-          <div className="lg:col-span-2 p-6 flex flex-col gap-4">
+            <div>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
@@ -220,6 +222,7 @@ export default function InstallmentDetail() {
                   Down: PKR {Number(plan.downpayment || 0).toLocaleString()}
                 </div>
               </div>
+            </div>
             </div>
 
             {/* video */}
@@ -246,6 +249,9 @@ export default function InstallmentDetail() {
                 </NavLink>
                 <NavLink className="px-4 py-2 rounded-md border" to={`${(plan._id) ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
                   Compare
+                </NavLink>
+                <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
+                  Back
                 </NavLink>
                 
               </div>
@@ -407,10 +413,10 @@ export default function InstallmentDetail() {
             </div>
 
             {/* debug */}
-            <details className="mt-3 text-xs text-gray-400">
+            {/* <details className="mt-3 text-xs text-gray-400">
               <summary className="cursor-pointer">Raw data (debug)</summary>
               <pre className="mt-2 text-xs bg-gray-50 p-2 rounded max-h-40 overflow-auto">{JSON.stringify(plan, null, 2)}</pre>
-            </details>
+            </details> */}
           </div>
         </div>
       </div>
