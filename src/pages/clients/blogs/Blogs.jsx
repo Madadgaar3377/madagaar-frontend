@@ -1,6 +1,7 @@
 // src/pages/BlogsPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import LoadingPage from "../../../compontents/Loader";
 
 const PAGE_SIZE = 6;
 const BRAND = "rgb(183,36,42)";
@@ -103,6 +104,11 @@ export default function BlogsPage() {
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
+  if (loading) {
+    return (
+      <LoadingPage />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">

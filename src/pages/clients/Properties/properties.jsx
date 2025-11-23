@@ -1,6 +1,7 @@
 // src/pages/PropertiesPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import LoadingPage from "../../../compontents/Loader";
 
 const PAGE_SIZE = 6;
 
@@ -62,6 +63,12 @@ export default function PropertiesPage() {
     const start = (page - 1) * PAGE_SIZE;
     return properties.slice(start, start + PAGE_SIZE);
   }, [properties, page]);
+
+  if (loading) {
+    return (
+      <LoadingPage />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

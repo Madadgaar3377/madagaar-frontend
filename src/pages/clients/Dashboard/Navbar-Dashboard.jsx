@@ -70,7 +70,7 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                 {loansOpen && (
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
                     <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">View All</NavLink>
-                    <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Add Loan Plan</NavLink>
+                    <NavLink to="/dashboard/loan/create" className="block px-3 py-2 hover:bg-gray-50">Add Loan Plan</NavLink>
                     <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</NavLink>
                   </div>
                 )}

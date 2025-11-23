@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import LoadingPage from "../../../compontents/Loader";
 
 const PLACEHOLDER = "/placeholder.png";
 const BRAND = "rgb(183,36,42)";
@@ -131,9 +132,7 @@ export default function InstallmentDetail() {
 
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-gray-600">Loading plan details…</div>
-      </div>
+      <LoadingPage />
     );
 
   if (error)

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./compontents/Navbar";
-import TopBar from "./compontents/TopBar";
+// import TopBar from "./compontents/TopBar";
 import Footer from "./compontents/Footer";
 
 // Pages
@@ -23,12 +23,18 @@ import InstallmentApplicationsPage from "./pages/clients/Installment/AllRequest.
 import ManageInstallmentsPage from "./pages/clients/Installment/Update-Status.jsx";
 import CreateInstallmentPlan from "./pages/clients/Installment/Create-Installments.jsx";
 import CompareProducts from "./pages/clients/CompareProduct/CompareProducts.jsx";
+import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
+import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
+import NotFound from "./pages/404Page.jsx";
+import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
+import LoadingPage from "./compontents/Loader.jsx";
+import React from "react";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
   // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/loan") || location.pathname.startsWith("/dashboard/Installments") ;
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*");
 
   return (
     <>
@@ -43,13 +49,22 @@ function LayoutWrapper({ children }) {
 }
 
 function App() {
+  const [loading, setLoading] = React.useState(false);
+
+  if (loading) {
+    return <LoadingPage  />;
+  }
+
   return (
     <Router>
       <LayoutWrapper>
         <Routes>
+          <Route path="*" element={<NotFound />} />
           {/* Public pages */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/loans" element={<LoansPage />} />
+          <Route path="/loans/:id" element={<LoanDetails />} />
 
           {/* account login */}
           <Route path="/account" element={<LoginPage />} />
@@ -80,6 +95,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Loans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/loan/create"
+            element={
+              <ProtectedRoute>
+                <AdminCreateLoan />
               </ProtectedRoute>
             }
           />

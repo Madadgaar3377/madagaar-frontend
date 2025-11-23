@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import { Link } from "react-router-dom";
+import LoadingPage from "../../../compontents/Loader";
 
 /**
  * InstallmentPlans.jsx
@@ -167,7 +168,7 @@ export default function InstallmentPlans() {
 
         {/* content */}
         {loading ? (
-          <div className="py-24 text-center text-gray-500">Loading installment plans...</div>
+          <LoadingPage />
         ) : error ? (
           <div className="py-12 text-center text-red-600">{error}</div>
         ) : filtered.length === 0 ? (

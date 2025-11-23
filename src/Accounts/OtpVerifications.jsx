@@ -49,7 +49,7 @@ export default function OtpVerifyPage() {
       if (data?.user) localStorage.setItem("user", JSON.stringify(data.user));
 
       setMsg({ type: "success", text: "Verified! Redirecting..." });
-      setTimeout(() => navigate("/dashboard"), 700);
+      setTimeout(() => navigate("/"), 700);
     } catch (err) {
       console.error("OTP verify error:", err);
       setMsg({ type: "error", text: "Network error — please try again." });
