@@ -27,6 +27,7 @@ import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
 import NotFound from "./pages/404Page.jsx";
 import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
+import LoanApplicationPage from "./pages/clients/Loans/loanApply.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -60,6 +61,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/loans" element={<LoansPage />} />
           <Route path="/loans/:id" element={<LoanDetails />} />
+          <Route path="/loan/apply/planId/:id" element={<LoanApplicationPage />} />
 
           {/* account login */}
           <Route path="/account" element={<LoginPage />} />

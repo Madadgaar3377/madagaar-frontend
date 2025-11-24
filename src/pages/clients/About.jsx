@@ -15,6 +15,7 @@ export default function AboutPage() {
           <img
             src="/Media/Aboutscreen/about-h4-1.png"
             alt="Madadgaar Services"
+            loading="lazy"
             className="rounded-2xl shadow-lg w-full max-w-md object-cover"
           />
         </div>
@@ -73,6 +74,7 @@ export default function AboutPage() {
             src="/Media/Aboutscreen/about-h4-sm1.png"
             alt="Madadgaar Services"
             className="rounded-2xl shadow-lg w-full max-w-md object-cover"
+            loading="lazy"
           />
         </div>
       </section>

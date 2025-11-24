@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed
 import LoadingPage from "../../../compontents/Loader";
+import OurPartners from "../OverPartener";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 const PDF_ASSET = "/mnt/data/Installment Updates.pdf"; // developer-provided upload path
@@ -50,7 +51,7 @@ export default function LoanDetails() {
 
   const handleApply = () => {
     const planId = plan?._id || plan?.loanPlanId;
-    if (planId) navigate(`/loan/apply?planId=${encodeURIComponent(planId)}`);
+    if (planId) navigate(`/loan/apply/planId/${encodeURIComponent(planId)}`);
     else navigate("/loan/apply");
   };
 
@@ -86,6 +87,7 @@ export default function LoanDetails() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
@@ -212,5 +214,7 @@ export default function LoanDetails() {
         </div>
       </div>
     </div>
+    <OurPartners />
+    </>
   );
 }

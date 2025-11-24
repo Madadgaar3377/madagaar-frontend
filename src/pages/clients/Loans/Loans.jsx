@@ -275,7 +275,7 @@ export default function LoansPage() {
                         className="border-b last:border-b-0 hover:bg-gray-50 transition"
                       >
                         <td className="px-4 py-3 text-gray-700">{(page - 1) * pageSize + idx + 1}</td>
-                        <td className="px-4 py-3 text-gray-700">{String(row._id || row._idStr || "").slice(0, 12)}</td>
+                        <td className="px-4 py-3 text-gray-700">{String(row.loanFormId || row._idStr || "").slice(0, 12)}</td>
                         <td className="px-4 py-3 text-gray-700">{row.name ?? row.fullName ?? "-"}</td>
                         <td className="px-4 py-3 text-gray-700">{row.email ?? "-"}</td>
                         <td className="px-4 py-3 text-gray-700">{row.phone ?? row.number ?? "-"}</td>

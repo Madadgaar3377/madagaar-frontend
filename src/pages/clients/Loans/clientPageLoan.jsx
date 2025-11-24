@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed
 import LoadingPage from "../../../compontents/Loader";
+import OurPartners from "../OverPartener";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
@@ -46,7 +47,7 @@ export default function LoansPage() {
 
   const handleApply = (plan) => {
     const planId = plan._id || plan.loanPlanId;
-    navigate(`/loan/apply?planId=${encodeURIComponent(planId)}`);
+    navigate(`/loan/apply/planId/${encodeURIComponent(planId)}`);
   };
 
   const filtered = loanPlans.filter((p) => {
@@ -263,7 +264,7 @@ export default function LoansPage() {
       </div>
 
       {/* Details Modal */}
-
+        <OurPartners />
     </div>
   );
 }

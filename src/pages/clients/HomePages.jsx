@@ -45,6 +45,7 @@ export default function HomePage() {
             src="/Media/inshero.png"
             alt="Madadgaar Services"
             className="rounded-2xl shadow-lg w-full max-w-md object-cover"
+            loading="lazy"
           />
         </div>
       </section>
