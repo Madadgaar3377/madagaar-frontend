@@ -1,4 +1,3 @@
-// src/pages/LoansPage.jsx
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed
@@ -12,8 +11,12 @@ export default function LoansPage() {
   const [loanPlans, setLoanPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
- 
+
   const [query, setQuery] = useState("");
+
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 9; // show 10 plans per page
 
   useEffect(() => {
     let cancelled = false;
@@ -36,9 +39,12 @@ export default function LoansPage() {
     };
   }, []);
 
- 
+  useEffect(() => {
+    // when query changes, reset back to page 1 so user sees first results
+    setCurrentPage(1);
+  }, [query]);
+
   const handleApply = (plan) => {
-    // Navigate to apply page and pass planId. The apply page should fetch plan or use planId to prefill.
     const planId = plan._id || plan.loanPlanId;
     navigate(`/loan/apply?planId=${encodeURIComponent(planId)}`);
   };
@@ -48,15 +54,28 @@ export default function LoansPage() {
     const q = query.toLowerCase();
     return (
       (p.title || "").toLowerCase().includes(q) ||
+      (p._id || "").toLowerCase().includes(q) ||
       (p.planBy || "").toLowerCase().includes(q) ||
-      (p.loanAmount || "").toLowerCase().includes(q) ||
+      (String(p.loanAmount || "") || "").toLowerCase().includes(q) ||
       (p.loanPlanId || "").toLowerCase().includes(q)
     );
   });
+
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+
+  // clamp currentPage
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages);
+    if (currentPage < 1) setCurrentPage(1);
+  }, [currentPage, totalPages]);
+
+  const startIdx = (currentPage - 1) * pageSize;
+  const endIdx = startIdx + pageSize;
+  const visible = filtered.slice(startIdx, endIdx);
+
   if (loading) {
-    return (
-      <LoadingPage />
-    );
+    return <LoadingPage />;
   }
 
   return (
@@ -106,13 +125,13 @@ export default function LoansPage() {
         {/* Grid */}
         {!loading && !error && (
           <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.length === 0 && (
+            {totalItems === 0 && (
               <div className="col-span-full rounded-lg bg-white border p-6 text-center text-gray-600 shadow-sm">
                 No loan plans found.
               </div>
             )}
 
-            {filtered.map((plan) => (
+            {visible.map((plan) => (
               <article key={plan._id || plan.loanPlanId} className="bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col">
                 {/* image */}
                 <div className="h-44 bg-gray-100 overflow-hidden">
@@ -150,7 +169,6 @@ export default function LoansPage() {
                     <div className="flex gap-2">
                       <NavLink
                         to={`/loans/${plan._id || plan.loanPlanId}`}
-                        
                         className="px-3 py-2 rounded-md border text-sm hover:bg-gray-50"
                       >
                         Details
@@ -169,6 +187,68 @@ export default function LoansPage() {
           </section>
         )}
 
+        {/* Pagination controls */}
+        {!loading && !error && totalItems > 0 && (
+          <div className="flex items-center justify-between gap-4 mt-6">
+            <div className="text-sm text-gray-600">
+              Showing <span className="font-semibold">{Math.min(totalItems, startIdx + 1)}</span> - <span className="font-semibold">{Math.min(totalItems, endIdx)}</span> of <span className="font-semibold">{totalItems}</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md border disabled:opacity-50"
+              >
+                First
+              </button>
+              <button
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded-md border disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {/* page numbers (show up to 5 pages in control) */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                  // center the page buttons around current page if possible
+                  const half = Math.floor(Math.min(5, totalPages) / 2);
+                  let start = Math.max(1, currentPage - half);
+                  const maxStart = Math.max(1, totalPages - (Math.min(5, totalPages) - 1));
+                  if (start > maxStart) start = maxStart;
+                  const page = start + i;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 rounded-md border ${page === currentPage ? "bg-gray-100 font-semibold" : ""}`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md border disabled:opacity-50"
+              >
+                Next
+              </button>
+              <button
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded-md border disabled:opacity-50"
+              >
+                Last
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Footer small CTA */}
         <div className="rounded-2xl bg-white p-6 border shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -183,7 +263,7 @@ export default function LoansPage() {
       </div>
 
       {/* Details Modal */}
-     
+
     </div>
   );
 }

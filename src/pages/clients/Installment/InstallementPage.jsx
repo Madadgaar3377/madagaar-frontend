@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import { Link } from "react-router-dom";
 import LoadingPage from "../../../compontents/Loader";
+import VideoPage from "../youtube/YoutubeVide";
+import OurPartners from "../OverPartener";
 
 /**
  * InstallmentPlans.jsx
@@ -131,6 +133,7 @@ export default function InstallmentPlans() {
   };
 
   return (
+    <>
     <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
       <div className="max-w-7xl mx-auto">
         <header className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -354,5 +357,8 @@ export default function InstallmentPlans() {
         )}
       </div>
     </div>
+          <OurPartners />
+    <VideoPage />
+    </>
   );
 }

@@ -27,8 +27,7 @@ import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
 import NotFound from "./pages/404Page.jsx";
 import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
-import LoadingPage from "./compontents/Loader.jsx";
-import React from "react";
+
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
@@ -49,11 +48,7 @@ function LayoutWrapper({ children }) {
 }
 
 function App() {
-  const [loading, setLoading] = React.useState(false);
-
-  if (loading) {
-    return <LoadingPage  />;
-  }
+  
 
   return (
     <Router>

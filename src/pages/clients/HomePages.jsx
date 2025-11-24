@@ -5,6 +5,7 @@ import SecondCards from "./SecondCards";
 import MobileAppPage from "./MadadghaarAppPage";
 import VideoPage from "./youtube/YoutubeVide";
 import InfoBoxes from "./ChosewhyPAge";
+import OurPartners from "./OverPartener";
 
 export default function HomePage() {
   return (
@@ -52,7 +53,9 @@ export default function HomePage() {
       <SecondCards />
       <MobileAppPage />
       <VideoPage />
+      <OurPartners />
       <InfoBoxes />
+
     </>
   );
 }
