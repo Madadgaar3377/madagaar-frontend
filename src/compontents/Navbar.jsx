@@ -1,16 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
-import {NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 export default function Navbar({
   logoSrc = "/Media/Group%2033.png",
-  services = ["Insurance", "Properties", "Loans", "installments"],
+  services = ["Insurance", "Properties", "Loans", "Installments"],
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false); // Desktop dropdown
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile collapsible
   const servicesRef = useRef(null);
+  const closeTimeout = useRef(null);
 
-  // Close desktop dropdown when clicking outside
+  // Close desktop dropdown when clicking outside (still useful for clicks)
   useEffect(() => {
     function handleClick(e) {
       if (servicesRef.current && !servicesRef.current.contains(e.target)) {
@@ -20,6 +21,35 @@ export default function Navbar({
     document.addEventListener("click", handleClick);
     return () => document.removeEventListener("click", handleClick);
   }, []);
+
+  // Close menus on Escape
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setMobileOpen(false);
+        setServicesOpen(false);
+        setMobileServicesOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  // Handlers that debounce the closing to prevent flicker when moving between button and dropdown
+  const handleServicesEnter = () => {
+    if (closeTimeout.current) {
+      clearTimeout(closeTimeout.current);
+      closeTimeout.current = null;
+    }
+    setServicesOpen(true);
+  };
+  const handleServicesLeave = () => {
+    // small delay so moving cursor from button -> dropdown doesn't close it
+    closeTimeout.current = setTimeout(() => {
+      setServicesOpen(false);
+      closeTimeout.current = null;
+    }, 150); // 150ms works well; tweak if you want it slower/faster
+  };
 
   return (
     <header className="w-full bg-white shadow-sm z-50">
@@ -42,10 +72,13 @@ export default function Navbar({
             <div
               className="relative"
               ref={servicesRef}
-              onMouseEnter={() => setServicesOpen(true)}
-              onMouseLeave={() => setServicesOpen(false)}
+              onMouseEnter={handleServicesEnter}
+              onMouseLeave={handleServicesLeave}
             >
               <button
+                type="button"
+                aria-expanded={servicesOpen}
+                aria-controls="services-dropdown"
                 className="flex items-center gap-2 text-gray-700 hover:text-gray-900 focus:outline-none"
               >
                 Services
@@ -64,15 +97,20 @@ export default function Navbar({
 
               {/* Dropdown */}
               <div
-                className={`absolute left-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-20 transition-all duration-300 transform ${
+                id="services-dropdown"
+                className={`absolute left-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-20 transition-all duration-200 transform ${
                   servicesOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                 }`}
+                // also keep mouse enter/leave on dropdown itself to avoid accidental close
+                onMouseEnter={handleServicesEnter}
+                onMouseLeave={handleServicesLeave}
               >
                 {services.map((s) => (
                   <NavLink
                     key={s}
                     to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
                     className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                    onClick={() => setServicesOpen(false)}
                   >
                     {s}
                   </NavLink>
@@ -99,31 +137,45 @@ export default function Navbar({
             </NavLink>
 
             <button
-              onClick={() => setMobileOpen(true)}
+              type="button"
+              onClick={() => setMobileOpen((prev) => !prev)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
               className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                {mobileOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                )}
               </svg>
             </button>
           </div>
         </div>
       </nav>
 
+      {/* Mobile sidebar overlay */}
+      <div
+        onClick={() => setMobileOpen(false)}
+        className={`fixed inset-0 z-40 transition-opacity duration-200 ${mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"} bg-black/30`}
+      />
+
       {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-40 transition-opacity duration-200 ${mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"} bg-black/30`} />
       <aside
         className={`fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
+        aria-hidden={!mobileOpen}
       >
         <div className="flex items-center justify-between px-4 py-4 border-b">
-          <NavLink to="/" className="flex items-center gap-3">
+          <NavLink to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
             <img src={logoSrc} alt="logo" className="h-10 rounded-md object-cover" />
           </NavLink>
           <button
+            type="button"
             onClick={() => setMobileOpen(false)}
             className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+            aria-label="Close menu"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -132,15 +184,17 @@ export default function Navbar({
         </div>
 
         <nav className="px-4 py-4 overflow-auto h-[calc(100%-80px)]">
-          <NavLink to="/" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          <NavLink to="/" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             Home
           </NavLink>
 
           {/* Mobile Services collapsible */}
           <div className="mt-2 border-t pt-3">
             <button
+              type="button"
               onClick={() => setMobileServicesOpen((s) => !s)}
               className="w-full flex items-center justify-between px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none"
+              aria-expanded={mobileServicesOpen}
             >
               <span className="font-medium">Services</span>
               <svg className={`w-4 h-4 transform transition-transform duration-300 ${mobileServicesOpen ? "rotate-180" : "rotate-0"}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -154,7 +208,10 @@ export default function Navbar({
                   key={s}
                   to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
                   className="block px-4 py-2 text-gray-700 rounded-md hover:bg-gray-50"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setMobileServicesOpen(false);
+                  }}
                 >
                   {s}
                 </NavLink>
@@ -162,10 +219,10 @@ export default function Navbar({
             </div>
           </div>
 
-          <NavLink to="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          <NavLink to="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             About Us
           </NavLink>
-          <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50">
+          <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             Blog
           </NavLink>
 
