@@ -30,6 +30,7 @@ import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
 import LoanApplicationPage from "./pages/clients/Loans/loanApply.jsx";
 import AdminLoanForms from "./pages/clients/Loans/DeleteLoanPlan.jsx";
 import InsuranceInfo from "./pages/clients/Insurance/insurance";
+import InsuranceApply from "./pages/clients/Insurance/apply-insurance.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -78,6 +79,7 @@ function App() {
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
           <Route path="/insurance" element={<InsuranceInfo />} />
+          <Route path="/apply-insurance" element={<InsuranceApply />} />
 
           {/* PropertiesPage */}
           <Route path="/properties" element={<PropertiesPage />} />

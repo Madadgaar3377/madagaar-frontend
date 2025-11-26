@@ -13,7 +13,7 @@ export default function InsuranceInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50  ">
       {/* top banner */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -44,9 +44,7 @@ export default function InsuranceInfo() {
               Secure your future with the right coverage
             </h2>
             <p className="text-sm md:text-base text-gray-600 mt-3">
-              Unexpected events can happen anytime. Our partner insurance plans
-              help you safeguard your family, income, and valuable assets
-              through easy monthly contributions and flexible coverage options.
+              We are offers reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease. With a focus on transparency and customer satisfaction, we are your go-to resource for resolving insurance complaints in Pakistan.
             </p>
 
             <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -89,13 +87,18 @@ export default function InsuranceInfo() {
           <div className="w-full md:w-72 flex-shrink-0">
             <div className="h-52 md:h-60 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 flex items-center justify-center">
               <div className="text-center px-4">
-                <div className="text-sm font-semibold text-gray-700">
-                  Peace of Mind
-                </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  Visual placeholder – you can replace this with a real banner or
-                  illustration for your brand.
-                </div>
+                <div className="h-52 md:h-60 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 flex items-center justify-center">
+  <img
+    src="Media/ins%20Frame.png"
+    alt="Insurance illustration"
+    className="
+      max-h-full
+      max-w-full
+      object-contain
+    "
+  />
+</div>
+
               </div>
             </div>
           </div>
