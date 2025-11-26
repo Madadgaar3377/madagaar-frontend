@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import { logout, getUser } from "../../../utils/auth";
-import { NavLink } from "react-router-dom";
 
 export default function NavbarDashboard({ onToggleSidebar }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -11,9 +11,49 @@ export default function NavbarDashboard({ onToggleSidebar }) {
   const [mobPropertiesOpen, setMobPropertiesOpen] = useState(false);
   const [mobLoansOpen, setMobLoansOpen] = useState(false);
 
+  const location = useLocation();
+  const navRef = useRef(null);
+
   useEffect(() => {
     setUser(getUser());
   }, []);
+
+  // Close dropdowns on route change
+  useEffect(() => {
+    setPropertiesOpen(false);
+    setLoansOpen(false);
+    setMoreOpen(false);
+    setMobileOpen(false);
+    setMobPropertiesOpen(false);
+    setMobLoansOpen(false);
+  }, [location.pathname]);
+
+  // click outside & Escape to close
+  useEffect(() => {
+    function onDown(e) {
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setPropertiesOpen(false);
+        setLoansOpen(false);
+        setMoreOpen(false);
+      }
+    }
+    function onKey(e) {
+      if (e.key === "Escape") {
+        setPropertiesOpen(false);
+        setLoansOpen(false);
+        setMoreOpen(false);
+        setMobileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, []);
+
+  const avatarLetter = (user?.name || "U")[0];
 
   return (
     <header className="bg-white border-b shadow-sm">
@@ -21,31 +61,34 @@ export default function NavbarDashboard({ onToggleSidebar }) {
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => { if (onToggleSidebar) onToggleSidebar(); else setMobileOpen((s) => !s); }}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none"
+              onClick={() => {
+                if (onToggleSidebar) onToggleSidebar();
+                else setMobileOpen((s) => !s);
+              }}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500"
               aria-label="Toggle sidebar"
+              aria-expanded={mobileOpen}
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
 
             <a href="/dashboard" className="flex items-center gap-3">
               <img src="/Media/Group%2033.png" alt="logo" className="h-8 w-auto" />
-             
             </a>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-4">
+            <div ref={navRef} className="hidden sm:flex items-center gap-4">
               {/* Inline links with dropdowns on Properties and Loans */}
-              <NavLink to="/dashboard" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Home</NavLink>
-              <NavLink to="/dashboard" className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm">Analytics</NavLink>
+              <NavLink to="/dashboard" className={({isActive})=>`px-3 py-2 rounded-md hover:bg-gray-100 text-sm ${isActive ? "bg-gray-100 font-medium":""}`}>Home</NavLink>
+              <NavLink to="/dashboard" className={({isActive})=>`px-3 py-2 rounded-md hover:bg-gray-100 text-sm ${isActive ? "bg-gray-100 font-medium":""}`}>Analytics</NavLink>
 
               <div className="relative">
                 <button
                   onClick={() => { setPropertiesOpen((s) => !s); setLoansOpen(false); setMoreOpen(false); }}
-                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium"
+                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500"
                   aria-expanded={propertiesOpen}
                 >
                   Properties
@@ -62,7 +105,7 @@ export default function NavbarDashboard({ onToggleSidebar }) {
               <div className="relative">
                 <button
                   onClick={() => { setLoansOpen((s) => !s); setPropertiesOpen(false); setMoreOpen(false); }}
-                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium"
+                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500"
                   aria-expanded={loansOpen}
                 >
                   Loans
@@ -71,14 +114,15 @@ export default function NavbarDashboard({ onToggleSidebar }) {
                   <div className="absolute right-0 mt-2 w-44 bg-white border rounded-md shadow-lg z-40">
                     <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">View All</NavLink>
                     <NavLink to="/dashboard/loan/create" className="block px-3 py-2 hover:bg-gray-50">Add Loan Plan</NavLink>
-                    <NavLink to="/dashboard/loan" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</NavLink>
+                    <NavLink to="/dashboard/loan/update/delete" className="block px-3 py-2 hover:bg-gray-50">Update / Delete</NavLink>
                   </div>
                 )}
               </div>
+
               <div className="relative">
                 <button
                   onClick={() => { setMoreOpen((s) => !s); }}
-                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium"
+                  className="px-3 py-2 rounded-md hover:bg-gray-100 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-sky-500"
                   aria-expanded={moreOpen}
                 >
                   Installments
@@ -110,7 +154,7 @@ export default function NavbarDashboard({ onToggleSidebar }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => logout('/')}
-                className="px-3 py-1.5 bg-red-700 text-white rounded-md text-sm hover:bg-red-800"
+                className="px-3 py-1.5 bg-red-700 text-white rounded-md text-sm hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-600"
               >
                 Logout
               </button>
@@ -154,7 +198,7 @@ export default function NavbarDashboard({ onToggleSidebar }) {
               {mobLoansOpen && (
                 <div className="pl-4 mt-1 flex flex-col gap-1">
                   <a href="/dashboard/loan" className="px-3 py-2 rounded-md hover:bg-gray-50">View All</a>
-                  <a href="/dashboard/loan" className="px-3 py-2 rounded-md hover:bg-gray-50">Add Loan Plan</a>
+                  <a href="/dashboard/loan/create" className="px-3 py-2 rounded-md hover:bg-gray-50">Add Loan Plan</a>
                   <a href="/loans/manage" className="px-3 py-2 rounded-md hover:bg-gray-50">Update / Delete</a>
                 </div>
               )}

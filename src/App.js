@@ -28,6 +28,7 @@ import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
 import NotFound from "./pages/404Page.jsx";
 import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
 import LoanApplicationPage from "./pages/clients/Loans/loanApply.jsx";
+import AdminLoanForms from "./pages/clients/Loans/DeleteLoanPlan.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -92,6 +93,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Loans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/loan/update/delete"
+            element={
+              <ProtectedRoute>
+                <AdminLoanForms />
               </ProtectedRoute>
             }
           />

@@ -16,6 +16,8 @@ import {
 } from "recharts";
 import CountUp from "react-countup";
 import NavbarDashboard from "./Navbar-Dashboard";
+import { getAuthToken } from "../../../utils/auth";
+import { Navigate } from "react-router-dom";
 
 /**
  * DashboardAnalytics.jsx
@@ -32,6 +34,34 @@ export default function DashboardAnalytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // check if user are admin 
+  // useEffect(() => {
+  //   async function checkAdminStatus() {
+  //     try {
+  //       const res = await fetch(`${apiUrl}/users/verify/admin/check`, {
+  //         method: "GET",
+          
+  //         credentials: "include",
+  //          headers: {
+  //                   Authorization: `Bearer ${getAuthToken() || ""}`,
+  //                 },
+  //       });
+  //       const payload = await res.json().catch(() => null);
+  //       if (!res.ok || (payload && payload.success === false)) {
+  //        Navigate()
+  //       } else {
+          
+  //       }
+  //     } catch (err) {
+  //       console.error("Admin check error:", err);
+       
+  //     }
+  //   }
+  //   checkAdminStatus();
+  // }, [apiUrl]);
+
+
 
   useEffect(() => {
     let mounted = true;
