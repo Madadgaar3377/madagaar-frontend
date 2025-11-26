@@ -29,6 +29,7 @@ import NotFound from "./pages/404Page.jsx";
 import AdminCreateLoan from "./pages/clients/Loans/CreateLoanPlan.jsx";
 import LoanApplicationPage from "./pages/clients/Loans/loanApply.jsx";
 import AdminLoanForms from "./pages/clients/Loans/DeleteLoanPlan.jsx";
+import InsuranceInfo from "./pages/clients/Insurance/insurance";
 
 
 function LayoutWrapper({ children }) {
@@ -76,6 +77,7 @@ function App() {
           <Route path="installment/get-now/:id" element={<InstallmentApplicationForm />} />
           {/* blogs */}
           <Route path="/blog" element={<BlogsPage />} />
+          <Route path="/insurance" element={<InsuranceInfo />} />
 
           {/* PropertiesPage */}
           <Route path="/properties" element={<PropertiesPage />} />
