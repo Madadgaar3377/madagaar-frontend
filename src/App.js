@@ -33,6 +33,7 @@ import InsuranceInfo from "./pages/clients/Insurance/insurance";
 import InsuranceApply from "./pages/clients/Insurance/apply-insurance.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
+import InsuranceRequests from "./pages/clients/Insurance/getAllRequest.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -117,6 +118,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AdminCreateLoan />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="dashboard/insurance/get-quote"
+            element={
+              <ProtectedRoute>
+                <InsuranceRequests />
               </ProtectedRoute>
             }
           />

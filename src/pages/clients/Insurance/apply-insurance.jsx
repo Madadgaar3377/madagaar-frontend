@@ -209,8 +209,9 @@ export default function InsuranceApply() {
         console.error("getAuthToken threw:", err);
       }
       if (!token) {
-        setError("Missing auth token — please log in.");
-        addToast("Missing auth token — please log in.", "error");
+        setError("Missing  — please log in.");
+        addToast("Missing  — please log in.", "error");
+        // Navigate("/account");
         return;
       }
     }
