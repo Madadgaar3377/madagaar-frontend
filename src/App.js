@@ -31,6 +31,8 @@ import LoanApplicationPage from "./pages/clients/Loans/loanApply.jsx";
 import AdminLoanForms from "./pages/clients/Loans/DeleteLoanPlan.jsx";
 import InsuranceInfo from "./pages/clients/Insurance/insurance";
 import InsuranceApply from "./pages/clients/Insurance/apply-insurance.jsx";
+import ForgotPassword from "./Accounts/forgotpassword.jsx";
+import ResetPassword from "./Accounts/NewPassword.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -70,6 +72,8 @@ function App() {
           <Route path="/account" element={<LoginPage />} />
           <Route path="/account/register" element={<SignupPage />} />
           <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
+          <Route path="/account/forgot" element={<ForgotPassword />} />
+          <Route path="/account/reset" element={<ResetPassword />} />
 
           {/* installement router  */}
           <Route path="/installments" element={<InstallmentPlans />} />

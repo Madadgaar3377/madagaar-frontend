@@ -1,0 +1,152 @@
+import React, { useEffect, useState } from "react";
+import { backendBaseUrl } from "../constants/apiUrl"; // adjust path if needed
+import { useNavigate, useLocation } from "react-router-dom";
+
+const API = (backendBaseUrl || "").replace(/\/$/, "");
+
+// helper to read query params
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
+export default function ResetPassword() {
+  const query = useQuery();
+  const prefillEmail = query.get("email") || "";
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState(prefillEmail);
+  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (prefillEmail) setEmail(prefillEmail);
+  }, [prefillEmail]);
+
+  function validatePassword(p) {
+    return p && p.length >= 8;
+  }
+
+  async function handleReset(e) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!email.trim()) return setError("Please enter your email.");
+    if (!otp.trim()) return setError("Please enter the OTP sent to your email.");
+    if (!validatePassword(password)) return setError("Password must be at least 8 characters.");
+    if (password !== confirm) return setError("Passwords do not match.");
+
+    setLoading(true);
+    try {
+      const res = await fetch(`${API}/auth/resetpassword`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), otp: otp.trim(), password }),
+      });
+
+      const body = await res.json().catch(() => null);
+
+      if (!res.ok) {
+        setError(body?.message || body?.error || "Reset failed. Please check OTP and try again.");
+      } else {
+        setSuccess(body?.message || "Password reset successfully. Redirecting to login...");
+        // optional: redirect to login after a short delay
+        setTimeout(() => navigate("/account"), 1200);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Reset Password</h2>
+        <p className="text-sm text-gray-500 mb-4">
+          Enter the OTP we sent to your email and choose a new password.
+        </p>
+
+        {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
+        {success && <div className="mb-3 text-sm text-green-600">{success}</div>}
+
+        <form onSubmit={handleReset} className="space-y-4">
+          <div>
+            <label className="block text-xs text-gray-600">Email</label>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-gray-600">OTP</label>
+            <input
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              placeholder="Enter OTP"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-gray-600">New Password</label>
+            <input
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              type="password"
+              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              placeholder="At least 8 characters"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs text-gray-600">Confirm Password</label>
+            <input
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              type="password"
+              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              placeholder="Repeat new password"
+              required
+            />
+          </div>
+
+          <div className="flex items-center justify-between gap-2">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-4 py-2 rounded-lg bg-[rgb(183,36,42)] text-white font-medium disabled:opacity-60"
+            >
+              {loading ? "Resetting..." : "Reset Password"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate("/account")}
+              className="px-4 py-2 rounded-lg border text-sm text-gray-700"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+
+        <div className="text-xs text-gray-400 mt-4">
+          If your OTP expired, go back to Forgot Password and request a new one.
+        </div>
+      </div>
+    </div>
+  );
+}

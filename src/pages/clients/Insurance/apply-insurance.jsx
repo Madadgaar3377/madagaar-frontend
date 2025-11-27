@@ -103,13 +103,15 @@ export default function InsuranceApply() {
       if (typeof getAuthToken === "function") {
         const token = getAuthToken();
         if (!token) {
-          addToast("User not Found , please Sigin or Signup — requests will be unauthenticated.", "warning", 5000);
+          addToast("User not Found , please Sigin or Signup" , 5000);
+          Navigate("/insurance");
         }
       }
     } catch (e) {
       // If getAuthToken throws, warn as well
-      addToast("Auth check failed (getAuthToken threw). Requests may be unauthenticated.", "warning", 5000);
-      console.error(e);
+    //   addToast("Auth check failed (getAuthToken threw). Requests may be unauthenticated.", "warning", 5000);
+      console.error(e.message
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

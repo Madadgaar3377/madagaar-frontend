@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { isAuthenticated } from "../utils/auth";
+import { NavLink } from "react-router-dom";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -167,7 +168,7 @@ export default function LoginPage() {
               <span className="text-gray-600">Remember me</span>
             </label>
 
-            <a href="/forgot-password" className="text-sm text-[rgb(183,36,42)] hover:underline">Forgot?</a>
+            <NavLink to="/account/forgot" className="text-sm text-[rgb(183,36,42)] hover:underline">Forgot?</NavLink>
           </div>
 
           <button
