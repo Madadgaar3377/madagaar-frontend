@@ -34,13 +34,14 @@ import InsuranceApply from "./pages/clients/Insurance/apply-insurance.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
 import InsuranceRequests from "./pages/clients/Insurance/getAllRequest.jsx";
+import ProfilePage from "./pages/clients/ClientDashboard/Profile-panel.jsx";
 
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
   // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*");
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*")||location.pathname.startsWith("/client/dashboard/profile")||location.pathname.startsWith("/client/*");
 
   return (
     <>
@@ -88,7 +89,21 @@ function App() {
 
           {/* PropertiesPage */}
           <Route path="/properties" element={<PropertiesPage />} />
+
+
+          {/* user panel routes */}
+
+          <Route
+            path="/client/dashboard/profile"
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
           {/* dashboard protected */}
+
+
           <Route
             path="/dashboard"
             element={
