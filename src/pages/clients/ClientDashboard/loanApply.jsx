@@ -1,10 +1,10 @@
 // src/pages/client/UserLoanRequests.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { getAuthToken, getUser } from "../../../utils/auth"; // adjust path
-import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path
+import { getAuthToken, getUser } from "../../../utils/auth"; 
+import { backendBaseUrl } from "../../../constants/apiUrl"; 
 import { useNavigate } from "react-router-dom";
 import ClientNavbar from "./ClientNavbar";
-import LoadingPage from "../../../compontents/Loader"; // keep your original path if correct
+import LoadingPage from "../../../compontents/Loader";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 const ENDPOINT = `${API}/loanForm/user/request-loan`;
@@ -20,25 +20,19 @@ export default function UserLoanRequests() {
   const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
-  const [selected, setSelected] = useState(null); // detail
+  const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
   const [selectedRows, setSelectedRows] = useState(() => new Set());
 
-  // helper to safely parse text to json (keeps previous behavior)
   function safeJson(res) {
     return res
       .text()
       .then((t) => {
-        try {
-          return JSON.parse(t);
-        } catch {
-          return null;
-        }
+        try { return JSON.parse(t); } catch { return null; }
       })
       .catch(() => null);
   }
 
-  // Fetch loans — simplified to POST { email } (backend expects body.email)
   async function fetchLoans() {
     if (!userEmail) {
       setError("User not found. Please login.");
@@ -62,15 +56,12 @@ export default function UserLoanRequests() {
       const body = await safeJson(res);
 
       if (!res.ok) {
-        // if server returned non-2xx, try to show message from body if available
-        const msg = (body && (body.message || (body.error && body.error.message))) || `Server returned ${res.status}`;
-        console.error("fetchLoans server error:", msg);
+        const msg = (body && (body.message || (body.error?.message))) || `Server returned ${res.status}`;
         setError(msg);
         setItems([]);
       } else {
-        // success — backend returns { success: true, data: [...] } per your example
-        const list = (body && (Array.isArray(body.data) ? body.data : Array.isArray(body) ? body : (body.data || []))) || [];
-        setItems(Array.isArray(list) ? list : []);
+        const list = (body?.data?.length ? body.data : Array.isArray(body) ? body : (body.data || [])) || [];
+        setItems(list);
       }
     } catch (err) {
       console.error("fetchLoans error", err);
@@ -82,7 +73,6 @@ export default function UserLoanRequests() {
   }
 
   useEffect(() => {
-    // redirect if not logged in
     if (!userEmail) {
       navigate("/account");
       return;
@@ -91,7 +81,6 @@ export default function UserLoanRequests() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userEmail]);
 
-  // pagination + search
   const paginated = useMemo(() => {
     const filtered = items.filter((it) => {
       if (!search.trim()) return true;
@@ -109,13 +98,6 @@ export default function UserLoanRequests() {
       rows: filtered.slice(start, start + limit),
     };
   }, [items, page, limit, search]);
-
-  function openDetail(row) {
-    setSelected(row);
-  }
-  function closeDetail() {
-    setSelected(null);
-  }
 
   function toggleSelect(rowId) {
     setSelectedRows((s) => {
@@ -175,7 +157,6 @@ export default function UserLoanRequests() {
     URL.revokeObjectURL(url);
   }
 
-  // navigate to apply page (example)
   function navigateToApply(row) {
     const id = row._id || row.loanPlanId || row.installmentPlanId;
     if (id) {
@@ -188,17 +169,18 @@ export default function UserLoanRequests() {
   return (
     <>
       <ClientNavbar />
-      <div className="min-h-screen p-6 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <header className="flex items-center justify-between mb-6">
+      <div className="min-h-screen p-4 sm:p-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div>
               <h1 className="text-2xl font-semibold text-gray-800">My Loan Requests</h1>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 mt-1">
                 View status of your loan requests. You can export visible rows to CSV.
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mt-2 sm:mt-0">
               <input
                 type="text"
                 placeholder="Search by title, id or city..."
@@ -207,12 +189,12 @@ export default function UserLoanRequests() {
                   setSearch(e.target.value);
                   setPage(1);
                 }}
-                className="px-3 py-2 border rounded-lg text-sm"
+                className="px-3 py-2 border rounded-lg text-sm w-full sm:w-auto"
               />
               <button
                 onClick={() =>
                   exportCSV(
-                    Array.from(selectedRows).length
+                    selectedRows.size
                       ? items.filter((it) => selectedRows.has(it._id || it.loanFormId || it.loanPlanId))
                       : null
                   )
@@ -221,13 +203,14 @@ export default function UserLoanRequests() {
               >
                 Export CSV
               </button>
-              <button onClick={() => fetchLoans()} className="px-3 py-2 border rounded-lg text-sm">
+              <button onClick={fetchLoans} className="px-3 py-2 border rounded-lg text-sm">
                 Refresh
               </button>
             </div>
-          </header>
+          </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border overflow-hidden">
+          {/* Table */}
+          <div className="bg-white rounded-2xl shadow-sm border overflow-x-auto">
             {loading ? (
               <LoadingPage />
             ) : error ? (
@@ -236,92 +219,92 @@ export default function UserLoanRequests() {
               <div className="p-6 text-center text-gray-500">You have no loan requests yet.</div>
             ) : (
               <>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-3 text-left">
+                <table className="min-w-full text-sm divide-y divide-gray-200">
+                  <thead className="bg-gray-50 sticky top-0 z-10">
+                    <tr>
+                      <th className="px-3 py-2 text-left">
+                        <input
+                          type="checkbox"
+                          checked={paginated.rows.every((r) => selectedRows.has(r._id || r.loanPlanId || r.loanFormId))}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setSelectedRows((s) => {
+                              const next = new Set(s);
+                              if (checked) paginated.rows.forEach((r) => next.add(r._id || r.loanPlanId || r.loanFormId));
+                              else paginated.rows.forEach((r) => next.delete(r._id || r.loanPlanId || r.loanFormId));
+                              return next;
+                            });
+                          }}
+                        />
+                      </th>
+                      <th className="px-3 py-2 text-left">ID</th>
+                      <th className="px-3 py-2 text-left">Title</th>
+                      <th className="px-3 py-2 text-left hidden md:table-cell">Amount</th>
+                      <th className="px-3 py-2 text-left">Tenure</th>
+                      <th className="px-3 py-2 text-left">Status</th>
+                      <th className="px-3 py-2 text-left hidden lg:table-cell">City</th>
+                      <th className="px-3 py-2 text-left">Created</th>
+                      <th className="px-3 py-2 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {paginated.rows.map((r) => (
+                      <tr key={r._id || r.loanFormId || r.loanPlanId}>
+                        <td className="px-3 py-2">
                           <input
                             type="checkbox"
-                            checked={paginated.rows.every((r) => selectedRows.has(r._id || r.loanPlanId || r.loanFormId))}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
-                              setSelectedRows((s) => {
-                                const next = new Set(s);
-                                if (checked) {
-                                  paginated.rows.forEach((r) => next.add(r._id || r.loanPlanId || r.loanFormId));
-                                } else {
-                                  paginated.rows.forEach((r) => next.delete(r._id || r.loanPlanId || r.loanFormId));
-                                }
-                                return next;
-                              });
-                            }}
+                            checked={selectedRows.has(r._id || r.loanPlanId || r.loanFormId)}
+                            onChange={() => toggleSelect(r._id || r.loanPlanId || r.loanFormId)}
                           />
-                        </th>
-                        <th className="px-4 py-3 text-left">ID</th>
-                        <th className="px-4 py-3 text-left">Title</th>
-                        <th className="px-4 py-3 text-left hidden md:table-cell">Amount</th>
-                        <th className="px-4 py-3 text-left">Tenure</th>
-                        <th className="px-4 py-3 text-left">Status</th>
-                        <th className="px-4 py-3 text-left hidden lg:table-cell">City</th>
-                        <th className="px-4 py-3 text-left">Created</th>
-                        <th className="px-4 py-3 text-right">Actions</th>
+                        </td>
+                        <td className="px-3 py-2 text-gray-700">{r.loanFormId || r.loanPlanId || (r._id || "").slice(0, 8)}</td>
+                        <td className="px-3 py-2 font-medium text-gray-800">{r.title || r.productName || "-"}</td>
+                        <td className="px-3 py-2 hidden md:table-cell">Rs. {Number(r.loanAmount || r.price || 0).toLocaleString("en-PK")}</td>
+                        <td className="px-3 py-2 text-gray-700">{r.tenure || r.tenureCustom || r.installment?.toString() || "-"}</td>
+                        <td className="px-3 py-2">
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
+                              r.status === "approved"
+                                ? "bg-green-100 text-green-800"
+                                : r.status === "rejected"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {r.status || "pending"}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 hidden lg:table-cell">{r.city || "-"}</td>
+                        <td className="px-3 py-2 text-gray-500">{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-PK") : "-"}</td>
+                        <td className="px-3 py-2 text-right">
+                          <div className="flex items-center justify-end gap-2 flex-wrap">
+                            <button onClick={() => setSelected(r)} className="px-2 py-1 border rounded text-sm">View</button>
+                            <button onClick={() => navigateToApply(r)} className="px-2 py-1 bg-[rgb(183,36,42)] text-white rounded text-sm">Apply</button>
+                          </div>
+                        </td>
                       </tr>
-                    </thead>
+                    ))}
+                  </tbody>
+                </table>
 
-                    <tbody>
-                      {paginated.rows.map((r) => (
-                        <tr key={r._id || r.loanFormId || r.loanPlanId} className="border-t">
-                          <td className="px-4 py-3">
-                            <input
-                              type="checkbox"
-                              checked={selectedRows.has(r._id || r.loanPlanId || r.loanFormId)}
-                              onChange={() => toggleSelect(r._id || r.loanPlanId || r.loanFormId)}
-                            />
-                          </td>
-                          <td className="px-4 py-3 text-sm text-gray-700">
-                            {r.loanFormId || r.loanPlanId || (r._id || "").slice(0, 8)}
-                          </td>
-                          <td className="px-4 py-3 text-sm font-medium text-gray-800">{r.title || r.productName || "-"}</td>
-                          <td className="px-4 py-3 hidden md:table-cell">Rs. {Number(r.loanAmount || r.price || 0).toLocaleString("en-PK")}</td>
-                          <td className="px-4 py-3 text-sm text-gray-700">{r.tenure || r.tenureCustom || r.installment?.toString() || "-"}</td>
-                          <td className="px-4 py-3">
-                            <span
-                              className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                                r.status === "approved" ? "bg-green-100 text-green-800" : r.status === "rejected" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
-                              }`}
-                            >
-                              {r.status || "pending"}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 hidden lg:table-cell">{r.city || "-"}</td>
-                          <td className="px-4 py-3 text-sm text-gray-500">{r.createdAt ? new Date(r.createdAt).toLocaleDateString("en-PK") : "-"}</td>
-                          <td className="px-4 py-3 text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <button onClick={() => openDetail(r)} className="px-3 py-1 rounded-md text-sm border">
-                                View
-                              </button>
-                              <button onClick={() => navigateToApply(r)} className="px-3 py-1 rounded-md bg-[rgb(183,36,42)] text-white text-sm">
-                                Apply
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* pagination controls */}
-                <div className="flex items-center justify-between gap-3 px-4 py-3 border-t bg-gray-50">
-                  <div className="text-sm text-gray-600">
-                    Page <strong className="text-gray-800">{page}</strong> of <strong>{paginated.pages}</strong> — <span>{paginated.total} results</span>
+                {/* Pagination */}
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-3 py-2 border-t bg-gray-50 text-sm">
+                  <div>
+                    Page <strong>{page}</strong> of <strong>{paginated.pages}</strong> — {paginated.total} results
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1} className={`px-3 py-1 rounded ${page <= 1 ? "opacity-60 cursor-not-allowed" : "border"}`}>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                      className={`px-3 py-1 rounded ${page <= 1 ? "opacity-60 cursor-not-allowed" : "border"}`}
+                    >
                       Prev
                     </button>
-                    <button onClick={() => setPage((p) => Math.min(paginated.pages, p + 1))} disabled={page >= paginated.pages} className={`px-3 py-1 rounded ${page >= paginated.pages ? "opacity-60 cursor-not-allowed" : "border"}`}>
+                    <button
+                      onClick={() => setPage((p) => Math.min(paginated.pages, p + 1))}
+                      disabled={page >= paginated.pages}
+                      className={`px-3 py-1 rounded ${page >= paginated.pages ? "opacity-60 cursor-not-allowed" : "border"}`}
+                    >
                       Next
                     </button>
                   </div>
@@ -333,19 +316,15 @@ export default function UserLoanRequests() {
 
         {/* Detail Drawer */}
         {selected && (
-          <div className="fixed inset-0 z-50 flex">
-            <div className="flex-1 bg-black/40" onClick={closeDetail} />
-            <div className="w-full max-w-2xl bg-white h-full overflow-y-auto p-6">
-              <div className="flex items-start justify-between mb-4">
+          <div className="fixed inset-0 z-50 flex flex-col sm:flex-row">
+            <div className="flex-1 bg-black/40" onClick={() => setSelected(null)} />
+            <div className="w-full sm:w-96 bg-white h-full overflow-y-auto p-6 shadow-lg">
+              <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
                 <div>
                   <h2 className="text-xl font-semibold">{selected.title || selected.productName || "Loan Request"}</h2>
                   <div className="text-sm text-gray-500">ID: {selected.loanFormId || selected.loanPlanId || selected._id}</div>
                 </div>
-                <div className="flex gap-2">
-                  <button className="px-3 py-1 border rounded" onClick={closeDetail}>
-                    Close
-                  </button>
-                </div>
+                <button className="px-3 py-1 border rounded" onClick={() => setSelected(null)}>Close</button>
               </div>
 
               <div className="space-y-4 text-sm text-gray-700">
