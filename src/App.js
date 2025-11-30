@@ -35,13 +35,15 @@ import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
 import InsuranceRequests from "./pages/clients/Insurance/getAllRequest.jsx";
 import ProfilePage from "./pages/clients/ClientDashboard/Profile-panel.jsx";
+import UserLoanRequests from "./pages/clients/ClientDashboard/loanApply.jsx";
+import MyInsuranceRequests from "./pages/clients/ClientDashboard/insuranceApply.jsx";
 
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
   // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*")||location.pathname.startsWith("/client/dashboard/profile")||location.pathname.startsWith("/client/*");
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*")||location.pathname.startsWith("/client/dashboard")||location.pathname.startsWith("/client/loans")||location.pathname.startsWith("/client/insurance");
 
   return (
     <>
@@ -94,10 +96,26 @@ function App() {
           {/* user panel routes */}
 
           <Route
-            path="/client/dashboard/profile"
+            path="/client/dashboard"
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/client/loans"
+            element={
+              <ProtectedRoute>
+                <UserLoanRequests />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/client/insurance"
+            element={
+              <ProtectedRoute>
+                <MyInsuranceRequests />
               </ProtectedRoute>
             }
           />

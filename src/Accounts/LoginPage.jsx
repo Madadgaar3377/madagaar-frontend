@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { isAuthenticated } from "../utils/auth";
+import { getUser } from "../utils/auth";
 import { NavLink } from "react-router-dom";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
   useEffect(() => {
-    // If the user already has a token, redirect to dashboard
-    if (isAuthenticated()) {
-      window.location.href = "/dashboard";
+    
+    if (getUser()){
+      getUser().userType ==="User" ? window.location.href = "/client/dashboard" : window.location.href = "/dashboard";
     }
   }, []);
   const [email, setEmail] = useState("");
@@ -105,7 +105,13 @@ export default function LoginPage() {
         }
 
       // navigate to dashboard
-      window.location.href = "/dashboard";
+        // check user are admin or clinet 
+        if(data.user.userType ==="User"){
+          window.location.href = "/client/dashboard";
+          return;
+        }else{
+          window.location.href = "/dashboard";
+        }
     } catch (err) {
       console.error("Login error:", err);
       setGeneralError("Network error — please try again.");
