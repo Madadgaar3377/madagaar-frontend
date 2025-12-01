@@ -1,13 +1,11 @@
-// src/pages/dashboard/CreateInstallmentPlan.jsx
-import React, { useState, useRef } from "react";
-import { getAuthToken } from "../../../utils/auth"; // adjust path if needed
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
-import NavbarDashboard from "../Dashboard/Navbar-Dashboard";
+import LoadingPage from "../../../compontents/Loader";
 
-const API_BASE = (backendBaseUrl || "").replace(/\/$/, "");
-const ACCENT = "rgb(183,36,42)";
+const PLACEHOLDER = "/placeholder.png";
+const BRAND = "rgb(183,36,42)";
 
-// categories available for selection. Keys should match your backend's category field names
 const CATEGORIES = [
   { key: "mobile", label: "Mobile / Phone" },
   { key: "airConditioner", label: "Air Conditioner" },
@@ -16,682 +14,481 @@ const CATEGORIES = [
   { key: "other", label: "Other / Generic" },
 ];
 
-export default function CreateInstallmentPlan() {
-  const [form, setForm] = useState({
-    productName: "",
-    city: "",
-    category: "",
-    price: "",
-    downpayment: "",
-    installment: "",
-    tenure: "",
-    customTenure: "",
-    postedBy: "",
-    videoUrl: "",
-    description: "",
-    companyName: "",
-    productImages: [""], // allow multiple URLs
-    // minimal spec fields (mobile default)
-    generalFeatures: { operatingSystem: "", simSupport: "", colors: "" },
-    display: { screenSize: "", screenResolution: "", technology: "" },
-    battery: { type: "" },
-    camera: { frontCamera: "", backCamera: "", features: "" },
-    memory: { internalMemory: "", ram: "", cardSlot: "" },
-    connectivity: { data: "", nfc: "", bluetooth: "" },
-
-    // air conditioner
-    airConditioner: {
-      brand: "",
-      model: "",
-      color: "",
-      capacityInTon: "",
-      type: "",
-      energyEfficient: "",
-      display: "",
-      indoorDimension: "",
-      outdoorDimension: "",
-      indoorWeightKg: "",
-      outdoorWeightKg: "",
-      powerSupply: "",
-      otherFeatures: "",
-      warranty: "",
-    },
-
-    // electrical bike
-    electricalBike: {
-      motorRatedPower: "",
-      battery: "",
-      maxSpeed: "",
-      maxDistanceRange: "",
-      chargingTime: "",
-      rimsTiresFront: "",
-      rimsTiresBack: "",
-      brakes: "",
-      shocks: "",
-      meter: "",
-      maxLoad: "",
-      dryWeight: "",
-      vehicleDimensions: "",
-      features: "",
-      colors: "",
-    },
-
-    // mechanical bike
-    mechanicalBike: {
-      generalFeatures: { dimensions: "", weight: "", engine: "", colors: "", other: "" },
-      performance: { transmission: "", groundClearance: "", starting: "", displacement: "", petrolCapacity: "" },
-      assembly: { compressionRatio: "", boreAndStroke: "", tyreAtFront: "", tyreAtBack: "", seatHeight: "" },
-    },
-
-    // dynamic payment plans
-    paymentPlans: [
-      {
-        planName: "Plan 1",
-        installmentPrice: "",
-        downPayment: "",
-        monthlyInstallment: "",
-        tenureMonths: "",
-        interestRatePercent: "",
-        interestType: "Flat Rate",
-        markup: "",
-        otherChargesNote: "",
-      },
-    ],
-  });
-
-  const [loading, setLoading] = useState(false);
-  const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [errors, setErrors] = useState({});
-
-  // image upload UI state
-  const [uploadingIndex, setUploadingIndex] = useState(null); // index being uploaded or null
-  const [uploadError, setUploadError] = useState("");
-  const fileInputRef = useRef(null);
-
-  // helpers
-  const update = (path, value) => {
-    setForm((f) => {
-      const next = JSON.parse(JSON.stringify(f));
-      const parts = path.split(".");
-      let cur = next;
-      for (let i = 0; i < parts.length - 1; i++) {
-        if (!cur[parts[i]]) cur[parts[i]] = {};
-        cur = cur[parts[i]];
-      }
-      cur[parts[parts.length - 1]] = value;
-      return next;
-    });
-  };
-
-  // payment plans helpers
-  const addPaymentPlan = () => {
-    setForm((f) => ({
-      ...f,
-      paymentPlans: [
-        ...f.paymentPlans,
-        {
-          planName: `Plan ${f.paymentPlans.length + 1}`,
-          installmentPrice: "",
-          downPayment: "",
-          monthlyInstallment: "",
-          tenureMonths: "",
-          interestRatePercent: "",
-          interestType: "Flat Rate",
-          markup: "",
-          otherChargesNote: "",
-        },
-      ],
-    }));
-  };
-
-  const removePaymentPlan = (idx) => {
-    setForm((f) => {
-      const pp = [...f.paymentPlans];
-      pp.splice(idx, 1);
-      return { ...f, paymentPlans: pp };
-    });
-  };
-
-  const handlePaymentPlanChange = (idx, key, value) => {
-    setForm((f) => {
-      const pp = f.paymentPlans.map((p, i) => (i === idx ? { ...p, [key]: value } : p));
-      return { ...f, paymentPlans: pp };
-    });
-  };
-
-  // product image helpers
-  const addImageSlot = () => update("productImages", [...form.productImages, ""]);
-  const updateImage = (i, v) => {
-    const arr = [...form.productImages];
-    arr[i] = v;
-    update("productImages", arr);
-  };
-  const removeImage = (i) => {
-    const arr = [...form.productImages];
-    arr.splice(i, 1);
-    update("productImages", arr);
-  };
-
-  // When user clicks "Upload" for a slot, open file picker and remember index
-  const triggerFilePickerForIndex = (i) => {
-    setUploadError("");
-    setUploadingIndex(i);
-    if (fileInputRef.current) fileInputRef.current.value = null;
-    if (fileInputRef.current) fileInputRef.current.click();
-  };
-
-  // Upload selected file to /image-upload/single (key: image) and store returned url
-  const handleFileSelected = async (e) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-    const file = files[0];
-    const idx = uploadingIndex;
-    if (idx === null) return;
-
-    setUploadError("");
-    // set a temporary "uploading" marker
-    const prevValue = form.productImages[idx];
-    updateImage(idx, "__UPLOADING__");
-
-    try {
-      const token = getAuthToken();
-      const fd = new FormData();
-      fd.append("image", file);
-
-      const res = await fetch(`${API_BASE}/image-upload/single`, {
-        method: "POST",
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: fd,
-      });
-
-      const body = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        const msg = body?.message || `Upload failed: ${res.status}`;
-        setUploadError(msg);
-        updateImage(idx, prevValue);
-      } else {
-        // expected response hint: { success: true, url: "https://...", file: {...} }
-        const url = body?.url || body?.data?.url || body?.file?.url;
-        if (body?.success && typeof body.url === "string") {
-          updateImage(idx, body.url);
-        } else if (url) {
-          updateImage(idx, url);
-        } else {
-          // fallback: try to read body.message or entire body
-          setUploadError("Upload succeeded but server response missing URL");
-          updateImage(idx, prevValue);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-      setUploadError("Network error during image upload");
-      updateImage(idx, prevValue);
-    } finally {
-      setUploadingIndex(null);
-    }
-  };
-
-  // validation
-  function validate() {
-    const e = {};
-    if (!form.productName.trim()) e.productName = "Product name is required";
-    if (!form.price || isNaN(Number(form.price))) e.price = "Valid price required";
-    if (!form.installment || isNaN(Number(form.installment))) e.installment = "Valid installment required";
-    // at least one payment plan with numeric monthlyInstallment
-    if (!Array.isArray(form.paymentPlans) || form.paymentPlans.length === 0) {
-      e.paymentPlans = "Add at least one payment plan";
-    } else {
-      form.paymentPlans.forEach((p, idx) => {
-        if (!p.planName?.trim()) e[`paymentPlans.${idx}.planName`] = "Plan name required";
-        if (!p.monthlyInstallment || isNaN(Number(p.monthlyInstallment)))
-          e[`paymentPlans.${idx}.monthlyInstallment`] = "Monthly installment required";
-      });
-    }
-    setErrors(e);
-    return Object.keys(e).length === 0;
+/* ---------- helpers ---------- */
+function isYouTubeUrl(url = "") {
+  try {
+    return /(youtube\.com\/watch\?v=|youtu\.be\/)/.test(url);
+  } catch {
+    return false;
   }
+}
+function getYouTubeEmbed(url = "") {
+  if (!url) return null;
+  const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+}
+function safe(obj, path, fallback = "-") {
+  try {
+    if (!obj) return fallback;
+    const val = path
+      .split(".")
+      .reduce((s, k) => (s && s[k] !== undefined ? s[k] : null), obj);
+    if (val === null || val === undefined || val === "") return fallback;
+    return val;
+  } catch {
+    return fallback;
+  }
+}
+function isObjectPresent(obj, key) {
+  return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null && !(Array.isArray(obj[key]) && obj[key].length === 0);
+}
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setServerError("");
-    setSuccess("");
-    if (!validate()) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
+function anySpecHasValue(plan, paths = []) {
+  for (const p of paths) {
+    const v = safe(plan, p, "-");
+    if (v !== "-" && v !== null && v !== undefined) return true;
+  }
+  return false;
+}
 
-    try {
+/* ---------- component ---------- */
+export default function InstallmentDetail() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
+
+  const [plan, setPlan] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [index, setIndex] = useState(0);
+
+  // fetch plan
+  useEffect(() => {
+    let mounted = true;
+    async function fetchPlan() {
       setLoading(true);
-      const token = getAuthToken();
-
-      // prepare payload: convert numeric fields
-      const payload = {
-        productName: form.productName,
-        city: form.city,
-        category: form.category,
-        price: Number(form.price) || 0,
-        downpayment: Number(form.downpayment) || 0,
-        installment: Number(form.installment) || 0,
-        tenure: form.tenure,
-        customTenure: form.customTenure,
-        postedBy: form.postedBy,
-        videoUrl: form.videoUrl,
-        description: form.description,
-        companyName: form.companyName,
-        productImages: (form.productImages || []).filter(Boolean).filter((v) => v !== "__UPLOADING__"),
-        // specs (only include non-empty) — keep category-specific block
-        generalFeatures: form.generalFeatures,
-        display: form.display,
-        battery: form.battery,
-        camera: form.camera,
-        memory: form.memory,
-        connectivity: form.connectivity,
-        airConditioner: form.airConditioner,
-        electricalBike: form.electricalBike,
-        mechanicalBike: form.mechanicalBike,
-        // payment plans: convert numeric inside each
-        paymentPlans: (form.paymentPlans || []).map((p) => ({
-          planName: p.planName,
-          installmentPrice: Number(p.installmentPrice) || 0,
-          downPayment: Number(p.downPayment) || 0,
-          monthlyInstallment: Number(p.monthlyInstallment) || 0,
-          tenureMonths: Number(p.tenureMonths) || 0,
-          interestRatePercent: Number(p.interestRatePercent) || 0,
-          interestType: p.interestType || "Flat Rate",
-          markup: Number(p.markup) || 0,
-          otherChargesNote: p.otherChargesNote || "",
-        })),
-      };
-
-      const res = await fetch(`${API_BASE}/installmentplan`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const body = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        setServerError(body?.message || `Failed: ${res.status}`);
-      } else {
-        setSuccess(body?.message || "Installment plan created successfully");
-        // reset form
-        setForm({
-          productName: "",
-          city: "",
-          category: "",
-          price: "",
-          downpayment: "",
-          installment: "",
-          tenure: "",
-          customTenure: "",
-          postedBy: "",
-          videoUrl: "",
-          description: "",
-          companyName: "",
-          productImages: [""],
-          generalFeatures: { operatingSystem: "", simSupport: "", colors: "" },
-          display: { screenSize: "", screenResolution: "", technology: "" },
-          battery: { type: "" },
-          camera: { frontCamera: "", backCamera: "", features: "" },
-          memory: { internalMemory: "", ram: "", cardSlot: "" },
-          connectivity: { data: "", nfc: "", bluetooth: "" },
-          airConditioner: {
-            brand: "",
-            model: "",
-            color: "",
-            capacityInTon: "",
-            type: "",
-            energyEfficient: "",
-            display: "",
-            indoorDimension: "",
-            outdoorDimension: "",
-            indoorWeightKg: "",
-            outdoorWeightKg: "",
-            powerSupply: "",
-            otherFeatures: "",
-            warranty: "",
-          },
-          electricalBike: {
-            motorRatedPower: "",
-            battery: "",
-            maxSpeed: "",
-            maxDistanceRange: "",
-            chargingTime: "",
-            rimsTiresFront: "",
-            rimsTiresBack: "",
-            brakes: "",
-            shocks: "",
-            meter: "",
-            maxLoad: "",
-            dryWeight: "",
-            vehicleDimensions: "",
-            features: "",
-            colors: "",
-          },
-          mechanicalBike: {
-            generalFeatures: { dimensions: "", weight: "", engine: "", colors: "", other: "" },
-            performance: { transmission: "", groundClearance: "", starting: "", displacement: "", petrolCapacity: "" },
-            assembly: { compressionRatio: "", boreAndStroke: "", tyreAtFront: "", tyreAtBack: "", seatHeight: "" },
-          },
-          paymentPlans: [
-            {
-              planName: "Plan 1",
-              installmentPrice: "",
-              downPayment: "",
-              monthlyInstallment: "",
-              tenureMonths: "",
-              interestRatePercent: "",
-              interestType: "Flat Rate",
-              markup: "",
-              otherChargesNote: "",
-            },
-          ],
+      setError("");
+      try {
+        const res = await fetch(`${apiUrl}/installmentplan/get/public/${encodeURIComponent(id)}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
         });
-        setErrors({});
+        const payload = await res.json().catch(() => null);
+        if (!res.ok || (payload && payload.success === false)) {
+          setError(payload?.message || `Failed to load (${res.status})`);
+        } else {
+          let data = payload;
+          if (payload && payload.success !== undefined && payload.data !== undefined) data = payload.data;
+          const planObj = Array.isArray(data) ? data[0] : data;
+          if (mounted) setPlan(planObj || null);
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Network error — could not fetch plan.");
+      } finally {
+        if (mounted) setLoading(false);
       }
-    } catch (err) {
-      console.error(err);
-      setServerError("Network error — could not create plan");
-    } finally {
-      setLoading(false);
     }
-  }
+    fetchPlan();
+    return () => (mounted = false);
+  }, [apiUrl, id]);
 
-  // Renders specification inputs for selected category
-  function renderCategorySpecs(category) {
-    switch (category) {
-      case "airConditioner":
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Field label="Brand"><input value={form.airConditioner.brand} onChange={(e) => update("airConditioner.brand", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Model"><input value={form.airConditioner.model} onChange={(e) => update("airConditioner.model", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Type"><input value={form.airConditioner.type} onChange={(e) => update("airConditioner.type", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Capacity (Ton)"><input value={form.airConditioner.capacityInTon} onChange={(e) => update("airConditioner.capacityInTon", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Energy Efficient"><input value={form.airConditioner.energyEfficient} onChange={(e) => update("airConditioner.energyEfficient", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Warranty"><input value={form.airConditioner.warranty} onChange={(e) => update("airConditioner.warranty", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Other Features"><input value={form.airConditioner.otherFeatures} onChange={(e) => update("airConditioner.otherFeatures", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-          </div>
-        );
+  // images + embed
+  const images = useMemo(() => {
+    if (!plan) return [PLACEHOLDER];
+    return Array.isArray(plan.productImages) && plan.productImages.length ? plan.productImages : [PLACEHOLDER];
+  }, [plan]);
 
-      case "electricalBike":
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Field label="Motor Rated Power"><input value={form.electricalBike.motorRatedPower} onChange={(e) => update("electricalBike.motorRatedPower", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Battery"><input value={form.electricalBike.battery} onChange={(e) => update("electricalBike.battery", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Max Speed"><input value={form.electricalBike.maxSpeed} onChange={(e) => update("electricalBike.maxSpeed", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Max Distance Range"><input value={form.electricalBike.maxDistanceRange} onChange={(e) => update("electricalBike.maxDistanceRange", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Charging Time"><input value={form.electricalBike.chargingTime} onChange={(e) => update("electricalBike.chargingTime", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            <Field label="Features"><input value={form.electricalBike.features} onChange={(e) => update("electricalBike.features", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-          </div>
-        );
+  const embed = useMemo(() => {
+    if (!plan || !plan.videoUrl) return null;
+    return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
+  }, [plan]);
 
-      case "mechanicalBike":
-        return (
-          <div className="space-y-3">
-            <h5 className="text-sm font-medium">General Features</h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Field label="Dimensions"><input value={form.mechanicalBike.generalFeatures.dimensions} onChange={(e) => update("mechanicalBike.generalFeatures.dimensions", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Weight"><input value={form.mechanicalBike.generalFeatures.weight} onChange={(e) => update("mechanicalBike.generalFeatures.weight", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Engine"><input value={form.mechanicalBike.generalFeatures.engine} onChange={(e) => update("mechanicalBike.generalFeatures.engine", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            </div>
+  // determine selected category key (one of CATEGORIES.keys) and detect available groups
+  const detected = useMemo(() => {
+    if (!plan) return {};
+    const catRaw = (plan.category || plan.customCategory || "").toLowerCase();
 
-            <h5 className="text-sm font-medium">Performance</h5>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Field label="Transmission"><input value={form.mechanicalBike.performance.transmission} onChange={(e) => update("mechanicalBike.performance.transmission", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Displacement"><input value={form.mechanicalBike.performance.displacement} onChange={(e) => update("mechanicalBike.performance.displacement", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            </div>
-          </div>
-        );
+    const hasGeneral = isObjectPresent(plan, "generalFeatures") && anySpecHasValue(plan, [
+      "generalFeatures.operatingSystem",
+      "generalFeatures.simSupport",
+      "generalFeatures.phoneDimensions",
+    ]);
+    const hasPerformance = isObjectPresent(plan, "performance") && anySpecHasValue(plan, ["performance.processor", "performance.gpu"]);
+    const hasDisplay = isObjectPresent(plan, "display") && anySpecHasValue(plan, ["display.screenSize", "display.screenResolution"]);
+    const hasBattery = isObjectPresent(plan, "battery") && anySpecHasValue(plan, ["battery.type"]);
+    const hasCamera = isObjectPresent(plan, "camera") && anySpecHasValue(plan, ["camera.frontCamera", "camera.backCamera"]);
+    const hasMemory = isObjectPresent(plan, "memory") && anySpecHasValue(plan, ["memory.internalMemory", "memory.ram"]);
+    const hasConnectivity = isObjectPresent(plan, "connectivity") && anySpecHasValue(plan, ["connectivity.data", "connectivity.bluetooth"]);
+    const hasAC = isObjectPresent(plan, "airConditioner") && anySpecHasValue(plan, ["airConditioner.brand", "airConditioner.model", "airConditioner.capacityInTon"]);
+    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, ["electricalBike.motorRatedPower", "electricalBike.battery"]);
+    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, ["mechanicalBike.generalFeatures.engine", "mechanicalBike.performance.transmission"]);
 
-      case "mobile":
-        return (
-          <div>
-            <h5 className="text-sm font-medium">Mobile / Phone Specs</h5>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Field label="OS"><input value={form.generalFeatures.operatingSystem} onChange={(e) => update("generalFeatures.operatingSystem", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="SIM"><input value={form.generalFeatures.simSupport} onChange={(e) => update("generalFeatures.simSupport", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Colors"><input value={form.generalFeatures.colors} onChange={(e) => update("generalFeatures.colors", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
+    // heuristics by category text
+    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(catRaw) || hasGeneral || hasDisplay || hasBattery || hasCamera || hasMemory;
+    const isACCat = /air|ac|air conditioner|split|cooler/.test(catRaw) || hasAC;
+    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(catRaw) || hasElectricalBike || hasMechanicalBike;
+    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(catRaw) || hasDisplay;
 
-              <Field label="Screen Size"><input value={form.display.screenSize} onChange={(e) => update("display.screenSize", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Resolution"><input value={form.display.screenResolution} onChange={(e) => update("display.screenResolution", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Technology"><input value={form.display.technology} onChange={(e) => update("display.technology", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
+    // map to our category keys (prefer explicit fields presence over text)
+    let selected = "other";
+    if (isMobileCat) selected = "mobile";
+    else if (isACCat) selected = "airConditioner";
+    else if (hasElectricalBike) selected = "electricalBike";
+    else if (hasMechanicalBike) selected = "mechanicalBike";
 
-              <Field label="Battery"><input value={form.battery.type} onChange={(e) => update("battery.type", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Camera Front"><input value={form.camera.frontCamera} onChange={(e) => update("camera.frontCamera", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Camera Back"><input value={form.camera.backCamera} onChange={(e) => update("camera.backCamera", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
+    return {
+      hasGeneral,
+      hasPerformance,
+      hasDisplay,
+      hasBattery,
+      hasCamera,
+      hasMemory,
+      hasConnectivity,
+      hasAC,
+      hasElectricalBike,
+      hasMechanicalBike,
+      isMobileCat,
+      isTvCat,
+      isACCat,
+      isBikeCat,
+      category: catRaw,
+      selectedCategoryKey: selected,
+    };
+  }, [plan]);
 
-              <Field label="Internal Memory"><input value={form.memory.internalMemory} onChange={(e) => update("memory.internalMemory", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="RAM"><input value={form.memory.ram} onChange={(e) => update("memory.ram", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Card Slot"><input value={form.memory.cardSlot} onChange={(e) => update("memory.cardSlot", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            </div>
+  if (loading) return <LoadingPage />;
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
-              <Field label="Connectivity - Data"><input value={form.connectivity.data} onChange={(e) => update("connectivity.data", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-              <Field label="Connectivity - Bluetooth"><input value={form.connectivity.bluetooth} onChange={(e) => update("connectivity.bluetooth", e.target.value)} className="w-full px-3 py-2 border rounded" /></Field>
-            </div>
-          </div>
-        );
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
 
-      default:
-        return (
-          <div className="text-sm text-gray-500">Select a category above to expose category-specific specification fields.</div>
-        );
-    }
-  }
+  if (!plan)
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-gray-600">
+          Plan not found.
+          <button onClick={() => navigate(-1)} className="ml-2 text-[rgb(183,36,42)] underline">
+            Go back
+          </button>
+        </div>
+      </div>
+    );
+
+  // helper: should we render a spec block? only when the detected category matches that block (or selected is 'other')
+  const shouldShowBlock = (blockKey, hasFlag = false) => {
+    if (!detected) return false;
+    if (!hasFlag) return detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other";
+    return (detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other") && hasFlag;
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <NavbarDashboard />
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-sm p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Create Installment Plan</h2>
-        <p className="text-sm text-gray-500 mb-4">Create a new product and its payment plans. Fields marked required will be validated.</p>
-
-        {serverError && <div className="mb-3 text-sm text-red-600">{serverError}</div>}
-        {success && <div className="mb-3 text-sm text-green-700">{success}</div>}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* product basics */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Field label="Product Name" required error={errors.productName}>
-              <input value={form.productName} onChange={(e) => update("productName", e.target.value)} className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Category">
-              <select value={form.category} onChange={(e) => update("category", e.target.value)} className="w-full px-3 py-2 border rounded">
-                <option value="">-- Select category --</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>{c.label}</option>
-                ))}
-              </select>
-            </Field>
-
-            <Field label="City">
-              <input value={form.city} onChange={(e) => update("city", e.target.value)} className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Company">
-              <input value={form.companyName} onChange={(e) => update("companyName", e.target.value)} className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Price (PKR)" required error={errors.price}>
-              <input value={form.price} onChange={(e) => update("price", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Downpayment (PKR)">
-              <input value={form.downpayment} onChange={(e) => update("downpayment", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Installment (monthly) (PKR)" required error={errors.installment}>
-              <input value={form.installment} onChange={(e) => update("installment", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-            </Field>
-
-            <Field label="Tenure / Label">
-              <input value={form.tenure} onChange={(e) => update("tenure", e.target.value)} className="w-full px-3 py-2 border rounded" />
-            </Field>
+    <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
+      <div className="max-w-8xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
+        <div className="p-6 flex flex-col gap-4">
+          {/* carousel */}
+          <div className="relative">
+            <img
+              src={images[index]}
+              onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+              alt={plan.productName}
+              className="w-full h-80 object-contain bg-white"
+            />
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => setIndex((i) => (i + 1) % images.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              </>
+            )}
           </div>
 
-          {/* category-specific specs */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Category Specifications</h4>
-            <div className="mb-3 text-sm text-gray-600">Selected: {form.category || "None"}</div>
-            <div className="bg-gray-50 p-4 rounded border">{renderCategorySpecs(form.category)}</div>
+          <div className="p-3 flex gap-2 overflow-auto">
+            {images.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={`p-0 rounded overflow-hidden border ${i === index ? "ring-2 ring-[rgb(183,36,42)]" : "opacity-80"}`}>
+                <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-16 w-24 object-cover" />
+              </button>
+            ))}
           </div>
 
-          {/* images (with direct upload) */}
-          <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Product Images (URLs) — upload files directly</h4>
-            <div className="space-y-2">
-              {form.productImages.map((img, i) => (
-                <div key={i} className="flex gap-3 items-center">
-                  <div className="w-24 h-16 border rounded overflow-hidden flex items-center justify-center bg-white">
-                    {img === "" && <span className="text-xs text-gray-400">No image</span>}
-                    {img === "__UPLOADING__" && <span className="text-xs text-gray-500">Uploading...</span>}
-                    {img && img !== "__UPLOADING__" && (
-                      <img src={img} alt={`img-${i}`} className="w-full h-full object-cover" />
-                    )}
-                  </div>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
+              <div className="text-sm text-gray-500 mt-1">{plan.companyName || plan.companyNameOther || plan.category}</div>
+            </div>
 
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileSelected}
-                  />
+            <div className="text-right">
+              <div className="text-sm text-gray-500">Price</div>
+              <div className="text-xl font-bold" style={{ color: BRAND }}>PKR {Number(plan.price || 0).toLocaleString()}</div>
+              <div className="text-xs text-gray-500 mt-1">Down: PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
+            </div>
+          </div>
 
-                  <div className="flex-1">
-                    <input value={img} onChange={(e) => updateImage(i, e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="https://... or upload file" />
-                    <div className="flex gap-2 mt-2">
-                      <button type="button" onClick={() => triggerFilePickerForIndex(i)} className="px-3 py-1 rounded border text-sm">Upload File</button>
-                      <button type="button" onClick={() => removeImage(i)} className="px-3 py-1 rounded border text-sm">Remove</button>
-                      <button type="button" onClick={() => updateImage(i, "")} className="px-3 py-1 rounded border text-sm">Clear URL</button>
+          {/* video */}
+          {embed && (
+            <div className="rounded-md overflow-hidden border">
+              {isYouTubeUrl(plan.videoUrl) ? (
+                <iframe
+                  title="product-video"
+                  src={embed}
+                  className="w-full h-64"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video controls src={plan.videoUrl} className="w-full h-64 object-contain bg-black" />
+              )}
+            </div>
+          )}
+
+          <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
+            <div className="flex items-center gap-3">
+              <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
+                Get Now
+              </NavLink>
+              <NavLink className="px-4 py-2 rounded-md border" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
+                Compare
+              </NavLink>
+              <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
+                Back
+              </NavLink>
+            </div>
+          </div>
+
+          {/* description */}
+          <div className="prose max-w-none text-gray-700">
+            <h3 className="text-lg font-semibold">Description</h3>
+            <p className="whitespace-pre-line">{plan.description || plan.productName || "No description"}</p>
+          </div>
+
+          {/* payment plans */}
+          {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
+            <section className="mt-4">
+              <h3 className="text-lg font-semibold">Available Payment Plans</h3>
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {plan.paymentPlans.map((p, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 bg-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-gray-500">{p.planName || `Plan ${idx + 1}`}</div>
+                        <div className="text-xl font-bold">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm">Tenure: {p.tenureMonths ? `${p.tenureMonths} months` : (p.customTenureLabel || plan.tenure || "—")}</div>
+                        <div className="text-sm">Monthly: PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</div>
+                      </div>
                     </div>
-                    {uploadingIndex === i && <div className="text-xs text-gray-500 mt-1">Uploading image...</div>}
+                    <div className="mt-2 text-sm text-gray-600">Interest: {p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"} {p.markup ? `(markup: ${p.markup})` : ""}</div>
+                    {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
+                      <details className="mt-2 text-sm">
+                        <summary className="cursor-pointer">Show schedule</summary>
+                        <div className="mt-2 text-xs max-h-40 overflow-auto">
+                          {p.installmentSchedule.map((it, i) => (
+                            <div key={i} className="flex justify-between py-1 border-b">
+                              <div>#{i + 1}</div>
+                              <div>{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</div>
+                              <div>PKR {Number(it.amount || 0).toLocaleString()}</div>
+                              <div>{it.paid ? "Paid" : "Unpaid"}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                    {p.otherChargesNote && <div className="mt-2 text-xs text-gray-500">Note: {p.otherChargesNote}</div>}
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </section>
+          )}
 
-              <div className="flex gap-2">
-                <button type="button" onClick={addImageSlot} className="mt-2 inline-flex items-center gap-2 px-3 py-2 rounded border text-sm">+ Add Image Slot</button>
-                <div className="text-sm text-red-600 mt-3">{uploadError}</div>
+          {/* ---------- dynamic specifications ---------- */}
+          <section className="mt-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Specifications</h3>
+              <div className="text-sm text-gray-500">Auto-selected based on product data</div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Generic / general features (show only for mobile or other) */}
+              {shouldShowBlock("mobile", detected.hasGeneral) && (
+                <SpecCard title="General">
+                  <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
+                  <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
+                  <SpecRow label="Dimensions" value={safe(plan, "generalFeatures.phoneDimensions")} />
+                  <SpecRow label="Weight" value={safe(plan, "generalFeatures.phoneWeight")} />
+                  <SpecRow label="Colors" value={safe(plan, "generalFeatures.colors")} />
+                </SpecCard>
+              )}
+
+              {/* Performance (mobile / others) */}
+              {shouldShowBlock("mobile", detected.hasPerformance) && (
+                <SpecCard title="Performance">
+                  <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
+                  <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
+                </SpecCard>
+              )}
+
+              {/* Display */}
+              {shouldShowBlock("mobile", detected.hasDisplay) && (
+                <SpecCard title="Display">
+                  <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
+                  <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
+                  <SpecRow label="Technology" value={safe(plan, "display.technology")} />
+                  <SpecRow label="Protection" value={safe(plan, "display.protection")} />
+                </SpecCard>
+              )}
+
+              {/* Battery */}
+              {shouldShowBlock("mobile", detected.hasBattery) && (
+                <SpecCard title="Battery">
+                  <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
+                </SpecCard>
+              )}
+
+              {/* Camera */}
+              {shouldShowBlock("mobile", detected.hasCamera) && (
+                <SpecCard title="Camera">
+                  <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
+                  <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
+                  <SpecRow label="Features" value={safe(plan, "camera.features")} />
+                </SpecCard>
+              )}
+
+              {/* Memory */}
+              {shouldShowBlock("mobile", detected.hasMemory) && (
+                <SpecCard title="Memory & Storage">
+                  <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
+                  <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
+                  <SpecRow label="Card slot" value={safe(plan, "memory.cardSlot")} />
+                </SpecCard>
+              )}
+
+              {/* Connectivity */}
+              {shouldShowBlock("mobile", detected.hasConnectivity) && (
+                <SpecCard title="Connectivity">
+                  <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
+                  <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
+                  <SpecRow label="Bluetooth" value={safe(plan, "connectivity.bluetooth")} />
+                  <SpecRow label="Infrared" value={safe(plan, "connectivity.infrared")} />
+                </SpecCard>
+              )}
+
+              {/* Air conditioner */}
+              {shouldShowBlock("airConditioner", detected.hasAC) && (
+                <SpecCard title="Air Conditioner">
+                  <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
+                  <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
+                  <SpecRow label="Capacity (Ton)" value={safe(plan, "airConditioner.capacityInTon")} />
+                  <SpecRow label="Energy" value={safe(plan, "airConditioner.energyEfficient")} />
+                  <SpecRow label="Warranty" value={safe(plan, "airConditioner.warranty")} />
+                </SpecCard>
+              )}
+
+              {/* Electrical bike */}
+              {shouldShowBlock("electricalBike", detected.hasElectricalBike) && (
+                <SpecCard title="Electric Bike">
+                  <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
+                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
+                  <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
+                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange")} />
+                  <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
+                </SpecCard>
+              )}
+
+              {/* Mechanical Bike */}
+              {shouldShowBlock("mechanicalBike", detected.hasMechanicalBike) && (
+                <SpecCard title="Mechanical Bike">
+                  <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
+                  <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
+                  <SpecRow label="Ground Clearance" value={safe(plan, "mechanicalBike.performance.groundClearance")} />
+                  <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
+                </SpecCard>
+              )}
+
+              {/* fallback: other */}
+              {detected.selectedCategoryKey === "other" && (
+                <SpecCard title="Details">
+                  <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
+                  <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
+                  <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+                  <SpecRow label="City" value={plan.city || "-"} />
+                </SpecCard>
+              )}
+            </div>
+          </section>
+
+          {/* quick facts */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Fact label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+            <Fact label="Tenure" value={plan.tenure || plan.customTenure || "—"} />
+            <Fact label="City" value={plan.city || "—"} />
+            <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+          </div>
+
+          {/* seller & actions */}
+          <div className="mt-2 border-t pt-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+                {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
+              </div>
+              <div>
+                <div className="text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
+                <div className="text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
               </div>
             </div>
+
           </div>
 
-          {/* video and description */}
-          <div>
-            <Field label="Video URL">
-              <input value={form.videoUrl} onChange={(e) => update("videoUrl", e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="YouTube or mp4 link" />
-            </Field>
-
-            <Field label="Description">
-              <textarea value={form.description} onChange={(e) => update("description", e.target.value)} className="w-full px-3 py-2 border rounded h-28" />
-            </Field>
-          </div>
-
-          {/* specs (optional) -- mobile fallback also shown above in category specs */}
-
-          {/* dynamic payment plans */}
-          <div>
-            <h4 className="text-lg font-medium text-gray-800 mb-3">Payment Plans</h4>
-            {errors.paymentPlans && <div className="text-sm text-red-600 mb-2">{errors.paymentPlans}</div>}
-
-            <div className="space-y-4">
-              {form.paymentPlans.map((p, idx) => (
-                <div key={idx} className="border rounded p-3 bg-gray-50">
-                  <div className="flex items-center justify-between mb-2">
-                    <strong>Plan {idx + 1}</strong>
-                    <div className="flex items-center gap-2">
-                      <button type="button" onClick={() => removePaymentPlan(idx)} className="text-sm px-2 py-1 border rounded">Remove</button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Field label="Plan Name" error={errors[`paymentPlans.${idx}.planName`]}>
-                      <input value={p.planName} onChange={(e) => handlePaymentPlanChange(idx, "planName", e.target.value)} className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Installment Price">
-                      <input value={p.installmentPrice} onChange={(e) => handlePaymentPlanChange(idx, "installmentPrice", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Down Payment">
-                      <input value={p.downPayment} onChange={(e) => handlePaymentPlanChange(idx, "downPayment", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Monthly Installment" required error={errors[`paymentPlans.${idx}.monthlyInstallment`]}>
-                      <input value={p.monthlyInstallment} onChange={(e) => handlePaymentPlanChange(idx, "monthlyInstallment", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Tenure (months)">
-                      <input value={p.tenureMonths} onChange={(e) => handlePaymentPlanChange(idx, "tenureMonths", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Interest %">
-                      <input value={p.interestRatePercent} onChange={(e) => handlePaymentPlanChange(idx, "interestRatePercent", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Interest Type">
-                      <select value={p.interestType} onChange={(e) => handlePaymentPlanChange(idx, "interestType", e.target.value)} className="w-full px-3 py-2 border rounded">
-                        <option>Flat Rate</option>
-                        <option>Reducing Balance</option>
-                        <option>Compound Interest</option>
-                        <option>Profit-Based (Islamic/Shariah)</option>
-                      </select>
-                    </Field>
-
-                    <Field label="Markup">
-                      <input value={p.markup} onChange={(e) => handlePaymentPlanChange(idx, "markup", e.target.value)} type="number" className="w-full px-3 py-2 border rounded" />
-                    </Field>
-
-                    <Field label="Other Charges / Note">
-                      <input value={p.otherChargesNote} onChange={(e) => handlePaymentPlanChange(idx, "otherChargesNote", e.target.value)} className="w-full px-3 py-2 border rounded" />
-                    </Field>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-3">
-              <button type="button" onClick={addPaymentPlan} className="inline-flex items-center gap-2 px-4 py-2 rounded border bg-white">
-                + Add Payment Plan
-              </button>
-            </div>
-          </div>
-
-          {/* submit */}
-          <div className="flex items-center gap-3 pt-4">
-            <button type="submit" disabled={loading} style={{ background: ACCENT }} className="px-4 py-2 rounded text-white shadow">
-              {loading ? "Creating..." : "Create Installment Plan"}
-            </button>
-
-            <button type="button" onClick={() => { /* optional: navigate back */ }} className="px-4 py-2 rounded border">
-              Cancel
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 }
 
-/* --- small UI helper --- */
-function Field({ label, children, required = false, error = null }) {
+/* ---------- small UI components ---------- */
+function SpecCard({ title, children }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+    <div className="bg-white border rounded-lg p-4 shadow-sm">
+      <div className="flex items-center justify-between mb-2">
+        <h4 className="text-sm font-semibold text-gray-700">{title}</h4>
+      </div>
       <div>{children}</div>
-      {error && <div className="text-xs text-red-600 mt-1">{error}</div>}
+    </div>
+  );
+}
+
+function SpecRow({ label, value }) {
+  return (
+    <div className="flex items-start justify-between py-1 border-b last:border-b-0">
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="text-sm text-gray-700 ml-3 text-right">{value ?? "-"}</div>
+    </div>
+  );
+}
+
+function Fact({ label, value }) {
+  return (
+    <div className="bg-gray-50 rounded-lg p-3 text-sm">
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="mt-1 font-medium text-gray-800">{value}</div>
     </div>
   );
 }

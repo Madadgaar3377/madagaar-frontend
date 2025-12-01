@@ -1,6 +1,5 @@
-// src/pages/InstallmentDetail.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, Link, useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 
@@ -22,15 +21,18 @@ function getYouTubeEmbed(url = "") {
 }
 function safe(obj, path, fallback = "-") {
   try {
-    return path
+    if (!obj) return fallback;
+    const val = path
       .split(".")
-      .reduce((s, k) => (s && s[k] !== undefined ? s[k] : null), obj) ?? fallback;
+      .reduce((s, k) => (s && s[k] !== undefined ? s[k] : null), obj);
+    if (val === null || val === undefined || val === "") return fallback;
+    return val;
   } catch {
     return fallback;
   }
 }
 function isObjectPresent(obj, key) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null;
+  return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null && !(Array.isArray(obj[key]) && obj[key].length === 0);
 }
 
 /* ---------- component ---------- */
@@ -61,7 +63,6 @@ export default function InstallmentDetail() {
         } else {
           let data = payload;
           if (payload && payload.success !== undefined && payload.data !== undefined) data = payload.data;
-          // backend might return array or object
           const planObj = Array.isArray(data) ? data[0] : data;
           if (mounted) setPlan(planObj || null);
         }
@@ -104,11 +105,11 @@ export default function InstallmentDetail() {
     const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike");
 
     // heuristics by category
-    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(cat);
-    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(cat);
-    const isACCat = /air|ac|air conditioner|split|cooler/.test(cat);
-    const isBikeCat = /bike|motorcycle|electrical|electric/.test(cat);
-    const isWashingMachine = /wash|washing|machine|washer|dryer/.test(cat);
+    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(cat) || hasGeneral || hasPerformance || hasDisplay || hasBattery || hasCamera || hasMemory;
+    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(cat) || /screen|resolution/.test(JSON.stringify(plan));
+    const isACCat = /air|ac|air conditioner|split|cooler/.test(cat) || hasAC;
+    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(cat) || hasElectricalBike || hasMechanicalBike;
+    const isWashingMachine = /wash|washing|machine|washer|dryer/.test(cat) || /washer|dryer/.test(JSON.stringify(plan));
 
     return {
       hasGeneral,
@@ -130,10 +131,7 @@ export default function InstallmentDetail() {
     };
   }, [plan]);
 
-  if (loading)
-    return (
-      <LoadingPage />
-    );
+  if (loading) return <LoadingPage />;
 
   if (error)
     return (
@@ -157,266 +155,284 @@ export default function InstallmentDetail() {
   return (
     <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
       <div className="max-w-8xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
-        <div className=" ">
-          {/* left: carousel */}
-          {/* <div className=" bg-gray-100">
-            
-          </div> */}
+        <div className="p-6 flex flex-col gap-4">
+          {/* carousel */}
+          <div className="relative">
+            <img
+              src={images[index]}
+              onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+              alt={plan.productName}
+              className="w-full h-80 object-contain bg-white"
+            />
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
+                  aria-label="Previous image"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => setIndex((i) => (i + 1) % images.length)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
+                  aria-label="Next image"
+                >
+                  ›
+                </button>
+              </>
+            )}
+          </div>
 
-          {/* right: details */}
-          <div className="lg:col-span-2 p-6 flex flex-col gap-4">
-            <div className="relative">
-              <img
-                src={images[index]}
-                onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-                alt={plan.productName}
-                className="w-full h-80 object-contain bg-white"
-              />
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                    aria-label="Previous image"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={() => setIndex((i) => (i + 1) % images.length)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                    aria-label="Next image"
-                  >
-                    ›
-                  </button>
-                </>
+          <div className="p-3 flex gap-2 overflow-auto">
+            {images.map((src, i) => (
+              <button
+                key={i}
+                onClick={() => setIndex(i)}
+                className={`p-0 rounded overflow-hidden border ${i === index ? "ring-2 ring-[rgb(183,36,42)]" : "opacity-80"}`}>
+                <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-16 w-24 object-cover" />
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
+              <div className="text-sm text-gray-500 mt-1">{plan.companyName || plan.companyNameOther || plan.category}</div>
+            </div>
+
+            <div className="text-right">
+              <div className="text-sm text-gray-500">Price</div>
+              <div className="text-xl font-bold" style={{ color: BRAND }}>PKR {Number(plan.price || 0).toLocaleString()}</div>
+              <div className="text-xs text-gray-500 mt-1">Down: PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
+            </div>
+          </div>
+
+          {/* video */}
+          {embed && (
+            <div className="rounded-md overflow-hidden border">
+              {isYouTubeUrl(plan.videoUrl) ? (
+                <iframe
+                  title="product-video"
+                  src={embed}
+                  className="w-full h-64"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <video controls src={plan.videoUrl} className="w-full h-64 object-contain bg-black" />
               )}
             </div>
+          )}
 
-            <div className="p-3 flex gap-2 overflow-auto">
-              {images.map((src, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIndex(i)}
-                  className={`p-0 rounded overflow-hidden border ${i === index ? "ring-2 ring-[rgb(183,36,42)]" : "opacity-80"}`}
-                >
-                  <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-16 w-24 object-cover" />
-                </button>
-              ))}
+          <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
+            <div className="flex items-center gap-3">
+              <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
+                Get Now
+              </NavLink>
+              <NavLink className="px-4 py-2 rounded-md border" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
+                Compare
+              </NavLink>
+              <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
+                Back
+              </NavLink>
             </div>
-            <div>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
-                <div className="text-sm text-gray-500 mt-1">
-                  {plan.companyName || plan.companyNameOther || plan.category}
-                </div>
-              </div>
+          </div>
 
-              <div className="text-right">
-                <div className="text-sm text-gray-500">Price</div>
-                <div className="text-xl font-bold" style={{ color: BRAND }}>
-                  PKR {Number(plan.price || 0).toLocaleString()}
-                </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  Down: PKR {Number(plan.downpayment || 0).toLocaleString()}
-                </div>
-              </div>
-            </div>
-            </div>
+          {/* description */}
+          <div className="prose max-w-none text-gray-700">
+            <h3 className="text-lg font-semibold">Description</h3>
+            <p className="whitespace-pre-line">{plan.description || plan.productName || "No description"}</p>
+          </div>
 
-            {/* video */}
-            {embed && (
-              <div className="rounded-md overflow-hidden border">
-                {isYouTubeUrl(plan.videoUrl) ? (
-                  <iframe
-                    title="product-video"
-                    src={embed}
-                    className="w-full h-64"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <video controls src={plan.videoUrl} className="w-full h-64 object-contain bg-black" />
-                )}
-              </div>
-            )}
-            <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
-                <div className="flex items-center gap-3">
-                <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id)|| ""}`}>
-                  Get Now
-                </NavLink>
-                <NavLink className="px-4 py-2 rounded-md border" to={`${(plan._id) ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
-                  Compare
-                </NavLink>
-                <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
-                  Back
-                </NavLink>
-                
-              </div>
-            </div>
-
-
-            {/* description */}
-            <div className="prose max-w-none text-gray-700">
-              <h3 className="text-lg font-semibold">Description</h3>
-              <p className="whitespace-pre-line">{plan.description || plan.productName || "No description"}</p>
-            </div>
-
-            {/* ---------- dynamic specifications ---------- */}
-            <section className="mt-2">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Specifications</h3>
-                <div className="text-sm text-gray-500">Auto-selected based on product data</div>
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Generic / general features */}
-                {detected.hasGeneral && (
-                  <SpecCard title="General">
-                    <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
-                    <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
-                    <SpecRow label="Dimensions" value={safe(plan, "generalFeatures.phoneDimensions")} />
-                    <SpecRow label="Weight" value={safe(plan, "generalFeatures.phoneWeight")} />
-                    <SpecRow label="Colors" value={safe(plan, "generalFeatures.colors")} />
-                  </SpecCard>
-                )}
-
-                {/* Performance */}
-                {detected.hasPerformance && (
-                  <SpecCard title="Performance">
-                    <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
-                    <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
-                  </SpecCard>
-                )}
-
-                {/* Display (TV / phone displays) */}
-                {detected.hasDisplay && (
-                  <SpecCard title="Display">
-                    <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
-                    <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
-                    <SpecRow label="Technology" value={safe(plan, "display.technology")} />
-                    <SpecRow label="Protection" value={safe(plan, "display.protection")} />
-                  </SpecCard>
-                )}
-
-                {/* Battery */}
-                {detected.hasBattery && (
-                  <SpecCard title="Battery">
-                    <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
-                  </SpecCard>
-                )}
-
-                {/* Camera */}
-                {detected.hasCamera && (
-                  <SpecCard title="Camera">
-                    <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
-                    <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
-                    <SpecRow label="Features" value={safe(plan, "camera.features")} />
-                  </SpecCard>
-                )}
-
-                {/* Memory */}
-                {detected.hasMemory && (
-                  <SpecCard title="Memory & Storage">
-                    <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
-                    <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
-                    <SpecRow label="Card slot" value={safe(plan, "memory.cardSlot")} />
-                  </SpecCard>
-                )}
-
-                {/* Connectivity */}
-                {detected.hasConnectivity && (
-                  <SpecCard title="Connectivity">
-                    <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
-                    <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
-                    <SpecRow label="Bluetooth" value={safe(plan, "connectivity.bluetooth")} />
-                    <SpecRow label="Infrared" value={safe(plan, "connectivity.infrared")} />
-                  </SpecCard>
-                )}
-
-                {/* Air conditioner */}
-                {detected.hasAC && (
-                  <SpecCard title="Air Conditioner">
-                    <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
-                    <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
-                    <SpecRow label="Capacity (Ton)" value={safe(plan, "airConditioner.capacityInTon")} />
-                    <SpecRow label="Energy" value={safe(plan, "airConditioner.energyEfficient")} />
-                    <SpecRow label="Warranty" value={safe(plan, "airConditioner.warranty")} />
-                  </SpecCard>
-                )}
-
-                {/* Electrical bike */}
-                {detected.hasElectricalBike && (
-                  <SpecCard title="Electric Bike">
-                    <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
-                    <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
-                    <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
-                    <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange")} />
-                    <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
-                  </SpecCard>
-                )}
-
-                {/* Mechanical Bike */}
-                {detected.hasMechanicalBike && (
-                  <SpecCard title="Mechanical Bike">
-                    <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
-                    <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
-                    <SpecRow label="Ground Clearance" value={safe(plan, "mechanicalBike.performance.groundClearance")} />
-                    <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
-                  </SpecCard>
-                )}
-
-                {/* fallback: show a few simple fields if none of the spec blocks matched */}
-                {!detected.hasGeneral &&
-                  !detected.hasPerformance &&
-                  !detected.hasDisplay &&
-                  !detected.hasBattery &&
-                  !detected.hasCamera &&
-                  !detected.hasMemory &&
-                  !detected.hasConnectivity &&
-                  !detected.hasAC &&
-                  !detected.hasElectricalBike &&
-                  !detected.hasMechanicalBike && (
-                    <SpecCard title="Details">
-                      <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
-                      <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
-                      <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-                      <SpecRow label="City" value={plan.city || "-"} />
-                    </SpecCard>
-                  )}
+          {/* payment plans */}
+          {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
+            <section className="mt-4">
+              <h3 className="text-lg font-semibold">Available Payment Plans</h3>
+              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                {plan.paymentPlans.map((p, idx) => (
+                  <div key={idx} className="border rounded-lg p-4 bg-white">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-gray-500">{p.planName || `Plan ${idx + 1}`}</div>
+                        <div className="text-xl font-bold">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm">Tenure: {p.tenureMonths ? `${p.tenureMonths} months` : (p.customTenureLabel || plan.tenure || "—")}</div>
+                        <div className="text-sm">Monthly: PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</div>
+                      </div>
+                    </div>
+                    <div className="mt-2 text-sm text-gray-600">Interest: {p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"} {p.markup ? `(markup: ${p.markup})` : ""}</div>
+                    {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
+                      <details className="mt-2 text-sm">
+                        <summary className="cursor-pointer">Show schedule</summary>
+                        <div className="mt-2 text-xs max-h-40 overflow-auto">
+                          {p.installmentSchedule.map((it, i) => (
+                            <div key={i} className="flex justify-between py-1 border-b">
+                              <div>#{i + 1}</div>
+                              <div>{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</div>
+                              <div>PKR {Number(it.amount || 0).toLocaleString()}</div>
+                              <div>{it.paid ? "Paid" : "Unpaid"}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                    {p.otherChargesNote && <div className="mt-2 text-xs text-gray-500">Note: {p.otherChargesNote}</div>}
+                  </div>
+                ))}
               </div>
             </section>
+          )}
 
-            {/* quick facts */}
-            <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Fact label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-              <Fact label="Tenure" value={plan.tenure || plan.customTenure || "—"} />
-              <Fact label="City" value={plan.city || "—"} />
-              <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+          {/* ---------- dynamic specifications ---------- */}
+          <section className="mt-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Specifications</h3>
+              <div className="text-sm text-gray-500">Auto-selected based on product data</div>
             </div>
 
-            {/* seller & actions */}
-            <div className="mt-2 border-t pt-4 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
-                  {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
-                </div>
-                <div>
-                  <div className="text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
-                  <div className="text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
-                </div>
-              </div>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Generic / general features */}
+              {detected.hasGeneral && (
+                <SpecCard title="General">
+                  <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
+                  <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
+                  <SpecRow label="Dimensions" value={safe(plan, "generalFeatures.phoneDimensions")} />
+                  <SpecRow label="Weight" value={safe(plan, "generalFeatures.phoneWeight")} />
+                  <SpecRow label="Colors" value={safe(plan, "generalFeatures.colors")} />
+                </SpecCard>
+              )}
 
-              
+              {/* Performance */}
+              {detected.hasPerformance && (
+                <SpecCard title="Performance">
+                  <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
+                  <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
+                </SpecCard>
+              )}
+
+              {/* Display (TV / phone displays) */}
+              {detected.hasDisplay && (
+                <SpecCard title="Display">
+                  <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
+                  <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
+                  <SpecRow label="Technology" value={safe(plan, "display.technology")} />
+                  <SpecRow label="Protection" value={safe(plan, "display.protection")} />
+                </SpecCard>
+              )}
+
+              {/* Battery */}
+              {detected.hasBattery && (
+                <SpecCard title="Battery">
+                  <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
+                </SpecCard>
+              )}
+
+              {/* Camera */}
+              {detected.hasCamera && (
+                <SpecCard title="Camera">
+                  <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
+                  <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
+                  <SpecRow label="Features" value={safe(plan, "camera.features")} />
+                </SpecCard>
+              )}
+
+              {/* Memory */}
+              {detected.hasMemory && (
+                <SpecCard title="Memory & Storage">
+                  <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
+                  <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
+                  <SpecRow label="Card slot" value={safe(plan, "memory.cardSlot")} />
+                </SpecCard>
+              )}
+
+              {/* Connectivity */}
+              {detected.hasConnectivity && (
+                <SpecCard title="Connectivity">
+                  <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
+                  <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
+                  <SpecRow label="Bluetooth" value={safe(plan, "connectivity.bluetooth")} />
+                  <SpecRow label="Infrared" value={safe(plan, "connectivity.infrared")} />
+                </SpecCard>
+              )}
+
+              {/* Air conditioner */}
+              {detected.hasAC && (
+                <SpecCard title="Air Conditioner">
+                  <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
+                  <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
+                  <SpecRow label="Capacity (Ton)" value={safe(plan, "airConditioner.capacityInTon")} />
+                  <SpecRow label="Energy" value={safe(plan, "airConditioner.energyEfficient")} />
+                  <SpecRow label="Warranty" value={safe(plan, "airConditioner.warranty")} />
+                </SpecCard>
+              )}
+
+              {/* Electrical bike */}
+              {detected.hasElectricalBike && (
+                <SpecCard title="Electric Bike">
+                  <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
+                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
+                  <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
+                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange")} />
+                  <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
+                </SpecCard>
+              )}
+
+              {/* Mechanical Bike */}
+              {detected.hasMechanicalBike && (
+                <SpecCard title="Mechanical Bike">
+                  <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
+                  <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
+                  <SpecRow label="Ground Clearance" value={safe(plan, "mechanicalBike.performance.groundClearance")} />
+                  <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
+                </SpecCard>
+              )}
+
+              {/* fallback: show a few simple fields if none of the spec blocks matched */}
+              {!detected.hasGeneral &&
+                !detected.hasPerformance &&
+                !detected.hasDisplay &&
+                !detected.hasBattery &&
+                !detected.hasCamera &&
+                !detected.hasMemory &&
+                !detected.hasConnectivity &&
+                !detected.hasAC &&
+                !detected.hasElectricalBike &&
+                !detected.hasMechanicalBike && (
+                  <SpecCard title="Details">
+                    <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
+                    <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
+                    <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+                    <SpecRow label="City" value={plan.city || "-"} />
+                  </SpecCard>
+                )}
             </div>
+          </section>
 
-            {/* debug */}
-            {/* <details className="mt-3 text-xs text-gray-400">
-              <summary className="cursor-pointer">Raw data (debug)</summary>
-              <pre className="mt-2 text-xs bg-gray-50 p-2 rounded max-h-40 overflow-auto">{JSON.stringify(plan, null, 2)}</pre>
-            </details> */}
+          {/* quick facts */}
+          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <Fact label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+            <Fact label="Tenure" value={plan.tenure || plan.customTenure || "—"} />
+            <Fact label="City" value={plan.city || "—"} />
+            <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
           </div>
+
+          {/* seller & actions */}
+          <div className="mt-2 border-t pt-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+                {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
+              </div>
+              <div>
+                <div className="text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
+                <div className="text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
     </div>
