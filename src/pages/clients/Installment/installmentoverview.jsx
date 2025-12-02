@@ -6,6 +6,14 @@ import LoadingPage from "../../../compontents/Loader";
 const PLACEHOLDER = "/placeholder.png";
 const BRAND = "rgb(183,36,42)";
 
+const CATEGORIES = [
+  { key: "mobile", label: "Mobile / Phone" },
+  { key: "airConditioner", label: "Air Conditioner" },
+  { key: "electricalBike", label: "Electrical Bike" },
+  { key: "mechanicalBike", label: "Mechanical Bike" },
+  { key: "other", label: "Other / Generic" },
+];
+
 /* ---------- helpers ---------- */
 function isYouTubeUrl(url = "") {
   try {
@@ -33,6 +41,14 @@ function safe(obj, path, fallback = "-") {
 }
 function isObjectPresent(obj, key) {
   return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null && !(Array.isArray(obj[key]) && obj[key].length === 0);
+}
+
+function anySpecHasValue(plan, paths = []) {
+  for (const p of paths) {
+    const v = safe(plan, p, "-");
+    if (v !== "-" && v !== null && v !== undefined) return true;
+  }
+  return false;
 }
 
 /* ---------- component ---------- */
@@ -88,28 +104,38 @@ export default function InstallmentDetail() {
     return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
   }, [plan]);
 
-  // determine types to show
+  // determine selected category key (one of CATEGORIES.keys) and detect available groups
   const detected = useMemo(() => {
     if (!plan) return {};
-    const cat = (plan.category || plan.customCategory || "").toLowerCase();
+    const catRaw = (plan.category || plan.customCategory || "").toLowerCase();
 
-    const hasGeneral = isObjectPresent(plan, "generalFeatures");
-    const hasPerformance = isObjectPresent(plan, "performance");
-    const hasDisplay = isObjectPresent(plan, "display");
-    const hasBattery = isObjectPresent(plan, "battery");
-    const hasCamera = isObjectPresent(plan, "camera");
-    const hasMemory = isObjectPresent(plan, "memory");
-    const hasConnectivity = isObjectPresent(plan, "connectivity");
-    const hasAC = isObjectPresent(plan, "airConditioner");
-    const hasElectricalBike = isObjectPresent(plan, "electricalBike");
-    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike");
+    const hasGeneral = isObjectPresent(plan, "generalFeatures") && anySpecHasValue(plan, [
+      "generalFeatures.operatingSystem",
+      "generalFeatures.simSupport",
+      "generalFeatures.phoneDimensions",
+    ]);
+    const hasPerformance = isObjectPresent(plan, "performance") && anySpecHasValue(plan, ["performance.processor", "performance.gpu"]);
+    const hasDisplay = isObjectPresent(plan, "display") && anySpecHasValue(plan, ["display.screenSize", "display.screenResolution"]);
+    const hasBattery = isObjectPresent(plan, "battery") && anySpecHasValue(plan, ["battery.type"]);
+    const hasCamera = isObjectPresent(plan, "camera") && anySpecHasValue(plan, ["camera.frontCamera", "camera.backCamera"]);
+    const hasMemory = isObjectPresent(plan, "memory") && anySpecHasValue(plan, ["memory.internalMemory", "memory.ram"]);
+    const hasConnectivity = isObjectPresent(plan, "connectivity") && anySpecHasValue(plan, ["connectivity.data", "connectivity.bluetooth"]);
+    const hasAC = isObjectPresent(plan, "airConditioner") && anySpecHasValue(plan, ["airConditioner.brand", "airConditioner.model", "airConditioner.capacityInTon"]);
+    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, ["electricalBike.motorRatedPower", "electricalBike.battery"]);
+    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, ["mechanicalBike.generalFeatures.engine", "mechanicalBike.performance.transmission"]);
 
-    // heuristics by category
-    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(cat) || hasGeneral || hasPerformance || hasDisplay || hasBattery || hasCamera || hasMemory;
-    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(cat) || /screen|resolution/.test(JSON.stringify(plan));
-    const isACCat = /air|ac|air conditioner|split|cooler/.test(cat) || hasAC;
-    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(cat) || hasElectricalBike || hasMechanicalBike;
-    const isWashingMachine = /wash|washing|machine|washer|dryer/.test(cat) || /washer|dryer/.test(JSON.stringify(plan));
+    // heuristics by category text
+    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(catRaw) || hasGeneral || hasDisplay || hasBattery || hasCamera || hasMemory;
+    const isACCat = /air|ac|air conditioner|split|cooler/.test(catRaw) || hasAC;
+    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(catRaw) || hasElectricalBike || hasMechanicalBike;
+    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(catRaw) || hasDisplay;
+
+    // map to our category keys (prefer explicit fields presence over text)
+    let selected = "other";
+    if (isMobileCat) selected = "mobile";
+    else if (isACCat) selected = "airConditioner";
+    else if (hasElectricalBike) selected = "electricalBike";
+    else if (hasMechanicalBike) selected = "mechanicalBike";
 
     return {
       hasGeneral,
@@ -126,8 +152,8 @@ export default function InstallmentDetail() {
       isTvCat,
       isACCat,
       isBikeCat,
-      isWashingMachine,
-      category: cat,
+      category: catRaw,
+      selectedCategoryKey: selected,
     };
   }, [plan]);
 
@@ -151,6 +177,13 @@ export default function InstallmentDetail() {
         </div>
       </div>
     );
+
+  // helper: should we render a spec block? only when the detected category matches that block (or selected is 'other')
+  const shouldShowBlock = (blockKey, hasFlag = false) => {
+    if (!detected) return false;
+    if (!hasFlag) return detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other";
+    return (detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other") && hasFlag;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
@@ -294,8 +327,8 @@ export default function InstallmentDetail() {
             </div>
 
             <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Generic / general features */}
-              {detected.hasGeneral && (
+              {/* Generic / general features (show only for mobile or other) */}
+              {shouldShowBlock("mobile", detected.hasGeneral) && (
                 <SpecCard title="General">
                   <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
                   <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
@@ -305,16 +338,16 @@ export default function InstallmentDetail() {
                 </SpecCard>
               )}
 
-              {/* Performance */}
-              {detected.hasPerformance && (
+              {/* Performance (mobile / others) */}
+              {shouldShowBlock("mobile", detected.hasPerformance) && (
                 <SpecCard title="Performance">
                   <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
                   <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
                 </SpecCard>
               )}
 
-              {/* Display (TV / phone displays) */}
-              {detected.hasDisplay && (
+              {/* Display */}
+              {shouldShowBlock("mobile", detected.hasDisplay) && (
                 <SpecCard title="Display">
                   <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
                   <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
@@ -324,14 +357,14 @@ export default function InstallmentDetail() {
               )}
 
               {/* Battery */}
-              {detected.hasBattery && (
+              {shouldShowBlock("mobile", detected.hasBattery) && (
                 <SpecCard title="Battery">
                   <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
                 </SpecCard>
               )}
 
               {/* Camera */}
-              {detected.hasCamera && (
+              {shouldShowBlock("mobile", detected.hasCamera) && (
                 <SpecCard title="Camera">
                   <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
                   <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
@@ -340,7 +373,7 @@ export default function InstallmentDetail() {
               )}
 
               {/* Memory */}
-              {detected.hasMemory && (
+              {shouldShowBlock("mobile", detected.hasMemory) && (
                 <SpecCard title="Memory & Storage">
                   <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
                   <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
@@ -349,7 +382,7 @@ export default function InstallmentDetail() {
               )}
 
               {/* Connectivity */}
-              {detected.hasConnectivity && (
+              {shouldShowBlock("mobile", detected.hasConnectivity) && (
                 <SpecCard title="Connectivity">
                   <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
                   <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
@@ -359,7 +392,7 @@ export default function InstallmentDetail() {
               )}
 
               {/* Air conditioner */}
-              {detected.hasAC && (
+              {shouldShowBlock("airConditioner", detected.hasAC) && (
                 <SpecCard title="Air Conditioner">
                   <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
                   <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
@@ -370,7 +403,7 @@ export default function InstallmentDetail() {
               )}
 
               {/* Electrical bike */}
-              {detected.hasElectricalBike && (
+              {shouldShowBlock("electricalBike", detected.hasElectricalBike) && (
                 <SpecCard title="Electric Bike">
                   <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
                   <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
@@ -381,7 +414,7 @@ export default function InstallmentDetail() {
               )}
 
               {/* Mechanical Bike */}
-              {detected.hasMechanicalBike && (
+              {shouldShowBlock("mechanicalBike", detected.hasMechanicalBike) && (
                 <SpecCard title="Mechanical Bike">
                   <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
                   <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
@@ -390,24 +423,15 @@ export default function InstallmentDetail() {
                 </SpecCard>
               )}
 
-              {/* fallback: show a few simple fields if none of the spec blocks matched */}
-              {!detected.hasGeneral &&
-                !detected.hasPerformance &&
-                !detected.hasDisplay &&
-                !detected.hasBattery &&
-                !detected.hasCamera &&
-                !detected.hasMemory &&
-                !detected.hasConnectivity &&
-                !detected.hasAC &&
-                !detected.hasElectricalBike &&
-                !detected.hasMechanicalBike && (
-                  <SpecCard title="Details">
-                    <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
-                    <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
-                    <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-                    <SpecRow label="City" value={plan.city || "-"} />
-                  </SpecCard>
-                )}
+              {/* fallback: other */}
+              {detected.selectedCategoryKey === "other" && (
+                <SpecCard title="Details">
+                  <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
+                  <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
+                  <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+                  <SpecRow label="City" value={plan.city || "-"} />
+                </SpecCard>
+              )}
             </div>
           </section>
 

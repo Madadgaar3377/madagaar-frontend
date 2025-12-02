@@ -1,494 +1,760 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
-import { backendBaseUrl } from "../../../constants/apiUrl";
-import LoadingPage from "../../../compontents/Loader";
+// src/pages/admin/CreateInstallmentPlan.jsx
+import React, { useState } from "react";
+import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path
+import { getAuthToken } from "../../../utils/auth"; // adjust path
+import { useNavigate } from "react-router-dom";
+import NavbarDashboard from "../Dashboard/Navbar-Dashboard";
 
-const PLACEHOLDER = "/placeholder.png";
-const BRAND = "rgb(183,36,42)";
+const API = (backendBaseUrl || "").replace(/\/$/, "");
+const UPLOAD_URL = `${API}/image-upload/single`;
+const SUBMIT_URL = `${API}/installmentplan`;
 
-const CATEGORIES = [
-  { key: "mobile", label: "Mobile / Phone" },
-  { key: "airConditioner", label: "Air Conditioner" },
-  { key: "electricalBike", label: "Electrical Bike" },
-  { key: "mechanicalBike", label: "Mechanical Bike" },
-  { key: "other", label: "Other / Generic" },
+const defaultPlan = {
+  planName: "",
+  installmentPrice: 0,
+  downPayment: 0,
+  monthlyInstallment: 0,
+  tenureMonths: 0,
+  interestRatePercent: 0,
+  interestType: "Flat Rate",
+  markup: 0,
+  otherChargesNote: "",
+};
+
+const CATEGORY_OPTIONS = [
+  { value: "", label: "Select category" },
+  { value: "phones", label: "Phones / Mobile" },
+  { value: "bikes_mechanical", label: "Bikes — Mechanical" },
+  { value: "bikes_electric", label: "Bikes — Electric" },
+  { value: "air_conditioner", label: "Air Conditioner" },
+  { value: "appliances", label: "Home Appliances / Other" },
+  { value: "other", label: "Other (custom)" },
 ];
 
-/* ---------- helpers ---------- */
-function isYouTubeUrl(url = "") {
-  try {
-    return /(youtube\.com\/watch\?v=|youtu\.be\/)/.test(url);
-  } catch {
-    return false;
-  }
-}
-function getYouTubeEmbed(url = "") {
-  if (!url) return null;
-  const match = url.match(/(?:v=|youtu\.be\/)([A-Za-z0-9_-]{6,})/);
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
-}
-function safe(obj, path, fallback = "-") {
-  try {
-    if (!obj) return fallback;
-    const val = path
-      .split(".")
-      .reduce((s, k) => (s && s[k] !== undefined ? s[k] : null), obj);
-    if (val === null || val === undefined || val === "") return fallback;
-    return val;
-  } catch {
-    return fallback;
-  }
-}
-function isObjectPresent(obj, key) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null && !(Array.isArray(obj[key]) && obj[key].length === 0);
-}
-
-function anySpecHasValue(plan, paths = []) {
-  for (const p of paths) {
-    const v = safe(plan, p, "-");
-    if (v !== "-" && v !== null && v !== undefined) return true;
-  }
-  return false;
-}
-
-/* ---------- component ---------- */
-export default function InstallmentDetail() {
-  const { id } = useParams();
+export default function CreateInstallmentPlan() {
   const navigate = useNavigate();
-  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [index, setIndex] = useState(0);
+  const [form, setForm] = useState({
+    productName: "",
+    city: "",
+    price: "",
+    downpayment: "",
+    installment: "",
+    tenure: "",
+    customTenure: "",
+    postedBy: "",
+    videoUrl: "",
+    description: "",
+    companyName: "",
+    companyNameOther: "",
+    category: "",
+    customCategory: "",
+    status: "pending",
+    productImages: [],
+    paymentPlans: [{ ...defaultPlan }],
+    // mobile / product specs
+    generalFeatures: {
+      operatingSystem: "",
+      simSupport: "",
+      phoneDimensions: "",
+      phoneWeight: "",
+      colors: "",
+    },
+    performance: { processor: "", gpu: "" },
+    display: { screenSize: "", screenResolution: "", technology: "", protection: "" },
+    battery: { type: "" },
+    camera: { frontCamera: "", backCamera: "", features: "" },
+    memory: { internalMemory: "", ram: "", cardSlot: "" },
+    connectivity: { data: "", nfc: "", bluetooth: "", infrared: "" },
 
-  // fetch plan
-  useEffect(() => {
-    let mounted = true;
-    async function fetchPlan() {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(`${apiUrl}/installmentplan/get/public/${encodeURIComponent(id)}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const payload = await res.json().catch(() => null);
-        if (!res.ok || (payload && payload.success === false)) {
-          setError(payload?.message || `Failed to load (${res.status})`);
-        } else {
-          let data = payload;
-          if (payload && payload.success !== undefined && payload.data !== undefined) data = payload.data;
-          const planObj = Array.isArray(data) ? data[0] : data;
-          if (mounted) setPlan(planObj || null);
+    // AC
+    airConditioner: {
+      brand: "",
+      model: "",
+      color: "",
+      capacityInTon: "",
+      type: "",
+      energyEfficient: "",
+      display: "",
+      indoorDimension: "",
+      outdoorDimension: "",
+      indoorWeightKg: "",
+      outdoorWeightKg: "",
+      powerSupply: "",
+      otherFeatures: "",
+      warranty: "",
+    },
+
+    // electrical bike
+    electricalBike: {
+      motorRatedPower: "",
+      battery: "",
+      maxSpeed: "",
+      maxDistanceRange: "",
+      chargingTime: "",
+      rimsTiresFront: "",
+      rimsTiresBack: "",
+      brakes: "",
+      shocks: "",
+      meter: "",
+      maxLoad: "",
+      dryWeight: "",
+      vehicleDimensions: "",
+      features: "",
+      colors: "",
+    },
+
+    // mechanical bike
+    mechanicalBike: {
+      generalFeatures: {
+        dimensions: "",
+        weight: "",
+        engine: "",
+        colors: "",
+        other: "",
+      },
+      performance: {
+        transmission: "",
+        groundClearance: "",
+        starting: "",
+        displacement: "",
+        petrolCapacity: "",
+      },
+      assembly: {
+        compressionRatio: "",
+        boreAndStroke: "",
+        tyreAtFront: "",
+        tyreAtBack: "",
+        seatHeight: "",
+      },
+    },
+  });
+
+  const [localImages, setLocalImages] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState(null);
+  const [error, setError] = useState(null);
+
+  // Wizard state
+  const [step, setStep] = useState(1);
+  const totalSteps = 4;
+
+  // helper to update nested path safely (supports dotted paths)
+  function updateForm(path, value) {
+    if (!path) return;
+    if (path.includes(".")) {
+      const parts = path.split(".");
+      setForm((prev) => {
+        const copy = JSON.parse(JSON.stringify(prev)); // simple deep copy
+        let cur = copy;
+        for (let i = 0; i < parts.length - 1; i++) {
+          if (cur[parts[i]] === undefined) cur[parts[i]] = {};
+          cur = cur[parts[i]];
         }
-      } catch (err) {
-        console.error(err);
-        setError("Network error — could not fetch plan.");
-      } finally {
-        if (mounted) setLoading(false);
+        cur[parts[parts.length - 1]] = value;
+        return copy;
+      });
+      return;
+    }
+    setForm((f) => ({ ...f, [path]: value }));
+  }
+
+  function updatePaymentPlan(index, key, value) {
+    setForm((f) => {
+      const pp = [...(f.paymentPlans || [])];
+      pp[index] = { ...pp[index], [key]: value };
+      return { ...f, paymentPlans: pp };
+    });
+  }
+
+  function addPaymentPlan() {
+    setForm((f) => ({ ...f, paymentPlans: [...(f.paymentPlans || []), { ...defaultPlan }] }));
+  }
+
+  function removePaymentPlan(idx) {
+    setForm((f) => ({ ...f, paymentPlans: f.paymentPlans.filter((_, i) => i !== idx) }));
+  }
+
+  function handleFilesChange(e) {
+    const files = Array.from(e.target.files || []);
+    setLocalImages((prev) => [...prev, ...files]);
+  }
+
+  function removeLocalImage(idx) {
+    setLocalImages((s) => s.filter((_, i) => i !== idx));
+  }
+
+  async function uploadSingleFile(file) {
+    const token = getAuthToken?.();
+    const fd = new FormData();
+    fd.append("image", file);
+    const res = await fetch(UPLOAD_URL, {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: fd,
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Upload failed: ${res.status} ${text}`);
+    }
+    const body = await res.json().catch(() => null);
+    if (body?.url) return body.url;
+    if (body?.data?.url) return body.data.url;
+    if (body?.data && typeof body.data === "string") return body.data;
+    if (body?.success && body?.data && Array.isArray(body.data) && body.data[0]) return body.data[0];
+    if (body && typeof body === "object") {
+      const str = Object.values(body).find((v) => typeof v === "string" && v.startsWith("http"));
+      if (str) return str;
+    }
+    throw new Error("Unexpected upload response");
+  }
+
+  async function handleUploadAll() {
+    if (!localImages.length) return [];
+    setUploading(true);
+    setError(null);
+    try {
+      const urls = [];
+      for (let i = 0; i < localImages.length; i++) {
+        const u = await uploadSingleFile(localImages[i]);
+        urls.push(u);
+      }
+      setForm((f) => ({ ...f, productImages: [...(f.productImages || []), ...urls] }));
+      setLocalImages([]);
+      setMessage("Images uploaded successfully.");
+      return urls;
+    } catch (err) {
+      console.error("upload error", err);
+      setError(err.message || "Image upload failed.");
+      throw err;
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function removeUploadedImage(idx) {
+    setForm((f) => ({ ...f, productImages: f.productImages.filter((_, i) => i !== idx) }));
+  }
+
+  // Validation per step
+  function validateStep(currentStep = step) {
+    const errs = [];
+    if (currentStep === 1) {
+      if (!form.productName || form.productName.trim().length < 3) errs.push("Product name min 3 chars.");
+      if (!form.price || Number(form.price) <= 0) errs.push("Price must be > 0.");
+      if (!form.category) errs.push("Select category.");
+    }
+    if (currentStep === 2) {
+      if (form.category === "phones") {
+        if (!form.generalFeatures.operatingSystem) errs.push("Operating system required.");
+        if (!form.performance.processor) errs.push("Processor required.");
+        if (!form.display.screenSize) errs.push("Screen size required.");
+        if (!form.memory.internalMemory) errs.push("Internal memory required.");
+      }
+      // add other category checks if needed
+    }
+    if (currentStep === 3) {
+      // images optional — no validation
+    }
+    if (currentStep === 4) {
+      if (!form.paymentPlans || !form.paymentPlans.length) errs.push("At least one payment plan required.");
+    }
+    return errs;
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+
+    // final validation: run all steps' validations
+    for (let s = 1; s <= totalSteps; s++) {
+      const v = validateStep(s);
+      if (v.length) {
+        setError(`Step ${s} error: ${v.join(" ")}`);
+        setStep(s);
+        return;
       }
     }
-    fetchPlan();
-    return () => (mounted = false);
-  }, [apiUrl, id]);
 
-  // images + embed
-  const images = useMemo(() => {
-    if (!plan) return [PLACEHOLDER];
-    return Array.isArray(plan.productImages) && plan.productImages.length ? plan.productImages : [PLACEHOLDER];
-  }, [plan]);
+    setSubmitting(true);
+    try {
+      // if local images selected, upload them first
+      if (localImages.length > 0) {
+        await handleUploadAll();
+      }
 
-  const embed = useMemo(() => {
-    if (!plan || !plan.videoUrl) return null;
-    return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
-  }, [plan]);
+      const body = {
+        productName: form.productName,
+        city: form.city,
+        price: parseInt(form.price || 0),
+        downpayment: parseInt(form.downpayment || 0),
+        installment: parseInt(form.installment || 0),
+        tenure: form.tenure,
+        customTenure: form.customTenure,
+        postedBy: form.postedBy,
+        videoUrl: form.videoUrl,
+        description: form.description,
+        companyName: form.companyName,
+        companyNameOther: form.companyNameOther,
+        category: form.category === "other" ? form.customCategory || "" : form.category,
+        customCategory: form.customCategory,
+        status: "approved",
+        productImages: form.productImages,
+        paymentPlans: Array.isArray(form.paymentPlans)
+          ? form.paymentPlans.map((p) => ({
+              planName: p.planName || "",
+              installmentPrice: Number(p.installmentPrice) || 0,
+              downPayment: Number(p.downPayment) || 0,
+              monthlyInstallment: Number(p.monthlyInstallment) || 0,
+              tenureMonths: parseInt(p.tenureMonths || 0),
+              interestRatePercent: Number(p.interestRatePercent || 0),
+              interestType: p.interestType || "Flat Rate",
+              markup: Number(p.markup || 0),
+              otherChargesNote: p.otherChargesNote || "",
+            }))
+          : [],
+        generalFeatures: form.generalFeatures,
+        performance: form.performance,
+        display: form.display,
+        battery: form.battery,
+        camera: form.camera,
+        memory: form.memory,
+        connectivity: form.connectivity,
+        airConditioner: form.airConditioner,
+        electricalBike: form.electricalBike,
+        mechanicalBike: form.mechanicalBike,
+      };
 
-  // determine selected category key (one of CATEGORIES.keys) and detect available groups
-  const detected = useMemo(() => {
-    if (!plan) return {};
-    const catRaw = (plan.category || plan.customCategory || "").toLowerCase();
+      const token = getAuthToken?.();
 
-    const hasGeneral = isObjectPresent(plan, "generalFeatures") && anySpecHasValue(plan, [
-      "generalFeatures.operatingSystem",
-      "generalFeatures.simSupport",
-      "generalFeatures.phoneDimensions",
-    ]);
-    const hasPerformance = isObjectPresent(plan, "performance") && anySpecHasValue(plan, ["performance.processor", "performance.gpu"]);
-    const hasDisplay = isObjectPresent(plan, "display") && anySpecHasValue(plan, ["display.screenSize", "display.screenResolution"]);
-    const hasBattery = isObjectPresent(plan, "battery") && anySpecHasValue(plan, ["battery.type"]);
-    const hasCamera = isObjectPresent(plan, "camera") && anySpecHasValue(plan, ["camera.frontCamera", "camera.backCamera"]);
-    const hasMemory = isObjectPresent(plan, "memory") && anySpecHasValue(plan, ["memory.internalMemory", "memory.ram"]);
-    const hasConnectivity = isObjectPresent(plan, "connectivity") && anySpecHasValue(plan, ["connectivity.data", "connectivity.bluetooth"]);
-    const hasAC = isObjectPresent(plan, "airConditioner") && anySpecHasValue(plan, ["airConditioner.brand", "airConditioner.model", "airConditioner.capacityInTon"]);
-    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, ["electricalBike.motorRatedPower", "electricalBike.battery"]);
-    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, ["mechanicalBike.generalFeatures.engine", "mechanicalBike.performance.transmission"]);
+      const res = await fetch(SUBMIT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+      });
 
-    // heuristics by category text
-    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(catRaw) || hasGeneral || hasDisplay || hasBattery || hasCamera || hasMemory;
-    const isACCat = /air|ac|air conditioner|split|cooler/.test(catRaw) || hasAC;
-    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(catRaw) || hasElectricalBike || hasMechanicalBike;
-    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(catRaw) || hasDisplay;
+      const resBody = await res.json().catch(() => null);
 
-    // map to our category keys (prefer explicit fields presence over text)
-    let selected = "other";
-    if (isMobileCat) selected = "mobile";
-    else if (isACCat) selected = "airConditioner";
-    else if (hasElectricalBike) selected = "electricalBike";
-    else if (hasMechanicalBike) selected = "mechanicalBike";
+      if (!res.ok || !resBody?.success) {
+        throw new Error(resBody?.message || resBody?.error?.serverError || `Submit failed (${res.status})`);
+      }
 
-    return {
-      hasGeneral,
-      hasPerformance,
-      hasDisplay,
-      hasBattery,
-      hasCamera,
-      hasMemory,
-      hasConnectivity,
-      hasAC,
-      hasElectricalBike,
-      hasMechanicalBike,
-      isMobileCat,
-      isTvCat,
-      isACCat,
-      isBikeCat,
-      category: catRaw,
-      selectedCategoryKey: selected,
-    };
-  }, [plan]);
+      setMessage("Installment Plan created successfully.");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 900);
+    } catch (err) {
+      console.error("submit error", err);
+      setError(err.message || "Failed to submit installment plan.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
-  if (loading) return <LoadingPage />;
-
-  if (error)
+  // Render mobile-specific full form
+  function renderMobileFields() {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-red-600">{error}</div>
-      </div>
-    );
+      <section className="space-y-3">
+        <h3 className="text-sm font-medium">Mobile — Full specifications</h3>
 
-  if (!plan)
-    return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="text-gray-600">
-          Plan not found.
-          <button onClick={() => navigate(-1)} className="ml-2 text-[rgb(183,36,42)] underline">
-            Go back
-          </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label className="block">
+            <div className="text-xs text-gray-500">Operating System</div>
+            <input value={form.generalFeatures.operatingSystem} onChange={(e)=>updateForm("generalFeatures.operatingSystem", e.target.value)} placeholder="e.g. Android 14" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">SIM Support</div>
+            <input value={form.generalFeatures.simSupport} onChange={(e)=>updateForm("generalFeatures.simSupport", e.target.value)} placeholder="e.g. Dual SIM" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Processor</div>
+            <input value={form.performance.processor} onChange={(e)=>updateForm("performance.processor", e.target.value)} placeholder="e.g. Snapdragon 8 Gen 3" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">GPU</div>
+            <input value={form.performance.gpu} onChange={(e)=>updateForm("performance.gpu", e.target.value)} placeholder="GPU" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Screen Size</div>
+            <input value={form.display.screenSize} onChange={(e)=>updateForm("display.screenSize", e.target.value)} placeholder="e.g. 6.7 inch" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Screen Resolution</div>
+            <input value={form.display.screenResolution} onChange={(e)=>updateForm("display.screenResolution", e.target.value)} placeholder="e.g. 1080x2400" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Display Tech / Protection</div>
+            <input value={form.display.technology} onChange={(e)=>updateForm("display.technology", e.target.value)} placeholder="e.g. AMOLED, Gorilla Glass" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Battery</div>
+            <input value={form.battery.type} onChange={(e)=>updateForm("battery.type", e.target.value)} placeholder="e.g. 5000 mAh, Fast charge 120W" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Front Camera</div>
+            <input value={form.camera.frontCamera} onChange={(e)=>updateForm("camera.frontCamera", e.target.value)} placeholder="e.g. 16 MP" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Back Camera</div>
+            <input value={form.camera.backCamera} onChange={(e)=>updateForm("camera.backCamera", e.target.value)} placeholder="e.g. 50 MP + 8 MP" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block col-span-1 sm:col-span-2">
+            <div className="text-xs text-gray-500">Camera Features</div>
+            <input value={form.camera.features} onChange={(e)=>updateForm("camera.features", e.target.value)} placeholder="e.g. OIS, Night mode" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Internal Memory</div>
+            <input value={form.memory.internalMemory} onChange={(e)=>updateForm("memory.internalMemory", e.target.value)} placeholder="e.g. 128 GB" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">RAM</div>
+            <input value={form.memory.ram} onChange={(e)=>updateForm("memory.ram", e.target.value)} placeholder="e.g. 8 GB" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Card Slot</div>
+            <input value={form.memory.cardSlot} onChange={(e)=>updateForm("memory.cardSlot", e.target.value)} placeholder="e.g. microSD upto 1TB" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">Connectivity (data)</div>
+            <input value={form.connectivity.data} onChange={(e)=>updateForm("connectivity.data", e.target.value)} placeholder="e.g. 5G, LTE" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block">
+            <div className="text-xs text-gray-500">NFC / Bluetooth / Infrared</div>
+            <input value={form.connectivity.nfc} onChange={(e)=>updateForm("connectivity.nfc", e.target.value)} placeholder="e.g. NFC: Yes, Bluetooth 5.3" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block col-span-1 sm:col-span-2">
+            <div className="text-xs text-gray-500">Colors / Finishes</div>
+            <input value={form.generalFeatures.colors} onChange={(e)=>updateForm("generalFeatures.colors", e.target.value)} placeholder="e.g. Black, Blue" className="px-3 py-2 border rounded w-full" />
+          </label>
+
+          <label className="block col-span-1 sm:col-span-2">
+            <div className="text-xs text-gray-500">Short Description (if any)</div>
+            <input value={form.description} onChange={(e)=>updateForm("description", e.target.value)} placeholder="Short product highlights" className="px-3 py-2 border rounded w-full" />
+          </label>
         </div>
-      </div>
+      </section>
     );
+  }
 
-  // helper: should we render a spec block? only when the detected category matches that block (or selected is 'other')
-  const shouldShowBlock = (blockKey, hasFlag = false) => {
-    if (!detected) return false;
-    if (!hasFlag) return detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other";
-    return (detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other") && hasFlag;
-  };
+  // Render category step content
+  function renderCategoryStep() {
+    if (!form.category) {
+      return <div className="text-sm text-gray-500">Choose a category in step 1 to see category-specific fields here.</div>;
+    }
+    if (form.category === "phones") {
+      return renderMobileFields();
+    }
+    if (form.category === "bikes_mechanical") {
+      return (
+        <section>
+          <h3 className="text-sm font-medium">Mechanical Bike Details</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <input value={form.mechanicalBike.generalFeatures.dimensions} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.dimensions", e.target.value)} placeholder="Dimensions" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.generalFeatures.weight} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.weight", e.target.value)} placeholder="Weight" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.performance.transmission} onChange={(e)=>updateForm("mechanicalBike.performance.transmission", e.target.value)} placeholder="Transmission" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.performance.displacement} onChange={(e)=>updateForm("mechanicalBike.performance.displacement", e.target.value)} placeholder="Displacement" className="px-3 py-2 border rounded w-full" />
+          </div>
+        </section>
+      );
+    }
+    if (form.category === "bikes_electric") {
+      return (
+        <section>
+          <h3 className="text-sm font-medium">Electric Bike Details</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <input value={form.electricalBike.motorRatedPower} onChange={(e)=>updateForm("electricalBike.motorRatedPower", e.target.value)} placeholder="Motor rated power" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.battery} onChange={(e)=>updateForm("electricalBike.battery", e.target.value)} placeholder="Battery spec" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.maxDistanceRange} onChange={(e)=>updateForm("electricalBike.maxDistanceRange", e.target.value)} placeholder="Max range" className="px-3 py-2 border rounded w-full" />
+          </div>
+        </section>
+      );
+    }
+    if (form.category === "air_conditioner") {
+      return (
+        <section>
+          <h3 className="text-sm font-medium">Air Conditioner Details</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+            <input value={form.airConditioner.brand} onChange={(e)=>updateForm("airConditioner.brand", e.target.value)} placeholder="Brand" className="px-3 py-2 border rounded w-full" />
+            <input value={form.airConditioner.capacityInTon} onChange={(e)=>updateForm("airConditioner.capacityInTon", e.target.value)} placeholder="Capacity (ton)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.airConditioner.energyEfficient} onChange={(e)=>updateForm("airConditioner.energyEfficient", e.target.value)} placeholder="Energy rating" className="px-3 py-2 border rounded w-full" />
+          </div>
+        </section>
+      );
+    }
+    // default
+    return (
+      <section>
+        <h3 className="text-sm font-medium">Product Details</h3>
+        <div className="mt-3">
+          <input value={form.generalFeatures.phoneDimensions} onChange={(e)=>updateForm("generalFeatures.phoneDimensions", e.target.value)} placeholder="Dimensions / Size" className="px-3 py-2 border rounded w-full" />
+          <input value={form.generalFeatures.colors} onChange={(e)=>updateForm("generalFeatures.colors", e.target.value)} placeholder="Colors / Finishes" className="mt-2 px-3 py-2 border rounded w-full" />
+        </div>
+      </section>
+    );
+  }
+
+  // Step navigation
+  function goNext() {
+    setError(null);
+    const errs = validateStep(step);
+    if (errs.length) {
+      setError(errs.join(" "));
+      return;
+    }
+    setStep((s) => Math.min(totalSteps, s + 1));
+  }
+  function goPrev() {
+    setError(null);
+    setStep((s) => Math.max(1, s - 1));
+  }
+
+  // small UI: step title
+  function stepTitle(s) {
+    switch (s) {
+      case 1: return "Basic Info";
+      case 2: return "Category Details";
+      case 3: return "Images";
+      case 4: return "Payment Plans & Submit";
+      default: return "";
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
-      <div className="max-w-8xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
-        <div className="p-6 flex flex-col gap-4">
-          {/* carousel */}
-          <div className="relative">
-            <img
-              src={images[index]}
-              onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-              alt={plan.productName}
-              className="w-full h-80 object-contain bg-white"
-            />
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                  aria-label="Previous image"
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={() => setIndex((i) => (i + 1) % images.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                  aria-label="Next image"
-                >
-                  ›
-                </button>
-              </>
-            )}
+    <>
+      <NavbarDashboard />
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-4">
+            <h1 className="text-2xl font-semibold text-gray-800">Create Installment Plan</h1>
+            <p className="text-sm text-gray-500">Wizard: fill step-by-step. Use Back / Next to navigate.</p>
           </div>
 
-          <div className="p-3 flex gap-2 overflow-auto">
-            {images.map((src, i) => (
-              <button
-                key={i}
-                onClick={() => setIndex(i)}
-                className={`p-0 rounded overflow-hidden border ${i === index ? "ring-2 ring-[rgb(183,36,42)]" : "opacity-80"}`}>
-                <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-16 w-24 object-cover" />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
-              <div className="text-sm text-gray-500 mt-1">{plan.companyName || plan.companyNameOther || plan.category}</div>
+          <div className="bg-white p-5 rounded-2xl shadow">
+            {/* progress */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm font-medium text-gray-700">{stepTitle(step)}</div>
+                <div className="text-xs text-gray-500">Step {step} of {totalSteps}</div>
+              </div>
+              <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+                <div style={{ width: `${(step/totalSteps)*100}%` }} className="h-2 bg-[rgb(183,36,42)]"></div>
+              </div>
             </div>
 
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Price</div>
-              <div className="text-xl font-bold" style={{ color: BRAND }}>PKR {Number(plan.price || 0).toLocaleString()}</div>
-              <div className="text-xs text-gray-500 mt-1">Down: PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
-            </div>
-          </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Step 1: Basic info */}
+              {step === 1 && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <label className="block">
+                      <div className="text-xs text-gray-500 mb-1">Product Name *</div>
+                      <input required value={form.productName} onChange={(e)=>updateForm("productName", e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="e.g. Honda CG 125 2025" />
+                    </label>
 
-          {/* video */}
-          {embed && (
-            <div className="rounded-md overflow-hidden border">
-              {isYouTubeUrl(plan.videoUrl) ? (
-                <iframe
-                  title="product-video"
-                  src={embed}
-                  className="w-full h-64"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              ) : (
-                <video controls src={plan.videoUrl} className="w-full h-64 object-contain bg-black" />
-              )}
-            </div>
-          )}
+                    <label className="block">
+                      <div className="text-xs text-gray-500 mb-1">Category *</div>
+                      <select required value={form.category} onChange={(e)=>updateForm("category", e.target.value)} className="w-full px-3 py-2 border rounded">
+                        {CATEGORY_OPTIONS.map((opt)=>(
+                          <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        ))}
+                      </select>
+                      {form.category === "other" && (
+                        <input value={form.customCategory} onChange={(e)=>updateForm("customCategory", e.target.value)} placeholder="Enter custom category" className="mt-2 w-full px-3 py-2 border rounded" />
+                      )}
+                    </label>
 
-          <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
-            <div className="flex items-center gap-3">
-              <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
-                Get Now
-              </NavLink>
-              <NavLink className="px-4 py-2 rounded-md border" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
-                Compare
-              </NavLink>
-              <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
-                Back
-              </NavLink>
-            </div>
-          </div>
-
-          {/* description */}
-          <div className="prose max-w-none text-gray-700">
-            <h3 className="text-lg font-semibold">Description</h3>
-            <p className="whitespace-pre-line">{plan.description || plan.productName || "No description"}</p>
-          </div>
-
-          {/* payment plans */}
-          {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
-            <section className="mt-4">
-              <h3 className="text-lg font-semibold">Available Payment Plans</h3>
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
-                {plan.paymentPlans.map((p, idx) => (
-                  <div key={idx} className="border rounded-lg p-4 bg-white">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm text-gray-500">{p.planName || `Plan ${idx + 1}`}</div>
-                        <div className="text-xl font-bold">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-sm">Tenure: {p.tenureMonths ? `${p.tenureMonths} months` : (p.customTenureLabel || plan.tenure || "—")}</div>
-                        <div className="text-sm">Monthly: PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</div>
-                      </div>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-600">Interest: {p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"} {p.markup ? `(markup: ${p.markup})` : ""}</div>
-                    {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
-                      <details className="mt-2 text-sm">
-                        <summary className="cursor-pointer">Show schedule</summary>
-                        <div className="mt-2 text-xs max-h-40 overflow-auto">
-                          {p.installmentSchedule.map((it, i) => (
-                            <div key={i} className="flex justify-between py-1 border-b">
-                              <div>#{i + 1}</div>
-                              <div>{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</div>
-                              <div>PKR {Number(it.amount || 0).toLocaleString()}</div>
-                              <div>{it.paid ? "Paid" : "Unpaid"}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    )}
-                    {p.otherChargesNote && <div className="mt-2 text-xs text-gray-500">Note: {p.otherChargesNote}</div>}
+                    <label className="block">
+                      <div className="text-xs text-gray-500 mb-1">Brand / Company</div>
+                      <input value={form.companyName} onChange={(e)=>updateForm("companyName", e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="e.g. Honda" />
+                    </label>
                   </div>
-                ))}
+
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <label>
+                      <div className="text-xs text-gray-500 mb-1">Price (PKR) *</div>
+                      <input required type="number" value={form.price} onChange={(e)=>updateForm("price", e.target.value)} className="w-full px-3 py-2 border rounded" />
+                    </label>
+
+                    <label>
+                      <div className="text-xs text-gray-500 mb-1">Downpayment</div>
+                      <input type="number" value={form.downpayment} onChange={(e)=>updateForm("downpayment", e.target.value)} className="w-full px-3 py-2 border rounded" />
+                    </label>
+
+                    <label>
+                      <div className="text-xs text-gray-500 mb-1">Monthly Installment</div>
+                      <input type="number" value={form.installment} onChange={(e)=>updateForm("installment", e.target.value)} className="w-full px-3 py-2 border rounded" />
+                    </label>
+
+                    <label>
+                      <div className="text-xs text-gray-500 mb-1">Tenure</div>
+                      <input value={form.tenure} onChange={(e)=>updateForm("tenure", e.target.value)} className="w-full px-3 py-2 border rounded" placeholder="e.g. 12 months" />
+                    </label>
+                  </div>
+
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Short Description</div>
+                    <textarea value={form.description} onChange={(e)=>updateForm("description", e.target.value)} rows={3} className="w-full px-3 py-2 border rounded" />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Category-specific */}
+              {step === 2 && (
+                <div className="space-y-4">
+                  {renderCategoryStep()}
+                </div>
+              )}
+
+              {/* Step 3: Images */}
+              {step === 3 && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-xs text-gray-500">Product Images</div>
+                    <div className="text-xs text-gray-400">Upload & preview</div>
+                  </div>
+
+                  {localImages.length > 0 && (
+                    <div className="flex gap-3 mb-3 overflow-x-auto">
+                      {localImages.map((f,i)=>(
+                        <div key={i} className="w-28 h-20 relative rounded overflow-hidden border">
+                          <img src={URL.createObjectURL(f)} alt={f.name} className="w-full h-full object-cover" />
+                          <button type="button" onClick={()=>removeLocalImage(i)} className="absolute top-1 right-1 bg-white/80 rounded-full p-0.5 text-xs">×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 items-center flex-wrap">
+                    <input type="file" accept="image/*" multiple onChange={handleFilesChange} className="text-sm" />
+                    <button type="button" disabled={!localImages.length || uploading} onClick={handleUploadAll} className="px-3 py-1 rounded bg-[rgb(183,36,42)] text-white text-sm">
+                      {uploading ? "Uploading..." : `Upload ${localImages.length ? `(${localImages.length})` : ""}`}
+                    </button>
+                  </div>
+
+                  {form.productImages && form.productImages.length > 0 && (
+                    <div className="mt-3 flex gap-3 overflow-x-auto">
+                      {form.productImages.map((url, idx)=>(
+                        <div key={idx} className="w-28 h-20 relative rounded overflow-hidden border">
+                          <img src={url} alt={`img-${idx}`} className="w-full h-full object-cover" />
+                          <button type="button" onClick={()=>removeUploadedImage(idx)} className="absolute top-1 right-1 bg-white/80 rounded-full p-0.5 text-xs">×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 4: Payment Plans & Submit */}
+              {step === 4 && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-sm font-semibold text-gray-700">Payment Plans</div>
+                    <button type="button" onClick={addPaymentPlan} className="text-sm px-3 py-1 rounded border">Add Plan</button>
+                  </div>
+
+                  <div className="space-y-3">
+                    {form.paymentPlans.map((p, idx)=>(
+                      <div key={idx} className="p-3 rounded border bg-gray-50">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="text-xs text-gray-600">Plan #{idx + 1}</div>
+                          <div className="flex gap-2">
+                            {form.paymentPlans.length > 1 && <button type="button" onClick={()=>removePaymentPlan(idx)} className="text-xs px-2 py-1 rounded border">Remove</button>}
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                          <input value={p.planName} onChange={(e)=>updatePaymentPlan(idx,"planName",e.target.value)} placeholder="Plan name (e.g. 12 months)" className="px-3 py-2 border rounded" />
+                          <input type="number" value={p.monthlyInstallment} onChange={(e)=>updatePaymentPlan(idx,"monthlyInstallment",e.target.value)} placeholder="Monthly installment" className="px-3 py-2 border rounded" />
+                          <input type="number" value={p.downPayment} onChange={(e)=>updatePaymentPlan(idx,"downPayment",e.target.value)} placeholder="Down payment" className="px-3 py-2 border rounded" />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
+                          <input type="number" value={p.tenureMonths} onChange={(e)=>updatePaymentPlan(idx,"tenureMonths",e.target.value)} placeholder="Tenure months" className="px-3 py-2 border rounded" />
+                          <input type="number" value={p.interestRatePercent} onChange={(e)=>updatePaymentPlan(idx,"interestRatePercent",e.target.value)} placeholder="Interest % (e.g. 12.5)" className="px-3 py-2 border rounded" />
+                          <select value={p.interestType} onChange={(e)=>updatePaymentPlan(idx,"interestType",e.target.value)} className="px-3 py-2 border rounded">
+                            <option>Flat Rate</option>
+                            <option>Reducing Balance</option>
+                            <option>Compound Interest</option>
+                            <option>Profit-Based (Islamic/Shariah)</option>
+                          </select>
+                        </div>
+
+                        <div className="mt-3">
+                          <input type="number" value={p.markup} onChange={(e)=>updatePaymentPlan(idx,"markup",e.target.value)} placeholder="Markup (amount or percent)" className="px-3 py-2 border rounded w-full" />
+                        </div>
+
+                        <div className="mt-3">
+                          <input value={p.otherChargesNote} onChange={(e)=>updatePaymentPlan(idx,"otherChargesNote",e.target.value)} placeholder="Other charges / notes" className="px-3 py-2 border rounded w-full" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* <div className="flex items-center gap-3">
+                    <label className="text-xs text-gray-500">Status</label>
+                    <select value={form.status} onChange={(e)=>updateForm("status", e.target.value)} className="px-3 py-2 border rounded">
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                    </select>
+                  </div> */}
+                </div>
+              )}
+
+              {/* navigation & submit */}
+              <div className="flex items-center justify-between gap-3 pt-3 border-t">
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={goPrev} disabled={step === 1} className={`px-4 py-2 border rounded ${step===1 ? "opacity-50 cursor-not-allowed":""}`}>Back</button>
+                  {step < totalSteps && <button type="button" onClick={goNext} className="px-4 py-2 rounded bg-[rgb(183,36,42)] text-white">Next</button>}
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <button type="button" onClick={()=>{
+                    setForm({
+                      ...form,
+                      productName:'', city:'', price:'', productImages:[], paymentPlans:[{...defaultPlan}],
+                    });
+                    setLocalImages([]);
+                    setStep(1);
+                    setError(null);
+                    setMessage(null);
+                  }} className="px-4 py-2 border rounded">Reset</button>
+
+                  {step === totalSteps && (
+                    <button type="submit" disabled={submitting || uploading} className="px-4 py-2 rounded bg-[rgb(183,36,42)] text-white">
+                      {submitting ? "Submitting..." : "Create Installment Plan"}
+                    </button>
+                  )}
+                </div>
               </div>
-            </section>
-          )}
 
-          {/* ---------- dynamic specifications ---------- */}
-          <section className="mt-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Specifications</h3>
-              <div className="text-sm text-gray-500">Auto-selected based on product data</div>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Generic / general features (show only for mobile or other) */}
-              {shouldShowBlock("mobile", detected.hasGeneral) && (
-                <SpecCard title="General">
-                  <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
-                  <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
-                  <SpecRow label="Dimensions" value={safe(plan, "generalFeatures.phoneDimensions")} />
-                  <SpecRow label="Weight" value={safe(plan, "generalFeatures.phoneWeight")} />
-                  <SpecRow label="Colors" value={safe(plan, "generalFeatures.colors")} />
-                </SpecCard>
-              )}
-
-              {/* Performance (mobile / others) */}
-              {shouldShowBlock("mobile", detected.hasPerformance) && (
-                <SpecCard title="Performance">
-                  <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
-                  <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
-                </SpecCard>
-              )}
-
-              {/* Display */}
-              {shouldShowBlock("mobile", detected.hasDisplay) && (
-                <SpecCard title="Display">
-                  <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
-                  <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
-                  <SpecRow label="Technology" value={safe(plan, "display.technology")} />
-                  <SpecRow label="Protection" value={safe(plan, "display.protection")} />
-                </SpecCard>
-              )}
-
-              {/* Battery */}
-              {shouldShowBlock("mobile", detected.hasBattery) && (
-                <SpecCard title="Battery">
-                  <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
-                </SpecCard>
-              )}
-
-              {/* Camera */}
-              {shouldShowBlock("mobile", detected.hasCamera) && (
-                <SpecCard title="Camera">
-                  <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
-                  <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
-                  <SpecRow label="Features" value={safe(plan, "camera.features")} />
-                </SpecCard>
-              )}
-
-              {/* Memory */}
-              {shouldShowBlock("mobile", detected.hasMemory) && (
-                <SpecCard title="Memory & Storage">
-                  <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
-                  <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
-                  <SpecRow label="Card slot" value={safe(plan, "memory.cardSlot")} />
-                </SpecCard>
-              )}
-
-              {/* Connectivity */}
-              {shouldShowBlock("mobile", detected.hasConnectivity) && (
-                <SpecCard title="Connectivity">
-                  <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
-                  <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
-                  <SpecRow label="Bluetooth" value={safe(plan, "connectivity.bluetooth")} />
-                  <SpecRow label="Infrared" value={safe(plan, "connectivity.infrared")} />
-                </SpecCard>
-              )}
-
-              {/* Air conditioner */}
-              {shouldShowBlock("airConditioner", detected.hasAC) && (
-                <SpecCard title="Air Conditioner">
-                  <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
-                  <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
-                  <SpecRow label="Capacity (Ton)" value={safe(plan, "airConditioner.capacityInTon")} />
-                  <SpecRow label="Energy" value={safe(plan, "airConditioner.energyEfficient")} />
-                  <SpecRow label="Warranty" value={safe(plan, "airConditioner.warranty")} />
-                </SpecCard>
-              )}
-
-              {/* Electrical bike */}
-              {shouldShowBlock("electricalBike", detected.hasElectricalBike) && (
-                <SpecCard title="Electric Bike">
-                  <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
-                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
-                  <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
-                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange")} />
-                  <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
-                </SpecCard>
-              )}
-
-              {/* Mechanical Bike */}
-              {shouldShowBlock("mechanicalBike", detected.hasMechanicalBike) && (
-                <SpecCard title="Mechanical Bike">
-                  <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
-                  <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
-                  <SpecRow label="Ground Clearance" value={safe(plan, "mechanicalBike.performance.groundClearance")} />
-                  <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
-                </SpecCard>
-              )}
-
-              {/* fallback: other */}
-              {detected.selectedCategoryKey === "other" && (
-                <SpecCard title="Details">
-                  <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
-                  <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
-                  <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-                  <SpecRow label="City" value={plan.city || "-"} />
-                </SpecCard>
-              )}
-            </div>
-          </section>
-
-          {/* quick facts */}
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Fact label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-            <Fact label="Tenure" value={plan.tenure || plan.customTenure || "—"} />
-            <Fact label="City" value={plan.city || "—"} />
-            <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+              {/* messages */}
+              {message && <div className="text-sm text-green-600">{message}</div>}
+              {error && <div className="text-sm text-red-600">{error}</div>}
+            </form>
           </div>
-
-          {/* seller & actions */}
-          <div className="mt-2 border-t pt-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
-                {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
-              </div>
-              <div>
-                <div className="text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
-                <div className="text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
-              </div>
-            </div>
-
-          </div>
-
         </div>
       </div>
-    </div>
-  );
-}
-
-/* ---------- small UI components ---------- */
-function SpecCard({ title, children }) {
-  return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="text-sm font-semibold text-gray-700">{title}</h4>
-      </div>
-      <div>{children}</div>
-    </div>
-  );
-}
-
-function SpecRow({ label, value }) {
-  return (
-    <div className="flex items-start justify-between py-1 border-b last:border-b-0">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="text-sm text-gray-700 ml-3 text-right">{value ?? "-"}</div>
-    </div>
-  );
-}
-
-function Fact({ label, value }) {
-  return (
-    <div className="bg-gray-50 rounded-lg p-3 text-sm">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="mt-1 font-medium text-gray-800">{value}</div>
-    </div>
+    </>
   );
 }
