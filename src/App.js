@@ -21,6 +21,7 @@ import InstallmentDetail from "./pages/clients/Installment/installmentoverview.j
 import InstallmentApplicationForm from "./pages/clients/Installment/Apply-Installements.jsx";
 import InstallmentApplicationsPage from "./pages/clients/Installment/AllRequest.jsx";
 import ManageInstallmentsPage from "./pages/clients/Installment/Update-Status.jsx";
+import UpdateInstallmentPlan from "./pages/clients/Installment/UpdateInstallementsPlan.jsx";
 import CreateInstallmentPlan from "./pages/clients/Installment/Create-Installments.jsx";
 import CompareProducts from "./pages/clients/CompareProduct/CompareProducts.jsx";
 import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
@@ -37,6 +38,7 @@ import InsuranceRequests from "./pages/clients/Insurance/getAllRequest.jsx";
 import ProfilePage from "./pages/clients/ClientDashboard/Profile-panel.jsx";
 import UserLoanRequests from "./pages/clients/ClientDashboard/loanApply.jsx";
 import MyInsuranceRequests from "./pages/clients/ClientDashboard/insuranceApply.jsx";
+import AdminInstallment from "./pages/clients/Installment/AllPlan.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -171,6 +173,14 @@ function App() {
             }
           />
           <Route
+            path="/dashboard/Installments/all"
+            element={
+              <ProtectedRoute>
+                <AdminInstallment />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/dashboard/Installments/create"
             element={
               <ProtectedRoute>
@@ -179,7 +189,15 @@ function App() {
             }
           />
           <Route
-            path="/dashboard/Installments/update"
+            path="/dashboard/Installments/update/:id"
+            element={
+              <ProtectedRoute>
+                <UpdateInstallmentPlan />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/Installments/status"
             element={
               <ProtectedRoute>
                 <ManageInstallmentsPage />
