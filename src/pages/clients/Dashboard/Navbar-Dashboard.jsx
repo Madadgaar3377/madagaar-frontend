@@ -86,9 +86,9 @@ export default function NavbarDashboard({ onToggleSidebar }) {
       mobState: mobPropertiesOpen,
       setMobState: setMobPropertiesOpen,
       items: [
-        { to: "/properties", label: "View All Properties" },
-        { to: "/properties/add", label: "Add New Property" },
-        { to: "/properties/manage", label: "Manage Properties" },
+        { to: "/dashboard/properties", label: "View All Properties" },
+        { to: "/dashboard/properties/add", label: "Add New Property" },
+        { to: "/dashboard/properties/manage", label: "Manage Properties" },
       ],
     },
     {

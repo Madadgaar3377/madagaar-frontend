@@ -39,6 +39,7 @@ import ProfilePage from "./pages/clients/ClientDashboard/Profile-panel.jsx";
 import UserLoanRequests from "./pages/clients/ClientDashboard/loanApply.jsx";
 import MyInsuranceRequests from "./pages/clients/ClientDashboard/insuranceApply.jsx";
 import AdminInstallment from "./pages/clients/Installment/AllPlan.jsx";
+import CreatePropertyForm from "./pages/clients/Properties/AddProperties.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -137,6 +138,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Loans />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard/properties/add"
+            element={
+              <ProtectedRoute>
+                <CreatePropertyForm />
               </ProtectedRoute>
             }
           />
