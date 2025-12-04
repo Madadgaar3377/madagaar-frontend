@@ -186,7 +186,7 @@ export default function UpdateInstallmentPlan() {
       if (!body.success) throw new Error(body.message);
 
       setMessage("Installment plan updated successfully");
-      setTimeout(() => navigate("/admin/installment-plans"), 1000);
+      setTimeout(() => navigate("/dashboard/Installments/all"), 1000);
     } catch (err) {
       setError(err.message);
     }
