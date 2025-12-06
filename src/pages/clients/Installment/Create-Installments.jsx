@@ -1,5 +1,5 @@
 // src/pages/admin/CreateInstallmentPlan.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path
 import { getAuthToken } from "../../../utils/auth"; // adjust path
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ const SUBMIT_URL = `${API}/installmentplan`;
 
 const defaultPlan = {
   planName: "",
-  installmentPrice: 0,
+  installmentPrice: 0, // total paid over tenure
   downPayment: 0,
   monthlyInstallment: 0,
   tenureMonths: 0,
@@ -236,6 +236,115 @@ export default function CreateInstallmentPlan() {
   function removeUploadedImage(idx) {
     setForm((f) => ({ ...f, productImages: f.productImages.filter((_, i) => i !== idx) }));
   }
+
+  // --- NEW: installment calculation helpers ---
+
+  // amortization formula (monthly rate) for reducing/compound interest
+  function amortizedMonthlyPayment(principal, annualInterestPercent, months) {
+    if (!months || months <= 0) return 0;
+    const r = Number(annualInterestPercent) / 100 / 12;
+    if (!r) return principal / months;
+    const monthly = (principal * r) / (1 - Math.pow(1 + r, -months));
+    return monthly;
+  }
+
+  // flat rate interest: interest calculated on original principal for full term
+  function flatRateMonthlyPayment(principal, annualInterestPercent, months) {
+    if (!months || months <= 0) return 0;
+    const years = months / 12;
+    const totalInterest = (principal * (Number(annualInterestPercent) / 100) * years);
+    const totalPayable = principal + totalInterest;
+    return totalPayable / months;
+  }
+
+  // Calculate a single plan based on current form values and plan fields
+  function calcPlanValues(planIndex) {
+    const p = form.paymentPlans[planIndex];
+    const rawPrice = parseFloat(form.price) || 0;
+    const planDown = parseFloat(p.downPayment || 0);
+    const productDown = parseFloat(form.downpayment || 0);
+    // plan-level downPayment overrides product-level if provided (>0)
+    const down = planDown > 0 ? planDown : productDown;
+
+    // consider markup as absolute amount (if provided)
+    const markupAmount = parseFloat(p.markup || 0) || 0;
+
+    const principal = Math.max(0, rawPrice - down + markupAmount);
+    const months = parseInt(p.tenureMonths || 0, 10) || 0;
+    const rate = parseFloat(p.interestRatePercent || 0) || 0;
+
+    let monthly = 0;
+    if (months <= 0) {
+      monthly = 0;
+    } else if (p.interestType === "Flat Rate") {
+      monthly = flatRateMonthlyPayment(principal, rate, months);
+    } else if (p.interestType === "Reducing Balance") {
+      monthly = amortizedMonthlyPayment(principal, rate, months);
+    } else if (p.interestType === "Compound Interest") {
+      // treating compound same as amortized monthly compounding
+      monthly = amortizedMonthlyPayment(principal, rate, months);
+    } else if (p.interestType === "Profit-Based (Islamic/Shariah)") {
+      // for profit-based, we'll treat like flat rate for now (total profit distributed)
+      monthly = flatRateMonthlyPayment(principal, rate, months);
+    } else {
+      monthly = amortizedMonthlyPayment(principal, rate, months);
+    }
+
+    const installmentPrice = Number((monthly * months).toFixed(2));
+    const totalInterest = Number((installmentPrice - principal).toFixed(2));
+
+    return {
+      monthlyInstallment: Number(monthly.toFixed(2)),
+      installmentPrice,
+      principal: Number(principal.toFixed(2)),
+      totalInterest,
+      downPayment: Number(down),
+    };
+  }
+
+  // Recalculate a plan and update form state
+  function recalcPlan(index) {
+    setForm((f) => {
+      const pp = [...(f.paymentPlans || [])];
+      const calc = (function localCalc() {
+        const rawPrice = parseFloat(f.price) || 0;
+        const p = pp[index] || { ...defaultPlan };
+        const planDown = parseFloat(p.downPayment || 0);
+        const productDown = parseFloat(f.downpayment || 0);
+        const down = planDown > 0 ? planDown : productDown;
+        const markupAmount = parseFloat(p.markup || 0) || 0;
+        const principal = Math.max(0, rawPrice - down + markupAmount);
+        const months = parseInt(p.tenureMonths || 0, 10) || 0;
+        const rate = parseFloat(p.interestRatePercent || 0) || 0;
+
+        let monthly = 0;
+        if (months <= 0) monthly = 0;
+        else if (p.interestType === "Flat Rate") monthly = flatRateMonthlyPayment(principal, rate, months);
+        else monthly = amortizedMonthlyPayment(principal, rate, months);
+
+        const installmentPrice = Number((monthly * months).toFixed(2));
+        const totalInterest = Number((installmentPrice - principal).toFixed(2));
+
+        return {
+          monthlyInstallment: Number(monthly.toFixed(2)),
+          installmentPrice,
+          principal: Number(principal.toFixed(2)),
+          totalInterest,
+          downPayment: Number(down),
+        };
+      })();
+
+      pp[index] = { ...pp[index], ...calc };
+      return { ...f, paymentPlans: pp };
+    });
+  }
+
+  // Recalc all plans whenever price or product-level downpayment changes
+  useEffect(() => {
+    if (!form.paymentPlans || !form.paymentPlans.length) return;
+    form.paymentPlans.forEach((_, idx) => recalcPlan(idx));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.price, form.downpayment]);
 
   // Validation per step
   function validateStep(currentStep = step) {
@@ -547,7 +656,7 @@ export default function CreateInstallmentPlan() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <h1 className="text-2xl font-semibold text-gray-800">Create Installment Plan</h1>
-            <p className="text-sm text-gray-500">Wizard: fill step-by-step. Use Back / Next to navigate.</p>
+            <p className="text-sm text-gray-500">Wizard: fill step-by-step. Use Back / Next to navigate. Use the auto-calculator per plan to compute monthly & totals from price, downpayment, tenure and interest.</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl shadow">
@@ -685,14 +794,16 @@ export default function CreateInstallmentPlan() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <input value={p.planName} onChange={(e)=>updatePaymentPlan(idx,"planName",e.target.value)} placeholder="Plan name (e.g. 12 months)" className="px-3 py-2 border rounded" />
+
                           <input type="number" value={p.monthlyInstallment} onChange={(e)=>updatePaymentPlan(idx,"monthlyInstallment",e.target.value)} placeholder="Monthly installment" className="px-3 py-2 border rounded" />
-                          <input type="number" value={p.downPayment} onChange={(e)=>updatePaymentPlan(idx,"downPayment",e.target.value)} placeholder="Down payment" className="px-3 py-2 border rounded" />
+
+                          <input type="number" value={p.downPayment} onChange={(e)=>{updatePaymentPlan(idx,"downPayment",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} placeholder="Down payment" className="px-3 py-2 border rounded" />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
-                          <input type="number" value={p.tenureMonths} onChange={(e)=>updatePaymentPlan(idx,"tenureMonths",e.target.value)} placeholder="Tenure months" className="px-3 py-2 border rounded" />
-                          <input type="number" value={p.interestRatePercent} onChange={(e)=>updatePaymentPlan(idx,"interestRatePercent",e.target.value)} placeholder="Interest % (e.g. 12.5)" className="px-3 py-2 border rounded" />
-                          <select value={p.interestType} onChange={(e)=>updatePaymentPlan(idx,"interestType",e.target.value)} className="px-3 py-2 border rounded">
+                          <input type="number" value={p.tenureMonths} onChange={(e)=>{updatePaymentPlan(idx,"tenureMonths",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} placeholder="Tenure months" className="px-3 py-2 border rounded" />
+                          <input type="number" value={p.interestRatePercent} onChange={(e)=>{updatePaymentPlan(idx,"interestRatePercent",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} placeholder="Interest % (e.g. 12.5)" className="px-3 py-2 border rounded" />
+                          <select value={p.interestType} onChange={(e)=>{updatePaymentPlan(idx,"interestType",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} className="px-3 py-2 border rounded">
                             <option>Flat Rate</option>
                             <option>Reducing Balance</option>
                             <option>Compound Interest</option>
@@ -700,24 +811,30 @@ export default function CreateInstallmentPlan() {
                           </select>
                         </div>
 
-                        <div className="mt-3">
-                          <input type="number" value={p.markup} onChange={(e)=>updatePaymentPlan(idx,"markup",e.target.value)} placeholder="Markup (amount or percent)" className="px-3 py-2 border rounded w-full" />
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <input type="number" value={p.markup} onChange={(e)=>{updatePaymentPlan(idx,"markup",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} placeholder="Markup (absolute amount)" className="px-3 py-2 border rounded w-full" />
+
+                          <div className="flex items-center gap-2">
+                            <button type="button" onClick={()=>recalcPlan(idx)} className="px-3 py-2 rounded border text-sm">Auto-calc</button>
+                            <div className="text-xs text-gray-500">(calculate monthly & totals)</div>
+                          </div>
                         </div>
 
                         <div className="mt-3">
                           <input value={p.otherChargesNote} onChange={(e)=>updatePaymentPlan(idx,"otherChargesNote",e.target.value)} placeholder="Other charges / notes" className="px-3 py-2 border rounded w-full" />
                         </div>
+
+                        {/* summary */}
+                        <div className="mt-3 text-sm bg-white p-2 rounded border">
+                          <div className="flex justify-between"><div>Principal (price - down + markup)</div><div>{Number(p.principal || 0).toLocaleString()}</div></div>
+                          <div className="flex justify-between"><div>Total Interest</div><div>{Number(p.totalInterest || 0).toLocaleString()}</div></div>
+                          <div className="flex justify-between"><div>Total Payable</div><div>{Number(p.installmentPrice || 0).toLocaleString()}</div></div>
+                          <div className="flex justify-between"><div>Monthly</div><div>{Number(p.monthlyInstallment || 0).toLocaleString()}</div></div>
+                        </div>
                       </div>
                     ))}
                   </div>
 
-                  {/* <div className="flex items-center gap-3">
-                    <label className="text-xs text-gray-500">Status</label>
-                    <select value={form.status} onChange={(e)=>updateForm("status", e.target.value)} className="px-3 py-2 border rounded">
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                    </select>
-                  </div> */}
                 </div>
               )}
 
