@@ -11,7 +11,7 @@ const SUBMIT_URL = `${API}/installmentplan`;
 
 const defaultPlan = {
   planName: "",
-  installmentPrice: 0, // total paid over tenure
+  installmentPrice: 0,
   downPayment: 0,
   monthlyInstallment: 0,
   tenureMonths: 0,
@@ -237,7 +237,7 @@ export default function CreateInstallmentPlan() {
     setForm((f) => ({ ...f, productImages: f.productImages.filter((_, i) => i !== idx) }));
   }
 
-  // --- NEW: installment calculation helpers ---
+  // --- installment calculation helpers ---
 
   // amortization formula (monthly rate) for reducing/compound interest
   function amortizedMonthlyPayment(principal, annualInterestPercent, months) {
@@ -261,15 +261,11 @@ export default function CreateInstallmentPlan() {
   function calcPlanValues(planIndex) {
     const p = form.paymentPlans[planIndex];
     const rawPrice = parseFloat(form.price) || 0;
-    const planDown = parseFloat(p.downPayment || 0);
+    // product-level downpayment used as source of truth; plan-level downPayment will be calculated and shown (not editable)
     const productDown = parseFloat(form.downpayment || 0);
-    // plan-level downPayment overrides product-level if provided (>0)
-    const down = planDown > 0 ? planDown : productDown;
-
-    // consider markup as absolute amount (if provided)
     const markupAmount = parseFloat(p.markup || 0) || 0;
 
-    const principal = Math.max(0, rawPrice - down + markupAmount);
+    const principal = Math.max(0, rawPrice - productDown + markupAmount);
     const months = parseInt(p.tenureMonths || 0, 10) || 0;
     const rate = parseFloat(p.interestRatePercent || 0) || 0;
 
@@ -277,14 +273,6 @@ export default function CreateInstallmentPlan() {
     if (months <= 0) {
       monthly = 0;
     } else if (p.interestType === "Flat Rate") {
-      monthly = flatRateMonthlyPayment(principal, rate, months);
-    } else if (p.interestType === "Reducing Balance") {
-      monthly = amortizedMonthlyPayment(principal, rate, months);
-    } else if (p.interestType === "Compound Interest") {
-      // treating compound same as amortized monthly compounding
-      monthly = amortizedMonthlyPayment(principal, rate, months);
-    } else if (p.interestType === "Profit-Based (Islamic/Shariah)") {
-      // for profit-based, we'll treat like flat rate for now (total profit distributed)
       monthly = flatRateMonthlyPayment(principal, rate, months);
     } else {
       monthly = amortizedMonthlyPayment(principal, rate, months);
@@ -298,43 +286,40 @@ export default function CreateInstallmentPlan() {
       installmentPrice,
       principal: Number(principal.toFixed(2)),
       totalInterest,
-      downPayment: Number(down),
+      downPayment: Number(productDown || 0),
     };
   }
 
-  // Recalculate a plan and update form state
+  // Recalculate a plan and update form state (monthly & downPayment become computed read-only values)
   function recalcPlan(index) {
     setForm((f) => {
       const pp = [...(f.paymentPlans || [])];
-      const calc = (function localCalc() {
-        const rawPrice = parseFloat(f.price) || 0;
-        const p = pp[index] || { ...defaultPlan };
-        const planDown = parseFloat(p.downPayment || 0);
-        const productDown = parseFloat(f.downpayment || 0);
-        const down = planDown > 0 ? planDown : productDown;
-        const markupAmount = parseFloat(p.markup || 0) || 0;
-        const principal = Math.max(0, rawPrice - down + markupAmount);
-        const months = parseInt(p.tenureMonths || 0, 10) || 0;
-        const rate = parseFloat(p.interestRatePercent || 0) || 0;
+      const p = pp[index] || { ...defaultPlan };
 
-        let monthly = 0;
-        if (months <= 0) monthly = 0;
-        else if (p.interestType === "Flat Rate") monthly = flatRateMonthlyPayment(principal, rate, months);
-        else monthly = amortizedMonthlyPayment(principal, rate, months);
+      const rawPrice = parseFloat(f.price) || 0;
+      const productDown = parseFloat(f.downpayment || 0);
+      const markupAmount = parseFloat(p.markup || 0) || 0;
+      const principal = Math.max(0, rawPrice - productDown + markupAmount);
+      const months = parseInt(p.tenureMonths || 0, 10) || 0;
+      const rate = parseFloat(p.interestRatePercent || 0) || 0;
 
-        const installmentPrice = Number((monthly * months).toFixed(2));
-        const totalInterest = Number((installmentPrice - principal).toFixed(2));
+      let monthly = 0;
+      if (months <= 0) monthly = 0;
+      else if (p.interestType === "Flat Rate") monthly = flatRateMonthlyPayment(principal, rate, months);
+      else monthly = amortizedMonthlyPayment(principal, rate, months);
 
-        return {
-          monthlyInstallment: Number(monthly.toFixed(2)),
-          installmentPrice,
-          principal: Number(principal.toFixed(2)),
-          totalInterest,
-          downPayment: Number(down),
-        };
-      })();
+      const installmentPrice = Number((monthly * months).toFixed(2));
+      const totalInterest = Number((installmentPrice - principal).toFixed(2));
 
-      pp[index] = { ...pp[index], ...calc };
+      pp[index] = {
+        ...pp[index],
+        monthlyInstallment: Number(monthly.toFixed(2)),
+        installmentPrice,
+        principal: Number(principal.toFixed(2)),
+        totalInterest,
+        downPayment: Number(productDown || 0), // calculated, not editable when added
+      };
+
       return { ...f, paymentPlans: pp };
     });
   }
@@ -656,7 +641,7 @@ export default function CreateInstallmentPlan() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <h1 className="text-2xl font-semibold text-gray-800">Create Installment Plan</h1>
-            <p className="text-sm text-gray-500">Wizard: fill step-by-step. Use Back / Next to navigate. Use the auto-calculator per plan to compute monthly & totals from price, downpayment, tenure and interest.</p>
+            <p className="text-sm text-gray-500">Wizard: fill step-by-step. Use Back / Next to navigate. Monthly & Downpayment are calculated and shown (not editable) per plan.</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl shadow">
@@ -706,12 +691,12 @@ export default function CreateInstallmentPlan() {
                     </label>
 
                     <label>
-                      <div className="text-xs text-gray-500 mb-1">Downpayment</div>
+                      <div className="text-xs text-gray-500 mb-1">Downpayment (product-level)</div>
                       <input type="number" value={form.downpayment} onChange={(e)=>updateForm("downpayment", e.target.value)} className="w-full px-3 py-2 border rounded" />
                     </label>
 
                     <label>
-                      <div className="text-xs text-gray-500 mb-1">Monthly Installment</div>
+                      <div className="text-xs text-gray-500 mb-1">Monthly Installment (product-level)</div>
                       <input type="number" value={form.installment} onChange={(e)=>updateForm("installment", e.target.value)} className="w-full px-3 py-2 border rounded" />
                     </label>
 
@@ -795,9 +780,25 @@ export default function CreateInstallmentPlan() {
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <input value={p.planName} onChange={(e)=>updatePaymentPlan(idx,"planName",e.target.value)} placeholder="Plan name (e.g. 12 months)" className="px-3 py-2 border rounded" />
 
-                          <input type="number" value={p.monthlyInstallment} onChange={(e)=>updatePaymentPlan(idx,"monthlyInstallment",e.target.value)} placeholder="Monthly installment" className="px-3 py-2 border rounded" />
+                          {/* Monthly Installment: SHOW ONLY (not editable) */}
+                          <input
+                            type="number"
+                            value={p.monthlyInstallment || 0}
+                            readOnly
+                            disabled
+                            placeholder="Monthly installment (calculated)"
+                            className="px-3 py-2 border rounded bg-gray-100"
+                          />
 
-                          <input type="number" value={p.downPayment} onChange={(e)=>{updatePaymentPlan(idx,"downPayment",e.target.value); setTimeout(()=>recalcPlan(idx), 0);}} placeholder="Down payment" className="px-3 py-2 border rounded" />
+                          {/* Down Payment: SHOW ONLY (not editable). Uses product-level downpayment as source */}
+                          <input
+                            type="number"
+                            value={p.downPayment || 0}
+                            readOnly
+                            disabled
+                            placeholder="Down payment (calculated)"
+                            className="px-3 py-2 border rounded bg-gray-100"
+                          />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-3">
