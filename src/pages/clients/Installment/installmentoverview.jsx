@@ -121,8 +121,29 @@ export default function InstallmentDetail() {
     const hasMemory = isObjectPresent(plan, "memory") && anySpecHasValue(plan, ["memory.internalMemory", "memory.ram"]);
     const hasConnectivity = isObjectPresent(plan, "connectivity") && anySpecHasValue(plan, ["connectivity.data", "connectivity.bluetooth"]);
     const hasAC = isObjectPresent(plan, "airConditioner") && anySpecHasValue(plan, ["airConditioner.brand", "airConditioner.model", "airConditioner.capacityInTon"]);
-    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, ["electricalBike.motorRatedPower", "electricalBike.battery"]);
-    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, ["mechanicalBike.generalFeatures.engine", "mechanicalBike.performance.transmission"]);
+
+    // widened electrical bike checks to include multiple possible field names added in schema
+    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, [
+      "electricalBike.motorRatedPower",
+      "electricalBike.motor",
+      "electricalBike.battery",
+      "electricalBike.batterySpec",
+      "electricalBike.maxSpeed",
+      "electricalBike.maxDistanceRange",
+      "electricalBike.rangeKm",
+      "electricalBike.chargingTime",
+      "electricalBike.controllers",
+    ]);
+
+    // widened mechanical bike checks
+    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, [
+      "mechanicalBike.generalFeatures.engine",
+      "mechanicalBike.generalFeatures.model",
+      "mechanicalBike.generalFeatures.dimensions",
+      "mechanicalBike.performance.transmission",
+      "mechanicalBike.performance.displacement",
+      "mechanicalBike.performance.petrolCapacity",
+    ]);
 
     // heuristics by category text
     const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(catRaw) || hasGeneral || hasDisplay || hasBattery || hasCamera || hasMemory;
@@ -405,20 +426,37 @@ export default function InstallmentDetail() {
               {/* Electrical bike */}
               {shouldShowBlock("electricalBike", detected.hasElectricalBike) && (
                 <SpecCard title="Electric Bike">
-                  <SpecRow label="Motor Power" value={safe(plan, "electricalBike.motorRatedPower")} />
-                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery")} />
+                  <SpecRow label="Model" value={safe(plan, "electricalBike.model")} />
+                  <SpecRow label="Motor" value={safe(plan, "electricalBike.motorRatedPower") !== "-" ? safe(plan, "electricalBike.motorRatedPower") : safe(plan, "electricalBike.motor")} />
+                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery") !== "-" ? safe(plan, "electricalBike.battery") : safe(plan, "electricalBike.batterySpec")} />
                   <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
-                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange")} />
+                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange") !== "-" ? safe(plan, "electricalBike.maxDistanceRange") : safe(plan, "electricalBike.rangeKm")} />
                   <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
+                  <SpecRow label="Controllers" value={safe(plan, "electricalBike.controllers")} />
+                  <SpecRow label="Electricity Consumption" value={safe(plan, "electricalBike.electricityConsumption")} />
+                  <SpecRow label="Wheel Base" value={safe(plan, "electricalBike.wheelBase") || safe(plan, "electricalBike.vehicleDimensions")} />
+                  <SpecRow label="Ground Clearance" value={safe(plan, "electricalBike.groundClearance")} />
+                  <SpecRow label="Tyre (Front)" value={safe(plan, "electricalBike.tyreFront") || safe(plan, "electricalBike.rimsTiresFront")} />
+                  <SpecRow label="Tyre (Back)" value={safe(plan, "electricalBike.tyreBack") || safe(plan, "electricalBike.rimsTiresBack")} />
+                  <SpecRow label="Shocks" value={safe(plan, "electricalBike.shocks")} />
+                  <SpecRow label="Warranty" value={safe(plan, "electricalBike.warranty")} />
                 </SpecCard>
               )}
 
               {/* Mechanical Bike */}
               {shouldShowBlock("mechanicalBike", detected.hasMechanicalBike) && (
                 <SpecCard title="Mechanical Bike">
+                  <SpecRow label="Model" value={safe(plan, "mechanicalBike.generalFeatures.model")} />
+                  <SpecRow label="Dimensions" value={safe(plan, "mechanicalBike.generalFeatures.dimensions")} />
+                  <SpecRow label="Weight" value={safe(plan, "mechanicalBike.generalFeatures.weight")} />
                   <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
                   <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
-                  <SpecRow label="Ground Clearance" value={safe(plan, "mechanicalBike.performance.groundClearance")} />
+                  <SpecRow label="Displacement" value={safe(plan, "mechanicalBike.performance.displacement")} />
+                  <SpecRow label="Petrol Capacity" value={safe(plan, "mechanicalBike.performance.petrolCapacity")} />
+                  <SpecRow label="Compression Ratio" value={safe(plan, "mechanicalBike.assembly.compressionRatio")} />
+                  <SpecRow label="Bore & Stroke" value={safe(plan, "mechanicalBike.assembly.boreAndStroke")} />
+                  <SpecRow label="Tyre (Front)" value={safe(plan, "mechanicalBike.assembly.tyreAtFront")} />
+                  <SpecRow label="Tyre (Back)" value={safe(plan, "mechanicalBike.assembly.tyreAtBack")} />
                   <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
                 </SpecCard>
               )}

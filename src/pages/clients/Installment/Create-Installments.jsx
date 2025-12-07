@@ -1,4 +1,3 @@
-// src/pages/admin/CreateInstallmentPlan.jsx
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path
 import { getAuthToken } from "../../../utils/auth"; // adjust path
@@ -85,17 +84,38 @@ export default function CreateInstallmentPlan() {
       warranty: "",
     },
 
-    // electrical bike
+    // electrical bike (added fields preserved, plus new fields from schema)
     electricalBike: {
-      motorRatedPower: "",
-      battery: "",
-      maxSpeed: "",
-      maxDistanceRange: "",
+      // General Features
+      model: "",
+      dimensions: "",
+      weight: "",
+      speed: "",
+      batterySpec: "",
       chargingTime: "",
+      brakes: "",
+      warranty: "",
+
+      // Performance
+      transmission: "",
+      rangeKm: "",
+      groundClearance: "",
+      starting: "",
+      motor: "",
+      motorRatedPower: "",
+      controllers: "",
+      electricityConsumption: "",
+
+      // Assembly / other specs
+      recommendedLoadCapacity: "",
+      wheelBase: "",
+      shocks: "",
+      tyreFront: "",
+      tyreBack: "",
+      otherFeatures: "",
+      maxDistanceRange: "",
       rimsTiresFront: "",
       rimsTiresBack: "",
-      brakes: "",
-      shocks: "",
       meter: "",
       maxLoad: "",
       dryWeight: "",
@@ -104,9 +124,10 @@ export default function CreateInstallmentPlan() {
       colors: "",
     },
 
-    // mechanical bike
+    // mechanical bike (added model and engine kept)
     mechanicalBike: {
       generalFeatures: {
+        model: "",
         dimensions: "",
         weight: "",
         engine: "",
@@ -564,10 +585,25 @@ export default function CreateInstallmentPlan() {
         <section>
           <h3 className="text-sm font-medium">Mechanical Bike Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-            <input value={form.mechanicalBike.generalFeatures.dimensions} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.dimensions", e.target.value)} placeholder="Dimensions" className="px-3 py-2 border rounded w-full" />
-            <input value={form.mechanicalBike.generalFeatures.weight} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.weight", e.target.value)} placeholder="Weight" className="px-3 py-2 border rounded w-full" />
-            <input value={form.mechanicalBike.performance.transmission} onChange={(e)=>updateForm("mechanicalBike.performance.transmission", e.target.value)} placeholder="Transmission" className="px-3 py-2 border rounded w-full" />
-            <input value={form.mechanicalBike.performance.displacement} onChange={(e)=>updateForm("mechanicalBike.performance.displacement", e.target.value)} placeholder="Displacement" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.generalFeatures.model} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.model", e.target.value)} placeholder="Model (e.g. 2015)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.generalFeatures.dimensions} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.dimensions", e.target.value)} placeholder="Dimensions (L x W x H)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.generalFeatures.weight} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.weight", e.target.value)} placeholder="Weight (e.g. 82kg)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.generalFeatures.engine} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.engine", e.target.value)} placeholder="Engine (e.g. 4-Stroke , OHC Air Cooled)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.mechanicalBike.performance.transmission} onChange={(e)=>updateForm("mechanicalBike.performance.transmission", e.target.value)} placeholder="Transmission (e.g. 4 Speed Constant Mesh)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.performance.groundClearance} onChange={(e)=>updateForm("mechanicalBike.performance.groundClearance", e.target.value)} placeholder="Ground Clearance (e.g. 136 mm)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.performance.starting} onChange={(e)=>updateForm("mechanicalBike.performance.starting", e.target.value)} placeholder="Starting (e.g. Kick Starter)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.performance.displacement} onChange={(e)=>updateForm("mechanicalBike.performance.displacement", e.target.value)} placeholder="Displacement (e.g. 72 cm3)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.mechanicalBike.performance.petrolCapacity} onChange={(e)=>updateForm("mechanicalBike.performance.petrolCapacity", e.target.value)} placeholder="Petrol Capacity (e.g. 8.6 Liters)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.mechanicalBike.assembly.compressionRatio} onChange={(e)=>updateForm("mechanicalBike.assembly.compressionRatio", e.target.value)} placeholder="Compression Ratio (e.g. 8.8:1)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.assembly.boreAndStroke} onChange={(e)=>updateForm("mechanicalBike.assembly.boreAndStroke", e.target.value)} placeholder="Bore and Stroke (e.g. 47.0 x 41.4 mm)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.assembly.tyreAtFront} onChange={(e)=>updateForm("mechanicalBike.assembly.tyreAtFront", e.target.value)} placeholder="Tyre at Front (e.g. 2.25 – 17)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.assembly.tyreAtBack} onChange={(e)=>updateForm("mechanicalBike.assembly.tyreAtBack", e.target.value)} placeholder="Tyre at Back (e.g. 2.50 – 17)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.mechanicalBike.assembly.seatHeight} onChange={(e)=>updateForm("mechanicalBike.assembly.seatHeight", e.target.value)} placeholder="Seat Height (e.g. N/A)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.mechanicalBike.generalFeatures.colors} onChange={(e)=>updateForm("mechanicalBike.generalFeatures.colors", e.target.value)} placeholder="Colors" className="px-3 py-2 border rounded w-full" />
           </div>
         </section>
       );
@@ -577,9 +613,34 @@ export default function CreateInstallmentPlan() {
         <section>
           <h3 className="text-sm font-medium">Electric Bike Details</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-            <input value={form.electricalBike.motorRatedPower} onChange={(e)=>updateForm("electricalBike.motorRatedPower", e.target.value)} placeholder="Motor rated power" className="px-3 py-2 border rounded w-full" />
-            <input value={form.electricalBike.battery} onChange={(e)=>updateForm("electricalBike.battery", e.target.value)} placeholder="Battery spec" className="px-3 py-2 border rounded w-full" />
-            <input value={form.electricalBike.maxDistanceRange} onChange={(e)=>updateForm("electricalBike.maxDistanceRange", e.target.value)} placeholder="Max range" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.model} onChange={(e)=>updateForm("electricalBike.model", e.target.value)} placeholder="Model (e.g. 2025)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.dimensions} onChange={(e)=>updateForm("electricalBike.dimensions", e.target.value)} placeholder="Dimensions (e.g. 1680 × 680 × 1080 mm)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.weight} onChange={(e)=>updateForm("electricalBike.weight", e.target.value)} placeholder="Weight (e.g. 75 kg)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.speed} onChange={(e)=>updateForm("electricalBike.speed", e.target.value)} placeholder="Speed (e.g. 35–45 km/h)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.batterySpec} onChange={(e)=>updateForm("electricalBike.batterySpec", e.target.value)} placeholder="Battery (e.g. Graphene Battery 48V 26AH)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.chargingTime} onChange={(e)=>updateForm("electricalBike.chargingTime", e.target.value)} placeholder="Charging Time (e.g. 9.5 hours)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.brakes} onChange={(e)=>updateForm("electricalBike.brakes", e.target.value)} placeholder="Brakes (e.g. Front Disc; Rear Drum)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.warranty} onChange={(e)=>updateForm("electricalBike.warranty", e.target.value)} placeholder="Warranty (e.g. 24 months / 20,000 km)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.transmission} onChange={(e)=>updateForm("electricalBike.transmission", e.target.value)} placeholder="Transmission (e.g. Automatic (Electric Drive))" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.rangeKm} onChange={(e)=>updateForm("electricalBike.rangeKm", e.target.value)} placeholder="Range (e.g. 60 km)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.groundClearance} onChange={(e)=>updateForm("electricalBike.groundClearance", e.target.value)} placeholder="Ground Clearance (e.g. 140 mm)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.starting} onChange={(e)=>updateForm("electricalBike.starting", e.target.value)} placeholder="Starting (e.g. Electric Start)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.motor} onChange={(e)=>updateForm("electricalBike.motor", e.target.value)} placeholder="Motor (e.g. 500 W)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.controllers} onChange={(e)=>updateForm("electricalBike.controllers", e.target.value)} placeholder="Controllers (e.g. 9 Tube 25 A)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.electricityConsumption} onChange={(e)=>updateForm("electricalBike.electricityConsumption", e.target.value)} placeholder="Electricity Consumption (e.g. 1.56 Units/KWH)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.recommendedLoadCapacity} onChange={(e)=>updateForm("electricalBike.recommendedLoadCapacity", e.target.value)} placeholder="Recommended Load Capacity (e.g. 150 kg)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.wheelBase} onChange={(e)=>updateForm("electricalBike.wheelBase", e.target.value)} placeholder="Wheel Base (e.g. 1220 mm)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.shocks} onChange={(e)=>updateForm("electricalBike.shocks", e.target.value)} placeholder="Shocks (e.g. Front & Rear Hydraulic Suspension)" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.tyreFront} onChange={(e)=>updateForm("electricalBike.tyreFront", e.target.value)} placeholder="Tyre at Front (e.g. 3.0–10)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.tyreBack} onChange={(e)=>updateForm("electricalBike.tyreBack", e.target.value)} placeholder="Tyre at Back (e.g. 3.0–10)" className="px-3 py-2 border rounded w-full" />
+
+            <input value={form.electricalBike.otherFeatures} onChange={(e)=>updateForm("electricalBike.otherFeatures", e.target.value)} placeholder="Other Features" className="px-3 py-2 border rounded w-full" />
+            <input value={form.electricalBike.colors} onChange={(e)=>updateForm("electricalBike.colors", e.target.value)} placeholder="Colors" className="px-3 py-2 border rounded w-full" />
           </div>
         </section>
       );
@@ -764,7 +825,10 @@ export default function CreateInstallmentPlan() {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-sm font-semibold text-gray-700">Payment Plans</div>
-                    <button type="button" onClick={addPaymentPlan} className="text-sm px-3 py-1 rounded border">Add Plan</button>
+                    <div className="flex items-center gap-3">
+                      <button type="button" onClick={addPaymentPlan} className="text-sm px-3 py-1 rounded border">Add Plan</button>
+                      <div className="text-xs text-gray-500">Click "Add Plan" to create another payment option</div>
+                    </div>
                   </div>
 
                   <div className="space-y-3">
