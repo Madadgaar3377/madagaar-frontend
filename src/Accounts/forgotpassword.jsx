@@ -31,7 +31,7 @@ export default function ForgotPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/forgotpassword`, {
+      const res = await fetch(`${API}/forgetPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: email.trim() }),
@@ -39,13 +39,13 @@ export default function ForgotPassword() {
 
       const body = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        setError(body?.message || body?.error || "Failed to send reset OTP.");
+      if (!res.ok || (body && body.success === false)) {
+        setError(body?.message || "Failed to send reset OTP.");
       } else {
         setSuccess(body?.message || "OTP sent to your email. Check your inbox.");
-        // optionally navigate to reset page, prefill email in query
+        // Navigate to reset page with email
         setTimeout(() => {
-          navigate(`/account/reset?email=${encodeURIComponent(email.trim())}`);
+          navigate("/account/reset", { state: { email: email.trim() } });
         }, 1200);
       }
     } catch (err) {

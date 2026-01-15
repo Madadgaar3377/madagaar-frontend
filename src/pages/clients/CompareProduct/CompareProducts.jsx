@@ -5,7 +5,6 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 const MAX_COMPARE = 4;
-const ACCENT = "rgb(183,36,42)";
 
 export default function CompareProducts() {
   const { id: routeId } = useParams();
@@ -45,7 +44,7 @@ export default function CompareProducts() {
     (async () => {
       setLoadingSearch(true);
       try {
-        const url = `${API}/installmentplan/get/public?q=${encodeURIComponent(
+        const url = `${API}/getAllInstallments?q=${encodeURIComponent(
           debouncedQuery
         )}&limit=12`;
         const res = await fetch(url);
@@ -69,7 +68,7 @@ export default function CompareProducts() {
     setError("");
     try {
       const res = await fetch(
-        `${API}/installmentplan/get/public/${encodeURIComponent(identifier)}`
+        `${API}/getInstallment/${encodeURIComponent(identifier)}`
       );
       const body = await res.json().catch(() => null);
       let product = (body && (body.data || (body.success && body.data))) || body;
@@ -139,7 +138,7 @@ export default function CompareProducts() {
 
       async function tryFetch(q) {
         try {
-          const res = await fetch(`${API}/installmentplan/get/public?${q}&limit=${limit}`);
+          const res = await fetch(`${API}/getAllInstallments?${q}&limit=${limit}`);
           const body = await res.json().catch(() => null);
           const list = (body && (body.data || body)) || [];
           if (Array.isArray(list)) list.forEach((p) => hits.set(getId(p), p));
@@ -295,23 +294,27 @@ export default function CompareProducts() {
   const showComparison = compareList.length > 1;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* header */}
-        <div className="flex items-center justify-between">
+        <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-gray-800">Compare — Focused View</h1>
-            <p className="text-sm text-gray-500">Primary product is shown here. Use search to add other items for comparison.</p>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+              Compare Products
+            </h1>
+            <p className="text-sm text-gray-600 mt-2">Compare up to {MAX_COMPARE} products side by side</p>
           </div>
           <div className="flex gap-2">
-            <button onClick={clearAll} className="px-3 py-2 rounded-md bg-white border text-sm">Clear</button>
+            <button onClick={clearAll} className="px-4 py-2 rounded-lg bg-red-100 text-red-700 font-medium hover:bg-red-200 transition">
+              Clear All
+            </button>
           </div>
         </div>
 
         {/* base product hero card */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border flex flex-col md:flex-row gap-6">
+        <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 flex flex-col md:flex-row gap-6">
           <div className="w-full md:w-80 flex-shrink-0">
-            <div className="rounded-lg overflow-hidden bg-gray-100 h-56 flex items-center justify-center">
+            <div className="rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 h-64 flex items-center justify-center">
               <img src={(baseProduct && baseProduct.productImages && baseProduct.productImages[0]) || ""} alt="" className="w-full h-full object-cover" />
             </div>
           </div>
@@ -333,8 +336,12 @@ export default function CompareProducts() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <button onClick={() => addToCompare(baseProduct)} className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white">Compare</button>
-                    <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2 rounded-md border">Open Detail</button>
+                    <button onClick={() => addToCompare(baseProduct)} className="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition">
+                      ⚖️ Compare
+                    </button>
+                    <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition font-medium">
+                      View Details
+                    </button>
                   </div>
                 </div>
 
@@ -365,15 +372,22 @@ export default function CompareProducts() {
         </div>
 
         {/* Search / Add other products area */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border">
           <div className="flex gap-3 items-center">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search products to add for comparison (name, brand, city or plan id)..."
-              className="flex-1 px-4 py-3 border rounded-lg focus:outline-none"
-            />
-            <button onClick={() => setDebouncedQuery(query)} className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white">Search</button>
+            <div className="relative flex-1">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search products to compare by name, brand, city..."
+                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
+              />
+            </div>
+            <button onClick={() => setDebouncedQuery(query)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition">
+              Search
+            </button>
           </div>
 
           {loadingSearch && <div className="mt-3 text-sm text-gray-500">Searching…</div>}

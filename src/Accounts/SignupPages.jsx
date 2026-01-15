@@ -7,16 +7,16 @@ export default function SignupPage() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    businessName: "",
-    fullName: "",
+    name: "",
+    userName: "",
     email: "",
-    number: "",
-    whatsappNumber: "",
-    businessNumber: "",
-    cnic: "",
+    phoneNumber: "",
+    WhatsappNumber: "",
+    cnicNumber: "",
     password: "",
-    refferenceCode: "",
-    userType: "User",
+    Address: "",
+    refferedBy: "",
+    UserType: "user",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
@@ -32,13 +32,19 @@ export default function SignupPage() {
 
     try {
       const payload = {
-        ...formData,
-        // respect the selected userType from the form (default: User)
-        userType: formData.userType || "User",
-        walletDetails: [],
+        name: formData.name,
+        userName: formData.userName || undefined,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber || undefined,
+        WhatsappNumber: formData.WhatsappNumber || undefined,
+        cnicNumber: formData.cnicNumber || undefined,
+        password: formData.password,
+        Address: formData.Address || undefined,
+        refferedBy: formData.refferedBy || undefined,
+        UserType: formData.UserType || "user",
       };
 
-      const res = await fetch(`${apiUrl}/auth/registration/sign-up`, {
+      const res = await fetch(`${apiUrl}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -54,7 +60,7 @@ export default function SignupPage() {
       }
 
       setMessage(data?.message || "Signup successful! Check your email for OTP.");
-      navigate("/account/verify-otp", { state: { email: formData.email } });
+      navigate("/account", { state: { email: formData.email } });
     } catch (err) {
       console.error("Signup error:", err);
       setMessage("Network error — please try again.");
@@ -72,15 +78,14 @@ export default function SignupPage() {
         {message && <div className="mb-4 p-3 rounded-md text-sm text-red-700 bg-red-50">{message}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Row: Business Name / Full Name */}
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Business Name</label>
-            <input name="businessName" placeholder="Acme Traders" value={formData.businessName} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" required />
+            <label className="md:w-1/3 text-sm text-gray-600">Full Name</label>
+            <input name="name" placeholder="Your full name" value={formData.name} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" required />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Full Name</label>
-            <input name="fullName" placeholder="Your full name" value={formData.fullName} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" required />
+            <label className="md:w-1/3 text-sm text-gray-600">Username</label>
+            <input name="userName" placeholder="Optional" value={formData.userName} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
@@ -89,23 +94,23 @@ export default function SignupPage() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Phone</label>
-            <input name="number" type="tel" placeholder="03xx-xxxxxxx" value={formData.number} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" required />
+            <label className="md:w-1/3 text-sm text-gray-600">Phone Number</label>
+            <input name="phoneNumber" type="tel" placeholder="03xx-xxxxxxx" value={formData.phoneNumber} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Whatsapp</label>
-            <input name="whatsappNumber" placeholder="Optional" value={formData.whatsappNumber} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
+            <label className="md:w-1/3 text-sm text-gray-600">WhatsApp Number</label>
+            <input name="WhatsappNumber" type="tel" placeholder="Optional" value={formData.WhatsappNumber} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Business No.</label>
-            <input name="businessNumber" placeholder="Optional" value={formData.businessNumber} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
+            <label className="md:w-1/3 text-sm text-gray-600">CNIC Number</label>
+            <input name="cnicNumber" placeholder="XXXXX-XXXXXXX-X" value={formData.cnicNumber} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">CNIC</label>
-            <input name="cnic" placeholder="XXXXX-XXXXXXX-X" value={formData.cnic} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" required />
+            <label className="md:w-1/3 text-sm text-gray-600">Address</label>
+            <input name="Address" placeholder="Optional" value={formData.Address} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
@@ -117,17 +122,16 @@ export default function SignupPage() {
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
-            <label className="md:w-1/3 text-sm text-gray-600">Reference Code</label>
-            <input name="refferenceCode" placeholder="Optional" value={formData.refferenceCode} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
+            <label className="md:w-1/3 text-sm text-gray-600">Referred By</label>
+            <input name="refferedBy" placeholder="Optional" value={formData.refferedBy} onChange={handleChange} className="md:flex-1 p-2 border rounded-md" />
           </div>
 
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <label className="md:w-1/3 text-sm text-gray-600">User Type</label>
-            <select name="userType" value={formData.userType} onChange={handleChange} className="md:flex-1 p-2 border rounded-md">
-              <option value="User">User</option>
-              <option value="Affiliate">Affiliate</option>
-              <option value="Agent">Agent</option>
-              <option value="Partner">Partner</option>
+            <select name="UserType" value={formData.UserType} onChange={handleChange} className="md:flex-1 p-2 border rounded-md">
+              <option value="user">User</option>
+              <option value="agent">Agent</option>
+              <option value="partner">Partner</option>
             </select>
           </div>
 

@@ -69,7 +69,7 @@ export default function InstallmentDetail() {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`${apiUrl}/installmentplan/get/public/${encodeURIComponent(id)}`, {
+        const res = await fetch(`${apiUrl}/getInstallment/${encodeURIComponent(id)}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -77,7 +77,7 @@ export default function InstallmentDetail() {
         if (!res.ok || (payload && payload.success === false)) {
           setError(payload?.message || `Failed to load (${res.status})`);
         } else {
-          let data = payload;
+          let data = payload?.data ?? payload;
           if (payload && payload.success !== undefined && payload.data !== undefined) data = payload.data;
           const planObj = Array.isArray(data) ? data[0] : data;
           if (mounted) setPlan(planObj || null);
@@ -207,58 +207,78 @@ export default function InstallmentDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
-      <div className="max-w-8xl mx-auto max-h-7xl bg-white rounded-2xl shadow overflow-hidden">
-        <div className="p-6 flex flex-col gap-4">
-          {/* carousel */}
-          <div className="relative">
-            <img
-              src={images[index]}
-              onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-              alt={plan.productName}
-              className="w-full h-80 object-contain bg-white"
-            />
-            {images.length > 1 && (
-              <>
-                <button
-                  onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                  aria-label="Previous image"
-                >
-                  ‹
-                </button>
-                <button
-                  onClick={() => setIndex((i) => (i + 1) % images.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow"
-                  aria-label="Next image"
-                >
-                  ›
-                </button>
-              </>
-            )}
-          </div>
-
-          <div className="p-3 flex gap-2 overflow-auto">
-            {images.map((src, i) => (
-              <button
-                key={i}
-                onClick={() => setIndex(i)}
-                className={`p-0 rounded overflow-hidden border ${i === index ? "ring-2 ring-[rgb(183,36,42)]" : "opacity-80"}`}>
-                <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-16 w-24 object-cover" />
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">{plan.productName}</h1>
-              <div className="text-sm text-gray-500 mt-1">{plan.companyName || plan.companyNameOther || plan.category}</div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-6 lg:p-8 flex flex-col gap-6">
+            {/* carousel */}
+            <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl overflow-hidden">
+              <img
+                src={images[index]}
+                onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+                alt={plan.productName}
+                className="w-full h-96 object-contain"
+              />
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
+                    aria-label="Previous image"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={() => setIndex((i) => (i + 1) % images.length)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
+                    aria-label="Next image"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+                {index + 1} / {images.length}
+              </div>
             </div>
 
-            <div className="text-right">
-              <div className="text-sm text-gray-500">Price</div>
-              <div className="text-xl font-bold" style={{ color: BRAND }}>PKR {Number(plan.price || 0).toLocaleString()}</div>
-              <div className="text-xs text-gray-500 mt-1">Down: PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
+            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+              {images.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setIndex(i)}
+                  className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === index ? "ring-4 ring-[rgb(183,36,42)] border-[rgb(183,36,42)] scale-105" : "border-gray-200 opacity-60 hover:opacity-100"}`}>
+                  <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-20 w-28 object-cover" />
+                </button>
+              ))}
+            </div>
+
+          <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-6 border border-red-100">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">{plan.productName}</h1>
+                <div className="flex items-center gap-3 mt-2 text-gray-600">
+                  <span className="font-medium">{plan.companyName || plan.companyNameOther || plan.category}</span>
+                  <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+                  <span className="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                    </svg>
+                    {plan.city}
+                  </span>
+                </div>
+              </div>
+
+              <div className="text-right bg-white rounded-xl p-4 shadow-sm min-w-[200px]">
+                <div className="text-xs text-gray-500 font-medium uppercase">Total Price</div>
+                <div className="text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+                  PKR {Number(plan.price || 0).toLocaleString()}
+                </div>
+                <div className="text-xs text-gray-600 mt-2 flex items-center gap-1">
+                  <span className="font-medium">Down Payment:</span>
+                  <span className="text-[rgb(183,36,42)] font-bold">PKR {Number(plan.downpayment || 0).toLocaleString()}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -280,60 +300,88 @@ export default function InstallmentDetail() {
             </div>
           )}
 
-          <div className="rounded-md overflow-hidden  p-4 flex items-center justify-between bg-gray-50">
-            <div className="flex items-center gap-3">
-              <NavLink className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
-                Get Now
+          <div className="flex items-center justify-between gap-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
+            <div className="flex items-center gap-3 flex-wrap">
+              <NavLink className="px-6 py-3 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-bold hover:shadow-lg transition-all transform hover:scale-105" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
+                🛒 Get Now
               </NavLink>
-              <NavLink className="px-4 py-2 rounded-md border" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
-                Compare
+              <NavLink className="px-6 py-3 rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-all" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
+                ⚖️ Compare
               </NavLink>
-              <NavLink className="px-4 py-2 rounded-md border" to={"/installments"}>
-                Back
+              <NavLink className="px-6 py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-700 hover:text-white transition-all" to={"/installments"}>
+                ← Back to List
               </NavLink>
             </div>
           </div>
 
           {/* description */}
-          <div className="prose max-w-none text-gray-700">
-            <h3 className="text-lg font-semibold">Description</h3>
-            <p className="whitespace-pre-line">{plan.description || plan.productName || "No description"}</p>
+          <div className="bg-white rounded-xl p-6 border border-gray-200">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="text-2xl">📋</span>
+              Product Description
+            </h3>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
           </div>
 
           {/* payment plans */}
           {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
-            <section className="mt-4">
-              <h3 className="text-lg font-semibold">Available Payment Plans</h3>
-              <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <section className="mt-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <span className="text-2xl">💳</span>
+                Available Payment Plans
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {plan.paymentPlans.map((p, idx) => (
-                  <div key={idx} className="border rounded-lg p-4 bg-white">
-                    <div className="flex items-center justify-between">
+                  <div key={idx} className="group bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-5 hover:border-[rgb(183,36,42)] hover:shadow-lg transition-all">
+                    <div className="flex items-start justify-between mb-4">
                       <div>
-                        <div className="text-sm text-gray-500">{p.planName || `Plan ${idx + 1}`}</div>
-                        <div className="text-xl font-bold">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
+                        <div className="text-sm font-semibold text-[rgb(183,36,42)] uppercase">{p.planName || `Plan ${idx + 1}`}</div>
+                        <div className="text-3xl font-bold text-gray-900 mt-1">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm">Tenure: {p.tenureMonths ? `${p.tenureMonths} months` : (p.customTenureLabel || plan.tenure || "—")}</div>
-                        <div className="text-sm">Monthly: PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</div>
+                      <div className="bg-[rgb(183,36,42)] text-white px-3 py-1 rounded-full text-xs font-bold">
+                        {p.tenureMonths ? `${p.tenureMonths}M` : (p.customTenureLabel || plan.tenure || "—")}
                       </div>
                     </div>
-                    <div className="mt-2 text-sm text-gray-600">Interest: {p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"} {p.markup ? `(markup: ${p.markup})` : ""}</div>
+                    
+                    <div className="bg-white rounded-lg p-4 mb-3 border border-gray-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm text-gray-600">Monthly Payment</span>
+                        <span className="text-xl font-bold text-[rgb(183,36,42)]">PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span>Interest Rate</span>
+                        <span className="font-medium">{p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"}</span>
+                      </div>
+                      {p.markup > 0 && (
+                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                          <span>Markup</span>
+                          <span className="font-medium">PKR {p.markup}</span>
+                        </div>
+                      )}
+                    </div>
+                    
                     {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
-                      <details className="mt-2 text-sm">
-                        <summary className="cursor-pointer">Show schedule</summary>
-                        <div className="mt-2 text-xs max-h-40 overflow-auto">
+                      <details className="text-sm">
+                        <summary className="cursor-pointer font-semibold text-gray-700 hover:text-[rgb(183,36,42)] transition">📅 View Schedule</summary>
+                        <div className="mt-3 max-h-40 overflow-auto bg-gray-50 rounded-lg p-2">
                           {p.installmentSchedule.map((it, i) => (
-                            <div key={i} className="flex justify-between py-1 border-b">
-                              <div>#{i + 1}</div>
-                              <div>{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</div>
-                              <div>PKR {Number(it.amount || 0).toLocaleString()}</div>
-                              <div>{it.paid ? "Paid" : "Unpaid"}</div>
+                            <div key={i} className="flex justify-between py-2 border-b border-gray-200 last:border-0 text-xs">
+                              <span className="font-medium">#{i + 1}</span>
+                              <span>{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
+                              <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
+                              <span className={`px-2 py-0.5 rounded ${it.paid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                                {it.paid ? "✓ Paid" : "Pending"}
+                              </span>
                             </div>
                           ))}
                         </div>
                       </details>
                     )}
-                    {p.otherChargesNote && <div className="mt-2 text-xs text-gray-500">Note: {p.otherChargesNote}</div>}
+                    {p.otherChargesNote && (
+                      <div className="mt-3 text-xs text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2">
+                        <span className="font-semibold">Note:</span> {p.otherChargesNote}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -341,13 +389,16 @@ export default function InstallmentDetail() {
           )}
 
           {/* ---------- dynamic specifications ---------- */}
-          <section className="mt-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Specifications</h3>
-              <div className="text-sm text-gray-500">Auto-selected based on product data</div>
+          <section className="mt-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <span className="text-2xl">⚙️</span>
+                Technical Specifications
+              </h3>
+              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Auto-detected</div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Generic / general features (show only for mobile or other) */}
               {shouldShowBlock("mobile", detected.hasGeneral) && (
                 <SpecCard title="General">
@@ -474,11 +525,14 @@ export default function InstallmentDetail() {
           </section>
 
           {/* quick facts */}
-          <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Fact label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-            <Fact label="Tenure" value={plan.tenure || plan.customTenure || "—"} />
-            <Fact label="City" value={plan.city || "—"} />
-            <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+          <div className="mt-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+            <h4 className="text-lg font-bold text-gray-900 mb-4">Quick Facts</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Fact label="Monthly Payment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
+              <Fact label="Tenure Period" value={plan.tenure || plan.customTenure || "—"} />
+              <Fact label="Location" value={plan.city || "—"} />
+              <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+            </div>
           </div>
 
           {/* seller & actions */}
@@ -497,6 +551,7 @@ export default function InstallmentDetail() {
 
         </div>
       </div>
+      </div>
     </div>
   );
 }
@@ -504,29 +559,29 @@ export default function InstallmentDetail() {
 /* ---------- small UI components ---------- */
 function SpecCard({ title, children }) {
   return (
-    <div className="bg-white border rounded-lg p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-2">
-        <h4 className="text-sm font-semibold text-gray-700">{title}</h4>
+    <div className="bg-white border-2 border-gray-200 rounded-xl p-5 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-base font-bold text-gray-900">{title}</h4>
       </div>
-      <div>{children}</div>
+      <div className="space-y-2">{children}</div>
     </div>
   );
 }
 
 function SpecRow({ label, value }) {
   return (
-    <div className="flex items-start justify-between py-1 border-b last:border-b-0">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="text-sm text-gray-700 ml-3 text-right">{value ?? "-"}</div>
+    <div className="flex items-start justify-between py-2 border-b border-gray-100 last:border-b-0">
+      <div className="text-xs font-semibold text-gray-600 uppercase">{label}</div>
+      <div className="text-sm font-medium text-gray-900 ml-3 text-right">{value ?? "-"}</div>
     </div>
   );
 }
 
 function Fact({ label, value }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-3 text-sm">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="mt-1 font-medium text-gray-800">{value}</div>
+    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-[rgb(183,36,42)] transition-all">
+      <div className="text-xs font-semibold text-gray-500 uppercase mb-2">{label}</div>
+      <div className="text-lg font-bold text-gray-900">{value}</div>
     </div>
   );
 }

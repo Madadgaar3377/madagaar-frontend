@@ -40,7 +40,7 @@ export default function AdminInstallment() {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`${apiUrl}/installmentplan/get/public`, {
+        const res = await fetch(`${apiUrl}/getAllInstallments`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -48,7 +48,7 @@ export default function AdminInstallment() {
         if (!res.ok || (payload && payload.success === false)) {
           setError(payload?.message || `Failed to load (${res.status})`);
         } else {
-          const data = payload?.data ?? [];
+          const data = payload?.data ?? payload ?? [];
           if (mounted) setPlans(Array.isArray(data) ? data : []);
         }
       } catch (err) {
@@ -134,13 +134,16 @@ export default function AdminInstallment() {
   return (
     <>
     <NavbarDashboard />
-    <div className="min-h-screen bg-gray-50 p-6 lg:p-12">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <header className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-extrabold text-gray-900">Installment Plans</h1>
-            <p className="text-sm text-gray-500 mt-1">Explore available installment plans near you.</p>
-          </div>
+        <header className="mb-8 bg-white rounded-2xl shadow-sm p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div>
+              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+                Admin - Installment Plans
+              </h1>
+              <p className="text-sm text-gray-600 mt-2">Manage and monitor all installment plans</p>
+            </div>
 
           <div className="flex gap-2 flex-wrap items-center">
             <input
@@ -166,6 +169,7 @@ export default function AdminInstallment() {
             </select>
 
             <button onClick={() => { setSearch(""); setSelectedCity(""); setSelectedCategory(""); setPage(1); }} className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">Reset</button>
+          </div>
           </div>
         </header>
 
@@ -228,9 +232,9 @@ export default function AdminInstallment() {
                     <div className="flex items-center justify-between gap-2 mt-2">
                       <Link
                         to={`/dashboard/Installments/update/${plan._id}`}
-                        className="flex-1 px-3 py-2 rounded-md bg-white border border-gray-200 hover:shadow-sm text-sm text-center"
+                        className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-sm font-medium hover:shadow-lg transition text-center"
                       >
-                        Upade
+                        Update
                       </Link>
                       
                     </div>

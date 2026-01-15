@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import NavbarDashboard from "../Dashboard/Navbar-Dashboard";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
-const UPLOAD_URL = `${API}/image-upload/single`;
+const UPLOAD_URL = `${API}/upload-image`;
 const SUBMIT_URL = `${API}/installmentplan`;
 
 const defaultPlan = {

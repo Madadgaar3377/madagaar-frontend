@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 
-const VERIFY_ENDPOINT = "/auth/verify"; // adjust if different
-
 export default function OtpVerifyPage() {
   const apiUrl = backendBaseUrl.replace(/\/$/, "");
   const navigate = useNavigate();
@@ -28,7 +26,7 @@ export default function OtpVerifyPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}${VERIFY_ENDPOINT}`, {
+      const res = await fetch(`${apiUrl}/verifyAccount`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -37,19 +35,39 @@ export default function OtpVerifyPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
-        const errText = data?.error?.passwordError || data?.error?.numberError || data?.message || "Verification failed";
-        setMsg({ type: "error", text: typeof errText === "string" ? errText : JSON.stringify(errText) });
+        setMsg({ type: "error", text: data?.message || "Verification failed" });
         setLoading(false);
         return;
       }
 
-      // success: { success: true, access_token, user }
-      const token = data?.access_token || data?.token || data?.accessToken;
-      if (token) localStorage.setItem("authToken", token);
-      if (data?.user) localStorage.setItem("user", JSON.stringify(data.user));
+      // Success: { success, message, user, token }
+      const token = data?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+        localStorage.setItem("access_token", token);
+      }
+      
+      if (data?.user) {
+        const safeUser = { ...data.user };
+        delete safeUser.password;
+        delete safeUser.verificationOtp;
+        delete safeUser.passwordResetOtp;
+        delete safeUser.verificationOtpExpiryTime;
+        delete safeUser.passwordResetOtpExpiryTime;
+        localStorage.setItem("user", JSON.stringify(safeUser));
+      }
 
-      setMsg({ type: "success", text: "Verified! Redirecting..." });
-      setTimeout(() => navigate("/"), 700);
+      setMsg({ type: "success", text: "Account verified successfully! Redirecting..." });
+      
+      // Navigate based on user type
+      const userType = data?.user?.UserType || data?.user?.userType || "user";
+      setTimeout(() => {
+        if (userType === "user") {
+          navigate("/client/dashboard");
+        } else {
+          navigate("/dashboard");
+        }
+      }, 1000);
     } catch (err) {
       console.error("OTP verify error:", err);
       setMsg({ type: "error", text: "Network error — please try again." });
@@ -77,7 +95,7 @@ export default function OtpVerifyPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">OTP</label>
-            <input type="text" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full px-3 py-2 border rounded-md" placeholder="Enter 4-digit OTP" required />
+            <input type="text" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full px-3 py-2 border rounded-md" placeholder="Enter 6-digit OTP" maxLength="6" required />
           </div>
 
           <button type="submit" disabled={loading} className={`w-full py-2 rounded-md text-white font-medium ${loading ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed" : "bg-[rgb(183,36,42)] hover:opacity-95"}`}>

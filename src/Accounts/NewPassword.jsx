@@ -1,18 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { backendBaseUrl } from "../constants/apiUrl"; // adjust path if needed
+import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
-// helper to read query params
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
-
 export default function ResetPassword() {
-  const query = useQuery();
-  const prefillEmail = query.get("email") || "";
   const navigate = useNavigate();
+  const location = useLocation();
+  const prefillEmail = location.state?.email || "";
 
   const [email, setEmail] = useState(prefillEmail);
   const [otp, setOtp] = useState("");
@@ -42,20 +37,23 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API}/auth/resetpassword`, {
+      const res = await fetch(`${API}/newPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim(), otp: otp.trim(), password }),
+        body: JSON.stringify({ 
+          email: email.trim(), 
+          otp: otp.trim(), 
+          newPassword: password 
+        }),
       });
 
       const body = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        setError(body?.message || body?.error || "Reset failed. Please check OTP and try again.");
+      if (!res.ok || (body && body.success === false)) {
+        setError(body?.message || "Reset failed. Please check OTP and try again.");
       } else {
-        setSuccess(body?.message || "Password reset successfully. Redirecting to login...");
-        // optional: redirect to login after a short delay
-        setTimeout(() => navigate("/account"), 1200);
+        setSuccess(body?.message || "Password reset successfully! Redirecting to login...");
+        setTimeout(() => navigate("/account"), 1500);
       }
     } catch (err) {
       console.error(err);
@@ -90,12 +88,13 @@ export default function ResetPassword() {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-600">OTP</label>
+            <label className="block text-xs text-gray-600">OTP (6 digits)</label>
             <input
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               className="mt-1 w-full px-4 py-2 border rounded-lg"
-              placeholder="Enter OTP"
+              placeholder="Enter 6-digit OTP"
+              maxLength="6"
               required
             />
           </div>

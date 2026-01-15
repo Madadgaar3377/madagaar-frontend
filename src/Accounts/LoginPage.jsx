@@ -9,7 +9,7 @@ export default function LoginPage() {
   useEffect(() => {
     
     if (getUser()){
-      getUser().userType ==="User" ? window.location.href = "/client/dashboard" : window.location.href = "/dashboard";
+      getUser().userType ==="user" ? window.location.href = "/client/dashboard" : window.location.href = "/dashboard";
     }
   }, []);
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${apiUrl}/auth/login`, {
+      const res = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -45,73 +45,36 @@ export default function LoginPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
-        // Backend may return field-level errors under data.error
-        if (data && data.error) {
-          // Map known backend keys to our fields
-          const errs = {};
-          if (data.error.passwordError) errs.password = data.error.passwordError;
-          if (data.error.numberError) errs.email = data.error.numberError; // backend used 'numberError' for invalid credentials
-          if (Object.keys(errs).length) {
-            setFieldErrors(errs);
-          } else {
-            setGeneralError(data.error.message || JSON.stringify(data.error) || "Login failed");
-          }
-        } else {
-          setGeneralError(`Login failed (${res.status})`);
-        }
+        setGeneralError(data?.message || `Login failed (${res.status})`);
         setLoading(false);
         return;
       }
 
-      // success
-      const token = data?.access_token || data?.token || data?.accessToken;
+      // Success - Backend returns: { success, message, token, user }
+      const token = data?.token;
       if (token) {
-        // Keep backward-compatible key and a more explicit key
         localStorage.setItem("authToken", token);
         localStorage.setItem("access_token", token);
       }
-      // optional refresh token
-      if (data?.refresh_token || data?.refreshToken) {
-        localStorage.setItem("refresh_token", data?.refresh_token || data?.refreshToken);
+
+      // Store user data (sanitized)
+      if (data?.user) {
+        const safeUser = { ...data.user };
+        delete safeUser.password;
+        delete safeUser.verificationOtp;
+        delete safeUser.passwordResetOtp;
+        delete safeUser.verificationOtpExpiryTime;
+        delete safeUser.passwordResetOtpExpiryTime;
+        localStorage.setItem("user", JSON.stringify(safeUser));
       }
-        // Store user and full auth data, but remove sensitive fields before saving
-        if (data) {
-          try {
-            const fullData = JSON.parse(JSON.stringify(data));
-            if (fullData.user && typeof fullData.user === "object") {
-              const safeUser = { ...fullData.user };
-              // remove sensitive fields from stored user copy
-              delete safeUser.password;
-              delete safeUser.verificationOtp;
-              delete safeUser.passwordResetOtp;
-              delete safeUser.verificationOtpExpiryTime;
-              // store sanitized user separately for quick access
-              localStorage.setItem("user", JSON.stringify(safeUser));
 
-              // also store full auth response but with sanitized user
-              fullData.user = safeUser;
-              localStorage.setItem("authData", JSON.stringify(fullData));
-            } else {
-              // no user object, store whatever we have
-              localStorage.setItem("authData", JSON.stringify(fullData));
-            }
-          } catch (err) {
-            // fallback: store raw pieces if JSON fails
-            if (data.user) {
-              try { localStorage.setItem("user", JSON.stringify(data.user)); } catch {}
-            }
-            try { localStorage.setItem("authData", JSON.stringify(data)); } catch {}
-          }
-        }
-
-      // navigate to dashboard
-        // check user are admin or clinet 
-        if(data.user.userType ==="User"){
-          window.location.href = "/client/dashboard";
-          return;
-        }else{
-          window.location.href = "/dashboard";
-        }
+      // Navigate based on user type
+      const userType = data?.user?.UserType || data?.user?.userType || "user";
+      if (userType === "user") {
+        window.location.href = "/client/dashboard";
+      } else {
+        window.location.href = "/dashboard";
+      }
     } catch (err) {
       console.error("Login error:", err);
       setGeneralError("Network error — please try again.");
