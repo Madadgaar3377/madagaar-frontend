@@ -96,31 +96,31 @@ export default function LoansPage() {
   if (loading) return <LoadingPage />;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-4 sm:py-6 lg:py-8 px-2 sm:px-4">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Header */}
-        <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <header className="flex flex-col gap-3 sm:gap-4">
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-800">Loan Plans</h1>
-            <p className="mt-2 text-gray-600 max-w-2xl text-sm sm:text-base">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-800">Loan Plans</h1>
+            <p className="mt-1 sm:mt-2 text-gray-600 max-w-2xl text-xs sm:text-sm lg:text-base">
               Explore loan offerings — home, personal, auto and business plans. Click details for eligibility, rates & repayment
               options, or click Apply to start.
             </p>
           </div>
 
-          <div className="flex-shrink-0 flex gap-3 items-center w-full md:w-auto">
-            <div className="relative w-full md:w-auto">
+          <div className="flex-shrink-0 flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center w-full">
+            <div className="relative flex-1">
               <label htmlFor="loan-search" className="sr-only">Search loan plans</label>
               <input
                 id="loan-search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by title, provider, amount or id..."
-                className="w-full md:w-80 rounded-full border px-4 py-2 text-sm outline-none shadow-sm focus:ring-2 focus:ring-offset-1 focus:ring-red-400"
+                placeholder="Search by title, provider, amount..."
+                className="w-full rounded-full border px-4 py-2 text-xs sm:text-sm outline-none shadow-sm focus:ring-2 focus:ring-offset-1 focus:ring-red-400"
                 aria-label="Search loan plans"
                 autoComplete="off"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">⌕</span>
+              <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm">⌕</span>
             </div>
 
             <button
@@ -149,18 +149,18 @@ export default function LoansPage() {
         )}
 
         {/* Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {totalItems === 0 && (
-            <div className="col-span-full rounded-lg bg-white border p-6 text-center text-gray-600 shadow-sm">No loan plans found.</div>
+            <div className="col-span-full rounded-lg bg-white border p-4 sm:p-6 text-center text-sm sm:text-base text-gray-600 shadow-sm">No loan plans found.</div>
           )}
 
           {visible.map((plan) => (
             <article
               key={plan._id || plan.loanPlanId}
-              className="bg-white rounded-2xl shadow-sm border overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-150"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-sm border overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-150"
             >
               {/* image */}
-              <div className="h-44 bg-gray-100 overflow-hidden">
+              <div className="h-36 sm:h-44 bg-gray-100 overflow-hidden">
                 <img
                   src={(plan.loanImages && plan.loanImages[0]) || "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=60"}
                   alt={plan.title || "Loan plan image"}
@@ -169,40 +169,40 @@ export default function LoansPage() {
                 />
               </div>
 
-              <div className="p-4 flex-1 flex flex-col">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-800 truncate">{plan.title || "Untitled Plan"}</h3>
-                    <div className="text-xs text-gray-500 mt-1 truncate">{plan.planBy || plan.user?.businessName || "—"}</div>
+              <div className="p-3 sm:p-4 flex-1 flex flex-col">
+                <div className="flex items-start justify-between gap-2 sm:gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-sm sm:text-base lg:text-lg font-semibold text-gray-800 line-clamp-2">{plan.title || "Untitled Plan"}</h3>
+                    <div className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">{plan.planBy || plan.user?.businessName || "—"}</div>
                   </div>
 
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500">Tenure</div>
-                    <div className="font-semibold text-gray-800 text-sm">{plan.tenure === "other" ? plan.tenureCustom || "Custom" : plan.tenure || "—"}</div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="text-[10px] sm:text-xs text-gray-500">Tenure</div>
+                    <div className="font-semibold text-gray-800 text-xs sm:text-sm">{plan.tenure === "other" ? plan.tenureCustom || "Custom" : plan.tenure || "—"}</div>
                   </div>
                 </div>
 
-                <div className="mt-3 text-sm text-gray-700 flex-1">
-                  <div className="mb-2 text-sm leading-snug line-clamp-3" dangerouslySetInnerHTML={{ __html: plan.description ? (plan.description.slice(0, 300)) : "" }} />
+                <div className="mt-2 sm:mt-3 text-xs sm:text-sm text-gray-700 flex-1">
+                  <div className="mb-2 leading-snug line-clamp-3" dangerouslySetInnerHTML={{ __html: plan.description ? (plan.description.slice(0, 300)) : "" }} />
                 </div>
 
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-gray-500">Interest</div>
-                    <div className="font-semibold text-gray-800 text-sm">{plan.interestRate || plan.interestType || "—"}</div>
+                <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-3">
+                  <div className="flex-shrink-0">
+                    <div className="text-[10px] sm:text-xs text-gray-500">Interest</div>
+                    <div className="font-semibold text-gray-800 text-xs sm:text-sm">{plan.interestRate || plan.interestType || "—"}</div>
                   </div>
 
                   <div className="flex gap-2 items-center">
                     <NavLink
                       to={`/loans/${plan._id || plan.loanPlanId}`}
-                      className="px-3 py-2 rounded-md border text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200"
+                      className="flex-1 sm:flex-none px-3 py-2 rounded-md border text-xs sm:text-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200 text-center"
                       aria-label={`View details for ${plan.title || 'loan plan'}`}
                     >
                       Details
                     </NavLink>
                     <button
                       onClick={() => handleApply(plan)}
-                      className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white font-semibold hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-red-300"
+                      className="flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white text-xs sm:text-sm font-semibold hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-red-300 whitespace-nowrap"
                       aria-label={`Apply for ${plan.title || 'loan plan'}`}
                     >
                       Apply
@@ -216,16 +216,16 @@ export default function LoansPage() {
 
         {/* Pagination controls */}
         {totalItems > 0 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
-            <div className="text-sm text-gray-600" aria-live="polite">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left" aria-live="polite">
               Showing <span className="font-semibold">{totalItems === 0 ? 0 : startIdx + 1}</span> - <span className="font-semibold">{endIdx}</span> of <span className="font-semibold">{totalItems}</span>
             </div>
 
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
               <button
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
-                className={`px-3 py-1 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
                 aria-label="First page"
               >
                 First

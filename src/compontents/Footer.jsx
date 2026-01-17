@@ -66,7 +66,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between text-gray-400 text-sm">
           
           <p className="mb-4 md:mb-0">
-            © 2024 Madadgaar Expert Partner. Designed By <span className="text-red-500">My Digital Pixels</span>
+            © 2024 Madadgaar Expert Partner. Designed & Developed By <span className="text-red-500">Code-XA</span>
           </p>
   
           <div className="flex space-x-3">

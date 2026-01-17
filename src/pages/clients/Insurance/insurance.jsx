@@ -13,21 +13,21 @@ export default function InsuranceInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50  ">
+    <div className="min-h-screen bg-gray-50">
       {/* top banner */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-semibold text-gray-800">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
               Insurance Solutions
             </h1>
-            <p className="text-sm md:text-base text-gray-500 mt-1">
+            <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
               Protect your life, health, and assets with tailored insurance plans.
             </p>
           </div>
           <button
             onClick={handleApplyClick}
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-sm"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm"
             style={{ backgroundColor: ACCENT }}
           >
             Apply for Insurance
@@ -36,39 +36,39 @@ export default function InsuranceInfo() {
       </div>
 
       {/* main content */}
-      <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6 lg:space-y-8">
         {/* hero card */}
-        <div className="bg-white rounded-2xl shadow-sm border p-6 md:p-8 flex flex-col md:flex-row gap-6">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
           <div className="flex-1">
-            <h2 className="text-xl md:text-2xl font-semibold text-gray-800">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800">
               Secure your future with the right coverage
             </h2>
-            <p className="text-sm md:text-base text-gray-600 mt-3">
+            <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-2 sm:mt-3">
               We are offers reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease. With a focus on transparency and customer satisfaction, we are your go-to resource for resolving insurance complaints in Pakistan.
             </p>
 
-            <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="text-xs font-semibold text-gray-500">
+            <div className="mt-3 sm:mt-4 lg:mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="text-[10px] sm:text-xs font-semibold text-gray-500">
                   Quick Approvals
                 </div>
-                <div className="mt-2 text-sm text-gray-800">
+                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-800">
                   Simple documentation and fast processing for eligible customers.
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="text-xs font-semibold text-gray-500">
+              <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="text-[10px] sm:text-xs font-semibold text-gray-500">
                   Flexible Plans
                 </div>
-                <div className="mt-2 text-sm text-gray-800">
+                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-800">
                   Choose coverage and tenure according to your need & budget.
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <div className="text-xs font-semibold text-gray-500">
+              <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                <div className="text-[10px] sm:text-xs font-semibold text-gray-500">
                   Trusted Partners
                 </div>
-                <div className="mt-2 text-sm text-gray-800">
+                <div className="mt-1 sm:mt-2 text-xs sm:text-sm text-gray-800">
                   Insurance plans from reputed banks & insurance providers.
                 </div>
               </div>

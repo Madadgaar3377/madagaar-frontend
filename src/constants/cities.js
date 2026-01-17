@@ -90,8 +90,6 @@ const cities =[
   { value: 'Toba Tek Singh', title: 'Toba Tek Singh' },
   { value: 'Narowal', title: 'Narowal' },
   { value: 'Bhakkar', title: 'Bhakkar' },
-  { value: 'Khushab', title: 'Khushab' },
-  { value: 'Hafizabad', title: 'Hafizabad' },
   { value: 'Kotli', title: 'Kotli' },
   { value: 'Sialkot Cantonment', title: 'Sialkot Cantonment' },
 ]

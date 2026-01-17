@@ -207,61 +207,61 @@ export default function InstallmentDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-6 lg:p-8 flex flex-col gap-6">
+        <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
+          <div className="p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-3 sm:gap-4 lg:gap-6">
             {/* carousel */}
-            <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-xl overflow-hidden">
+            <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden">
               <img
                 src={images[index]}
                 onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
                 alt={plan.productName}
-                className="w-full h-96 object-contain"
+                className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-contain"
               />
               {images.length > 1 && (
                 <>
                   <button
                     onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
+                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
                     aria-label="Previous image"
                   >
                     ‹
                   </button>
                   <button
                     onClick={() => setIndex((i) => (i + 1) % images.length)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
+                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
                     aria-label="Next image"
                   >
                     ›
                   </button>
                 </>
               )}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
+              <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
                 {index + 1} / {images.length}
               </div>
             </div>
 
-            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin">
               {images.map((src, i) => (
                 <button
                   key={i}
                   onClick={() => setIndex(i)}
-                  className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${i === index ? "ring-4 ring-[rgb(183,36,42)] border-[rgb(183,36,42)] scale-105" : "border-gray-200 opacity-60 hover:opacity-100"}`}>
-                  <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-20 w-28 object-cover" />
+                  className={`flex-shrink-0 rounded-md sm:rounded-lg overflow-hidden border-2 transition-all ${i === index ? "ring-2 sm:ring-4 ring-[rgb(183,36,42)] border-[rgb(183,36,42)] scale-105" : "border-gray-200 opacity-60 hover:opacity-100"}`}>
+                  <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-14 w-20 sm:h-20 sm:w-28 object-cover" />
                 </button>
               ))}
             </div>
 
-          <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-6 border border-red-100">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">{plan.productName}</h1>
-                <div className="flex items-center gap-3 mt-2 text-gray-600">
+          <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-red-100">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+              <div className="flex-1 w-full">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900">{plan.productName}</h1>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs sm:text-sm text-gray-600">
                   <span className="font-medium">{plan.companyName || plan.companyNameOther || plan.category}</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-400"></span>
+                  <span className="w-1 h-1 rounded-full bg-gray-400 hidden sm:inline"></span>
                   <span className="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
                       <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                     </svg>
                     {plan.city}
@@ -269,12 +269,12 @@ export default function InstallmentDetail() {
                 </div>
               </div>
 
-              <div className="text-right bg-white rounded-xl p-4 shadow-sm min-w-[200px]">
-                <div className="text-xs text-gray-500 font-medium uppercase">Total Price</div>
-                <div className="text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+              <div className="w-full sm:w-auto sm:text-right bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm sm:min-w-[200px]">
+                <div className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Total Price</div>
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
                   PKR {Number(plan.price || 0).toLocaleString()}
                 </div>
-                <div className="text-xs text-gray-600 mt-2 flex items-center gap-1">
+                <div className="text-[10px] sm:text-xs text-gray-600 mt-1 sm:mt-2 flex items-center gap-1">
                   <span className="font-medium">Down Payment:</span>
                   <span className="text-[rgb(183,36,42)] font-bold">PKR {Number(plan.downpayment || 0).toLocaleString()}</span>
                 </div>
@@ -300,39 +300,39 @@ export default function InstallmentDetail() {
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-5 border border-gray-200">
-            <div className="flex items-center gap-3 flex-wrap">
-              <NavLink className="px-6 py-3 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-bold hover:shadow-lg transition-all transform hover:scale-105" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 border border-gray-200">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+              <NavLink className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-bold hover:shadow-lg transition-all transform hover:scale-105 text-center" to={`/installment/get-now/${encodeURIComponent(plan._id) || ""}`}>
                 🛒 Get Now
               </NavLink>
-              <NavLink className="px-6 py-3 rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-all" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
+              <NavLink className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-all text-center" to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}>
                 ⚖️ Compare
               </NavLink>
-              <NavLink className="px-6 py-3 rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-700 hover:text-white transition-all" to={"/installments"}>
+              <NavLink className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-700 hover:text-white transition-all text-center" to={"/installments"}>
                 ← Back to List
               </NavLink>
             </div>
           </div>
 
           {/* description */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="text-2xl">📋</span>
+          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-gray-200">
+            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+              <span className="text-lg sm:text-xl lg:text-2xl">📋</span>
               Product Description
             </h3>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
+            <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
           </div>
 
           {/* payment plans */}
           {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
-            <section className="mt-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="text-2xl">💳</span>
+            <section className="mt-3 sm:mt-4 lg:mt-6">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                <span className="text-lg sm:text-xl lg:text-2xl">💳</span>
                 Available Payment Plans
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
                 {plan.paymentPlans.map((p, idx) => (
-                  <div key={idx} className="group bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl p-5 hover:border-[rgb(183,36,42)] hover:shadow-lg transition-all">
+                  <div key={idx} className="group bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 hover:border-[rgb(183,36,42)] hover:shadow-lg transition-all">
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <div className="text-sm font-semibold text-[rgb(183,36,42)] uppercase">{p.planName || `Plan ${idx + 1}`}</div>
@@ -389,16 +389,16 @@ export default function InstallmentDetail() {
           )}
 
           {/* ---------- dynamic specifications ---------- */}
-          <section className="mt-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <span className="text-2xl">⚙️</span>
+          <section className="mt-3 sm:mt-4 lg:mt-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4 lg:mb-6">
+              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <span className="text-lg sm:text-xl lg:text-2xl">⚙️</span>
                 Technical Specifications
               </h3>
-              <div className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">Auto-detected</div>
+              <div className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 sm:px-3 py-1 rounded-full">Auto-detected</div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {/* Generic / general features (show only for mobile or other) */}
               {shouldShowBlock("mobile", detected.hasGeneral) && (
                 <SpecCard title="General">
@@ -525,9 +525,9 @@ export default function InstallmentDetail() {
           </section>
 
           {/* quick facts */}
-          <div className="mt-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
-            <h4 className="text-lg font-bold text-gray-900 mb-4">Quick Facts</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-3 sm:mt-4 lg:mt-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-gray-200">
+            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Facts</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
               <Fact label="Monthly Payment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
               <Fact label="Tenure Period" value={plan.tenure || plan.customTenure || "—"} />
               <Fact label="Location" value={plan.city || "—"} />
@@ -536,14 +536,14 @@ export default function InstallmentDetail() {
           </div>
 
           {/* seller & actions */}
-          <div className="mt-2 border-t pt-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700">
+          <div className="mt-2 border-t pt-3 sm:pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-sm sm:text-base text-gray-700">
                 {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
               </div>
               <div>
-                <div className="text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
-                <div className="text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
+                <div className="text-xs sm:text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
+                <div className="text-[10px] sm:text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
               </div>
             </div>
 
@@ -559,29 +559,29 @@ export default function InstallmentDetail() {
 /* ---------- small UI components ---------- */
 function SpecCard({ title, children }) {
   return (
-    <div className="bg-white border-2 border-gray-200 rounded-xl p-5 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="text-base font-bold text-gray-900">{title}</h4>
+    <div className="bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <h4 className="text-sm sm:text-base font-bold text-gray-900">{title}</h4>
       </div>
-      <div className="space-y-2">{children}</div>
+      <div className="space-y-1 sm:space-y-2">{children}</div>
     </div>
   );
 }
 
 function SpecRow({ label, value }) {
   return (
-    <div className="flex items-start justify-between py-2 border-b border-gray-100 last:border-b-0">
-      <div className="text-xs font-semibold text-gray-600 uppercase">{label}</div>
-      <div className="text-sm font-medium text-gray-900 ml-3 text-right">{value ?? "-"}</div>
+    <div className="flex items-start justify-between py-1.5 sm:py-2 border-b border-gray-100 last:border-b-0">
+      <div className="text-[10px] sm:text-xs font-semibold text-gray-600 uppercase">{label}</div>
+      <div className="text-xs sm:text-sm font-medium text-gray-900 ml-2 sm:ml-3 text-right">{value ?? "-"}</div>
     </div>
   );
 }
 
 function Fact({ label, value }) {
   return (
-    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-[rgb(183,36,42)] transition-all">
-      <div className="text-xs font-semibold text-gray-500 uppercase mb-2">{label}</div>
-      <div className="text-lg font-bold text-gray-900">{value}</div>
+    <div className="bg-white rounded-md sm:rounded-lg p-2 sm:p-3 lg:p-4 border border-gray-200 hover:border-[rgb(183,36,42)] transition-all">
+      <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase mb-1 sm:mb-2">{label}</div>
+      <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 break-words">{value}</div>
     </div>
   );
 }

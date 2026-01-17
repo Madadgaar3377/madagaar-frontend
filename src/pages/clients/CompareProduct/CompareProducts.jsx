@@ -294,59 +294,59 @@ export default function CompareProducts() {
   const showComparison = compareList.length > 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 lg:p-8">
+      <div className="max-w-7xl mx-auto space-y-3 sm:space-y-4 lg:space-y-6">
         {/* header */}
-        <div className="bg-white rounded-2xl shadow-sm p-6 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
               Compare Products
             </h1>
-            <p className="text-sm text-gray-600 mt-2">Compare up to {MAX_COMPARE} products side by side</p>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Compare up to {MAX_COMPARE} products side by side</p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={clearAll} className="px-4 py-2 rounded-lg bg-red-100 text-red-700 font-medium hover:bg-red-200 transition">
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button onClick={clearAll} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg bg-red-100 text-red-700 font-medium hover:bg-red-200 transition">
               Clear All
             </button>
           </div>
         </div>
 
         {/* base product hero card */}
-        <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-200 flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-80 flex-shrink-0">
-            <div className="rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 h-64 flex items-center justify-center">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border-2 border-gray-200 flex flex-col gap-3 sm:gap-4 lg:gap-6">
+          <div className="w-full flex-shrink-0">
+            <div className="rounded-lg sm:rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 h-48 sm:h-56 lg:h-64 flex items-center justify-center">
               <img src={(baseProduct && baseProduct.productImages && baseProduct.productImages[0]) || ""} alt="" className="w-full h-full object-cover" />
             </div>
           </div>
 
           <div className="flex-1">
             {loadingProduct ? (
-              <div className="p-6 text-center text-gray-500">Loading product...</div>
+              <div className="p-4 sm:p-6 text-center text-sm sm:text-base text-gray-500">Loading product...</div>
             ) : baseProduct ? (
               <>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-3">
-                      {baseProduct.productName}
-                      <span className="px-2 py-0.5 text-xs font-medium rounded bg-[rgba(183,36,42,0.12)] text-[rgb(183,36,42)]">Base</span>
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
+                  <div className="flex-1">
+                    <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-800 flex flex-wrap items-center gap-2 sm:gap-3">
+                      <span className="break-words">{baseProduct.productName}</span>
+                      <span className="px-2 py-0.5 text-xs font-medium rounded bg-[rgba(183,36,42,0.12)] text-[rgb(183,36,42)] whitespace-nowrap">Base</span>
                     </h2>
-                    <div className="text-sm text-gray-500 mt-1">{baseProduct.companyName} • {baseProduct.category} • {baseProduct.city}</div>
-                    <div className="mt-4 text-lg text-gray-800 font-semibold">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</div>
-                    <div className="mt-2 text-sm text-gray-600">{(baseProduct.description || "").slice(0, 220).replace(/<\/?[^>]+(>|$)/g, "")}</div>
+                    <div className="text-xs sm:text-sm text-gray-500 mt-1 break-words">{baseProduct.companyName} • {baseProduct.category} • {baseProduct.city}</div>
+                    <div className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-800 font-semibold">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</div>
+                    <div className="mt-2 text-xs sm:text-sm text-gray-600 line-clamp-3">{(baseProduct.description || "").slice(0, 220).replace(/<\/?[^>]+(>|$)/g, "")}</div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <button onClick={() => addToCompare(baseProduct)} className="px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition">
+                  <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+                    <button onClick={() => addToCompare(baseProduct)} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition whitespace-nowrap">
                       ⚖️ Compare
                     </button>
-                    <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2 rounded-lg border-2 border-gray-300 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition font-medium">
+                    <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg border-2 border-gray-300 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition font-medium whitespace-nowrap">
                       View Details
                     </button>
                   </div>
                 </div>
 
                 {/* small specs row */}
-                <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="mt-3 sm:mt-4 lg:mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                   <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
                     <div className="text-xs text-gray-400">Monthly</div>
                     <div className="font-medium">Rs. {Number(baseProduct.installment || 0).toLocaleString("en-PK")}</div>
@@ -372,20 +372,20 @@ export default function CompareProducts() {
         </div>
 
         {/* Search / Add other products area */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border">
-          <div className="flex gap-3 items-center">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-sm border">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
             <div className="relative flex-1">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products to compare by name, brand, city..."
-                className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
+                placeholder="Search products to compare..."
+                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
               />
             </div>
-            <button onClick={() => setDebouncedQuery(query)} className="px-6 py-3 rounded-xl bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition">
+            <button onClick={() => setDebouncedQuery(query)} className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition whitespace-nowrap">
               Search
             </button>
           </div>
@@ -393,14 +393,14 @@ export default function CompareProducts() {
           {loadingSearch && <div className="mt-3 text-sm text-gray-500">Searching…</div>}
 
           {!loadingSearch && searchResults.length > 0 && (
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {searchResults.map((s) => (
-                <div key={getId(s)} className="p-3 rounded-lg border bg-white flex gap-3 items-start">
-                  <img src={(s.productImages && s.productImages[0]) || ""} alt="" className="w-20 h-14 object-cover rounded" />
-                  <div className="flex-1">
-                    <div className="font-medium text-sm">{s.productName}</div>
-                    <div className="text-xs text-gray-500 mt-1">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</div>
-                    <div className="mt-3 flex gap-2">
+                <div key={getId(s)} className="p-2 sm:p-3 rounded-lg border bg-white flex gap-2 sm:gap-3 items-start">
+                  <img src={(s.productImages && s.productImages[0]) || ""} alt="" className="w-16 h-12 sm:w-20 sm:h-14 object-cover rounded flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-xs sm:text-sm truncate">{s.productName}</div>
+                    <div className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</div>
+                    <div className="mt-2 sm:mt-3 flex gap-1 sm:gap-2">
                       <button
                         onClick={async () => {
                           const id = getId(s);
@@ -415,12 +415,12 @@ export default function CompareProducts() {
                             setBaseProduct(s);
                           }
                         }}
-                        className="px-3 py-1 rounded text-xs bg-[rgb(183,36,42)] text-white"
+                        className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-xs bg-[rgb(183,36,42)] text-white whitespace-nowrap"
                       >
                         Set base
                       </button>
 
-                      <button onClick={() => addToCompare(s)} className="px-3 py-1 rounded text-xs border">Add to Compare</button>
+                      <button onClick={() => addToCompare(s)} className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-xs border whitespace-nowrap">Add</button>
                     </div>
                   </div>
                 </div>
@@ -467,48 +467,50 @@ export default function CompareProducts() {
 
         {/* comparison table appears only when > 1 item */}
         {showComparison && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border overflow-auto">
-            <div className="text-sm text-gray-600 mb-3">Comparison</div>
-            <table className="min-w-full">
-              <thead>
-                <tr>
-                  <th className="text-left p-3 w-44 text-sm text-gray-600">Feature</th>
-                  {compareList.map((p) => (
-                    <th key={getId(p)} className="p-3 text-left" style={{ minWidth: 220 }}>
-                      <div className="flex items-center gap-3">
-                        <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-14 h-11 object-cover rounded" />
-                        <div>
-                          <div className="font-semibold text-sm">{p.productName}</div>
-                          <div className="text-xs text-gray-500">{p.companyName}</div>
-                        </div>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonRows.map((row) => (
-                  <tr key={row.key} className="">
-                    <td className="p-3 text-sm font-medium text-gray-700 bg-gray-50 border-r">{row.label}</td>
+          <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-sm border overflow-hidden">
+            <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2 sm:px-0">Comparison</div>
+            <div className="overflow-x-auto -mx-2 sm:mx-0">
+              <table className="min-w-full">
+                <thead>
+                  <tr>
+                    <th className="text-left p-2 sm:p-3 w-24 sm:w-32 lg:w-44 text-xs sm:text-sm text-gray-600 sticky left-0 bg-white z-10">Feature</th>
                     {compareList.map((p) => (
-                      <td key={getId(p) + row.key} className="p-3 align-top">
-                        {row.key === "__paymentPlans" ? (
-                          Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
-                            <ul className="text-sm space-y-1">
-                              {p.paymentPlans.map((pl, i) => (
-                                <li key={i}><div className="font-medium text-sm">{pl.planName || `Plan ${i+1}`}</div><div className="text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment||pl.installmentPrice||0).toLocaleString("en-PK")}</div></li>
-                              ))}
-                            </ul>
-                          ) : <div className="text-sm text-gray-400">No plans</div>
+                      <th key={getId(p)} className="p-2 sm:p-3 text-left" style={{ minWidth: 180, maxWidth: 220 }}>
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-10 h-8 sm:w-14 sm:h-11 object-cover rounded flex-shrink-0" />
+                          <div className="min-w-0">
+                            <div className="font-semibold text-xs sm:text-sm truncate">{p.productName}</div>
+                            <div className="text-[10px] sm:text-xs text-gray-500 truncate">{p.companyName}</div>
+                          </div>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonRows.map((row) => (
+                    <tr key={row.key} className="">
+                      <td className="p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 bg-gray-50 border-r sticky left-0 z-10">{row.label}</td>
+                      {compareList.map((p) => (
+                        <td key={getId(p) + row.key} className="p-2 sm:p-3 align-top">
+                          {row.key === "__paymentPlans" ? (
+                            Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
+                              <ul className="text-xs sm:text-sm space-y-1">
+                                {p.paymentPlans.map((pl, i) => (
+                                  <li key={i}><div className="font-medium text-xs sm:text-sm">{pl.planName || `Plan ${i+1}`}</div><div className="text-[10px] sm:text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment||pl.installmentPrice||0).toLocaleString("en-PK")}</div></li>
+                                ))}
+                              </ul>
+                            ) : <div className="text-xs sm:text-sm text-gray-400">No plans</div>
                         ) : (
                           renderCell(p, row.key)
                         )}
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
