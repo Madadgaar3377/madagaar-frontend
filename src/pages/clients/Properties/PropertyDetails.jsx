@@ -154,27 +154,27 @@ const PropertyDetails = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Breadcrumb */}
             <div className="bg-white border-b">
-                <div className="max-w-7xl mx-auto px-4 py-4">
-                    <div className="flex items-center gap-2 text-sm">
-                        <Link to="/" className="text-gray-600 hover:text-red-600">Home</Link>
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+                    <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
+                        <Link to="/" className="text-gray-600 hover:text-red-600 flex-shrink-0">Home</Link>
                         <span className="text-gray-400">/</span>
-                        <Link to="/properties" className="text-gray-600 hover:text-red-600">Properties</Link>
+                        <Link to="/properties" className="text-gray-600 hover:text-red-600 flex-shrink-0">Properties</Link>
                         <span className="text-gray-400">/</span>
-                        <span className="text-gray-900 font-semibold">{property.title}</span>
+                        <span className="text-gray-900 font-semibold truncate max-w-[200px] sm:max-w-none">{property.title}</span>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-6 lg:py-8">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Title & Quick Info */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <div className="flex items-start justify-between mb-4">
-                                <div>
-                                    <div className="flex items-center gap-3 mb-2">
-                                        <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-4">
+                                <div className="flex-1">
+                                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                                        <span className={`text-xs font-bold px-2 sm:px-3 py-1 rounded-full ${
                                             property.type === "Project" 
                                                 ? "bg-blue-100 text-blue-800" 
                                                 : "bg-purple-100 text-purple-800"
@@ -182,7 +182,7 @@ const PropertyDetails = () => {
                                             {property.type}
                                         </span>
                                         {property.transactionType && (
-                                            <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+                                            <span className={`text-xs font-bold px-2 sm:px-3 py-1 rounded-full ${
                                                 property.transactionType === "Sale" 
                                                     ? "bg-green-100 text-green-800" 
                                                     : property.transactionType === "Rent"
@@ -193,19 +193,19 @@ const PropertyDetails = () => {
                                             </span>
                                         )}
                                     </div>
-                                    <h1 className="text-2xl lg:text-3xl font-black text-gray-900 mb-2">
+                                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 mb-2">
                                         {property.title}
                                     </h1>
                                     <div className="flex items-center gap-2 text-gray-600">
-                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                                         </svg>
-                                        <span className="text-sm font-semibold">{property.city}{property.location ? `, ${property.location}` : ""}</span>
+                                        <span className="text-xs sm:text-sm font-semibold">{property.city}{property.location ? `, ${property.location}` : ""}</span>
                                     </div>
                                 </div>
-                                <div className="text-right">
-                                    <div className="text-3xl font-black text-red-600">
+                                <div className="sm:text-right">
+                                    <div className="text-2xl sm:text-3xl font-black text-red-600">
                                         {typeof property.price === "number" 
                                             ? `PKR ${property.price.toLocaleString()}` 
                                             : property.price || "Contact for Price"}
@@ -217,28 +217,28 @@ const PropertyDetails = () => {
                             </div>
 
                             {/* Quick Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t">
+                            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 pt-4 border-t">
                                 {property.areaSize && (
-                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-2xl font-bold text-gray-900">{property.areaSize}</div>
+                                    <div className="text-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg sm:text-2xl font-bold text-gray-900">{property.areaSize}</div>
                                         <div className="text-xs text-gray-600 mt-1">{property.areaUnit || "sq. ft"}</div>
                                     </div>
                                 )}
                                 {property.bedrooms && (
-                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-2xl font-bold text-gray-900">{property.bedrooms}</div>
+                                    <div className="text-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg sm:text-2xl font-bold text-gray-900">{property.bedrooms}</div>
                                         <div className="text-xs text-gray-600 mt-1">Bedrooms</div>
                                     </div>
                                 )}
                                 {property.bathrooms && (
-                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-2xl font-bold text-gray-900">{property.bathrooms}</div>
+                                    <div className="text-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg sm:text-2xl font-bold text-gray-900">{property.bathrooms}</div>
                                         <div className="text-xs text-gray-600 mt-1">Bathrooms</div>
                                     </div>
                                 )}
                                 {property.totalUnits && (
-                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                                        <div className="text-2xl font-bold text-gray-900">{property.totalUnits}</div>
+                                    <div className="text-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg sm:text-2xl font-bold text-gray-900">{property.totalUnits}</div>
                                         <div className="text-xs text-gray-600 mt-1">Total Units</div>
                                     </div>
                                 )}
@@ -247,26 +247,26 @@ const PropertyDetails = () => {
 
                         {/* Image Gallery */}
                         {property.images && property.images.length > 0 && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Property Images</h2>
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Property Images</h2>
                                 
                                 {/* Main Image */}
-                                <div className="mb-4">
+                                <div className="mb-3 sm:mb-4">
                                     <img
                                         src={property.images[selectedImage]}
                                         alt={property.title}
-                                        className="w-full h-64 md:h-96 object-cover rounded-xl"
+                                        className="w-full h-48 sm:h-64 md:h-96 object-cover rounded-lg sm:rounded-xl"
                                     />
                                 </div>
 
                                 {/* Thumbnail Gallery */}
                                 {property.images.length > 1 && (
-                                    <div className="grid grid-cols-4 md:grid-cols-6 gap-2">
+                                    <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2">
                                         {property.images.map((img, idx) => (
                                             <button
                                                 key={idx}
                                                 onClick={() => setSelectedImage(idx)}
-                                                className={`relative h-16 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                                                className={`relative h-14 sm:h-16 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
                                                     selectedImage === idx 
                                                         ? 'border-red-600 scale-105' 
                                                         : 'border-gray-200 hover:border-gray-300'
@@ -286,10 +286,10 @@ const PropertyDetails = () => {
 
                         {/* Description */}
                         {property.description && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Description</h2>
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Description</h2>
                                 <div 
-                                    className="text-gray-700 leading-relaxed whitespace-pre-line prose max-w-none"
+                                    className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line prose max-w-none"
                                     dangerouslySetInnerHTML={{ __html: property.description }}
                                 />
                             </div>
@@ -297,9 +297,9 @@ const PropertyDetails = () => {
 
                         {/* Project Highlights */}
                         {property.type === "Project" && property.highlights && property.highlights.length > 0 && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Key Highlights</h2>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Key Highlights</h2>
+                                <div className="grid grid-cols-1 gap-2 sm:gap-3">
                                     {property.highlights.filter(h => h).map((highlight, idx) => (
                                         <div key={idx} className="flex items-start gap-3">
                                             <svg className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -314,8 +314,8 @@ const PropertyDetails = () => {
 
                         {/* Units & Pricing (for Projects) */}
                         {property.type === "Project" && property.units && property.units.length > 0 && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Available Units & Pricing</h2>
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Available Units & Pricing</h2>
                                 <div className="space-y-4">
                                     {property.units.map((unit, idx) => (
                                         <div key={idx} className="border-2 border-gray-100 rounded-xl p-4 hover:border-red-200 transition-colors">
@@ -346,8 +346,8 @@ const PropertyDetails = () => {
                         )}
 
                         {/* Features & Amenities */}
-                        <div className="bg-white rounded-2xl shadow-sm p-6">
-                            <h2 className="text-xl font-black text-gray-900 mb-4">Features & Amenities</h2>
+                        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                            <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Features & Amenities</h2>
                             
                             {/* Utilities */}
                             {property.utilities && (
@@ -393,19 +393,19 @@ const PropertyDetails = () => {
 
                         {/* Nearby Landmarks */}
                         {property.nearbyLandmarks && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Nearby Landmarks</h2>
-                                <p className="text-gray-700 leading-relaxed whitespace-pre-line">{property.nearbyLandmarks}</p>
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Nearby Landmarks</h2>
+                                <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">{property.nearbyLandmarks}</p>
                             </div>
                         )}
                     </div>
 
                     {/* Sidebar */}
-                    <div className="space-y-6">
+                    <div className="space-y-4 sm:space-y-6">
                         {/* Contact Card */}
                         {property.contact && (
-                            <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-4">
-                                <h2 className="text-xl font-black text-gray-900 mb-4">Contact Information</h2>
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 lg:sticky lg:top-4">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4">Contact Information</h2>
                                 <div className="space-y-3">
                                     {property.contact.name && (
                                         <div>
@@ -455,9 +455,9 @@ const PropertyDetails = () => {
 
                 {/* Related Properties */}
                 {relatedProperties.length > 0 && (
-                    <div className="mt-12">
-                        <h2 className="text-2xl font-black text-gray-900 mb-6">Related Properties</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="mt-8 sm:mt-12">
+                        <h2 className="text-xl sm:text-2xl font-black text-gray-900 mb-4 sm:mb-6">Related Properties</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                             {relatedProperties.map((related) => (
                                 <Link
                                     key={related._id}
@@ -473,11 +473,11 @@ const PropertyDetails = () => {
                                             />
                                         </div>
                                     ) : (
-                                        <div className="h-48 bg-gray-200 flex items-center justify-center">
-                                            <span className="text-gray-400">No Image</span>
+                                        <div className="h-40 sm:h-48 bg-gray-200 flex items-center justify-center">
+                                            <span className="text-gray-400 text-sm">No Image</span>
                                         </div>
                                     )}
-                                    <div className="p-4">
+                                    <div className="p-3 sm:p-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <span className={`text-xs font-bold px-2 py-1 rounded-full ${
                                                 related.type === "Project" 

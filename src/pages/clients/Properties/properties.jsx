@@ -24,6 +24,9 @@ function PropertiesPage() {
   // Pagination
   const [page, setPage] = useState(1);
 
+  // Filter visibility for mobile
+  const [showFilters, setShowFilters] = useState(false);
+
   // Helper function to extract property data based on type
   const extractPropertyData = (property) => {
     if (property.type === "Individual") {
@@ -184,10 +187,30 @@ function PropertiesPage() {
       {/* Filters */}
       <section className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-3 sm:p-4 lg:p-6">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Filter Properties</h2>
+          {/* Filter Header with Toggle Button */}
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 inline-block mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              Filter Properties
+            </h2>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="lg:hidden flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              {showFilters ? "Hide" : "Filters"}
+            </button>
+          </div>
+
+          {/* Filter Content */}
+          <div className={`${showFilters ? 'block' : 'hidden'} lg:block space-y-3 sm:space-y-4`}>
           
           {/* Search Location */}
-          <div className="mb-3 sm:mb-4">
+          <div>
             <input
               type="text"
               placeholder="Search location (e.g., DHA, Gulberg)"
@@ -289,6 +312,7 @@ function PropertiesPage() {
                 Clear Filters
               </button>
             </div>
+          </div>
           </div>
 
           {/* Results Count */}
