@@ -200,10 +200,10 @@ madagaar-frontend/
 
 2. **Install dependencies**
    ```bash
-   npm install --legacy-peer-deps
+   npm install
    ```
    
-   > Note: Use `--legacy-peer-deps` flag due to React 19 compatibility
+   > Note: The `.npmrc` file automatically handles React 19 compatibility with `legacy-peer-deps=true`
 
 3. **Set up environment variables**
    ```bash
@@ -442,10 +442,22 @@ npm run build
 ### Deploy to Hosting
 
 #### Vercel
+
+**Important**: The project includes a `.npmrc` file with `legacy-peer-deps=true` for React 19 compatibility.
+
 ```bash
+# Deploy using Vercel CLI
 npm i -g vercel
 vercel
+
+# Or connect your GitHub repo to Vercel dashboard
+# The .npmrc file will automatically handle dependency installation
 ```
+
+**Vercel Configuration**:
+- Build Command: `npm run build`
+- Output Directory: `build`
+- Install Command: `npm install` (automatically uses .npmrc settings)
 
 #### Netlify
 ```bash
