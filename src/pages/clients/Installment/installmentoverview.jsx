@@ -4,15 +4,6 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 
 const PLACEHOLDER = "/placeholder.png";
-const BRAND = "rgb(183,36,42)";
-
-const CATEGORIES = [
-  { key: "mobile", label: "Mobile / Phone" },
-  { key: "airConditioner", label: "Air Conditioner" },
-  { key: "electricalBike", label: "Electrical Bike" },
-  { key: "mechanicalBike", label: "Mechanical Bike" },
-  { key: "other", label: "Other / Generic" },
-];
 
 /* ---------- helpers ---------- */
 function isYouTubeUrl(url = "") {
