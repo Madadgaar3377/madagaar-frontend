@@ -4,10 +4,19 @@ import { Link } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import cities from "../../../constants/cities";
+import SEO from "../../../components/SEO";
 
 const PAGE_SIZE = 6;
 
 function PropertiesPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateAgent",
+    "name": "Madadgaar Property Solutions",
+    "description": "Find your dream property in Pakistan. Browse residential, commercial, and industrial properties across all major cities.",
+    "url": "https://madadgaar.com.pk/properties",
+    "areaServed": "Pakistan"
+  };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -173,6 +182,13 @@ function PropertiesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Property Solutions Pakistan - Buy, Sell & Rent Properties | Madadgaar"
+        description="Discover the best property solutions in Pakistan. Browse residential, commercial, and industrial properties for sale and rent across Lahore, Karachi, Islamabad, and more. Compare verified property listings from trusted dealers."
+        keywords="property pakistan, real estate pakistan, buy property pakistan, sell property pakistan, rent property pakistan, property lahore, property karachi, property islamabad, residential property, commercial property, houses for sale, apartments for rent"
+        canonicalUrl="https://madadgaar.com.pk/properties"
+        structuredData={structuredData}
+      />
       <header className="bg-gradient-to-r from-red-700 via-rose-500 to-orange-400 text-white py-4 sm:py-6 lg:py-8">
         <div className="max-w-6xl mx-auto px-3 sm:px-4">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mb-1 sm:mb-2">
@@ -211,11 +227,11 @@ function PropertiesPage() {
           
           {/* Search Location */}
           <div>
-            <input
-              type="text"
+        <input
+          type="text"
               placeholder="Search location (e.g., DHA, Gulberg)"
-              value={location}
-              onChange={(e) => { setLocation(e.target.value); setPage(1); }}
+          value={location}
+          onChange={(e) => { setLocation(e.target.value); setPage(1); }}
               className="px-3 py-2 text-sm rounded-lg sm:rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
             />
           </div>
@@ -239,28 +255,28 @@ function PropertiesPage() {
             {/* City Filter */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">City</label>
-              <select
-                value={city}
-                onChange={(e) => { setCity(e.target.value); setPage(1); }}
+        <select
+          value={city}
+          onChange={(e) => { setCity(e.target.value); setPage(1); }}
                 className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
+        >
                 <option value="All">All Cities</option>
                 {cities.map((cityItem) => (
                   <option key={cityItem.value} value={cityItem.value}>
                     {cityItem.title}
                   </option>
                 ))}
-              </select>
+        </select>
             </div>
 
             {/* Property Type Filter */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Property Type</label>
-              <select
-                value={propertyType}
-                onChange={(e) => { setPropertyType(e.target.value); setPage(1); }}
+        <select
+          value={propertyType}
+          onChange={(e) => { setPropertyType(e.target.value); setPage(1); }}
                 className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
+        >
                 <option value="All">All Types</option>
                 <option value="Apartment">Apartment / Flat</option>
                 <option value="Villa">Villa / House</option>
@@ -268,29 +284,29 @@ function PropertiesPage() {
                 <option value="Retail">Retail / Shop</option>
                 <option value="Commercial">Commercial</option>
                 <option value="Penthouse">Penthouse</option>
-              </select>
+        </select>
             </div>
 
             {/* Min Budget */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Min Budget (PKR)</label>
-              <input
-                type="number"
+          <input
+            type="number"
                 placeholder="e.g., 5000000"
-                value={budgetMin}
-                onChange={(e) => { setBudgetMin(e.target.value); setPage(1); }}
+            value={budgetMin}
+            onChange={(e) => { setBudgetMin(e.target.value); setPage(1); }}
                 className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
+          />
             </div>
 
             {/* Max Budget */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Max Budget (PKR)</label>
-              <input
-                type="number"
+          <input
+            type="number"
                 placeholder="e.g., 50000000"
-                value={budgetMax}
-                onChange={(e) => { setBudgetMax(e.target.value); setPage(1); }}
+            value={budgetMax}
+            onChange={(e) => { setBudgetMax(e.target.value); setPage(1); }}
                 className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
               />
             </div>
@@ -339,7 +355,7 @@ function PropertiesPage() {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
               {pageData.map((p) => (
                 <div
                   key={p._id}
@@ -379,7 +395,7 @@ function PropertiesPage() {
                     {p.propertyType && (
                       <p className="text-xs sm:text-sm text-gray-500 mb-1">
                         {p.propertyType}
-                      </p>
+                    </p>
                     )}
 
                     {/* Price */}

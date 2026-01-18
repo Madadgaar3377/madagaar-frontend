@@ -1,3 +1,24 @@
 # https://www.robotstxt.org/robotstxt.html
+# Madadgaar Expert Partner - Robots.txt
+
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /account/
+Disallow: /dashboard/
+Disallow: /admin/
+Disallow: /api/
+Disallow: /*?*utm_
+Disallow: /*?*sessionid=
+
+# Crawl-delay for specific bots
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Bingbot
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://madadgaar.com.pk/sitemap.xml
+
+# Host
+Host: https://madadgaar.com.pk

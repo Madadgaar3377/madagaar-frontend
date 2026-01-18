@@ -13,8 +13,7 @@ const Footer = () => {
               className="w-48 mb-4"
             />
             <p className="text-gray-300 leading-relaxed">
-              There are many variations of passages of Lorem Ipsum available,
-              but the majority have suffered alteration in some form working insurigo
+              Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's property solutions, insurance support, loans, or installment plans, we make your journey simple, reliable, and stress-free.
             </p>
           </div>
   
@@ -45,14 +44,23 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-semibold mb-4">Get In Touch</h3>
             <ul className="space-y-3 text-gray-300">
-              <li>Gulberg III, Lahore, Pakistan</li>
-              <li>+92 307 1113330</li>
-              <li>help.madadgaar@gmail.com</li>
-              <li className="hover:text-red-500 cursor-pointer">
-                More Information
+              <li className="flex items-start">
+                <span className="mr-2">📍</span>
+                <span>Gulberg III, Lahore, Pakistan</span>
               </li>
-              <li className="hover:text-red-500 cursor-pointer">
-                Family Insurance
+              <li className="flex items-start">
+                <span className="mr-2">📞</span>
+                <a href="tel:+923071113330" className="hover:text-red-500">+92 307 111 333 0</a>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">✉️</span>
+                <a href="mailto:help.madadgaar@gmail.com" className="hover:text-red-500">help.madadgaar@gmail.com</a>
+              </li>
+              <li className="flex items-start">
+                <span className="mr-2">🌐</span>
+                <a href="https://madadgaar.com.pk" target="_blank" rel="noopener noreferrer" className="hover:text-red-500">
+                  madadgaar.com.pk
+                </a>
               </li>
             </ul>
           </div>

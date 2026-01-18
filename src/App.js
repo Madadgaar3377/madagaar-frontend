@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { HelmetProvider } from 'react-helmet-async';
 
 import Navbar from "./compontents/Navbar";
 // import TopBar from "./compontents/TopBar";
@@ -19,6 +20,9 @@ import InstallmentDetail from "./pages/clients/Installment/installmentoverview.j
 import CompareProducts from "./pages/clients/CompareProduct/CompareProducts.jsx";
 import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
+import InsurancePage from "./pages/clients/Insurance/insurance.jsx";
+import ApplyInsurance from "./pages/clients/Insurance/apply-insurance.jsx";
+import TeamMemberDetail from "./pages/clients/TeamMemberDetail.jsx";
 import NotFound from "./pages/404Page.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
@@ -46,42 +50,48 @@ function App() {
   
 
   return (
-    <Router>
-      <LayoutWrapper>
-        <Routes>
-          <Route path="*" element={<NotFound />} />
-          {/* Public pages */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/loans" element={<LoansPage />} />
-          <Route path="/loans/:id" element={<LoanDetails />} />
-          
-          {/* account login */}
-          <Route path="/account" element={<LoginPage />} />
-          <Route path="/account/register" element={<SignupPage />} />
-          <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
-          <Route path="/account/forgot" element={<ForgotPassword />} />
-          <Route path="/account/reset" element={<ResetPassword />} />
+    <HelmetProvider>
+      <Router>
+        <LayoutWrapper>
+          <Routes>
+            <Route path="*" element={<NotFound />} />
+            {/* Public pages */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/team/:id" element={<TeamMemberDetail />} />
+            <Route path="/loans" element={<LoansPage />} />
+            <Route path="/loans/:id" element={<LoanDetails />} />
 
-          {/* installement router  */}
-          <Route path="/installments" element={<InstallmentPlans />} />
-          <Route path="/installment/:id" element={<InstallmentDetail />} />
-          <Route path="/installment/product/CompareProduct/:id" element={<CompareProducts />} />
-          {/* blogs */}
-          <Route path="/blog" element={<BlogsPage />} />
+            {/* account login */}
+            <Route path="/account" element={<LoginPage />} />
+            <Route path="/account/register" element={<SignupPage />} />
+            <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
+            <Route path="/account/forgot" element={<ForgotPassword />} />
+            <Route path="/account/reset" element={<ResetPassword />} />
+
+            {/* installement router  */}
+            <Route path="/installments" element={<InstallmentPlans />} />
+            <Route path="/installment/:id" element={<InstallmentDetail />} />
+            <Route path="/installment/product/CompareProduct/:id" element={<CompareProducts />} />
+            {/* blogs */}
+            <Route path="/blog" element={<BlogsPage />} />
+
+            {/* Insurance */}
+            <Route path="/insurance" element={<InsurancePage />} />
+            <Route path="/apply-insurance" element={<ApplyInsurance />} />
+
+            {/* PropertiesPage */}
+            <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/property/:id" element={<PropertyDetails />} />
 
 
-          {/* PropertiesPage */}
-          <Route path="/properties" element={<PropertiesPage />} />
-          <Route path="/property/:id" element={<PropertyDetails />} />
+            {/* user panel routes */}
 
-
-          {/* user panel routes */}
-
-         
-        </Routes>
-      </LayoutWrapper>
-    </Router>
+           
+          </Routes>
+        </LayoutWrapper>
+      </Router>
+    </HelmetProvider>
   );
 }
 

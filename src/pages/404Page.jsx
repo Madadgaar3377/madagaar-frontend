@@ -1,6 +1,7 @@
 // src/pages/NotFound.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import SEO from "../components/SEO";
 
 const ACCENT = "rgb(183,36,42)";
 
@@ -9,6 +10,12 @@ export default function NotFound() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-10">
+      <SEO
+        title="404 - Page Not Found | Madadgaar Expert Partner"
+        description="The page you are looking for doesn't exist. Return to Madadgaar homepage to explore property solutions, insurance, loans, and installment plans."
+        canonicalUrl="https://madadgaar.com.pk/404"
+        noIndex={true}
+      />
       <div className="max-w-xl w-full bg-white rounded-3xl shadow-sm border border-gray-100 p-8 text-center space-y-6">
         {/* Icon / Badge */}
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-50">

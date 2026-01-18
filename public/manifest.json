@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Madadgaar",
+  "name": "Madadgaar Expert Partner - Property, Insurance, Loans & Installments",
+  "description": "Pakistan's trusted marketplace for property solutions, insurance support, loans, and flexible installment plans",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +9,30 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "favcions/web-app-manifest-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "favcions/web-app-manifest-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favcions/apple-touch-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "portrait",
+  "theme_color": "#B7242A",
+  "background_color": "#ffffff",
+  "categories": ["finance", "business", "shopping"],
+  "lang": "en-PK",
+  "dir": "ltr"
 }

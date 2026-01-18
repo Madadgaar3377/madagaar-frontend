@@ -1,6 +1,7 @@
 // src/pages/InsuranceInfo.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import SEO from "../../../components/SEO";
 
 const ACCENT = "rgb(183,36,42)";
 
@@ -12,8 +13,24 @@ export default function InsuranceInfo() {
     navigate("/apply-insurance");
   };
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "InsuranceAgency",
+    "name": "Madadgaar Insurance Services",
+    "description": "Pakistan's trusted platform for resolving insurance complaints and finding the right insurance coverage",
+    "url": "https://madadgaar.com.pk/insurance",
+    "areaServed": "Pakistan"
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Insurance Solutions Pakistan - Car, Life, Health & Property Insurance | Madadgaar"
+        description="Pakistan's most trusted platform for resolving insurance complaints. Get car insurance, life insurance, health insurance, and property insurance from leading providers. Expert support for claims and coverage."
+        keywords="insurance pakistan, car insurance pakistan, life insurance, health insurance, property insurance, insurance claims, insurance companies pakistan, motor insurance, family insurance"
+        canonicalUrl="https://madadgaar.com.pk/insurance"
+        structuredData={structuredData}
+      />
       {/* top banner */}
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">

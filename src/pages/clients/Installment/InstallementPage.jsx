@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import LoadingPage from "../../../compontents/Loader";
 import VideoPage from "../youtube/YoutubeVide";
 import OurPartners from "../OverPartener";
+import SEO from "../../../components/SEO";
 
 /**
  * InstallmentPlans.jsx
@@ -23,6 +24,15 @@ export default function InstallmentPlans() {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FinancialService",
+    "name": "Madadgaar Installment Plans",
+    "description": "Buy products on easy installment plans in Pakistan. Electronics, appliances, furniture, and more with flexible monthly payment options.",
+    "url": "https://madadgaar.com.pk/installments",
+    "areaServed": "Pakistan"
+  };
 
   // UI state
   const [search, setSearch] = useState("");
@@ -111,6 +121,13 @@ export default function InstallmentPlans() {
 
   return (
     <>
+    <SEO
+      title="Installment Plans Pakistan - Buy Now Pay Later | Madadgaar"
+      description="Shop your favorite products on easy installment plans in Pakistan. Buy electronics, appliances, furniture, and more with flexible monthly payments. Zero or low interest rates available from trusted retailers."
+      keywords="installment plans pakistan, buy on installments, monthly payments pakistan, installment shopping, zero markup, low interest installments, electronics on installment, furniture installment, appliances installment pakistan"
+      canonicalUrl="https://madadgaar.com.pk/installments"
+      structuredData={structuredData}
+    />
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
         <header className="mb-4 sm:mb-6 lg:mb-8 bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
@@ -136,34 +153,34 @@ export default function InstallmentPlans() {
               </div>
 
               <div className="flex gap-2">
-                <select 
-                  value={selectedCategory} 
-                  onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }} 
+              <select 
+                value={selectedCategory} 
+                onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }} 
                   className="flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
-                >
-                  <option value="">All Categories</option>
-                  {categories.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+              >
+                <option value="">All Categories</option>
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
 
-                <select 
-                  value={selectedCity} 
-                  onChange={(e) => { setSelectedCity(e.target.value); setPage(1); }} 
+              <select 
+                value={selectedCity} 
+                onChange={(e) => { setSelectedCity(e.target.value); setPage(1); }} 
                   className="flex-1 sm:flex-none px-3 sm:px-4 py-2 sm:py-2.5 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
-                >
-                  <option value="">All Cities</option>
-                  {cities.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+              >
+                <option value="">All Cities</option>
+                {cities.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
 
-                <button 
-                  onClick={() => { setSearch(""); setSelectedCity(""); setSelectedCategory(""); setPage(1); }} 
+              <button 
+                onClick={() => { setSearch(""); setSelectedCity(""); setSelectedCategory(""); setPage(1); }} 
                   className="px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition whitespace-nowrap"
-                >
-                  Reset
-                </button>
+              >
+                Reset
+              </button>
               </div>
             </div>
           </div>
@@ -178,7 +195,7 @@ export default function InstallmentPlans() {
           <div className="py-16 sm:py-24 text-center text-gray-500 text-sm sm:text-base">No plans found.</div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
               {pageData.map((plan) => (
                 <article key={plan._id} className="group bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100">
                   <div className="relative overflow-hidden">

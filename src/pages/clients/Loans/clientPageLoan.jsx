@@ -3,11 +3,21 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
+import SEO from "../../../components/SEO";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
 export default function LoansPage() {
   const navigate = useNavigate();
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "FinancialService",
+    "name": "Madadgaar Loan Services",
+    "description": "Compare and find the best loan options in Pakistan. Personal loans, home loans, business loans, and more from trusted financial institutions.",
+    "url": "https://madadgaar.com.pk/loans",
+    "areaServed": "Pakistan"
+  };
 
   const [loanPlans, setLoanPlans] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -149,7 +159,7 @@ export default function LoansPage() {
         )}
 
         {/* Grid */}
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+        <section className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
           {totalItems === 0 && (
             <div className="col-span-full rounded-lg bg-white border p-4 sm:p-6 text-center text-sm sm:text-base text-gray-600 shadow-sm">No loan plans found.</div>
           )}

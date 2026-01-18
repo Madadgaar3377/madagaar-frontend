@@ -470,46 +470,46 @@ export default function CompareProducts() {
           <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-sm border overflow-hidden">
             <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2 sm:px-0">Comparison</div>
             <div className="overflow-x-auto -mx-2 sm:mx-0">
-              <table className="min-w-full">
-                <thead>
-                  <tr>
+            <table className="min-w-full">
+              <thead>
+                <tr>
                     <th className="text-left p-2 sm:p-3 w-24 sm:w-32 lg:w-44 text-xs sm:text-sm text-gray-600 sticky left-0 bg-white z-10">Feature</th>
-                    {compareList.map((p) => (
+                  {compareList.map((p) => (
                       <th key={getId(p)} className="p-2 sm:p-3 text-left" style={{ minWidth: 180, maxWidth: 220 }}>
                         <div className="flex items-center gap-2 sm:gap-3">
                           <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-10 h-8 sm:w-14 sm:h-11 object-cover rounded flex-shrink-0" />
                           <div className="min-w-0">
                             <div className="font-semibold text-xs sm:text-sm truncate">{p.productName}</div>
                             <div className="text-[10px] sm:text-xs text-gray-500 truncate">{p.companyName}</div>
-                          </div>
                         </div>
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonRows.map((row) => (
-                    <tr key={row.key} className="">
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonRows.map((row) => (
+                  <tr key={row.key} className="">
                       <td className="p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 bg-gray-50 border-r sticky left-0 z-10">{row.label}</td>
-                      {compareList.map((p) => (
+                    {compareList.map((p) => (
                         <td key={getId(p) + row.key} className="p-2 sm:p-3 align-top">
-                          {row.key === "__paymentPlans" ? (
-                            Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
+                        {row.key === "__paymentPlans" ? (
+                          Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
                               <ul className="text-xs sm:text-sm space-y-1">
-                                {p.paymentPlans.map((pl, i) => (
+                              {p.paymentPlans.map((pl, i) => (
                                   <li key={i}><div className="font-medium text-xs sm:text-sm">{pl.planName || `Plan ${i+1}`}</div><div className="text-[10px] sm:text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment||pl.installmentPrice||0).toLocaleString("en-PK")}</div></li>
-                                ))}
-                              </ul>
+                              ))}
+                            </ul>
                             ) : <div className="text-xs sm:text-sm text-gray-400">No plans</div>
                         ) : (
                           renderCell(p, row.key)
                         )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             </div>
           </div>
         )}

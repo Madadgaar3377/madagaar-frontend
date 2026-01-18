@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
+import SEO from "../../../components/SEO";
 
 const PAGE_SIZE = 6;
 const BRAND = "rgb(183,36,42)";
@@ -16,6 +17,21 @@ function stripHtml(html = "") {
 }
 
 export default function BlogsPage() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Madadgaar Blog",
+    "description": "Stay updated with the latest news, tips, and insights about property, insurance, loans, and installment plans in Pakistan",
+    "url": "https://madadgaar.com.pk/blog",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Madadgaar Expert Partner",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://madadgaar.com.pk/Media/Group%2033.png"
+      }
+    }
+  };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const [blogs, setBlogs] = useState([]);
   const [totalBlog, setTotalBlog] = useState(0);
@@ -112,6 +128,13 @@ export default function BlogsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
+      <SEO
+        title="Blog - Property, Insurance & Loan Tips | Madadgaar Expert Partner"
+        description="Stay updated with the latest news, expert tips, and insights about property solutions, insurance, loans, and installment plans in Pakistan. Read our comprehensive guides and industry updates."
+        keywords="madadgaar blog, property tips pakistan, insurance guide, loan advice, real estate news pakistan, financial tips pakistan, installment guide"
+        canonicalUrl="https://madadgaar.com.pk/blog"
+        structuredData={structuredData}
+      />
       {/* Hero / heading section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[rgb(183,36,42)] via-rose-500 to-orange-400 text-white">
         <div className="max-w-6xl mx-auto px-4 lg:px-8 py-10 lg:py-14 relative z-10">

@@ -67,6 +67,9 @@ export default function Navbar({
             <NavLink to="/" className="text-gray-700 hover:text-gray-900">
               Home
             </NavLink>
+            <NavLink to="/about" className="text-gray-700 hover:text-gray-900">
+              About Us
+            </NavLink>
 
             {/* Desktop dropdown */}
             <div
@@ -118,9 +121,7 @@ export default function Navbar({
               </div>
             </div>
 
-            <NavLink to="/about" className="text-gray-700 hover:text-gray-900">
-              About Us
-            </NavLink>
+            
             <NavLink to="/blog" className="text-gray-700 hover:text-gray-900">
               Blog
             </NavLink>
