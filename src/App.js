@@ -4,6 +4,7 @@ import { HelmetProvider } from 'react-helmet-async';
 import Navbar from "./compontents/Navbar";
 // import TopBar from "./compontents/TopBar";
 import Footer from "./compontents/Footer";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Pages
 import HomePage from "./pages/clients/HomePages";
@@ -15,11 +16,14 @@ import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import PropertyDetails from "./pages/clients/Properties/PropertyDetails.jsx";
+import ApplyProperty from "./pages/clients/Properties/ApplyProperty.jsx";
 
 import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
+import ApplyInstallment from "./pages/clients/Installment/ApplyInstallment.jsx";
 import CompareProducts from "./pages/clients/CompareProduct/CompareProducts.jsx";
 import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
+import ApplyLoan from "./pages/clients/Loans/ApplyLoan.jsx";
 import InsurancePage from "./pages/clients/Insurance/insurance.jsx";
 import ApplyInsurance from "./pages/clients/Insurance/apply-insurance.jsx";
 // import TeamMemberDetail from "./pages/clients/TeamMemberDetail.jsx"; // Phase 1: Disabled team detail pages
@@ -55,6 +59,7 @@ function App() {
   return (
     <HelmetProvider>
       <Router>
+        <ScrollToTop />
         <LayoutWrapper>
           <Routes>
             <Route path="*" element={<NotFound />} />
@@ -65,6 +70,7 @@ function App() {
             {/* <Route path="/team/:id" element={<TeamMemberDetail />} /> */}
             <Route path="/loans" element={<LoansPage />} />
             <Route path="/loans/:id" element={<LoanDetails />} />
+            <Route path="/loans/:id/apply" element={<ApplyLoan />} />
 
             {/* account login */}
             <Route path="/account" element={<LoginPage />} />
@@ -81,6 +87,7 @@ function App() {
             {/* installement router  */}
             <Route path="/installments" element={<InstallmentPlans />} />
             <Route path="/installment/:id" element={<InstallmentDetail />} />
+            <Route path="/installment/:id/apply" element={<ApplyInstallment />} />
             <Route path="/installment/product/CompareProduct/:id" element={<CompareProducts />} />
             {/* blogs */}
             <Route path="/blog" element={<BlogsPage />} />
@@ -92,6 +99,7 @@ function App() {
             {/* PropertiesPage */}
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/property/:id" element={<PropertyDetails />} />
+            <Route path="/property/:id/apply" element={<ApplyProperty />} />
 
 
             {/* user panel routes */}

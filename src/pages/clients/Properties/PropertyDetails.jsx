@@ -444,9 +444,12 @@ const PropertyDetails = () => {
                                             </div>
                                         </a>
                                     )}
-                                    <button className="w-full mt-2 px-4 py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors">
-                                        Send Inquiry
-                                    </button>
+                                    <Link
+                                        to={`/property/${property._id}/apply`}
+                                        className="w-full mt-2 px-4 py-3 bg-red-600 text-white rounded-lg font-bold hover:bg-red-700 transition-colors text-center block"
+                                    >
+                                        Apply Now
+                                    </Link>
                                 </div>
                             </div>
                         )}
