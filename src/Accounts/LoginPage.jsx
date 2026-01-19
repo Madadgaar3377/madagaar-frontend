@@ -7,9 +7,14 @@ export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
   useEffect(() => {
-    
+    // Check if user is already logged in
     if (getUser()){
-      getUser().userType ==="user" ? window.location.href = "/client/dashboard" : window.location.href = "/dashboard";
+      const userType = getUser().userType || getUser().UserType;
+      if (userType === "user") {
+        window.location.href = "/dashboard";
+      } else {
+        window.location.href = "/dashboard"; // Admin/other types can use same dashboard for now
+      }
     }
   }, []);
   const [email, setEmail] = useState("");
@@ -68,13 +73,10 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(safeUser));
       }
 
-      // Navigate based on user type
+      // Navigate to dashboard after successful login
       const userType = data?.user?.UserType || data?.user?.userType || "user";
-      if (userType === "user") {
-        window.location.href = "/client/dashboard";
-      } else {
-        window.location.href = "/dashboard";
-      }
+      // Redirect all users to the dashboard
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login error:", err);
       setGeneralError("Network error — please try again.");

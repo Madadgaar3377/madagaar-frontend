@@ -194,7 +194,7 @@ madagaar-frontend/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/your-org/madagaar-frontend.git
+   git clone https://github.com/Madadgaar3377/madagaar-frontend.git
    cd madagaar-frontend
    ```
 
@@ -203,7 +203,9 @@ madagaar-frontend/
    npm install
    ```
    
-   > Note: The `.npmrc` file automatically handles React 19 compatibility with `legacy-peer-deps=true`
+   > **Note**: The `.npmrc` file automatically handles React 19 compatibility with `legacy-peer-deps=true`
+   > 
+   > This is required because `react-helmet-async@2.0.5` has peer dependency constraints with React 19.
 
 3. **Set up environment variables**
    ```bash
@@ -433,11 +435,22 @@ Route protection for authenticated pages
 
 ## 🌐 Deployment
 
+### Quick Deployment Fix
+
+**⚠️ Important for Vercel/Netlify**: The project includes configuration files to handle React 19 compatibility:
+- `.npmrc` - Sets `legacy-peer-deps=true` for automatic dependency resolution
+- `vercel.json` - Optimized routing and caching for SPA
+- `.vercelignore` - Excludes unnecessary files from deployment
+
+These files ensure successful deployment without dependency conflicts.
+
 ### Build for Production
 
 ```bash
 npm run build
 ```
+
+For detailed deployment instructions to Vercel, Netlify, cPanel, or Docker, see [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ### Deploy to Hosting
 
@@ -480,6 +493,17 @@ netlify deploy --prod
   RewriteRule . /index.html [L]
 </IfModule>
 ```
+
+---
+
+## 📚 Documentation
+
+### Available Guides
+
+- **[CHANGELOG.md](./CHANGELOG.md)** - Version history, feature updates, and bug fixes
+- **[DEPLOYMENT.md](./DEPLOYMENT.md)** - Comprehensive deployment guide for Vercel, Netlify, cPanel, and Docker
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Developer guidelines and coding standards
+- **[README.md](./README.md)** - This file (project overview and quick start)
 
 ---
 

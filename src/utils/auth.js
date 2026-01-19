@@ -69,8 +69,20 @@ export function logout(redirectPath = "/account") {
   localStorage.removeItem("user");
   localStorage.removeItem("authData");
   
+  // Clear dashboard cache
+  localStorage.removeItem("dashboardData");
+  localStorage.removeItem("dashboardDataTime");
+  
   // Redirect to login
   window.location.href = redirectPath;
+}
+
+/**
+ * Clear dashboard cache (call when data changes)
+ */
+export function clearDashboardCache() {
+  localStorage.removeItem("dashboardData");
+  localStorage.removeItem("dashboardDataTime");
 }
 
 /**

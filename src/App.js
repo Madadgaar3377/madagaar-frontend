@@ -22,7 +22,10 @@ import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
 import InsurancePage from "./pages/clients/Insurance/insurance.jsx";
 import ApplyInsurance from "./pages/clients/Insurance/apply-insurance.jsx";
-import TeamMemberDetail from "./pages/clients/TeamMemberDetail.jsx";
+// import TeamMemberDetail from "./pages/clients/TeamMemberDetail.jsx"; // Phase 1: Disabled team detail pages
+import UserDashboard from "./pages/clients/Dashboard/UserDashboard.jsx";
+import DashboardProfile from "./pages/clients/Dashboard/DashboardProfile.jsx";
+import DashboardSecurity from "./pages/clients/Dashboard/DashboardSecurity.jsx";
 import NotFound from "./pages/404Page.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
@@ -58,7 +61,8 @@ function App() {
             {/* Public pages */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/team/:id" element={<TeamMemberDetail />} />
+            {/* Phase 1: Team detail route disabled - contact via email only */}
+            {/* <Route path="/team/:id" element={<TeamMemberDetail />} /> */}
             <Route path="/loans" element={<LoansPage />} />
             <Route path="/loans/:id" element={<LoanDetails />} />
 
@@ -68,6 +72,11 @@ function App() {
             <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
             <Route path="/account/forgot" element={<ForgotPassword />} />
             <Route path="/account/reset" element={<ResetPassword />} />
+
+            {/* User Dashboard */}
+            <Route path="/dashboard" element={<UserDashboard />} />
+            <Route path="/dashboard/profile" element={<DashboardProfile />} />
+            <Route path="/dashboard/security" element={<DashboardSecurity />} />
 
             {/* installement router  */}
             <Route path="/installments" element={<InstallmentPlans />} />

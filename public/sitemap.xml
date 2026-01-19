@@ -67,33 +67,12 @@
     <priority>0.5</priority>
   </url>
 
-  <!-- Team Member Pages -->
+  <!-- User Dashboard -->
   <url>
-    <loc>https://madadgaar.com.pk/team/1</loc>
+    <loc>https://madadgaar.com.pk/dashboard</loc>
     <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://madadgaar.com.pk/team/2</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://madadgaar.com.pk/team/3</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-
-  <url>
-    <loc>https://madadgaar.com.pk/team/4</loc>
-    <lastmod>2026-01-18</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <!-- Insurance -->
