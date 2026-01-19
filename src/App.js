@@ -17,6 +17,7 @@ import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import PropertyDetails from "./pages/clients/Properties/PropertyDetails.jsx";
 import ApplyProperty from "./pages/clients/Properties/ApplyProperty.jsx";
+import ContactForm from "./pages/clients/Contact/ContactForm.jsx";
 
 import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
 import ApplyInstallment from "./pages/clients/Installment/ApplyInstallment.jsx";
@@ -101,6 +102,8 @@ function App() {
             <Route path="/property/:id" element={<PropertyDetails />} />
             <Route path="/property/:id/apply" element={<ApplyProperty />} />
 
+            {/* Contact */}
+            <Route path="/contact" element={<ContactForm />} />
 
             {/* user panel routes */}
 
