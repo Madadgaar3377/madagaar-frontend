@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 /**
  * FeatureCards
@@ -46,14 +46,50 @@ const features = [
 ];
 
 export default function FeatureCards({ items = features }) {
+  const [visibleItems, setVisibleItems] = useState(new Set());
+  const itemRefs = useRef([]);
+
+  useEffect(() => {
+    const observers = itemRefs.current.map((el, index) => {
+      if (!el) return null;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleItems((prev) => new Set([...prev, index]));
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+          rootMargin: '0px 0px -50px 0px',
+        }
+      );
+
+      observer.observe(el);
+      return observer;
+    });
+
+    return () => {
+      observers.forEach((obs) => {
+        if (obs) obs.disconnect();
+      });
+    };
+  }, []);
+
   return (
     <section className="section-padding-sm bg-white">
       <div className="container-content">
         <div className="responsive-grid-3 lg:grid-cols-4">
-          {items.map((item) => (
+          {items.map((item, index) => (
             <div
               key={item.id}
-              className="relative bg-white border border-gray-100 rounded-lg p-6 shadow-sm hover:shadow-2xl transform hover:-translate-y-2 transition "
+              ref={(el) => (itemRefs.current[index] = el)}
+              className={`relative bg-white border border-gray-100 rounded-lg p-6 shadow-sm hover:shadow-2xl transform hover:-translate-y-2 transition ${
+                visibleItems.has(index) ? 'animate-fade-in-up' : 'animate-on-scroll'
+              }`}
+              style={visibleItems.has(index) ? { animationDelay: `${index * 100}ms` } : {}}
             >
               {/* Top-right pink semicircle number badge */}
               <div

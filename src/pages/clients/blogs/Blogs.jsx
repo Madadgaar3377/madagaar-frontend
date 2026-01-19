@@ -127,7 +127,7 @@ export default function BlogsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 via-white to-gray-100">
+    <div className="bg-gradient-to-b from-gray-50 via-white to-gray-100">
       <SEO
         title="Blog - Property, Insurance & Loan Tips | Madadgaar Expert Partner"
         description="Stay updated with the latest news, expert tips, and insights about property solutions, insurance, loans, and installment plans in Pakistan. Read our comprehensive guides and industry updates."

@@ -294,7 +294,7 @@ export default function CompareProducts() {
   const showComparison = compareList.length > 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 lg:p-8">
+    <div className="bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <div className="container-content space-y-3 sm:space-y-4 lg:space-y-6">
         {/* header */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">

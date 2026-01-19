@@ -11,10 +11,12 @@ import TeamMemberCard from "../../components/TeamMemberCard";
 import teamMembers from "../../constants/teamMembers";
 import { Toast, useToast } from "../../components/Toast";
 import { backendBaseUrl } from "../../constants/apiUrl";
+import { useScrollAnimation } from "../../hooks/useScrollAnimation";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
+  const heroRef = useScrollAnimation({ animation: 'fadeInUp', threshold: 0.1 });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -141,7 +143,10 @@ export default function HomePage() {
         canonicalUrl="https://madadgaar.com.pk"
         structuredData={structuredData}
       />
-      <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding">
+      <section 
+        ref={heroRef.ref}
+        className={`w-full flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding ${heroRef.isVisible ? 'animate-fade-in-up' : 'animate-on-scroll'}`}
+      >
         {/* Left Content */}
         <div className="md:w-1/2 space-y-3 sm:space-y-4 lg:space-y-6 w-full">
           <h2
@@ -183,7 +188,7 @@ export default function HomePage() {
       <FeatureCards />
       <Services />
       <SecondCards />
-      
+
       {/* Team Members Section */}
       <section className="w-full bg-gray-50 section-padding">
         <div className="container-content">
@@ -207,7 +212,7 @@ export default function HomePage() {
       {/* <MobileAppPage /> */}
       <VideoPage />
       <OurPartners />
-      
+
       {/* Strategy Section */}
       <section className="w-full bg-white section-padding">
         <div className="container-content">

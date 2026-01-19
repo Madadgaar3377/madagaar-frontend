@@ -1,51 +1,176 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-// Example images (replace with your own URLs)
 const boxData = [
   {
-    img: "Media/Agent-1.png",
+    img: "/Media/Agent-1.png",
     title: "Team of Industry Experts",
     description:
-      "We take pride in our team of experienced professionals who bring in-depth knowledge, dedication, and industry insight to every interaction. With a strong commitment to excellence and client satisfaction, our experts work closely with you to understand your unique needs and provide tailored solutions. Whether you're facing a challenge or planning ahead, you can count on our team to offer trusted guidance, timely support, and a seamless experience every step of the way.",
+      "Our experienced professionals bring deep knowledge and dedication to every interaction. From property solutions to insurance, loans, and installments, our experts work closely with you to understand your unique needs and provide tailored solutions that fit perfectly.",
+    icon: "👥",
   },
   {
-    img: "Media/Agent-2.png",
+    img: "/Media/Agent-2.png",
     title: "No Upfront Charges",
     description:
-      "We believe in building trust through transparency and fairness. That’s why we do not require any upfront payments for our services. You only pay when real value is delivered, ensuring complete peace of mind and a risk-free experience from the very beginning.",
+      "We believe in building trust through transparency. That's why we don't require any upfront payments for our services. You only pay when real value is delivered, ensuring complete peace of mind and a risk-free experience from day one.",
+    icon: "💰",
   },
   {
-    img: "Media/Agent-3.png",
+    img: "/Media/Agent-3.png",
     title: "Customer-First Approach",
     description:
-      "Our clients are at the heart of everything we do. We take the time to understand your individual needs and priorities, ensuring every solution we offer is tailored to your goals. Our team is committed to delivering prompt, honest, and personalized support—because your satisfaction and success are what matter most to us. With a focus on long-term relationships, we go beyond transactions to truly make a difference in your journey.",
+      "Your satisfaction is our top priority. We take time to understand your individual needs, ensuring every solution—whether it's finding the right property, securing insurance, getting a loan, or choosing an installment plan—is tailored to your goals and delivered with care.",
+    icon: "❤️",
   },
 ];
 
 export default function InfoBoxes() {
+  const [visibleItems, setVisibleItems] = useState(new Set());
+  const headerRef = useRef(null);
+  const cardsRef = useRef([]);
+  const benefitsRef = useRef(null);
+
+  useEffect(() => {
+    // Header animation
+    const headerObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-down');
+            entry.target.classList.remove('animate-on-scroll');
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    if (headerRef.current) headerObserver.observe(headerRef.current);
+
+    // Cards animation
+    const cardObservers = cardsRef.current.map((el, index) => {
+      if (!el) return null;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleItems((prev) => new Set([...prev, index]));
+            }
+          });
+        },
+        { threshold: 0.1 }
+      );
+      observer.observe(el);
+      return observer;
+    });
+
+    // Benefits animation
+    const benefitsObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+            entry.target.classList.remove('animate-on-scroll');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+    if (benefitsRef.current) benefitsObserver.observe(benefitsRef.current);
+
+    return () => {
+      headerObserver.disconnect();
+      cardObservers.forEach((obs) => obs && obs.disconnect());
+      benefitsObserver.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen section-padding-sm">
+    <section className="w-full bg-gradient-to-br from-gray-50 via-white to-gray-50 section-padding">
       <div className="container-content">
-        <h2 className="text-center text-gray-800 font-semibold text-responsive-lg mb-6 sm:mb-8">Why Madadghaar?</h2>
-        <div className="responsive-grid-3">
-        {boxData.map((box, index) => (
-          <div
-            key={index}
-            className="bg-white rounded-xl border-2 border-gray-200  p-6 flex flex-col items-center text-center hover:shadow-2xl transition-shadow duration-300"
-          >
-            <img
-              src={box.img}
-              alt={box.title}
-              className="h-48 w-full rounded-lg object-contain mb-4"
-            />
-            <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-              {box.title}
-            </h3>
-            <p className="text-gray-600 text-sm text-start">{box.description}</p>
+        {/* Header Section */}
+        <div
+          ref={headerRef}
+          className="text-center mb-10 sm:mb-12 lg:mb-16 animate-on-scroll"
+        >
+          <div className="inline-block mb-4">
+            <span className="bg-red-100 text-red-600 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold uppercase tracking-wide">
+              Why Choose Us
+            </span>
           </div>
-        ))}
+          <h2 className="text-responsive-2xl font-bold text-gray-900 mb-4">
+            Why <span style={{ color: "rgb(183, 36, 42)" }}>Madadgaar</span>?
+          </h2>
+          <p className="text-gray-600 text-responsive-base max-w-3xl mx-auto leading-relaxed">
+            We're Pakistan's most trusted marketplace for property solutions, insurance support, loans, and flexible installment plans. Here's what makes us different and why thousands of customers trust us with their needs.
+          </p>
+        </div>
+
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          {boxData.map((box, index) => (
+            <div
+              key={index}
+              ref={(el) => (cardsRef.current[index] = el)}
+              className={`bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 flex flex-col hover:shadow-xl hover:border-red-300 transition-all duration-300 transform hover:-translate-y-1 ${
+                visibleItems.has(index) ? 'animate-scale-in' : 'animate-on-scroll'
+              }`}
+              style={visibleItems.has(index) ? { animationDelay: `${index * 150}ms` } : {}}
+            >
+              {/* Image Container */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="relative w-full max-w-[200px] h-40 sm:h-48">
+                  <img
+                    src={box.img}
+                    alt={box.title}
+                    className="w-full h-full rounded-xl object-contain"
+                    loading="lazy"
+                  />
+                  {/* Icon Badge */}
+                  <div className="absolute -top-3 -right-3 bg-red-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-lg">
+                    {box.icon}
+                  </div>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="flex-1 flex flex-col">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 text-center">
+                  {box.title}
+                </h3>
+                <p className="text-gray-600 text-sm sm:text-base leading-relaxed text-center flex-1">
+                  {box.description}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Additional Benefits Section */}
+        <div
+          ref={benefitsRef}
+          className="mt-12 sm:mt-16 lg:mt-20 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 animate-on-scroll"
+        >
+          <div className="text-center p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="text-3xl mb-2">🏆</div>
+            <h4 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Verified Partners</h4>
+            <p className="text-xs sm:text-sm text-gray-600">Trusted service providers across Pakistan</p>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="text-3xl mb-2">⚡</div>
+            <h4 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Quick Response</h4>
+            <p className="text-xs sm:text-sm text-gray-600">Fast and efficient service delivery</p>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="text-3xl mb-2">🔒</div>
+            <h4 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Secure & Safe</h4>
+            <p className="text-xs sm:text-sm text-gray-600">Your data and privacy protected</p>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow">
+            <div className="text-3xl mb-2">📱</div>
+            <h4 className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">Easy Access</h4>
+            <p className="text-xs sm:text-sm text-gray-600">Compare options anytime, anywhere</p>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

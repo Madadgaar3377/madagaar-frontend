@@ -23,7 +23,7 @@ export default function InsuranceInfo() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50">
       <SEO
         title="Insurance Solutions Pakistan - Car, Life, Health & Property Insurance | Madadgaar"
         description="Pakistan's most trusted platform for resolving insurance complaints. Get car insurance, life insurance, health insurance, and property insurance from leading providers. Expert support for claims and coverage."
