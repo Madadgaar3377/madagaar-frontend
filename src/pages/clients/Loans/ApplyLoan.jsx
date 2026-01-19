@@ -339,8 +339,8 @@ const ApplyLoan = () => {
         noIndex={true}
       />
 
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <button
@@ -352,10 +352,10 @@ const ApplyLoan = () => {
               </svg>
               Back
             </button>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1 className="text-responsive-xl font-bold text-gray-900">
               Apply for Loan
             </h1>
-            <p className="text-gray-600 mt-2">Complete the application in simple steps</p>
+            <p className="text-gray-600 mt-2 text-responsive-sm">Complete the application in simple steps</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -4,15 +4,15 @@ const Services = () => {
   return (
     <div>
       <>
-        <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between px-3 sm:px-6 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12">
+        <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between container-safe section-padding">
           {/* Left Content */}
 
           <div className="md:w-1/2 space-y-3 sm:space-y-4 lg:space-y-6 w-full">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold"  style={{color: "rgb(183, 36, 42)" }}>
+            <h2 className="text-responsive-lg font-semibold"  style={{color: "rgb(183, 36, 42)" }}>
               Our Free <br /> Support Services
             </h2>
 
-            <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed">
+            <p className="text-gray-700 text-responsive-sm leading-relaxed">
               Comprehensive assistance across various needs, Whether you're
               looking for property solution, resolving insurance issues, Looking
               for loan, or purchasing items on installments, our support is

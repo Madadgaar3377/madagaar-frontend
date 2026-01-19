@@ -34,13 +34,13 @@ export default function OurPartners() {
       .map((_, i) => images[(i + idx) % images.length]);
 
   return (
-    <div className="bg-gray-50 py-12 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="bg-gray-50 section-padding-sm">
+      <div className="container-content space-y-8">
         <header className="text-center">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800">
+          <h1 className="text-responsive-xl font-extrabold text-gray-800">
             Our Partners
           </h1>
-          <p className="mt-2 text-gray-500 max-w-2xl mx-auto">
+          <p className="mt-2 text-gray-500 max-w-2xl mx-auto text-responsive-sm">
             We proudly collaborate with trusted brands. Scroll to explore their
             logos — hover to pause.
           </p>

@@ -77,8 +77,8 @@ export default function OtpVerifyPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
 
         {msg.text && (

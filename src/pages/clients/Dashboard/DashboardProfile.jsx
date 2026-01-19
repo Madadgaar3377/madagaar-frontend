@@ -254,8 +254,8 @@ const DashboardProfile = () => {
       
       <DashboardNavbar />
       
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content max-w-4xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Profile Settings</h1>

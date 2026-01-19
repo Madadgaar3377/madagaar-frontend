@@ -137,7 +137,7 @@ export default function BlogsPage() {
       />
       {/* Hero / heading section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[rgb(183,36,42)] via-rose-500 to-orange-400 text-white">
-        <div className="max-w-6xl mx-auto px-4 lg:px-8 py-10 lg:py-14 relative z-10">
+        <div className="container-content max-w-6xl py-10 lg:py-14 relative z-10">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
             <div>
               <p className="inline-flex items-center text-xs uppercase tracking-[0.2em] bg-white/10 px-3 py-1 rounded-full mb-3 backdrop-blur">
@@ -252,7 +252,7 @@ export default function BlogsPage() {
       </section>
 
       {/* content area */}
-      <main className="max-w-6xl mx-auto px-4 lg:px-8 py-10">
+      <main className="container-content max-w-6xl py-10">
         {loading ? (
           <div className="py-20 flex flex-col items-center justify-center text-gray-500">
             <div className="w-10 h-10 rounded-full border-2 border-gray-300 border-t-[rgb(183,36,42)] animate-spin mb-3" />

@@ -70,8 +70,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl bg-white rounded-xl shadow-md p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center section-padding">
+      <div className="w-full max-w-3xl bg-white rounded-xl shadow-md p-4 sm:p-6 mx-auto safe-margin">
         <h3 className="text-2xl font-semibold mb-4">Create your account</h3>
         <p className="text-sm text-gray-500 mb-4">Simple and quick signup. Fields are arranged in rows for faster entry.</p>
 

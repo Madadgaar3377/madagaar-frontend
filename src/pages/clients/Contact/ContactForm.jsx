@@ -100,14 +100,14 @@ const ContactForm = () => {
         description="Get in touch with Madadgaar Expert Partner. We're here to help with your property, insurance, loan, and installment needs."
       />
 
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content max-w-4xl">
           {/* Header */}
           <div className="text-center mb-8 sm:mb-12">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-responsive-3xl font-bold text-gray-900 mb-4">
               Contact Us
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-responsive-base text-gray-600 max-w-2xl mx-auto">
               Have a question or need assistance? Fill out the form below and we'll get back to you as soon as possible.
             </p>
           </div>

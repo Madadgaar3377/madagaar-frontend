@@ -55,7 +55,7 @@ export default function AboutPage() {
        structuredData={structuredData}
      />
    {/* About Company Section */}
-   <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12">
+   <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding">
        <div className="md:w-1/2 mt-6 sm:mt-8 md:mt-0 flex justify-center w-full md:order-first">
           <img
             src="/Media/Aboutscreen/about-h4-1.png"
@@ -72,10 +72,10 @@ export default function AboutPage() {
           >
             About us
           </button>
-          <h1 className="text-lg sm:text-xl lg:text-3xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-responsive-lg font-bold text-gray-900 leading-tight">
            Madadgaar Expert Partner
           </h1>
-          <p className="text-gray-700 text-xs sm:text-sm lg:text-base leading-relaxed">
+          <p className="text-gray-700 text-responsive-sm leading-relaxed">
            Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's property solutions, insurance support, loans, or installment plans, we make your journey simple, reliable, and stress-free. Our platform lets you compare multiple options across Pakistan to find the perfect fit. Together, let's make things easier and make them happen!
           </p>
          
@@ -86,13 +86,13 @@ export default function AboutPage() {
       </section>
 
       {/* Mission and Vision Section */}
-      <section className="w-full bg-white px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+      <section className="w-full bg-white section-padding">
+        <div className="container-content">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-responsive-2xl font-bold text-gray-900 mb-4">
               Our Mission & Vision
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg max-w-4xl mx-auto">
+            <p className="text-gray-600 text-responsive-sm max-w-4xl mx-auto">
               We want to discuss how Madadgaar Expert Partner, as a trusted marketplace, simplifies access to property solutions, insurance support, loans, and installment plans.
             </p>
           </div>

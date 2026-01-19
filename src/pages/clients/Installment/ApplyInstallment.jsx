@@ -254,8 +254,8 @@ const ApplyInstallment = () => {
         noIndex={true}
       />
 
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content max-w-5xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <button
@@ -267,10 +267,10 @@ const ApplyInstallment = () => {
               </svg>
               Back
             </button>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+            <h1 className="text-responsive-xl font-bold text-gray-900">
               Apply for Installment Plan
             </h1>
-            <p className="text-gray-600 mt-2">Complete the form below to apply for this installment plan</p>
+            <p className="text-gray-600 mt-2 text-responsive-sm">Complete the form below to apply for this installment plan</p>
           </div>
 
           {/* Debug Info - Remove in production */}

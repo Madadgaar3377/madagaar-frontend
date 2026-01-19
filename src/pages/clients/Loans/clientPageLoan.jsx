@@ -169,13 +169,13 @@ export default function LoansPage() {
         canonicalUrl="https://madadgaar.com.pk/loans"
         structuredData={structuredData}
       />
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-4 sm:py-6 lg:py-8 px-2 sm:px-4">
-        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding-sm">
+        <div className="container-content space-y-4 sm:space-y-6">
         {/* Header */}
         <header className="flex flex-col gap-3 sm:gap-4">
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold text-gray-800">Loan Plans</h1>
-            <p className="mt-1 sm:mt-2 text-gray-600 max-w-2xl text-xs sm:text-sm lg:text-base">
+            <h1 className="text-responsive-xl font-extrabold text-gray-800">Loan Plans</h1>
+            <p className="mt-1 sm:mt-2 text-gray-600 max-w-2xl text-responsive-sm">
               Explore loan offerings — home, personal, auto and business plans. Click details for eligibility, rates & repayment
               options, or click Apply to start.
             </p>

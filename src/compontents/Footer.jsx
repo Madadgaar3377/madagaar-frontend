@@ -1,9 +1,9 @@
 const Footer = () => {
     return (
-      <footer  className=" bg-gray-900 text-white pt-16 pb-6 px-6 md:px-20">
-        
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+      <>
+      <footer className="bg-gray-900 text-white pt-12 sm:pt-16 pb-6 safe-area-bottom">
+        <div className="container-content">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
           
           {/* Logo + Description */}
           <div>
@@ -86,8 +86,10 @@ const Footer = () => {
           </div>
   
         </div>
-  
+      </div>
       </footer>
+      </>
+
     );
   };
   

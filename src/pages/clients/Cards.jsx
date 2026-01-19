@@ -47,9 +47,9 @@ const features = [
 
 export default function FeatureCards({ items = features }) {
   return (
-    <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <section className="section-padding-sm bg-white">
+      <div className="container-content">
+        <div className="responsive-grid-3 lg:grid-cols-4">
           {items.map((item) => (
             <div
               key={item.id}

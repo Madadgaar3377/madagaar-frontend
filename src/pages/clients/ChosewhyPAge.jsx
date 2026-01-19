@@ -24,9 +24,10 @@ const boxData = [
 
 export default function InfoBoxes() {
   return (
-    <div className="min-h-screen  py-12 px-4">
-      <h2 className="justify-center align-bottom text-center text-gray-800 font-semibold text-2xl mb-3">Why Madadghaar?</h2>
-      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div className="min-h-screen section-padding-sm">
+      <div className="container-content">
+        <h2 className="text-center text-gray-800 font-semibold text-responsive-lg mb-6 sm:mb-8">Why Madadghaar?</h2>
+        <div className="responsive-grid-3">
         {boxData.map((box, index) => (
           <div
             key={index}
@@ -43,6 +44,7 @@ export default function InfoBoxes() {
             <p className="text-gray-600 text-sm text-start">{box.description}</p>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );

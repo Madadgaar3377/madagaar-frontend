@@ -189,19 +189,19 @@ function PropertiesPage() {
         canonicalUrl="https://madadgaar.com.pk/properties"
         structuredData={structuredData}
       />
-      <header className="bg-gradient-to-r from-red-700 via-rose-500 to-orange-400 text-white py-4 sm:py-6 lg:py-8">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold mb-1 sm:mb-2">
+      <header className="bg-gradient-to-r from-red-700 via-rose-500 to-orange-400 text-white section-padding-sm">
+        <div className="container-content max-w-6xl">
+          <h1 className="text-responsive-xl font-extrabold mb-1 sm:mb-2">
             Available Properties
           </h1>
-          <p className="text-xs sm:text-sm lg:text-base text-white/90">
+          <p className="text-responsive-sm text-white/90">
             Browse properties filtered by city, location, type, or budget
           </p>
         </div>
       </header>
 
       {/* Filters */}
-      <section className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">
+      <section className="container-content max-w-6xl py-4 sm:py-6">
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-3 sm:p-4 lg:p-6">
           {/* Filter Header with Toggle Button */}
           <div className="flex items-center justify-between mb-3 sm:mb-4">

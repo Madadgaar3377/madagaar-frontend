@@ -4,7 +4,7 @@ const MobileAppPage = () => {
   return (
     <div>
       <>
-        <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between  px-6 md:px-16 py-12">
+        <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between container-safe section-padding">
           {/* Left Content */}
 
           <div className="md:w-1/2 space-y-6">

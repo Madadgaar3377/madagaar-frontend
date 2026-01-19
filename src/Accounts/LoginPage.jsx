@@ -86,8 +86,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <div className="mb-6 text-center">
           <img src="Media/Group%2033.png" alt="Logo" className="mx-auto h-12 mb-3" />
           <h1 className="text-2xl font-semibold">Sign in to your account</h1>

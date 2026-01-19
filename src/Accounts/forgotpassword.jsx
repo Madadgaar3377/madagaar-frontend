@@ -57,8 +57,8 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow p-6">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center section-padding">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-2xl font-semibold text-gray-800 mb-2">Forgot Password</h2>
         <p className="text-sm text-gray-500 mb-4">
           Enter the email tied to your account. We'll send a one-time code (OTP) to reset your password.

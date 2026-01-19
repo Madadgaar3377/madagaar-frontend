@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import FeatureCards from "./Cards";
 import Services from "./Services";
 import SecondCards from "./SecondCards";
-import MobileAppPage from "./MadadghaarAppPage";
+// import MobileAppPage from "./MadadghaarAppPage"; // Commented out as per user preference
 import VideoPage from "./youtube/YoutubeVide";
 import InfoBoxes from "./ChosewhyPAge";
 import OurPartners from "./OverPartener";
@@ -141,7 +141,7 @@ export default function HomePage() {
         canonicalUrl="https://madadgaar.com.pk"
         structuredData={structuredData}
       />
-      <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-6 sm:py-8 md:py-12">
+      <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding">
         {/* Left Content */}
         <div className="md:w-1/2 space-y-3 sm:space-y-4 lg:space-y-6 w-full">
           <h2
@@ -150,11 +150,11 @@ export default function HomePage() {
           >
             Now you'll have no more worries!
           </h2>
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-responsive-xl font-bold text-gray-900 leading-tight">
             Welcome to{" "}
             <span  style={{ color: "rgb(183, 36, 42)" }}>Madadgaar Platform!</span>
           </h1>
-          <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed">
+          <p className="text-gray-700 text-responsive-sm leading-relaxed">
             We're here to make your life easier with our awesome services.
             Whether you need property solutions, insurance support, loans, or
             installment plans, we're dedicated to assisting you with care and
@@ -185,18 +185,18 @@ export default function HomePage() {
       <SecondCards />
       
       {/* Team Members Section */}
-      <section className="w-full bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+      <section className="w-full bg-gray-50 section-padding">
+        <div className="container-content">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-responsive-2xl font-bold text-gray-900 mb-4">
               Our Management Team
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg italic">
+            <p className="text-gray-600 text-responsive-sm italic">
               Together as a team, we rise higher, push harder, and achieve the impossible.
             </p>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+          <div className="responsive-grid-3 grid-cols-2 lg:grid-cols-4">
             {teamMembers.map((member) => (
               <TeamMemberCard key={member.id} member={member} />
             ))}
@@ -209,18 +209,18 @@ export default function HomePage() {
       <OurPartners />
       
       {/* Strategy Section */}
-      <section className="w-full bg-white px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+      <section className="w-full bg-white section-padding">
+        <div className="container-content">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-responsive-2xl font-bold text-gray-900 mb-4">
               Our Strategy to Achieve Our Goals
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg">
+            <p className="text-gray-600 text-responsive-sm">
               Strategic approaches that drive our success and ensure quality service delivery
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="responsive-grid-3">
             <div className="bg-gray-50 rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow">
               <div className="text-4xl mb-4">📊</div>
               <h3 className="text-lg font-bold text-gray-900 mb-3">Marketplace Optimization</h3>
@@ -272,21 +272,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      <InfoBoxes />
+    
 
       {/* Contact Section */}
-      <section className="w-full bg-gradient-to-br from-gray-50 via-red-50 to-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+      <section className="w-full bg-gradient-to-br from-gray-50 via-red-50 to-gray-50 section-padding">
+        <div className="container-content max-w-6xl">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-responsive-2xl font-bold text-gray-900 mb-4">
               Connect With Us
             </h2>
-            <p className="text-gray-600 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 text-responsive-sm max-w-2xl mx-auto">
               Have a question or need assistance? Get in touch with our team for any inquiries or support. We're here to help!
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="responsive-grid-2 gap-6 lg:gap-8">
             {/* Contact Information Cards */}
             <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-lg">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Contact Information</h3>
@@ -329,8 +329,8 @@ export default function HomePage() {
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-1">Email</h4>
-                    <a href="mailto:help.madadgaar@gmail.com" className="text-sm hover:underline break-all" style={{ color: "rgb(183, 36, 42)" }}>
-                      help.madadgaar@gmail.com
+                    <a href="mailto:support@madadgaar.com.pk" className="text-sm hover:underline break-all" style={{ color: "rgb(183, 36, 42)" }}>
+                      support@madadgaar.com.pk
                     </a>
                   </div>
                 </div>
@@ -446,6 +446,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      <InfoBoxes />
 
     </>
   );

@@ -33,7 +33,7 @@ export default function InsuranceInfo() {
       />
       {/* top banner */}
       <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
+        <div className="container-content max-w-6xl py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
               Insurance Solutions
@@ -53,7 +53,7 @@ export default function InsuranceInfo() {
       </div>
 
       {/* main content */}
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="container-content max-w-6xl py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6 lg:space-y-8">
         {/* hero card */}
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
           <div className="flex-1">

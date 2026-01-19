@@ -128,15 +128,15 @@ export default function InstallmentPlans() {
       canonicalUrl="https://madadgaar.com.pk/installments"
       structuredData={structuredData}
     />
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
+      <div className="container-content">
         <header className="mb-4 sm:mb-6 lg:mb-8 bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
           <div className="flex flex-col gap-4 sm:gap-6">
             <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-responsive-xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
                 Installment Plans
               </h1>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Find the perfect payment plan for your dream product</p>
+              <p className="text-responsive-sm text-gray-600 mt-1 sm:mt-2">Find the perfect payment plan for your dream product</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">

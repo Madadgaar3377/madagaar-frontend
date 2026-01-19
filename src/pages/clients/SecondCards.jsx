@@ -61,8 +61,8 @@ const SecondCards = () => {
   }, []); // run once on mount
 
   return (
-    <div className="flex items-center justify-center p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+    <div className="flex items-center justify-center section-padding-sm">
+      <div className="responsive-grid-3 lg:grid-cols-4 w-full max-w-6xl mx-auto">
         {stats.map((item, index) => (
           <div
             key={`${item.title}-${index}`}

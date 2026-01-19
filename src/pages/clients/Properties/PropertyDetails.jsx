@@ -154,7 +154,7 @@ const PropertyDetails = () => {
         <div className="min-h-screen bg-gray-50">
             {/* Breadcrumb */}
             <div className="bg-white border-b">
-                <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
+                <div className="container-content py-3 sm:py-4">
                     <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm overflow-x-auto whitespace-nowrap">
                         <Link to="/" className="text-gray-600 hover:text-red-600 flex-shrink-0">Home</Link>
                         <span className="text-gray-400">/</span>
@@ -165,7 +165,7 @@ const PropertyDetails = () => {
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 lg:py-8">
+            <div className="container-content py-4 sm:py-6 lg:py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">

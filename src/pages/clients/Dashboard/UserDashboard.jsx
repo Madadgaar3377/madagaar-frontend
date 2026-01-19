@@ -222,8 +222,8 @@ const UserDashboard = () => {
 
       <DashboardNavbar />
 
-      <div className="min-h-screen bg-gray-50 py-6 sm:py-8 lg:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content">
           {/* Header */}
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 mb-6">
             <div className="flex justify-between items-start sm:items-center gap-4">

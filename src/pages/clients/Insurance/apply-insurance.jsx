@@ -267,8 +267,8 @@ export default function InsuranceApply() {
     <>
       <Toast toasts={toasts} onClose={removeToast} />
 
-      <div className="min-h-screen bg-gray-50 py-10 px-4">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gray-50 section-padding">
+        <div className="container-content max-w-4xl">
           <div className="bg-white rounded-2xl shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
