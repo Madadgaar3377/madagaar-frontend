@@ -126,6 +126,9 @@ export default function Navbar({
             <NavLink to="/blog" className="text-gray-700 hover:text-gray-900">
               Blog
             </NavLink>
+            <NavLink to="/faq" className="text-gray-700 hover:text-gray-900">
+              FAQs
+            </NavLink>
             <NavLink to="/contact" className="text-gray-700 hover:text-gray-900">
               Contact
             </NavLink>
@@ -242,6 +245,9 @@ export default function Navbar({
           </NavLink>
           <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             Blog
+          </NavLink>
+          <NavLink to="/faq" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+            FAQs
           </NavLink>
           <NavLink to="/contact" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             Contact

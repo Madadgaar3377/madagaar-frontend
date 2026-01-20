@@ -31,11 +31,26 @@ export default function LoansPage() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "FinancialService",
-    "name": "Madadgaar Loan Services",
-    "description": "Compare and find the best loan options in Pakistan. Personal loans, home loans, business loans, and more from trusted financial institutions.",
+    "@type": "Service",
+    "serviceType": "Financial Services",
+    "name": "Madadgaar Financing",
+    "description": "Get the funds you need, faster and smarter. Compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan.",
     "url": "https://madadgaar.com.pk/loans",
-    "areaServed": "Pakistan"
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Madadgaar Expert Partner",
+      "url": "https://madadgaar.com.pk"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Pakistan"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "PKR",
+      "description": "Free loan comparison and application services"
+    }
   };
 
   const [loanPlans, setLoanPlans] = useState([]);
@@ -163,9 +178,9 @@ export default function LoansPage() {
   return (
     <>
       <SEO
-        title="Loan Plans Pakistan - Personal, Home, Auto & Business Loans | Madadgaar"
-        description="Compare and find the best loan options in Pakistan. Personal loans, home loans, business loans, and more from trusted banks and financial institutions. Islamic and conventional financing available."
-        keywords="loan plans pakistan, personal loan, home loan, auto loan, business loan, islamic financing, car financing, house financing, sme loans pakistan"
+        title="Madadgaar Financing | Get the funds you need, faster and smarter"
+        description="Explore Financing – Compare, Select & Apply. Madadgaar helps you compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan — all in one easy-to-use platform."
+        keywords="loans pakistan, personal loan pakistan, home loan pakistan, car loan pakistan, business loan pakistan, bank loans pakistan, loan interest rates pakistan, financing pakistan, loan comparison pakistan, islamic financing, car financing, house financing, sme loans pakistan"
         canonicalUrl="https://madadgaar.com.pk/loans"
         structuredData={structuredData}
       />
@@ -174,10 +189,10 @@ export default function LoansPage() {
         {/* Header */}
         <header className="flex flex-col gap-3 sm:gap-4">
           <div className="flex-1">
-            <h1 className="text-responsive-xl font-extrabold text-gray-800">Loan Plans</h1>
+            <h1 className="text-responsive-xl font-extrabold text-gray-800">Madadgaar Financing | Get the funds you need, faster and smarter</h1>
             <p className="mt-1 sm:mt-2 text-gray-600 max-w-2xl text-responsive-sm">
               Explore loan offerings — home, personal, auto and business plans. Click details for eligibility, rates & repayment
-              options, or click Apply to start.
+              options, or click Apply to start. <a href="/faq#loan" className="text-red-600 hover:text-red-700 font-semibold">View loan FAQs</a> or <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">explore property solutions</a>.
             </p>
           </div>
 
@@ -316,7 +331,7 @@ export default function LoansPage() {
                 <div className="h-36 sm:h-44 bg-gray-100 overflow-hidden relative">
                   <img
                     src={plan.planImage || "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1200&q=60"}
-                    alt={plan.productName || "Loan plan image"}
+                    alt={`${plan.productName || "Loan"} - ${plan.bankName || "Financial"} Loan Plan in Pakistan`}
                     className="w-full h-full object-cover"
                     onError={imgFallback}
                   />

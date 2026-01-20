@@ -27,11 +27,26 @@ export default function InstallmentPlans() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "FinancialService",
+    "@type": "Service",
+    "serviceType": "Installment Plans & EMI Services",
     "name": "Madadgaar Installment Plans",
-    "description": "Buy products on easy installment plans in Pakistan. Electronics, appliances, furniture, and more with flexible monthly payment options.",
+    "description": "Big dreams? Pay small, with flexible plans that fit your budget. Compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods.",
     "url": "https://madadgaar.com.pk/installments",
-    "areaServed": "Pakistan"
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Madadgaar Expert Partner",
+      "url": "https://madadgaar.com.pk"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Pakistan"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "PKR",
+      "description": "Free installment plan comparison and application services"
+    }
   };
 
   // UI state
@@ -122,9 +137,9 @@ export default function InstallmentPlans() {
   return (
     <>
     <SEO
-      title="Installment Plans Pakistan - Buy Now Pay Later | Madadgaar"
-      description="Shop your favorite products on easy installment plans in Pakistan. Buy electronics, appliances, furniture, and more with flexible monthly payments. Zero or low interest rates available from trusted retailers."
-      keywords="installment plans pakistan, buy on installments, monthly payments pakistan, installment shopping, zero markup, low interest installments, electronics on installment, furniture installment, appliances installment pakistan"
+      title="Madadgaar Installment Plans | Big dreams? Pay small, with flexible plans that fit your budget"
+      description="Explore Installment Products – Compare, Select & Apply. Madadgaar helps you compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods — all on one easy-to-use platform."
+      keywords="installment plans pakistan, buy on installments, monthly payments pakistan, installment shopping, zero markup, low interest installments, electronics on installment, furniture installment, appliances installment pakistan, EMI plans pakistan, buy now pay later pakistan"
       canonicalUrl="https://madadgaar.com.pk/installments"
       structuredData={structuredData}
     />
@@ -134,9 +149,9 @@ export default function InstallmentPlans() {
           <div className="flex flex-col gap-4 sm:gap-6">
             <div>
               <h1 className="text-responsive-xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
-                Installment Plans
+                Madadgaar Installment Plans | Big dreams? Pay small, with flexible plans that fit your budget
               </h1>
-              <p className="text-responsive-sm text-gray-600 mt-1 sm:mt-2">Find the perfect payment plan for your dream product</p>
+              <p className="text-responsive-sm text-gray-600 mt-1 sm:mt-2">Find the perfect payment plan for your dream product. <a href="/faq#installment" className="text-red-600 hover:text-red-700 font-semibold">Learn about installment plans</a> or <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">compare financing options</a>.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -201,7 +216,7 @@ export default function InstallmentPlans() {
                   <div className="relative overflow-hidden">
                     <img
                       src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
-                      alt={plan.productName}
+                      alt={`${plan.productName} - Installment Plan in ${plan.city || "Pakistan"}`}
                       className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                     />

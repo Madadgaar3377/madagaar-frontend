@@ -6,15 +6,16 @@ import { Helmet } from 'react-helmet-async';
  * @param {Object} props - SEO configuration
  */
 const SEO = ({
-  title = 'Madadgaar Expert Partner - Property, Insurance, Loans & Installment Plans in Pakistan',
-  description = 'Madadgaar Expert Partner is Pakistan\'s trusted marketplace for property solutions, insurance support, loans, and flexible installment plans. Compare multiple options and find the best fit for your needs.',
-  keywords = 'madadgaar, property solutions pakistan, insurance pakistan, loans pakistan, installment plans, real estate pakistan, car insurance, life insurance, home loans, business loans, verified agents',
+  title = 'Madadgaar Expert Partner | Property, Financing, Installments & Insurance Services',
+  description = 'Let\'s make things easier — and make them happen together. Whether you are looking for property, loans, installment plans, or insurance support, Madadgaar helps you compare multiple options across Pakistan to find what truly fits your needs.',
+  keywords = 'madadgaar, property solutions pakistan, insurance pakistan, loans pakistan, installment plans, real estate pakistan, car insurance, life insurance, home loans, business loans, verified agents, property pakistan, financing pakistan, EMI plans pakistan',
   author = 'Madadgaar Expert Partner',
   canonicalUrl = 'https://madadgaar.com.pk',
   ogImage = 'https://madadgaar.com.pk/Media/Group%2033.png',
   ogType = 'website',
   twitterCard = 'summary_large_image',
   structuredData = null,
+  faqSchema = null,
   noIndex = false,
 }) => {
   const defaultStructuredData = {
@@ -94,9 +95,23 @@ const SEO = ({
       <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
       {/* Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify(structuredData || defaultStructuredData)}
-      </script>
+      {structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      )}
+      {!structuredData && (
+        <script type="application/ld+json">
+          {JSON.stringify(defaultStructuredData)}
+        </script>
+      )}
+      
+      {/* FAQ Schema */}
+      {faqSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqSchema)}
+        </script>
+      )}
     </Helmet>
   );
 };

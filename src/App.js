@@ -18,6 +18,7 @@ import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import PropertyDetails from "./pages/clients/Properties/PropertyDetails.jsx";
 import ApplyProperty from "./pages/clients/Properties/ApplyProperty.jsx";
 import ContactForm from "./pages/clients/Contact/ContactForm.jsx";
+import FAQPage from "./pages/clients/FAQ.jsx";
 
 import InstallmentDetail from "./pages/clients/Installment/installmentoverview.jsx";
 import ApplyInstallment from "./pages/clients/Installment/ApplyInstallment.jsx";
@@ -104,6 +105,9 @@ function App() {
 
             {/* Contact */}
             <Route path="/contact" element={<ContactForm />} />
+            
+            {/* FAQ */}
+            <Route path="/faq" element={<FAQPage />} />
 
             {/* user panel routes */}
 

@@ -23,7 +23,7 @@ const MobileAppPage = () => {
           <div className="md:w-1/2 mt-10 md:mt-0 flex justify-center">
             <img
               src="/Media/mobileAppMockup.png"
-              alt="Madadgaar Services"
+              alt="Madadgaar Mobile App - Property, Loans, Installments and Insurance Services on Mobile"
               className="rounded-2xl  w-full max-w-md "
             />
           </div>

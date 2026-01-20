@@ -275,7 +275,7 @@ export default function CompareProducts() {
       return (
         <div className="flex gap-2">
           {imgs.slice(0, 3).map((s, i) => (
-            <img key={i} src={s} alt="" className="w-16 h-12 object-cover rounded cursor-pointer" onClick={() => setImgPreview(s)} />
+            <img key={i} src={s} alt={`${product.productName || "Product"} - Image ${i + 1} - ${product.category || "Installment Plan"} in ${product.city || "Pakistan"}`} className="w-16 h-12 object-cover rounded cursor-pointer" onClick={() => setImgPreview(s)} />
           ))}
         </div>
       );
@@ -315,7 +315,7 @@ export default function CompareProducts() {
         <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border-2 border-gray-200 flex flex-col gap-3 sm:gap-4 lg:gap-6">
           <div className="w-full flex-shrink-0">
             <div className="rounded-lg sm:rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 h-48 sm:h-56 lg:h-64 flex items-center justify-center">
-              <img src={(baseProduct && baseProduct.productImages && baseProduct.productImages[0]) || ""} alt="" className="w-full h-full object-cover" />
+              <img src={(baseProduct && baseProduct.productImages && baseProduct.productImages[0]) || ""} alt={`${baseProduct?.productName || "Product"} - ${baseProduct?.category || "Installment Plan"} for comparison in ${baseProduct?.city || "Pakistan"}`} className="w-full h-full object-cover" />
             </div>
           </div>
 
@@ -396,7 +396,7 @@ export default function CompareProducts() {
             <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
               {searchResults.map((s) => (
                 <div key={getId(s)} className="p-2 sm:p-3 rounded-lg border bg-white flex gap-2 sm:gap-3 items-start">
-                  <img src={(s.productImages && s.productImages[0]) || ""} alt="" className="w-16 h-12 sm:w-20 sm:h-14 object-cover rounded flex-shrink-0" />
+                  <img src={(s.productImages && s.productImages[0]) || ""} alt={`${s.productName || "Product"} - ${s.category || "Installment Plan"} in ${s.city || "Pakistan"}`} className="w-16 h-12 sm:w-20 sm:h-14 object-cover rounded flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-xs sm:text-sm truncate">{s.productName}</div>
                     <div className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</div>
@@ -439,7 +439,7 @@ export default function CompareProducts() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {related.map((r) => (
                   <div key={getId(r)} className="p-2 rounded-lg border bg-white">
-                    <img src={(r.productImages && r.productImages[0]) || ""} alt="" className="w-full h-28 object-cover rounded" />
+                    <img src={(r.productImages && r.productImages[0]) || ""} alt={`${r.productName || "Product"} - Related ${r.category || "Installment Plan"} in ${r.city || "Pakistan"}`} className="w-full h-28 object-cover rounded" />
                     <div className="mt-2 text-xs font-medium">{r.productName}</div>
                     <div className="text-xs text-gray-500">Rs. {Number(r.price||0).toLocaleString("en-PK")}</div>
                     <div className="mt-2 flex gap-2">
@@ -457,7 +457,7 @@ export default function CompareProducts() {
         <div className="flex gap-2 flex-wrap items-center">
           {compareList.slice(0, MAX_COMPARE).map((p, idx) => (
             <div key={getId(p)} className={`flex items-center gap-2 bg-white px-3 py-1 rounded-full border ${idx===0 ? "ring-2 ring-[rgba(183,36,42,0.12)]" : ""}`}>
-              <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-8 h-6 object-cover rounded" />
+              <img src={(p.productImages && p.productImages[0]) || ""} alt={`${p.productName || "Product"} thumbnail - ${p.category || "Installment Plan"}`} className="w-8 h-6 object-cover rounded" />
               <div className="text-sm font-medium">{p.productName}</div>
               {idx !== 0 && <button onClick={() => removeFromCompare(p)} className="text-xs px-2 py-0.5 rounded border">Remove</button>}
             </div>
@@ -477,7 +477,7 @@ export default function CompareProducts() {
                   {compareList.map((p) => (
                       <th key={getId(p)} className="p-2 sm:p-3 text-left" style={{ minWidth: 180, maxWidth: 220 }}>
                         <div className="flex items-center gap-2 sm:gap-3">
-                          <img src={(p.productImages && p.productImages[0]) || ""} alt="" className="w-10 h-8 sm:w-14 sm:h-11 object-cover rounded flex-shrink-0" />
+                          <img src={(p.productImages && p.productImages[0]) || ""} alt={`${p.productName || "Product"} - ${p.category || "Installment Plan"} comparison`} className="w-10 h-8 sm:w-14 sm:h-11 object-cover rounded flex-shrink-0" />
                           <div className="min-w-0">
                             <div className="font-semibold text-xs sm:text-sm truncate">{p.productName}</div>
                             <div className="text-[10px] sm:text-xs text-gray-500 truncate">{p.companyName}</div>
@@ -522,7 +522,7 @@ export default function CompareProducts() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setImgPreview(null)}>
           <div className="bg-white rounded-lg p-3 max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-end"><button onClick={() => setImgPreview(null)} className="px-3 py-1 rounded border">Close</button></div>
-            <img src={imgPreview} alt="preview" className="w-full h-[60vh] object-contain mt-3" />
+            <img src={imgPreview} alt={`Product image preview - ${baseProduct?.productName || compareList[0]?.productName || "Installment Plan"} in ${baseProduct?.city || compareList[0]?.city || "Pakistan"}`} className="w-full h-[60vh] object-contain mt-3" />
           </div>
         </div>
       )}

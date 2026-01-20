@@ -243,7 +243,7 @@ export default function InstallmentDetail() {
               <img
                 src={images[index]}
                 onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-                alt={plan.productName}
+                alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
                 className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-contain"
               />
               {images.length > 1 && (
@@ -614,7 +614,7 @@ export default function InstallmentDetail() {
                   <div className="relative h-40 sm:h-48 bg-gradient-to-br from-gray-100 to-gray-50 overflow-hidden">
                     <img
                       src={product.productImages?.[0] || PLACEHOLDER}
-                      alt={product.productName}
+                      alt={`${product.productName || "Product"} - Installment Plan Comparison`}
                       onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
                       className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />

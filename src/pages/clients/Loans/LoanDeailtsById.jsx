@@ -248,7 +248,7 @@ export default function LoanDetails() {
                 <div className="bg-white rounded-xl shadow-md overflow-hidden">
                   <img
                     src={plan.planImage}
-                    alt={plan.productName}
+                    alt={`${plan.productName || "Loan"} - ${plan.bankName || "Financial"} ${plan.majorCategory || "Loan"} Plan in Pakistan`}
                     className="w-full h-64 object-cover"
                     onError={(e) => {
                       e.target.style.display = 'none';

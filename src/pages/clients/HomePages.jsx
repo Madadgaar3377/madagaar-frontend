@@ -96,11 +96,77 @@ export default function HomePage() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "LocalBusiness",
+    "@id": "https://madadgaar.com.pk",
     "name": "Madadgaar Expert Partner",
-    "description": "Pakistan's trusted marketplace for property solutions, insurance support, loans, and flexible installment plans",
+    "description": "Pakistan's trusted marketplace for property solutions, insurance support, loans, and flexible installment plans. Compare multiple options across Pakistan to find what truly fits your needs.",
     "url": "https://madadgaar.com.pk",
     "logo": "https://madadgaar.com.pk/Media/Group%2033.png",
+    "image": "https://madadgaar.com.pk/Media/Group%2033.png",
+    "telephone": "+92-307-111-333-0",
+    "email": "help.madadgaar@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Gulberg III",
+      "addressLocality": "Lahore",
+      "addressRegion": "Punjab",
+      "postalCode": "",
+      "addressCountry": "PK"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "31.5204",
+      "longitude": "74.3587"
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      "opens": "09:00",
+      "closes": "18:00"
+    },
+    "priceRange": "Free",
+    "areaServed": {
+      "@type": "Country",
+      "name": "Pakistan"
+    },
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Madadgaar Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Property Solutions",
+            "description": "Buy, sell, and rent properties across Pakistan"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Loan & Financing",
+            "description": "Compare and apply for loans from verified providers"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Installment Plans",
+            "description": "Buy products on flexible installment plans"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Insurance Support",
+            "description": "Compare insurance plans and get claim support"
+          }
+        }
+      ]
+    },
     "contactPoint": {
       "@type": "ContactPoint",
       "telephone": "+92-307-111-333-0",
@@ -109,16 +175,6 @@ export default function HomePage() {
       "areaServed": "PK",
       "availableLanguage": ["English", "Urdu"]
     },
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Lahore",
-      "addressRegion": "Punjab",
-      "addressCountry": "Pakistan",
-      "streetAddress": "Gulberg III"
-    },
-    "sameAs": [
-      "https://madadgaar.com.pk"
-    ],
     "founder": [
       {
         "@type": "Person",
@@ -137,9 +193,9 @@ export default function HomePage() {
     <>
       <Toast toasts={toasts} onClose={removeToast} />
       <SEO
-        title="Madadgaar Expert Partner - Property, Insurance, Loans & Installment Plans in Pakistan"
-        description="Pakistan's most trusted marketplace for property solutions, insurance support, loans, and flexible installment plans. Compare multiple options across Pakistan and find the perfect fit for your needs."
-        keywords="madadgaar, property solutions pakistan, real estate pakistan, insurance pakistan, loans pakistan, installment plans, verified agents, property dealers, car insurance, life insurance, home loans"
+        title="Madadgaar Expert Partner | Property, Financing, Installments & Insurance Services"
+        description="Let's make things easier — and make them happen together. Whether you are looking for property, loans, installment plans, or insurance support, Madadgaar helps you compare multiple options across Pakistan to find what truly fits your needs."
+        keywords="madadgaar, property solutions pakistan, real estate pakistan, insurance pakistan, loans pakistan, installment plans, verified agents, property dealers, car insurance, life insurance, home loans, financing pakistan, EMI plans, property buy rent pakistan"
         canonicalUrl="https://madadgaar.com.pk"
         structuredData={structuredData}
       />
@@ -156,8 +212,7 @@ export default function HomePage() {
             Now you'll have no more worries!
           </h2>
           <h1 className="text-responsive-xl font-bold text-gray-900 leading-tight">
-            Welcome to{" "}
-            <span  style={{ color: "rgb(183, 36, 42)" }}>Madadgaar Platform!</span>
+            Madadgaar Expert Partner | Property, Financing, Installments & Insurance Services
           </h1>
           <p className="text-gray-700 text-responsive-sm leading-relaxed">
             We're here to make your life easier with our awesome services.
@@ -167,19 +222,26 @@ export default function HomePage() {
           </p>
           <p className="text-gray-700 text-sm sm:text-base lg:text-lg leading-relaxed">
             On our platform, you can compare multiple options across Pakistan to
-            find the best fit for your needs. Let's make things easier & happen
-            together!
+            find the best fit for your needs. Explore <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">property solutions</a>, <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">loan options</a>, <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">installment plans</a>, and <a href="/insurance" className="text-red-600 hover:text-red-700 font-semibold">insurance support</a> all in one place. Let's make things easier & happen together!
           </p>
-          <button  style={{ backgroundColor: "rgb(183, 36, 42)" }} className="mt-4 sm:mt-6 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg font-medium hover:bg-blue-700 transition">
-            Explore Services
-          </button>
+          <div className="flex flex-wrap gap-3 mt-4 sm:mt-6">
+            <a href="/properties" style={{ backgroundColor: "rgb(183, 36, 42)" }} className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg font-medium hover:bg-red-700 transition">
+              Explore Properties
+            </a>
+            <a href="/loans" style={{ backgroundColor: "rgb(183, 36, 42)" }} className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg font-medium hover:bg-red-700 transition">
+              Compare Loans
+            </a>
+            <a href="/installments" style={{ backgroundColor: "rgb(183, 36, 42)" }} className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white rounded-lg font-medium hover:bg-red-700 transition">
+              View Installments
+            </a>
+          </div>
         </div>
 
         {/* Right Image */}
         <div className="md:w-1/2 mt-6 sm:mt-8 md:mt-0 flex justify-center w-full">
           <img
             src="/Media/inshero.png"
-            alt="Madadgaar Services"
+            alt="Madadgaar Expert Partner - Property, Financing, Installments & Insurance Services in Pakistan"
             className="rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md object-cover"
             loading="lazy"
           />
@@ -223,6 +285,12 @@ export default function HomePage() {
             <p className="text-gray-600 text-responsive-sm">
               Strategic approaches that drive our success and ensure quality service delivery
             </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-4">
+              <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold text-responsive-sm">Compare Properties →</a>
+              <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold text-responsive-sm">Explore Loans →</a>
+              <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold text-responsive-sm">View Installments →</a>
+              <a href="/insurance" className="text-red-600 hover:text-red-700 font-semibold text-responsive-sm">Insurance Support →</a>
+            </div>
           </div>
 
           <div className="responsive-grid-3">

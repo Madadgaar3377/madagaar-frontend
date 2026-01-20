@@ -11,11 +11,26 @@ const PAGE_SIZE = 6;
 function PropertiesPage() {
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "RealEstateAgent",
+    "@type": "Service",
+    "serviceType": "Real Estate Services",
     "name": "Madadgaar Property Solutions",
-    "description": "Find your dream property in Pakistan. Browse residential, commercial, and industrial properties across all major cities.",
+    "description": "Find, compare, and secure your perfect property—stress-free. Compare properties for sale, rent, and investment across Pakistan.",
     "url": "https://madadgaar.com.pk/properties",
-    "areaServed": "Pakistan"
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Madadgaar Expert Partner",
+      "url": "https://madadgaar.com.pk"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Pakistan"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "PKR",
+      "description": "Free property comparison and listing services"
+    }
   };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const [properties, setProperties] = useState([]);
@@ -183,19 +198,19 @@ function PropertiesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO
-        title="Property Solutions Pakistan - Buy, Sell & Rent Properties | Madadgaar"
-        description="Discover the best property solutions in Pakistan. Browse residential, commercial, and industrial properties for sale and rent across Lahore, Karachi, Islamabad, and more. Compare verified property listings from trusted dealers."
-        keywords="property pakistan, real estate pakistan, buy property pakistan, sell property pakistan, rent property pakistan, property lahore, property karachi, property islamabad, residential property, commercial property, houses for sale, apartments for rent"
+        title="Madadgaar Properties | Buy, Rent & Invest Easily"
+        description="Find, compare, and secure your perfect property—stress-free. Madadgaar helps you compare properties for sale, rent, and investment across Pakistan to find what truly fits your needs."
+        keywords="property pakistan, real estate pakistan, buy property pakistan, sell property pakistan, rent property pakistan, property lahore, property karachi, property islamabad, residential property, commercial property, houses for sale, apartments for rent, property investment pakistan"
         canonicalUrl="https://madadgaar.com.pk/properties"
         structuredData={structuredData}
       />
       <header className="bg-gradient-to-r from-red-700 via-rose-500 to-orange-400 text-white section-padding-sm">
         <div className="container-content max-w-6xl">
           <h1 className="text-responsive-xl font-extrabold mb-1 sm:mb-2">
-            Available Properties
+            Madadgaar Properties | Buy, Rent & Invest Easily
           </h1>
           <p className="text-responsive-sm text-white/90">
-            Browse properties filtered by city, location, type, or budget
+            Browse properties filtered by city, location, type, or budget. <a href="/faq#property" className="underline hover:text-white/80">Learn more about property services</a> or <a href="/loans" className="underline hover:text-white/80">explore financing options</a>.
           </p>
         </div>
       </header>
@@ -376,7 +391,7 @@ function PropertiesPage() {
                   {p.images?.[0] ? (
                     <img
                       src={p.images[0]}
-                      alt={p.title}
+                      alt={`${p.title} - ${p.propertyType || "Property"} for ${p.transactionType || "sale"} in ${p.city || "Pakistan"}`}
                       className="h-32 sm:h-40 w-full object-cover"
                     />
                   ) : (

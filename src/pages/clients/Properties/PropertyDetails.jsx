@@ -254,7 +254,7 @@ const PropertyDetails = () => {
                                 <div className="mb-3 sm:mb-4">
                                     <img
                                         src={property.images[selectedImage]}
-                                        alt={property.title}
+                                        alt={`${property.title} - ${property.propertyType || "Property"} for ${property.transactionType || "sale"} in ${property.city || "Pakistan"}`}
                                         className="w-full h-48 sm:h-64 md:h-96 object-cover rounded-lg sm:rounded-xl"
                                     />
                                 </div>
@@ -274,7 +274,7 @@ const PropertyDetails = () => {
                                             >
                                                 <img
                                                     src={img}
-                                                    alt={`${property.title} ${idx + 1}`}
+                                                    alt={`${property.title} - Image ${idx + 1} - ${property.propertyType || "Property"} in ${property.city || "Pakistan"}`}
                                                     className="w-full h-full object-cover"
                                                 />
                                             </button>
@@ -471,7 +471,7 @@ const PropertyDetails = () => {
                                         <div className="h-48 overflow-hidden">
                                             <img
                                                 src={related.images[0]}
-                                                alt={related.title}
+                                                alt={`${related.title} - ${related.propertyType || "Property"} in ${related.city || "Pakistan"}`}
                                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                             />
                                         </div>

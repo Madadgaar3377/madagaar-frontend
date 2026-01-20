@@ -13,7 +13,7 @@ const features = [
     title: "Property",
     desc: "Your Gateway to Seamless Property Solutions.",
     Icon: () => (
-      <img src="/Media/H%20icon-2.png" alt="" />
+      <img src="/Media/H%20icon-2.png" alt="Property Solutions Icon - Buy, Sell and Rent Properties in Pakistan" />
     ),
   },
   {
@@ -22,7 +22,7 @@ const features = [
     title: "Loan",
     desc: "Empower your ambitions with our seamless loan solutions.",
     Icon: () => (
-      <img src="/Media/H%20icon-3.png" alt="" />
+      <img src="/Media/H%20icon-3.png" alt="Loan and Financing Icon - Personal, Home, Car and Business Loans in Pakistan" />
     ),
   },
   {
@@ -31,7 +31,7 @@ const features = [
     title: "Installment",
     desc: "Big dreams, small payments - flexible installments for everything you need!",
     Icon: () => (
-      <img src="/Media/H%20icon3.jpeg" alt="" />
+      <img src="/Media/H%20icon3.jpeg" alt="Installment Plans Icon - Buy Products on EMI in Pakistan" />
     ),
   },
   {
@@ -40,7 +40,7 @@ const features = [
     title: "Insurance",
     desc: "Pakistan's most trusted platform for resolving insurance complaints.",
     Icon: () => (
-      <img src="/Media/H%20icon-1.png" alt="" />
+      <img src="/Media/H%20icon-1.png" alt="Insurance Services Icon - Car, Life, Health and Property Insurance in Pakistan" />
     ),
   },
 ];
@@ -123,7 +123,10 @@ export default function FeatureCards({ items = features }) {
                     {item.title}
                   </h3>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {item.desc}
+                    {item.desc} {item.id === 1 && <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">Explore properties →</a>}
+                    {item.id === 2 && <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">Compare loans →</a>}
+                    {item.id === 3 && <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">View installments →</a>}
+                    {item.id === 4 && <a href="/insurance" className="text-red-600 hover:text-red-700 font-semibold">Insurance support →</a>}
                   </p>
                 </div>
               </div>

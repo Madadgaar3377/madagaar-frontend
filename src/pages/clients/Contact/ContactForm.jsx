@@ -97,7 +97,9 @@ const ContactForm = () => {
       <Toast toasts={toasts} onClose={removeToast} />
       <SEO
         title="Contact Us | Madadgaar"
-        description="Get in touch with Madadgaar Expert Partner. We're here to help with your property, insurance, loan, and installment needs."
+        title="Contact Madadgaar Expert Partner"
+        description="Reach out to Madadgaar for property, loan, installment, and insurance support in Pakistan. Get expert guidance and assistance easily."
+        keywords="contact madadgaar, madadgaar support, customer service madadgaar, help madadgaar, madadgaar contact number, madadgaar email"
       />
 
       <div className="min-h-screen bg-gray-50 section-padding">

@@ -271,7 +271,7 @@ export default function AdminInstallment() {
                     {openPlan.productImages && openPlan.productImages.length ? (
                       <img
                         src={openPlan.productImages[carouselIndex]}
-                        alt="plan"
+                        alt={`${openPlan.productName || "Product"} - Installment Plan Image ${carouselIndex + 1} in ${openPlan.city || "Pakistan"}`}
                         className="w-full h-72 lg:h-full object-contain bg-white"
                         onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                       />

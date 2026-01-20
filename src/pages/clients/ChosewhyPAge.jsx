@@ -120,7 +120,7 @@ export default function InfoBoxes() {
                 <div className="relative w-full max-w-[200px] h-40 sm:h-48">
                   <img
                     src={box.img}
-                    alt={box.title}
+                    alt={`${box.title} - ${box.description.substring(0, 50)}...`}
                     className="w-full h-full rounded-xl object-contain"
                     loading="lazy"
                   />

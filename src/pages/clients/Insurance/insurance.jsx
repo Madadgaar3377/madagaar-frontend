@@ -15,19 +15,34 @@ export default function InsuranceInfo() {
 
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "InsuranceAgency",
-    "name": "Madadgaar Insurance Services",
-    "description": "Pakistan's trusted platform for resolving insurance complaints and finding the right insurance coverage",
+    "@type": "Service",
+    "serviceType": "Insurance Services",
+    "name": "Madadgaar Insurance Support",
+    "description": "Claim with confidence—Pakistan's most trusted insurance support. Compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support.",
     "url": "https://madadgaar.com.pk/insurance",
-    "areaServed": "Pakistan"
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Madadgaar Expert Partner",
+      "url": "https://madadgaar.com.pk"
+    },
+    "areaServed": {
+      "@type": "Country",
+      "name": "Pakistan"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "PKR",
+      "description": "Free insurance comparison and claim support services"
+    }
   };
 
   return (
     <div className="bg-gray-50">
       <SEO
-        title="Insurance Solutions Pakistan - Car, Life, Health & Property Insurance | Madadgaar"
-        description="Pakistan's most trusted platform for resolving insurance complaints. Get car insurance, life insurance, health insurance, and property insurance from leading providers. Expert support for claims and coverage."
-        keywords="insurance pakistan, car insurance pakistan, life insurance, health insurance, property insurance, insurance claims, insurance companies pakistan, motor insurance, family insurance"
+        title="Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support"
+        description="Explore Insurance Services – Compare, Select & Apply. Madadgaar helps you compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support — all on one easy-to-use platform."
+        keywords="insurance pakistan, car insurance pakistan, life insurance, health insurance, property insurance, insurance claims, insurance companies pakistan, motor insurance, family insurance, takaful pakistan, insurance support pakistan"
         canonicalUrl="https://madadgaar.com.pk/insurance"
         structuredData={structuredData}
       />
@@ -36,10 +51,10 @@ export default function InsuranceInfo() {
         <div className="container-content max-w-6xl py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
           <div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
-              Insurance Solutions
+              Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
-              Protect your life, health, and assets with tailored insurance plans.
+              Protect your life, health, and assets with tailored insurance plans. <a href="/faq#insurance" className="text-red-600 hover:text-red-700 font-semibold">View insurance FAQs</a> or <a href="/contact" className="text-red-600 hover:text-red-700 font-semibold">contact our support team</a>. Explore our <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">property solutions</a> and <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">loan options</a> for comprehensive financial planning.
             </p>
           </div>
           <button
@@ -61,7 +76,7 @@ export default function InsuranceInfo() {
               Secure your future with the right coverage
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-2 sm:mt-3">
-              We are offers reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease. With a focus on transparency and customer satisfaction, we are your go-to resource for resolving insurance complaints in Pakistan.
+              We are offers reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease. With a focus on transparency and customer satisfaction, we are your go-to resource for resolving insurance complaints in Pakistan. Learn more about <a href="/about" className="text-red-600 hover:text-red-700 font-semibold">how Madadgaar works</a> or explore <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">installment plans</a> for flexible payment options.
             </p>
 
             <div className="mt-3 sm:mt-4 lg:mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -107,7 +122,7 @@ export default function InsuranceInfo() {
                 <div className="h-52 md:h-60 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 flex items-center justify-center">
   <img
     src="Media/ins%20Frame.png"
-    alt="Insurance illustration"
+    alt="Insurance Services in Pakistan - Car, Life, Health and Property Insurance Support"
     className="
       max-h-full
       max-w-full

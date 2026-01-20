@@ -53,8 +53,8 @@ const Services = () => {
 
         <p className="text-gray-700 text-responsive-sm leading-relaxed">
           Comprehensive assistance across various needs, Whether you're
-          looking for property solution, resolving insurance issues, Looking
-          for loan, or purchasing items on installments, our support is
+          looking for <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">property solution</a>, resolving <a href="/insurance" className="text-red-600 hover:text-red-700 font-semibold">insurance issues</a>, Looking
+          for <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">loan</a>, or purchasing items on <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">installments</a>, our support is
           designed to make the process smooth and hassle-free. We provide
           tailored solutions to fit your specific requirements, ensuring you
           get the help you need at no cost. Our team is all about making
@@ -78,8 +78,8 @@ const Services = () => {
         style={imageVisible ? { animationDelay: '200ms' } : {}}
       >
         <img
-          src="/Media/Support%20service.png"
-          alt="Madadgaar Services"
+            src="/Media/Support%20service.png"
+            alt="Madadgaar Free Support Services - Property, Insurance, Loans and Installment Solutions in Pakistan"
           className="rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md"
           loading="lazy"
         />
