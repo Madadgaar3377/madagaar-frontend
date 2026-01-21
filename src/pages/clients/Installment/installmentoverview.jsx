@@ -54,6 +54,7 @@ export default function InstallmentDetail() {
   const [index, setIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [sellerExpanded, setSellerExpanded] = useState(false);
+  const [expandedPlanIndex, setExpandedPlanIndex] = useState(null);
 
   // fetch plan
   useEffect(() => {
@@ -131,6 +132,23 @@ export default function InstallmentDetail() {
     if (!plan || !plan.videoUrl) return null;
     return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
   }, [plan]);
+
+  const bestPlanIndex = useMemo(() => {
+    return findBestPlanIndex(plan?.paymentPlans || []);
+  }, [plan]);
+
+  // Mobile: open BEST plan by default
+  useEffect(() => {
+    if (Array.isArray(plan?.paymentPlans) && plan.paymentPlans.length > 0) {
+      setExpandedPlanIndex(bestPlanIndex);
+    } else {
+      setExpandedPlanIndex(null);
+    }
+  }, [bestPlanIndex, plan]);
+
+  const togglePlan = (idx) => {
+    setExpandedPlanIndex((prev) => (prev === idx ? null : idx));
+  };
 
 
   if (loading) return <LoadingPage />;
@@ -312,122 +330,251 @@ export default function InstallmentDetail() {
                   <span className="text-xl sm:text-2xl">💳</span>
                   Available Payment Plans ({plan.paymentPlans.length})
                 </h3>
-              
-              {/* Card Layout - All Screen Sizes */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-                {plan.paymentPlans.map((p, idx) => {
-                  const cashPrice = Number(plan.price || 0);
-                  const downPayment = Number(p.downPayment || 0);
-                  const financedAmount = Math.max(0, cashPrice - downPayment);
-                  const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
-                  const totalMarkup = Number(p.markup || 0);
-                  const totalCost = cashPrice + totalMarkup;
-                  const isBestPlan = idx === findBestPlanIndex(plan.paymentPlans);
-                  
-                  return (
-                    <div 
-                      key={idx} 
-                      className={`bg-gradient-to-br from-white to-gray-50 border-2 ${isBestPlan ? 'border-[rgb(183,36,42)] shadow-lg' : 'border-gray-200'} rounded-lg sm:rounded-xl overflow-hidden hover:shadow-xl transition-all flex flex-col ${isBestPlan ? 'ring-2 ring-[rgb(183,36,42)] ring-opacity-20' : ''}`}
-                    >
-                      {/* Card Header */}
-                      <div className="p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <div className="text-xs sm:text-sm font-bold text-[rgb(183,36,42)] uppercase truncate flex-1">
-                            {p.planName || `Plan ${idx + 1}`}
-                          </div>
-                          {isBestPlan && (
-                            <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[9px] sm:text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">
-                              ⭐ BEST
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-baseline gap-1.5 mb-1">
-                          <span className="text-xl sm:text-2xl lg:text-3xl font-black text-[rgb(183,36,42)]">
-                            PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
-                          </span>
-                          <span className="text-xs sm:text-sm text-gray-500">/month</span>
-                        </div>
-                        <div className="text-xs text-gray-600">
-                          {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
-                        </div>
-                      </div>
 
-                      {/* Card Body - All Details Visible */}
-                      <div className="p-3 sm:p-4 flex-1 flex flex-col space-y-2.5 sm:space-y-3">
-                        <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-gray-200 space-y-2 flex-1">
-                          <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
-                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Cash Price</span>
-                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {cashPrice.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] sm:text-xs text-gray-600">Down Payment</span>
-                            <span className="text-xs sm:text-sm font-medium text-gray-700">PKR {downPayment.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] sm:text-xs text-gray-600">Interest Rate</span>
-                            <span className="text-xs sm:text-sm font-medium text-gray-700">{p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] sm:text-xs text-gray-600">Interest Type</span>
-                            <span className="text-xs sm:text-sm font-medium text-gray-700 truncate ml-2">{p.interestType || "—"}</span>
-                          </div>
-                          {totalMarkup > 0 && (
-                            <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
-                              <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Total Markup</span>
-                              <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {totalMarkup.toLocaleString()}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
-                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Financed Amount</span>
-                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {financedAmount.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Total Payable</span>
-                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {totalPayable.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between pt-2 border-t-2 border-[rgb(183,36,42)] bg-red-50 rounded-lg p-2 -mx-1 sm:-mx-2 mt-2">
-                            <span className="text-xs sm:text-sm font-bold text-gray-900">Total Cost</span>
-                            <span className="text-sm sm:text-base lg:text-lg font-black text-[rgb(183,36,42)]">PKR {totalCost.toLocaleString()}</span>
-                          </div>
-                        </div>
-                        
-                        {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
-                          <details className="text-[10px] sm:text-xs">
-                            <summary className="cursor-pointer font-semibold text-gray-700 hover:text-[rgb(183,36,42)] transition py-1.5">📅 Payment Schedule</summary>
-                            <div className="mt-2 max-h-32 sm:max-h-40 overflow-auto bg-gray-50 rounded-lg p-2">
-                              {p.installmentSchedule.map((it, i) => (
-                                <div key={i} className="grid grid-cols-2 gap-2 py-1.5 border-b border-gray-200 last:border-0 text-[10px] sm:text-xs">
-                                  <span className="font-medium">#{i + 1}</span>
-                                  <span className="text-right">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
-                                  <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
-                                  <span className={`px-1.5 py-0.5 rounded text-center text-[9px] sm:text-[10px] ${it.paid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                                    {it.paid ? "✓ Paid" : "Pending"}
-                                  </span>
-                                </div>
-                              ))}
-                            </div>
-                          </details>
-                        )}
-                        {p.otherChargesNote && (
-                          <div className="text-[10px] sm:text-xs text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2">
-                            <span className="font-semibold">Note:</span> {p.otherChargesNote}
-                          </div>
-                        )}
-                      </div>
+                {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
+                <div className="lg:hidden space-y-3">
+                  {plan.paymentPlans.map((p, idx) => {
+                    const cashPrice = Number(plan.price || 0);
+                    const downPayment = Number(p.downPayment || 0);
+                    const financedAmount = Math.max(0, cashPrice - downPayment);
+                    const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
+                    const totalMarkup = Number(p.markup || 0);
+                    const totalCost = cashPrice + totalMarkup;
+                    const isBestPlan = idx === bestPlanIndex;
+                    const isOpen = expandedPlanIndex === idx;
+                    const panelId = `plan-panel-${idx}`;
 
-                      {/* Card Footer - Apply Button */}
-                      <div className="p-3 sm:p-4 pt-0 border-t border-gray-200">
-                        <NavLink
-                          to={`/installment/${plan._id}/apply?planIndex=${idx}`}
-                          className="block w-full text-center px-3 sm:px-4 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white text-xs sm:text-sm font-bold rounded-lg hover:bg-red-700 transition shadow-md hover:shadow-lg active:scale-95"
+                    return (
+                      <div
+                        key={idx}
+                        className={`border-2 rounded-xl overflow-hidden bg-white transition ${
+                          isBestPlan ? "border-[rgb(183,36,42)] shadow-md" : "border-gray-200"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => togglePlan(idx)}
+                          aria-expanded={isOpen}
+                          aria-controls={panelId}
+                          className="w-full p-4 flex items-start justify-between gap-3 text-left"
                         >
-                          Apply for This Plan
-                        </NavLink>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <div className="font-bold text-gray-900 truncate">
+                                {p.planName || `Plan ${idx + 1}`}
+                              </div>
+                              {isBestPlan && (
+                                <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full whitespace-nowrap">
+                                  ⭐ BEST
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 flex items-baseline gap-2">
+                              <span className="text-lg font-black text-[rgb(183,36,42)]">
+                                PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                              </span>
+                              <span className="text-xs text-gray-500">/month</span>
+                              <span className="ml-auto text-xs font-semibold text-gray-700 whitespace-nowrap">
+                                {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-xs text-gray-600">
+                              <span className="font-bold">Cash Price:</span> PKR {cashPrice.toLocaleString()}
+                            </div>
+                          </div>
+                          <svg
+                            className={`w-5 h-5 text-gray-500 flex-shrink-0 mt-1 transition-transform ${
+                              isOpen ? "rotate-180" : "rotate-0"
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </button>
+
+                        <div
+                          id={panelId}
+                          className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                            isOpen ? "max-h-[1600px] opacity-100" : "max-h-0 opacity-0"
+                          }`}
+                        >
+                          <div className="px-4 pb-4 pt-0 space-y-3">
+                            <div className="grid grid-cols-2 gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Down Payment</div>
+                                <div className="text-sm font-bold text-gray-900">PKR {downPayment.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Financed Amount</div>
+                                <div className="text-sm font-bold text-gray-900">PKR {financedAmount.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Interest Rate</div>
+                                <div className="text-sm font-bold text-gray-900">
+                                  {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Interest Type</div>
+                                <div className="text-sm font-bold text-gray-900 truncate">{p.interestType || "—"}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Total Payable</div>
+                                <div className="text-sm font-bold text-gray-900">PKR {totalPayable.toLocaleString()}</div>
+                              </div>
+                              <div>
+                                <div className="text-[11px] text-gray-500 font-semibold">Total Markup</div>
+                                <div className="text-sm font-bold text-gray-900">PKR {totalMarkup.toLocaleString()}</div>
+                              </div>
+                              <div className="col-span-2 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center justify-between">
+                                <div className="text-sm font-extrabold text-gray-900">Total Cost</div>
+                                <div className="text-base font-black text-[rgb(183,36,42)]">PKR {totalCost.toLocaleString()}</div>
+                              </div>
+                            </div>
+
+                            {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
+                              <details className="text-xs">
+                                <summary className="cursor-pointer font-semibold text-gray-800 hover:text-[rgb(183,36,42)] transition py-1.5">
+                                  📅 Payment Schedule
+                                </summary>
+                                <div className="mt-2 max-h-40 overflow-auto bg-gray-50 rounded-lg p-2 border border-gray-200">
+                                  {p.installmentSchedule.map((it, i) => (
+                                    <div
+                                      key={i}
+                                      className="grid grid-cols-2 gap-2 py-2 border-b border-gray-200 last:border-0 text-[11px]"
+                                    >
+                                      <span className="font-semibold">#{i + 1}</span>
+                                      <span className="text-right">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
+                                      <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
+                                      <span
+                                        className={`px-2 py-0.5 rounded text-center ${
+                                          it.paid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                                        }`}
+                                      >
+                                        {it.paid ? "✓ Paid" : "Pending"}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </details>
+                            )}
+
+                            {p.otherChargesNote && (
+                              <div className="text-xs text-gray-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                                <span className="font-semibold">Note:</span> {p.otherChargesNote}
+                              </div>
+                            )}
+
+                            <NavLink
+                              to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
+                              className="block w-full text-center px-4 py-3 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
+                            >
+                              Apply for This Plan
+                            </NavLink>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop: Cards grid */}
+                <div className="hidden lg:grid grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+                  {plan.paymentPlans.map((p, idx) => {
+                    const cashPrice = Number(plan.price || 0);
+                    const downPayment = Number(p.downPayment || 0);
+                    const financedAmount = Math.max(0, cashPrice - downPayment);
+                    const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
+                    const totalMarkup = Number(p.markup || 0);
+                    const totalCost = cashPrice + totalMarkup;
+                    const isBestPlan = idx === bestPlanIndex;
+
+                    return (
+                      <div
+                        key={idx}
+                        className={`bg-gradient-to-br from-white to-gray-50 border-2 ${
+                          isBestPlan ? "border-[rgb(183,36,42)] shadow-lg" : "border-gray-200"
+                        } rounded-xl overflow-hidden hover:shadow-xl transition-all flex flex-col ${
+                          isBestPlan ? "ring-2 ring-[rgb(183,36,42)] ring-opacity-20" : ""
+                        }`}
+                      >
+                        <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                          <div className="flex items-center justify-between gap-2 mb-2">
+                            <div className="text-sm font-bold text-[rgb(183,36,42)] uppercase truncate flex-1">
+                              {p.planName || `Plan ${idx + 1}`}
+                            </div>
+                            {isBestPlan && (
+                              <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">
+                                ⭐ BEST
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-2xl font-black text-[rgb(183,36,42)]">
+                              PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                            </span>
+                            <span className="text-sm text-gray-500">/month</span>
+                          </div>
+                          <div className="text-sm text-gray-700 mt-1">
+                            {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
+                          </div>
+                        </div>
+
+                        <div className="p-4 flex-1 flex flex-col gap-3">
+                          <div className="bg-white rounded-xl p-3 border border-gray-200 space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600 font-semibold">Cash Price</span>
+                              <span className="font-bold text-gray-900">PKR {cashPrice.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Down Payment</span>
+                              <span className="font-semibold text-gray-900">PKR {downPayment.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Financed Amount</span>
+                              <span className="font-semibold text-gray-900">PKR {financedAmount.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Interest</span>
+                              <span className="font-semibold text-gray-900">
+                                {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"} {p.interestType ? `• ${p.interestType}` : ""}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600 font-semibold">Total Payable</span>
+                              <span className="font-bold text-gray-900">PKR {totalPayable.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600 font-semibold">Total Markup</span>
+                              <span className="font-bold text-gray-900">PKR {totalMarkup.toLocaleString()}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-base pt-2 border-t-2 border-[rgb(183,36,42)] bg-red-50 rounded-lg p-2">
+                              <span className="font-extrabold text-gray-900">Total Cost</span>
+                              <span className="font-black text-[rgb(183,36,42)]">PKR {totalCost.toLocaleString()}</span>
+                            </div>
+                          </div>
+
+                          {p.otherChargesNote && (
+                            <div className="text-xs text-gray-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                              <span className="font-semibold">Note:</span> {p.otherChargesNote}
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="p-4 pt-0 border-t border-gray-200">
+                          <NavLink
+                            to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
+                            className="block w-full text-center px-4 py-2.5 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
+                          >
+                            Apply for This Plan
+                          </NavLink>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </section>
             ) : (
               /* Fallback for legacy plans without paymentPlans array */
