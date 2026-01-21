@@ -2,6 +2,17 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
+import InstallmentReviews from "../../../components/InstallmentReviews";
+
+// Helper to find best plan index
+const findBestPlanIndex = (paymentPlans) => {
+  if (!paymentPlans || paymentPlans.length === 0) return 0;
+  return paymentPlans.reduce((bestIdx, current, currentIdx) => {
+    const currentMonthly = Number(current.monthlyInstallment || 0);
+    const bestMonthly = Number(paymentPlans[bestIdx].monthlyInstallment || 0);
+    return currentMonthly > 0 && (bestMonthly === 0 || currentMonthly < bestMonthly) ? currentIdx : bestIdx;
+  }, 0);
+};
 
 const PLACEHOLDER = "/placeholder.png";
 
@@ -30,17 +41,6 @@ function safe(obj, path, fallback = "-") {
     return fallback;
   }
 }
-function isObjectPresent(obj, key) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, key) && obj[key] !== undefined && obj[key] !== null && !(Array.isArray(obj[key]) && obj[key].length === 0);
-}
-
-function anySpecHasValue(plan, paths = []) {
-  for (const p of paths) {
-    const v = safe(plan, p, "-");
-    if (v !== "-" && v !== null && v !== undefined) return true;
-  }
-  return false;
-}
 
 /* ---------- component ---------- */
 export default function InstallmentDetail() {
@@ -53,6 +53,7 @@ export default function InstallmentDetail() {
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [sellerExpanded, setSellerExpanded] = useState(false);
 
   // fetch plan
   useEffect(() => {
@@ -131,79 +132,6 @@ export default function InstallmentDetail() {
     return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
   }, [plan]);
 
-  // determine selected category key (one of CATEGORIES.keys) and detect available groups
-  const detected = useMemo(() => {
-    if (!plan) return {};
-    const catRaw = (plan.category || plan.customCategory || "").toLowerCase();
-
-    const hasGeneral = isObjectPresent(plan, "generalFeatures") && anySpecHasValue(plan, [
-      "generalFeatures.operatingSystem",
-      "generalFeatures.simSupport",
-      "generalFeatures.phoneDimensions",
-    ]);
-    const hasPerformance = isObjectPresent(plan, "performance") && anySpecHasValue(plan, ["performance.processor", "performance.gpu"]);
-    const hasDisplay = isObjectPresent(plan, "display") && anySpecHasValue(plan, ["display.screenSize", "display.screenResolution"]);
-    const hasBattery = isObjectPresent(plan, "battery") && anySpecHasValue(plan, ["battery.type"]);
-    const hasCamera = isObjectPresent(plan, "camera") && anySpecHasValue(plan, ["camera.frontCamera", "camera.backCamera"]);
-    const hasMemory = isObjectPresent(plan, "memory") && anySpecHasValue(plan, ["memory.internalMemory", "memory.ram"]);
-    const hasConnectivity = isObjectPresent(plan, "connectivity") && anySpecHasValue(plan, ["connectivity.data", "connectivity.bluetooth"]);
-    const hasAC = isObjectPresent(plan, "airConditioner") && anySpecHasValue(plan, ["airConditioner.brand", "airConditioner.model", "airConditioner.capacityInTon"]);
-
-    // widened electrical bike checks to include multiple possible field names added in schema
-    const hasElectricalBike = isObjectPresent(plan, "electricalBike") && anySpecHasValue(plan, [
-      "electricalBike.motorRatedPower",
-      "electricalBike.motor",
-      "electricalBike.battery",
-      "electricalBike.batterySpec",
-      "electricalBike.maxSpeed",
-      "electricalBike.maxDistanceRange",
-      "electricalBike.rangeKm",
-      "electricalBike.chargingTime",
-      "electricalBike.controllers",
-    ]);
-
-    // widened mechanical bike checks
-    const hasMechanicalBike = isObjectPresent(plan, "mechanicalBike") && anySpecHasValue(plan, [
-      "mechanicalBike.generalFeatures.engine",
-      "mechanicalBike.generalFeatures.model",
-      "mechanicalBike.generalFeatures.dimensions",
-      "mechanicalBike.performance.transmission",
-      "mechanicalBike.performance.displacement",
-      "mechanicalBike.performance.petrolCapacity",
-    ]);
-
-    // heuristics by category text
-    const isMobileCat = /phone|mobile|smartphone|samsung|apple|xiaomi|vivo|oppo|realme|galaxy|iphone/.test(catRaw) || hasGeneral || hasDisplay || hasBattery || hasCamera || hasMemory;
-    const isACCat = /air|ac|air conditioner|split|cooler/.test(catRaw) || hasAC;
-    const isBikeCat = /bike|motorcycle|electrical|electric|scooter|moped/.test(catRaw) || hasElectricalBike || hasMechanicalBike;
-    const isTvCat = /tv|television|led|oled|qled|smart tv/.test(catRaw) || hasDisplay;
-
-    // map to our category keys (prefer explicit fields presence over text)
-    let selected = "other";
-    if (isMobileCat) selected = "mobile";
-    else if (isACCat) selected = "airConditioner";
-    else if (hasElectricalBike) selected = "electricalBike";
-    else if (hasMechanicalBike) selected = "mechanicalBike";
-
-    return {
-      hasGeneral,
-      hasPerformance,
-      hasDisplay,
-      hasBattery,
-      hasCamera,
-      hasMemory,
-      hasConnectivity,
-      hasAC,
-      hasElectricalBike,
-      hasMechanicalBike,
-      isMobileCat,
-      isTvCat,
-      isACCat,
-      isBikeCat,
-      category: catRaw,
-      selectedCategoryKey: selected,
-    };
-  }, [plan]);
 
   if (loading) return <LoadingPage />;
 
@@ -226,379 +154,564 @@ export default function InstallmentDetail() {
       </div>
     );
 
-  // helper: should we render a spec block? only when the detected category matches that block (or selected is 'other')
-  const shouldShowBlock = (blockKey, hasFlag = false) => {
-    if (!detected) return false;
-    if (!hasFlag) return detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other";
-    return (detected.selectedCategoryKey === blockKey || detected.selectedCategoryKey === "other") && hasFlag;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
-          <div className="p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-3 sm:gap-4 lg:gap-6">
-            {/* carousel */}
-            <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden">
-              <img
-                src={images[index]}
-                onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-                alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
-                className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-contain"
-              />
-              {images.length > 1 && (
-                <>
-                  <button
-                    onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
-                    className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
-                    aria-label="Previous image"
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={() => setIndex((i) => (i + 1) % images.length)}
-                    className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)]"
-                    aria-label="Next image"
-                  >
-                    ›
-                  </button>
-                </>
-              )}
-              <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
-                {index + 1} / {images.length}
-              </div>
-            </div>
-
-            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-thin">
-              {images.map((src, i) => (
-                <button
-                  key={i}
-                  onClick={() => setIndex(i)}
-                  className={`flex-shrink-0 rounded-md sm:rounded-lg overflow-hidden border-2 transition-all ${i === index ? "ring-2 sm:ring-4 ring-[rgb(183,36,42)] border-[rgb(183,36,42)] scale-105" : "border-gray-200 opacity-60 hover:opacity-100"}`}>
-                  <img src={src} alt={`thumb-${i}`} onError={(e) => (e.currentTarget.src = PLACEHOLDER)} className="h-14 w-20 sm:h-20 sm:w-28 object-cover" />
-                </button>
-              ))}
-            </div>
-
-          <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-red-100">
-            <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
-              <div className="flex-1 w-full">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900">{plan.productName}</h1>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs sm:text-sm text-gray-600">
-                  <span className="font-medium">{plan.companyName || plan.companyNameOther || plan.category}</span>
-                  <span className="w-1 h-1 rounded-full bg-gray-400 hidden sm:inline"></span>
-                  <span className="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                    </svg>
-                    {plan.city}
-                  </span>
-                </div>
-              </div>
-
-              <div className="w-full sm:w-auto sm:text-right bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-sm sm:min-w-[200px]">
-                <div className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase">Total Price</div>
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
-                  PKR {Number(plan.price || 0).toLocaleString()}
-                </div>
-                <div className="text-[10px] sm:text-xs text-gray-600 mt-1 sm:mt-2 flex items-center gap-1">
-                  <span className="font-medium">Down Payment:</span>
-                  <span className="text-[rgb(183,36,42)] font-bold">PKR {Number(plan.downpayment || 0).toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* video */}
-          {embed && (
-            <div className="rounded-md sm:rounded-lg overflow-hidden border">
-              {isYouTubeUrl(plan.videoUrl) ? (
-                <iframe
-                  title="product-video"
-                  src={embed}
-                  className="w-full h-48 sm:h-64 md:h-80 lg:h-96"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
+          {/* Main Content: Left (Images) + Right (Details) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 p-3 sm:p-4 md:p-6 lg:p-8">
+            {/* Left Column: Image Gallery */}
+            <div className="space-y-3 sm:space-y-4">
+              {/* Main Selected Image */}
+              <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden aspect-square lg:sticky lg:top-4">
+                <img
+                  src={images[index]}
+                  onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+                  alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
+                  className="w-full h-full object-contain p-2 sm:p-4"
                 />
-              ) : (
-                <video controls src={plan.videoUrl} className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-contain bg-black" />
-              )}
-            </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 border border-gray-200">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-              <NavLink 
-                className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-bold hover:shadow-lg transition-all transform hover:scale-105 text-center flex items-center justify-center gap-2" 
-                to={`/installment/${encodeURIComponent(plan._id)}/apply`}
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Apply Now
-              </NavLink>
-              <NavLink 
-                className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-all text-center flex items-center justify-center gap-2" 
-                to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                Compare
-              </NavLink>
-              <NavLink 
-                className="px-4 sm:px-5 lg:px-6 py-2 sm:py-2.5 lg:py-3 text-sm sm:text-base rounded-lg border-2 border-gray-300 text-gray-700 font-semibold hover:bg-gray-700 hover:text-white transition-all text-center flex items-center justify-center gap-2" 
-                to={"/installments"}
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to List
-              </NavLink>
-            </div>
-          </div>
-
-          {/* description */}
-          <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-gray-200">
-            <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-              <span className="text-lg sm:text-xl lg:text-2xl">📋</span>
-              Product Description
-            </h3>
-            <p className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
-          </div>
-
-          {/* payment plans */}
-          {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 && (
-            <section className="mt-3 sm:mt-4 lg:mt-6">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                <span className="text-lg sm:text-xl lg:text-2xl">💳</span>
-                Available Payment Plans
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-                {plan.paymentPlans.map((p, idx) => (
-                  <div key={idx} className="group bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 hover:border-[rgb(183,36,42)] hover:shadow-lg transition-all">
-                    <div className="flex flex-col sm:flex-row items-start justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-                      <div className="flex-1">
-                        <div className="text-xs sm:text-sm font-semibold text-[rgb(183,36,42)] uppercase">{p.planName || `Plan ${idx + 1}`}</div>
-                        <div className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">PKR {Number(p.installmentPrice || plan.price || 0).toLocaleString()}</div>
-                      </div>
-                      <div className="bg-[rgb(183,36,42)] text-white px-2 sm:px-3 py-1 rounded-full text-xs font-bold self-start">
-                        {p.tenureMonths ? `${p.tenureMonths}M` : (p.customTenureLabel || plan.tenure || "—")}
-                      </div>
+                {images.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)] z-10"
+                      aria-label="Previous image"
+                    >
+                      ‹
+                    </button>
+                    <button
+                      onClick={() => setIndex((i) => (i + 1) % images.length)}
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)] z-10"
+                      aria-label="Next image"
+                    >
+                      ›
+                    </button>
+                    <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
+                      {index + 1} / {images.length}
                     </div>
-                    
-                    <div className="bg-white rounded-lg p-3 sm:p-4 mb-3 border border-gray-200">
-                      <div className="flex items-center justify-between mb-2 gap-2">
-                        <span className="text-xs sm:text-sm text-gray-600">Monthly Payment</span>
-                        <span className="text-lg sm:text-xl font-bold text-[rgb(183,36,42)] text-right">PKR {Number(p.monthlyInstallment || p.installmentPrice || 0).toLocaleString()}</span>
-                      </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>Interest Rate</span>
-                        <span className="font-medium">{p.interestRatePercent ? `${p.interestRatePercent}%` : p.interestType || "—"}</span>
-                      </div>
-                      {p.markup > 0 && (
-                        <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
-                          <span>Markup</span>
-                          <span className="font-medium">PKR {p.markup}</span>
-                        </div>
+                  </>
+                )}
+              </div>
+
+              {/* Thumbnail Gallery */}
+              {images.length > 1 && (
+                <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-4 gap-2 sm:gap-3">
+                  {images.map((src, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setIndex(i)}
+                      className={`relative aspect-square rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all ${
+                        i === index 
+                          ? "ring-2 ring-[rgb(183,36,42)] border-[rgb(183,36,42)] scale-105 shadow-md" 
+                          : "border-gray-200 opacity-70 hover:opacity-100 hover:border-gray-300"
+                      }`}
+                    >
+                      <img 
+                        src={src} 
+                        alt={`${plan.productName || "Product"} thumbnail ${i + 1}`}
+                        onError={(e) => (e.currentTarget.src = PLACEHOLDER)} 
+                        className="w-full h-full object-cover" 
+                      />
+                      {i === index && (
+                        <div className="absolute inset-0 bg-[rgb(183,36,42)]/10" />
                       )}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Video Section */}
+              {embed && (
+                <div className="rounded-lg sm:rounded-xl overflow-hidden border border-gray-200 bg-black">
+                  {isYouTubeUrl(plan.videoUrl) ? (
+                    <iframe
+                      title="product-video"
+                      src={embed}
+                      className="w-full aspect-video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video controls src={plan.videoUrl} className="w-full aspect-video object-contain" />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Product Details */}
+            <div className="space-y-4 sm:space-y-5">
+              {/* Product Title & Price */}
+              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{plan.productName}</h1>
+                <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-gray-600">
+                  <span>{plan.companyName || plan.companyNameOther || plan.category}</span>
+                  <span className="text-gray-400">•</span>
+                  <span>{plan.city || "Pakistan"}</span>
+                </div>
+                
+                <div className="space-y-3 pt-4 border-t border-gray-200">
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1 font-medium">Cash Price</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-[rgb(183,36,42)]">
+                      PKR {Number(plan.price || 0).toLocaleString()}
                     </div>
-                    
-                    {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
-                      <details className="text-xs sm:text-sm">
-                        <summary className="cursor-pointer font-semibold text-gray-700 hover:text-[rgb(183,36,42)] transition">📅 View Schedule</summary>
-                        <div className="mt-3 max-h-40 overflow-auto bg-gray-50 rounded-lg p-2">
-                          {p.installmentSchedule.map((it, i) => (
-                            <div key={i} className="grid grid-cols-2 sm:flex sm:justify-between gap-2 py-2 border-b border-gray-200 last:border-0 text-xs">
-                              <span className="font-medium">#{i + 1}</span>
-                              <span className="text-right sm:text-left">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
-                              <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
-                              <span className={`px-2 py-0.5 rounded text-center sm:text-left ${it.paid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
-                                {it.paid ? "✓ Paid" : "Pending"}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </details>
-                    )}
-                    {p.otherChargesNote && (
-                      <div className="mt-3 text-xs text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2">
-                        <span className="font-semibold">Note:</span> {p.otherChargesNote}
-                      </div>
-                    )}
                   </div>
-                ))}
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Down Payment:</div>
+                    <div className="text-base font-semibold text-gray-900">
+                      PKR {Number(plan.downpayment || 0).toLocaleString()}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </section>
-          )}
 
-          {/* ---------- dynamic specifications ---------- */}
-          <section className="mt-3 sm:mt-4 lg:mt-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 mb-3 sm:mb-4 lg:mb-6">
-              <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <span className="text-lg sm:text-xl lg:text-2xl">⚙️</span>
-                Technical Specifications
-              </h3>
-              <div className="text-xs sm:text-sm text-gray-500 bg-gray-100 px-2 sm:px-3 py-1 rounded-full">Auto-detected</div>
-            </div>
+              {/* Action Buttons */}
+              <div className="space-y-3">
+                <NavLink 
+                  className="block w-full px-4 py-3 text-sm sm:text-base rounded-lg bg-[rgb(183,36,42)] text-white font-semibold hover:bg-red-700 transition-colors text-center" 
+                  to={`/installment/${encodeURIComponent(plan._id)}/apply`}
+                >
+                  Apply Now
+                </NavLink>
+                <div className="grid grid-cols-2 gap-3">
+                  <NavLink 
+                    className="px-4 py-3 text-sm sm:text-base rounded-lg border border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-colors text-center" 
+                    to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}
+                  >
+                    Compare
+                  </NavLink>
+                  <NavLink 
+                    className="px-4 py-3 text-sm sm:text-base rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-100 transition-colors text-center" 
+                    to={"/installments"}
+                  >
+                    Back to List
+                  </NavLink>
+                </div>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              {/* Generic / general features (show only for mobile or other) */}
-              {shouldShowBlock("mobile", detected.hasGeneral) && (
-                <SpecCard title="General">
-                  <SpecRow label="OS" value={safe(plan, "generalFeatures.operatingSystem")} />
-                  <SpecRow label="SIM" value={safe(plan, "generalFeatures.simSupport")} />
-                  <SpecRow label="Dimensions" value={safe(plan, "generalFeatures.phoneDimensions")} />
-                  <SpecRow label="Weight" value={safe(plan, "generalFeatures.phoneWeight")} />
-                  <SpecRow label="Colors" value={safe(plan, "generalFeatures.colors")} />
-                </SpecCard>
-              )}
-
-              {/* Performance (mobile / others) */}
-              {shouldShowBlock("mobile", detected.hasPerformance) && (
-                <SpecCard title="Performance">
-                  <SpecRow label="Processor" value={safe(plan, "performance.processor")} />
-                  <SpecRow label="GPU" value={safe(plan, "performance.gpu")} />
-                </SpecCard>
-              )}
-
-              {/* Display */}
-              {shouldShowBlock("mobile", detected.hasDisplay) && (
-                <SpecCard title="Display">
-                  <SpecRow label="Screen" value={safe(plan, "display.screenSize")} />
-                  <SpecRow label="Resolution" value={safe(plan, "display.screenResolution")} />
-                  <SpecRow label="Technology" value={safe(plan, "display.technology")} />
-                  <SpecRow label="Protection" value={safe(plan, "display.protection")} />
-                </SpecCard>
-              )}
-
-              {/* Battery */}
-              {shouldShowBlock("mobile", detected.hasBattery) && (
-                <SpecCard title="Battery">
-                  <div className="text-sm text-gray-700">{safe(plan, "battery.type")}</div>
-                </SpecCard>
-              )}
-
-              {/* Camera */}
-              {shouldShowBlock("mobile", detected.hasCamera) && (
-                <SpecCard title="Camera">
-                  <SpecRow label="Front" value={safe(plan, "camera.frontCamera")} />
-                  <SpecRow label="Back" value={safe(plan, "camera.backCamera")} />
-                  <SpecRow label="Features" value={safe(plan, "camera.features")} />
-                </SpecCard>
-              )}
-
-              {/* Memory */}
-              {shouldShowBlock("mobile", detected.hasMemory) && (
-                <SpecCard title="Memory & Storage">
-                  <SpecRow label="Internal" value={safe(plan, "memory.internalMemory")} />
-                  <SpecRow label="RAM" value={safe(plan, "memory.ram")} />
-                  <SpecRow label="Card slot" value={safe(plan, "memory.cardSlot")} />
-                </SpecCard>
-              )}
-
-              {/* Connectivity */}
-              {shouldShowBlock("mobile", detected.hasConnectivity) && (
-                <SpecCard title="Connectivity">
-                  <SpecRow label="Data" value={safe(plan, "connectivity.data")} />
-                  <SpecRow label="NFC" value={safe(plan, "connectivity.nfc")} />
-                  <SpecRow label="Bluetooth" value={safe(plan, "connectivity.bluetooth")} />
-                  <SpecRow label="Infrared" value={safe(plan, "connectivity.infrared")} />
-                </SpecCard>
-              )}
-
-              {/* Air conditioner */}
-              {shouldShowBlock("airConditioner", detected.hasAC) && (
-                <SpecCard title="Air Conditioner">
-                  <SpecRow label="Brand" value={safe(plan, "airConditioner.brand")} />
-                  <SpecRow label="Model" value={safe(plan, "airConditioner.model")} />
-                  <SpecRow label="Capacity (Ton)" value={safe(plan, "airConditioner.capacityInTon")} />
-                  <SpecRow label="Energy" value={safe(plan, "airConditioner.energyEfficient")} />
-                  <SpecRow label="Warranty" value={safe(plan, "airConditioner.warranty")} />
-                </SpecCard>
-              )}
-
-              {/* Electrical bike */}
-              {shouldShowBlock("electricalBike", detected.hasElectricalBike) && (
-                <SpecCard title="Electric Bike">
-                  <SpecRow label="Model" value={safe(plan, "electricalBike.model")} />
-                  <SpecRow label="Motor" value={safe(plan, "electricalBike.motorRatedPower") !== "-" ? safe(plan, "electricalBike.motorRatedPower") : safe(plan, "electricalBike.motor")} />
-                  <SpecRow label="Battery" value={safe(plan, "electricalBike.battery") !== "-" ? safe(plan, "electricalBike.battery") : safe(plan, "electricalBike.batterySpec")} />
-                  <SpecRow label="Max Speed" value={safe(plan, "electricalBike.maxSpeed")} />
-                  <SpecRow label="Range" value={safe(plan, "electricalBike.maxDistanceRange") !== "-" ? safe(plan, "electricalBike.maxDistanceRange") : safe(plan, "electricalBike.rangeKm")} />
-                  <SpecRow label="Charging Time" value={safe(plan, "electricalBike.chargingTime")} />
-                  <SpecRow label="Controllers" value={safe(plan, "electricalBike.controllers")} />
-                  <SpecRow label="Electricity Consumption" value={safe(plan, "electricalBike.electricityConsumption")} />
-                  <SpecRow label="Wheel Base" value={safe(plan, "electricalBike.wheelBase") || safe(plan, "electricalBike.vehicleDimensions")} />
-                  <SpecRow label="Ground Clearance" value={safe(plan, "electricalBike.groundClearance")} />
-                  <SpecRow label="Tyre (Front)" value={safe(plan, "electricalBike.tyreFront") || safe(plan, "electricalBike.rimsTiresFront")} />
-                  <SpecRow label="Tyre (Back)" value={safe(plan, "electricalBike.tyreBack") || safe(plan, "electricalBike.rimsTiresBack")} />
-                  <SpecRow label="Shocks" value={safe(plan, "electricalBike.shocks")} />
-                  <SpecRow label="Warranty" value={safe(plan, "electricalBike.warranty")} />
-                </SpecCard>
-              )}
-
-              {/* Mechanical Bike */}
-              {shouldShowBlock("mechanicalBike", detected.hasMechanicalBike) && (
-                <SpecCard title="Mechanical Bike">
-                  <SpecRow label="Model" value={safe(plan, "mechanicalBike.generalFeatures.model")} />
-                  <SpecRow label="Dimensions" value={safe(plan, "mechanicalBike.generalFeatures.dimensions")} />
-                  <SpecRow label="Weight" value={safe(plan, "mechanicalBike.generalFeatures.weight")} />
-                  <SpecRow label="Engine" value={safe(plan, "mechanicalBike.generalFeatures.engine")} />
-                  <SpecRow label="Transmission" value={safe(plan, "mechanicalBike.performance.transmission")} />
-                  <SpecRow label="Displacement" value={safe(plan, "mechanicalBike.performance.displacement")} />
-                  <SpecRow label="Petrol Capacity" value={safe(plan, "mechanicalBike.performance.petrolCapacity")} />
-                  <SpecRow label="Compression Ratio" value={safe(plan, "mechanicalBike.assembly.compressionRatio")} />
-                  <SpecRow label="Bore & Stroke" value={safe(plan, "mechanicalBike.assembly.boreAndStroke")} />
-                  <SpecRow label="Tyre (Front)" value={safe(plan, "mechanicalBike.assembly.tyreAtFront")} />
-                  <SpecRow label="Tyre (Back)" value={safe(plan, "mechanicalBike.assembly.tyreAtBack")} />
-                  <SpecRow label="Seat Height" value={safe(plan, "mechanicalBike.assembly.seatHeight")} />
-                </SpecCard>
-              )}
-
-              {/* fallback: other */}
-              {detected.selectedCategoryKey === "other" && (
-                <SpecCard title="Details">
-                  <SpecRow label="Category" value={plan.category || plan.customCategory || "-"} />
-                  <SpecRow label="Tenure" value={plan.tenure || plan.customTenure || "-"} />
-                  <SpecRow label="Installment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-                  <SpecRow label="City" value={plan.city || "-"} />
-                </SpecCard>
-              )}
-            </div>
-          </section>
-
-          {/* quick facts */}
-          <div className="mt-3 sm:mt-4 lg:mt-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-6 border border-gray-200">
-            <h4 className="text-base sm:text-lg font-bold text-gray-900 mb-3 sm:mb-4">Quick Facts</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-              <Fact label="Monthly Payment" value={`PKR ${Number(plan.installment || 0).toLocaleString()}`} />
-              <Fact label="Tenure Period" value={plan.tenure || plan.customTenure || "—"} />
-              <Fact label="Location" value={plan.city || "—"} />
-              <Fact label="Category" value={plan.category || plan.customCategory || "—"} />
+              {/* Description */}
+              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <span>📋</span>
+                  Product Description
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
+              </div>
             </div>
           </div>
 
-          {/* seller & actions */}
-          <div className="mt-2 border-t pt-3 sm:pt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-sm sm:text-base text-gray-700">
-                {plan.user?.fullName?.charAt(0)?.toUpperCase() || (typeof plan.user === "object" && plan.user?.businessName?.charAt(0)?.toUpperCase()) || "S"}
+          {/* Full Width Sections Below */}
+          <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-6 lg:pb-8 space-y-4 sm:space-y-6">
+
+              {/* payment plans */}
+            {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 ? (
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
+                  <span className="text-xl sm:text-2xl">💳</span>
+                  Available Payment Plans ({plan.paymentPlans.length})
+                </h3>
+              
+              {/* Card Layout - All Screen Sizes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+                {plan.paymentPlans.map((p, idx) => {
+                  const cashPrice = Number(plan.price || 0);
+                  const downPayment = Number(p.downPayment || 0);
+                  const financedAmount = Math.max(0, cashPrice - downPayment);
+                  const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
+                  const totalMarkup = Number(p.markup || 0);
+                  const totalCost = cashPrice + totalMarkup;
+                  const isBestPlan = idx === findBestPlanIndex(plan.paymentPlans);
+                  
+                  return (
+                    <div 
+                      key={idx} 
+                      className={`bg-gradient-to-br from-white to-gray-50 border-2 ${isBestPlan ? 'border-[rgb(183,36,42)] shadow-lg' : 'border-gray-200'} rounded-lg sm:rounded-xl overflow-hidden hover:shadow-xl transition-all flex flex-col ${isBestPlan ? 'ring-2 ring-[rgb(183,36,42)] ring-opacity-20' : ''}`}
+                    >
+                      {/* Card Header */}
+                      <div className="p-3 sm:p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <div className="text-xs sm:text-sm font-bold text-[rgb(183,36,42)] uppercase truncate flex-1">
+                            {p.planName || `Plan ${idx + 1}`}
+                          </div>
+                          {isBestPlan && (
+                            <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[9px] sm:text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">
+                              ⭐ BEST
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-baseline gap-1.5 mb-1">
+                          <span className="text-xl sm:text-2xl lg:text-3xl font-black text-[rgb(183,36,42)]">
+                            PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                          </span>
+                          <span className="text-xs sm:text-sm text-gray-500">/month</span>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
+                        </div>
+                      </div>
+
+                      {/* Card Body - All Details Visible */}
+                      <div className="p-3 sm:p-4 flex-1 flex flex-col space-y-2.5 sm:space-y-3">
+                        <div className="bg-white rounded-lg p-2.5 sm:p-3 border border-gray-200 space-y-2 flex-1">
+                          <div className="flex items-center justify-between pb-1.5 border-b border-gray-100">
+                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Cash Price</span>
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {cashPrice.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] sm:text-xs text-gray-600">Down Payment</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">PKR {downPayment.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] sm:text-xs text-gray-600">Interest Rate</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">{p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] sm:text-xs text-gray-600">Interest Type</span>
+                            <span className="text-xs sm:text-sm font-medium text-gray-700 truncate ml-2">{p.interestType || "—"}</span>
+                          </div>
+                          {totalMarkup > 0 && (
+                            <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
+                              <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Total Markup</span>
+                              <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {totalMarkup.toLocaleString()}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center justify-between pt-1.5 border-t border-gray-100">
+                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Financed Amount</span>
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {financedAmount.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] sm:text-xs text-gray-600 font-semibold">Total Payable</span>
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">PKR {totalPayable.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between pt-2 border-t-2 border-[rgb(183,36,42)] bg-red-50 rounded-lg p-2 -mx-1 sm:-mx-2 mt-2">
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">Total Cost</span>
+                            <span className="text-sm sm:text-base lg:text-lg font-black text-[rgb(183,36,42)]">PKR {totalCost.toLocaleString()}</span>
+                          </div>
+                        </div>
+                        
+                        {Array.isArray(p.installmentSchedule) && p.installmentSchedule.length > 0 && (
+                          <details className="text-[10px] sm:text-xs">
+                            <summary className="cursor-pointer font-semibold text-gray-700 hover:text-[rgb(183,36,42)] transition py-1.5">📅 Payment Schedule</summary>
+                            <div className="mt-2 max-h-32 sm:max-h-40 overflow-auto bg-gray-50 rounded-lg p-2">
+                              {p.installmentSchedule.map((it, i) => (
+                                <div key={i} className="grid grid-cols-2 gap-2 py-1.5 border-b border-gray-200 last:border-0 text-[10px] sm:text-xs">
+                                  <span className="font-medium">#{i + 1}</span>
+                                  <span className="text-right">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
+                                  <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
+                                  <span className={`px-1.5 py-0.5 rounded text-center text-[9px] sm:text-[10px] ${it.paid ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
+                                    {it.paid ? "✓ Paid" : "Pending"}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </details>
+                        )}
+                        {p.otherChargesNote && (
+                          <div className="text-[10px] sm:text-xs text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-2">
+                            <span className="font-semibold">Note:</span> {p.otherChargesNote}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Card Footer - Apply Button */}
+                      <div className="p-3 sm:p-4 pt-0 border-t border-gray-200">
+                        <NavLink
+                          to={`/installment/${plan._id}/apply?planIndex=${idx}`}
+                          className="block w-full text-center px-3 sm:px-4 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white text-xs sm:text-sm font-bold rounded-lg hover:bg-red-700 transition shadow-md hover:shadow-lg active:scale-95"
+                        >
+                          Apply for This Plan
+                        </NavLink>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <div>
-                <div className="text-xs sm:text-sm font-medium">{(plan.user && plan.user.fullName) || plan.user?.businessName || "Seller"}</div>
-                <div className="text-[10px] sm:text-xs text-gray-500">{(plan.user && plan.user.city) || plan.user?.address || ""}</div>
+              </section>
+            ) : (
+              /* Fallback for legacy plans without paymentPlans array */
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
+                  <span className="text-xl sm:text-2xl">💳</span>
+                  Payment Plan
+                </h3>
+                <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                    <div className="text-xs sm:text-sm text-gray-500 mb-1"><span className="font-bold">Cash Price</span></div>
+                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.price || 0).toLocaleString()}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                    <div className="text-xs sm:text-sm text-gray-500 mb-1">Down Payment</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                    <div className="text-xs sm:text-sm text-gray-500 mb-1">Monthly Installment</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.installment || 0).toLocaleString()}</div>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
+                    <div className="text-xs sm:text-sm text-gray-500 mb-1">Tenure</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">{plan.tenure || plan.customTenure || "—"}</div>
+                  </div>
+                </div>
+                </div>
+              </section>
+            )}
+
+            {/* Product Specifications */}
+            {plan.productSpecifications && plan.productSpecifications.specifications && Array.isArray(plan.productSpecifications.specifications) && plan.productSpecifications.specifications.length > 0 && (
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <div className="mb-4 sm:mb-6">
+                <h3 className="text-xl sm:text-2xl lg:text-3xl font-black text-gray-900 flex items-center gap-2 sm:gap-3 mb-2">
+                  <span className="text-2xl sm:text-3xl">📋</span>
+                  <span className="font-black">Product Specifications</span>
+                  {plan.productSpecifications.category && (
+                    <span className="text-lg sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] ml-2 sm:ml-3">
+                      ({plan.productSpecifications.category})
+                    </span>
+                  )}
+                </h3>
+                {plan.productSpecifications.subCategory && (
+                  <p className="text-sm sm:text-base text-gray-600 ml-8 sm:ml-11">
+                    {plan.productSpecifications.subCategory}
+                  </p>
+                )}
               </div>
-            </div>
+              
+                <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl border-2 border-gray-200 shadow-sm overflow-hidden">
+                  <div className="p-4 sm:p-6 lg:p-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
+                      {plan.productSpecifications.specifications.map((spec, idx) => (
+                        <div 
+                          key={idx} 
+                          className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all group"
+                        >
+                          <div className="flex flex-col gap-2">
+                            <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
+                              {spec.field || "—"}
+                            </div>
+                            <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 group-hover:text-[rgb(183,36,42)] transition-colors">
+                              {spec.value || "—"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
 
-          </div>
+            {/* Seller Information - Accordion */}
+            {(plan.createdBy && Array.isArray(plan.createdBy) && plan.createdBy.length > 0) || plan.user || plan.postedBy ? (
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+              {(() => {
+                const seller = plan.createdBy && Array.isArray(plan.createdBy) && plan.createdBy.length > 0 
+                  ? plan.createdBy[0] 
+                  : null;
+                const sellerName = seller?.name || (plan.user && plan.user.fullName) || plan.user?.businessName || plan.postedBy || "Seller";
+                const sellerImage = seller?.profileImage || null;
+                const sellerInitial = sellerName?.charAt(0)?.toUpperCase() || "S";
+                const sellerUserType = seller?.userType || plan.user?.userType || plan.user?.UserType || null;
+                
+                return (
+                  <div className="bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 overflow-hidden">
+                    {/* Accordion Header - Always Visible */}
+                    <button
+                      onClick={() => setSellerExpanded(!sellerExpanded)}
+                      className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 hover:bg-gray-50 transition-colors"
+                      aria-expanded={sellerExpanded}
+                    >
+                      <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                        <div className="flex-shrink-0">
+                          {sellerImage ? (
+                            <img 
+                              src={sellerImage} 
+                              alt={sellerName} 
+                              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-200"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling.style.display = 'flex';
+                              }}
+                            />
+                          ) : null}
+                          <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 flex items-center justify-center font-bold text-white text-lg sm:text-xl ${sellerImage ? 'hidden' : ''}`}>
+                            {sellerInitial}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                            <h3 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 truncate">
+                              {sellerName}
+                            </h3>
+                            {sellerUserType && (
+                              <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap ${
+                                sellerUserType.toLowerCase() === 'partner' 
+                                  ? 'bg-purple-100 text-purple-700' 
+                                  : sellerUserType.toLowerCase() === 'admin'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : sellerUserType.toLowerCase() === 'agent'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-gray-100 text-gray-700'
+                              }`}>
+                                {sellerUserType}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs sm:text-sm text-gray-500 mt-1">
+                            Click to view contact information
+                          </div>
+                        </div>
+                      </div>
+                      <svg
+                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                          sellerExpanded ? 'rotate-180' : 'rotate-0'
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
 
-        </div>
+                    {/* Accordion Content - Expandable */}
+                    <div
+                      className={`transition-all duration-300 ease-in-out overflow-hidden ${
+                        sellerExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-200 pt-4 sm:pt-6">
+                        {seller ? (
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                              {seller.email && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Email</div>
+                                  <a href={`mailto:${seller.email}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline break-all">
+                                    {seller.email}
+                                  </a>
+                                </div>
+                              )}
+                              {(seller.phone || seller.phoneNumber) && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Phone</div>
+                                  <a href={`tel:${seller.phone || seller.phoneNumber}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline">
+                                    {seller.phone || seller.phoneNumber}
+                                  </a>
+                                </div>
+                              )}
+                              {seller.whatsappNumber && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">WhatsApp</div>
+                                  <a href={`https://wa.me/${seller.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base text-green-600 hover:underline">
+                                    {seller.whatsappNumber}
+                                  </a>
+                                </div>
+                              )}
+                              {(seller.address || seller.city) && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Location</div>
+                                  <div className="text-sm sm:text-base text-gray-900">
+                                    {seller.address && seller.city ? `${seller.address}, ${seller.city}` : (seller.address || seller.city)}
+                                  </div>
+                                </div>
+                              )}
+                              {seller.userId && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">User ID</div>
+                                  <div className="text-sm sm:text-base text-gray-900 font-mono">{seller.userId}</div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                              {(seller.phone || seller.phoneNumber) && (
+                                <a 
+                                  href={`tel:${seller.phone || seller.phoneNumber}`}
+                                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+                                >
+                                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                  </svg>
+                                  Call Seller
+                                </a>
+                              )}
+                              {seller.whatsappNumber && (
+                                <a 
+                                  href={`https://wa.me/${seller.whatsappNumber.replace(/[^0-9]/g, '')}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition text-sm sm:text-base"
+                                >
+                                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.893c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                                  </svg>
+                                  WhatsApp
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                              {plan.user?.city && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Location</div>
+                                  <div className="text-sm sm:text-base text-gray-900">📍 {plan.user.city}</div>
+                                </div>
+                              )}
+                              {plan.user?.address && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Address</div>
+                                  <div className="text-sm sm:text-base text-gray-900">🏠 {plan.user.address}</div>
+                                </div>
+                              )}
+                              {plan.user?.number && (
+                                <div>
+                                  <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Phone</div>
+                                  <a href={`tel:${plan.user.number}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline">
+                                    📞 {plan.user.number}
+                                  </a>
+                                </div>
+                              )}
+                            </div>
+                            {plan.user?.number && (
+                              <div className="pt-2 border-t border-gray-100">
+                                <a 
+                                  href={`tel:${plan.user.number}`}
+                                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+                                >
+                                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                  </svg>
+                                  Call Seller
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+              </section>
+            ) : null}
 
-        {/* Related Products */}
-        {relatedProducts.length > 0 && (
-          <div className="mt-6 sm:mt-8 lg:mt-12 p-4 sm:p-6 bg-gradient-to-br from-gray-50 to-white rounded-xl sm:rounded-2xl border border-gray-200">
+            {/* Reviews Section */}
+            {plan && (
+              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <InstallmentReviews 
+                  installmentPlanId={plan.installmentPlanId} 
+                  planId={plan._id} 
+                />
+              </div>
+            )}
+
+            {/* Related Products */}
+            {relatedProducts.length > 0 && (
+              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
             <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
               <span className="text-2xl">🔗</span>
               Related Products
@@ -649,7 +762,7 @@ export default function InstallmentDetail() {
                     <div className="border-t pt-2 mt-2">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="text-xs text-gray-500">Total Price</div>
+                          <div className="text-xs text-gray-500"><span className="font-bold">Cash Price</span></div>
                           <div className="text-lg sm:text-xl font-bold text-[rgb(183,36,42)]">
                             PKR {Number(product.price || 0).toLocaleString()}
                           </div>
@@ -670,41 +783,12 @@ export default function InstallmentDetail() {
                 </NavLink>
               ))}
             </div>
+            </div>
+            )}
           </div>
-        )}
-
-      </div>
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------- small UI components ---------- */
-function SpecCard({ title, children }) {
-  return (
-    <div className="bg-white border-2 border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 lg:p-5 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all">
-      <div className="flex items-center justify-between mb-2 sm:mb-3">
-        <h4 className="text-sm sm:text-base font-bold text-gray-900">{title}</h4>
-      </div>
-      <div className="space-y-1 sm:space-y-2">{children}</div>
-    </div>
-  );
-}
-
-function SpecRow({ label, value }) {
-  return (
-    <div className="flex items-start justify-between py-1.5 sm:py-2 border-b border-gray-100 last:border-b-0">
-      <div className="text-[10px] sm:text-xs font-semibold text-gray-600 uppercase">{label}</div>
-      <div className="text-xs sm:text-sm font-medium text-gray-900 ml-2 sm:ml-3 text-right">{value ?? "-"}</div>
-    </div>
-  );
-}
-
-function Fact({ label, value }) {
-  return (
-    <div className="bg-white rounded-md sm:rounded-lg p-2 sm:p-3 lg:p-4 border border-gray-200 hover:border-[rgb(183,36,42)] transition-all">
-      <div className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase mb-1 sm:mb-2">{label}</div>
-      <div className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 break-words">{value}</div>
-    </div>
-  );
-}

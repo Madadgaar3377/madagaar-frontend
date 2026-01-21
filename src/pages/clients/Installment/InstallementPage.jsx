@@ -130,6 +130,35 @@ export default function InstallmentPlans() {
 
   const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  // Helper to get the best (lowest monthly installment) plan
+  const getBestPlan = (plan) => {
+    if (!plan.paymentPlans || !Array.isArray(plan.paymentPlans) || plan.paymentPlans.length === 0) {
+      // Fallback to legacy fields
+      return {
+        monthlyInstallment: plan.installment || 0,
+        downPayment: plan.downpayment || 0,
+        tenureMonths: plan.tenure || plan.customTenure || "—",
+        planName: "Standard Plan"
+      };
+    }
+    
+    // Find plan with lowest monthly installment
+    const bestPlan = plan.paymentPlans.reduce((best, current) => {
+      const currentMonthly = Number(current.monthlyInstallment || 0);
+      const bestMonthly = Number(best.monthlyInstallment || 0);
+      return currentMonthly > 0 && (bestMonthly === 0 || currentMonthly < bestMonthly) ? current : best;
+    }, plan.paymentPlans[0]);
+    
+    return {
+      monthlyInstallment: bestPlan.monthlyInstallment || 0,
+      downPayment: bestPlan.downPayment || 0,
+      tenureMonths: bestPlan.tenureMonths || bestPlan.customTenureLabel || plan.tenure || plan.customTenure || "—",
+      planName: bestPlan.planName || "Best Plan",
+      interestRatePercent: bestPlan.interestRatePercent || 0,
+      interestType: bestPlan.interestType || ""
+    };
+  };
+
   // helpers
   const currency = (v) =>
     typeof v === "number" ? v.toLocaleString("en-PK", { style: "currency", currency: "PKR", maximumFractionDigits: 0 }) : v;
@@ -211,7 +240,11 @@ export default function InstallmentPlans() {
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
-              {pageData.map((plan) => (
+              {pageData.map((plan) => {
+                const bestPlan = getBestPlan(plan);
+                const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
+                
+                return (
                 <article key={plan._id} className="group bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100">
                   <div className="relative overflow-hidden">
                     <img
@@ -221,9 +254,11 @@ export default function InstallmentPlans() {
                       onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-white/95 backdrop-blur-sm text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full font-medium shadow-sm">
-                      {plan.tenure || plan.customTenure || "—"}
-                    </div>
+                    {hasMultiplePlans && (
+                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-[rgb(183,36,42)]/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
+                        ⭐ Best Plan
+                      </div>
+                    )}
                     <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                       <span className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm ${plan.status === "approved" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"}`}>
                         {plan.status}
@@ -243,14 +278,34 @@ export default function InstallmentPlans() {
 
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100">
                       <div className="flex items-center justify-between mb-1 sm:mb-2">
-                        <div className="text-[10px] sm:text-xs text-gray-600 font-medium">Monthly Payment</div>
-                        <div className="text-[10px] sm:text-xs text-gray-500">Down: {currency(plan.downpayment ?? plan.price * 0.2)}</div>
+                        <div className="text-[10px] sm:text-xs text-gray-600 font-medium">
+                          {hasMultiplePlans ? `Best: ${bestPlan.planName}` : "Monthly Payment"}
+                        </div>
+                        <div className="text-[10px] sm:text-xs text-gray-500">
+                          Down: {currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}
+                        </div>
                       </div>
                       <div className="flex items-baseline gap-1 sm:gap-2">
-                        <span className="text-lg sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)]">{currency(plan.installment)}</span>
+                        <span className="text-lg sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)]">
+                          {currency(bestPlan.monthlyInstallment || plan.installment || 0)}
+                        </span>
                         <span className="text-xs sm:text-sm text-gray-500">/month</span>
                       </div>
-                      <div className="text-[10px] sm:text-xs text-gray-600 mt-1">Total: {currency(plan.price)}</div>
+                      <div className="flex items-center justify-between mt-1">
+                        <div className="text-[10px] sm:text-xs text-gray-600">
+                          <span className="font-bold">Cash Price:</span> {currency(plan.price)}
+                        </div>
+                        {typeof bestPlan.tenureMonths === 'number' && (
+                          <div className="text-[10px] sm:text-xs text-gray-600 font-medium">
+                            {bestPlan.tenureMonths} Months
+                          </div>
+                        )}
+                      </div>
+                      {hasMultiplePlans && (
+                        <div className="text-[9px] sm:text-[10px] text-gray-500 mt-1 pt-1 border-t border-red-200">
+                          {plan.paymentPlans.length} plan{plan.paymentPlans.length > 1 ? 's' : ''} available
+                        </div>
+                      )}
                     </div>
 
                     <div className="mt-1 sm:mt-2">
@@ -263,7 +318,8 @@ export default function InstallmentPlans() {
                     </div>
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
 
             {/* pagination */}
