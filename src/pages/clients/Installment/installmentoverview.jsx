@@ -637,9 +637,10 @@ export default function InstallmentDetail() {
                         </svg>
                         <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Finance Details</span>
                       </div>
-                      <div className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed whitespace-pre-wrap bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
-                        {plan.finance.financeInfo}
-                      </div>
+                      <div 
+                        className="finance-html-content text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-3 sm:p-4 lg:p-5 border border-gray-200"
+                        dangerouslySetInnerHTML={{ __html: plan.finance.financeInfo }}
+                      />
                     </div>
                   )}
                   

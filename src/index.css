@@ -2,6 +2,121 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Finance HTML Content Styling */
+.finance-html-content {
+  @apply text-gray-700;
+}
+
+.finance-html-content h1,
+.finance-html-content h2,
+.finance-html-content h3,
+.finance-html-content h4,
+.finance-html-content h5,
+.finance-html-content h6 {
+  @apply font-bold text-gray-900 mt-4 mb-2;
+}
+
+.finance-html-content h1 {
+  @apply text-2xl sm:text-3xl;
+}
+
+.finance-html-content h2 {
+  @apply text-xl sm:text-2xl;
+}
+
+.finance-html-content h3 {
+  @apply text-lg sm:text-xl;
+}
+
+.finance-html-content h4 {
+  @apply text-base sm:text-lg;
+}
+
+.finance-html-content h5,
+.finance-html-content h6 {
+  @apply text-sm sm:text-base;
+}
+
+.finance-html-content p {
+  @apply mb-3 text-gray-700 leading-relaxed;
+}
+
+.finance-html-content strong,
+.finance-html-content b {
+  @apply font-bold text-gray-900;
+}
+
+.finance-html-content em,
+.finance-html-content i {
+  @apply italic;
+}
+
+.finance-html-content ul,
+.finance-html-content ol {
+  @apply mb-3 ml-4 sm:ml-6;
+}
+
+.finance-html-content ul {
+  @apply list-disc;
+}
+
+.finance-html-content ol {
+  @apply list-decimal;
+}
+
+.finance-html-content li {
+  @apply mb-1 text-gray-700;
+}
+
+.finance-html-content a {
+  @apply text-blue-600 underline hover:text-blue-700 transition-colors;
+}
+
+.finance-html-content blockquote {
+  @apply border-l-4 border-blue-300 pl-4 py-2 my-3 italic text-gray-600 bg-blue-50 rounded-r;
+}
+
+.finance-html-content code {
+  @apply bg-gray-200 px-1.5 py-0.5 rounded text-sm font-mono text-gray-800;
+}
+
+.finance-html-content pre {
+  @apply bg-gray-900 text-gray-100 p-3 sm:p-4 rounded-lg overflow-x-auto mb-3;
+}
+
+.finance-html-content pre code {
+  @apply bg-transparent text-gray-100 p-0;
+}
+
+.finance-html-content table {
+  @apply w-full border-collapse mb-4 mt-3;
+}
+
+.finance-html-content table th,
+.finance-html-content table td {
+  @apply border border-gray-300 p-2 sm:p-3 text-left;
+}
+
+.finance-html-content table th {
+  @apply bg-gray-100 font-semibold text-gray-900;
+}
+
+.finance-html-content table td {
+  @apply text-gray-700;
+}
+
+.finance-html-content table tr:nth-child(even) {
+  @apply bg-gray-50;
+}
+
+.finance-html-content img {
+  @apply max-w-full h-auto rounded-lg my-3;
+}
+
+.finance-html-content hr {
+  @apply border-t border-gray-300 my-4;
+}
+
 /* Global Responsive Utilities */
 @layer base {
   * {
