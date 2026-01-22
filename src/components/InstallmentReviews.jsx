@@ -59,7 +59,12 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
   // Fetch reviews
   useEffect(() => {
-    if (!installmentPlanId && !planId) return;
+    const id = getPlanId();
+    if (!id) {
+      setLoading(false);
+      setError("Installment plan ID is required to load reviews");
+      return;
+    }
     fetchReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [installmentPlanId, planId, page]);
@@ -78,16 +83,54 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
       const res = await fetch(`${apiUrl}/getInstallmentReviews/${encodeURIComponent(String(id))}?status=approved&page=${page}&limit=10&sortBy=createdAt&sortOrder=desc`);
       const data = await res.json();
       
-      if (data.success) {
-        setReviews(data.data.reviews || []);
-        setStatistics(data.data.statistics || statistics);
-        setTotalPages(data.data.pagination?.totalPages || 1);
+      // Debug logging
+      console.log('Reviews API Response:', { 
+        data, 
+        id, 
+        installmentPlanId, 
+        planId,
+        responseStatus: res.status,
+        responseOk: res.ok
+      });
+      
+      // Handle different response structures
+      if (data.success !== false) {
+        // Response is successful (could be data.success === true or data.success is undefined but has data)
+        const reviewsData = data.data?.reviews || data.reviews || [];
+        const existingStats = data.data?.statistics || data.statistics || {};
+        const paginationData = data.data?.pagination || data.pagination || { totalPages: 1 };
+        
+        // Calculate rating distribution from reviews if not provided
+        let ratingDistribution = existingStats.ratingDistribution || { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+        if (reviewsData.length > 0 && Object.values(ratingDistribution).every(v => v === 0)) {
+          ratingDistribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+          reviewsData.forEach(r => {
+            const rating = Math.round(r.rating || 0);
+            if (rating >= 1 && rating <= 5) {
+              ratingDistribution[rating] = (ratingDistribution[rating] || 0) + 1;
+            }
+          });
+        }
+        
+        // Build statistics object
+        const statsData = {
+          total: existingStats.total !== undefined ? existingStats.total : reviewsData.length,
+          averageRating: existingStats.averageRating !== undefined ? existingStats.averageRating : 
+            (reviewsData.length > 0 ? reviewsData.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewsData.length : 0),
+          ratingDistribution: ratingDistribution
+        };
+        
+        setReviews(reviewsData);
+        setStatistics(statsData);
+        setTotalPages(paginationData.totalPages || 1);
       } else {
         setError(data.message || "Failed to load reviews");
+        setReviews([]);
       }
     } catch (err) {
       console.error("Error fetching reviews:", err);
-      setError("Failed to load reviews");
+      setError("Failed to load reviews. Please try again.");
+      setReviews([]);
     } finally {
       setLoading(false);
     }
@@ -248,15 +291,14 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
   const userReviews = reviews.filter(r => r.userId === currentUser?.userId);
 
   return (
-    <section className="mt-6 sm:mt-8 lg:mt-12">
-      <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 lg:p-6 xl:p-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-          <div className="flex-1 w-full">
-            <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
-              <span className="text-xl sm:text-2xl">⭐</span>
-              <span>Customer Reviews</span>
-            </h3>
-            {statistics.total > 0 && (
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="flex-1 w-full">
+          <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
+            <span className="text-xl sm:text-2xl">⭐</span>
+            <span>Customer Reviews</span>
+          </h3>
+          {statistics.total > 0 && (
               <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
                 <div className="flex items-center gap-1">
                   <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{statistics.averageRating.toFixed(1)}</span>
@@ -276,9 +318,9 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                 </div>
                 <span className="text-xs sm:text-sm text-gray-600">({statistics.total} {statistics.total === 1 ? 'review' : 'reviews'})</span>
               </div>
-            )}
-          </div>
-          {isAuthenticated() && !userReviews.length && (
+          )}
+        </div>
+        {isAuthenticated() && !userReviews.length && (
             <button
               onClick={() => setShowReviewForm(true)}
               className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 lg:py-3 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-xs sm:text-sm lg:text-base whitespace-nowrap"
@@ -286,9 +328,9 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
               Write a Review
             </button>
           )}
-        </div>
+      </div>
 
-        {error && (
+      {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
             {error}
           </div>
@@ -400,9 +442,22 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           </div>
         )}
 
-        {/* Reviews List */}
+        {/* Reviews List - Always Show */}
         {loading ? (
-          <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">Loading reviews...</div>
+          <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(183,36,42)] mb-2"></div>
+            <p>Loading reviews...</p>
+          </div>
+        ) : error && !reviews.length ? (
+          <div className="text-center py-8 sm:py-12">
+            <p className="mb-3 sm:mb-4 text-sm sm:text-base text-red-600">{error}</p>
+            <button
+              onClick={fetchReviews}
+              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+            >
+              Retry Loading Reviews
+            </button>
+          </div>
         ) : reviews.length === 0 ? (
           <div className="text-center py-8 sm:py-12 text-gray-500">
             <p className="mb-3 sm:mb-4 text-sm sm:text-base">No reviews yet. Be the first to review this product!</p>
@@ -416,7 +471,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
             )}
           </div>
         ) : (
-          <>
+          <div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
               {reviews.map((review) => {
                 const isOwnReview = currentUser?.userId === review.userId;
@@ -496,7 +551,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                               <img
                                 key={idx}
                                 src={img}
-                                alt={`Review image ${idx + 1}`}
+                                alt={`Review ${idx + 1}`}
                                 className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover rounded-lg border border-gray-200 hover:scale-105 transition"
                               />
                             ))}
@@ -552,10 +607,9 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                 </div>
               </div>
             )}
-          </>
+            </div>
         )}
-      </div>
-    </section>
+    </div>
   );
 };
 

@@ -606,6 +606,57 @@ export default function InstallmentDetail() {
               </section>
             )}
 
+            {/* Finance Information - Separate from Installment Plans */}
+            {plan.finance && (plan.finance.bankName || plan.finance.financeInfo) && (
+              <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border-2 border-blue-200">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
+                  <span className="text-xl sm:text-2xl">🏦</span>
+                  <span>Bank Finance Information</span>
+                </h3>
+                
+                <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-blue-200 shadow-sm">
+                  {plan.finance.bankName && (
+                    <div className="mb-4 sm:mb-5 pb-4 sm:pb-5 border-b border-gray-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                        <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Bank Name</span>
+                      </div>
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700">
+                        {plan.finance.bankName}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {plan.finance.financeInfo && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Finance Details</span>
+                      </div>
+                      <div className="text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed whitespace-pre-wrap bg-gray-50 rounded-lg p-3 sm:p-4 border border-gray-200">
+                        {plan.finance.financeInfo}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-gray-200">
+                    <div className="flex items-start gap-2 text-xs sm:text-sm text-gray-600">
+                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <p className="leading-relaxed">
+                        <span className="font-semibold">Note:</span> This is bank finance information. Please contact the bank directly for application procedures, eligibility criteria, and terms & conditions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Product Specifications */}
             {plan.productSpecifications && plan.productSpecifications.specifications && Array.isArray(plan.productSpecifications.specifications) && plan.productSpecifications.specifications.length > 0 && (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
@@ -846,15 +897,19 @@ export default function InstallmentDetail() {
               </section>
             ) : null}
 
-            {/* Reviews Section */}
-            {plan && (
-              <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+            {/* Reviews Section - Always Show */}
+            <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+              {plan ? (
                 <InstallmentReviews 
                   installmentPlanId={plan.installmentPlanId} 
                   planId={plan._id} 
                 />
-              </div>
-            )}
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Loading product information...</p>
+                </div>
+              )}
+            </section>
 
             {/* Related Products */}
             {relatedProducts.length > 0 && (

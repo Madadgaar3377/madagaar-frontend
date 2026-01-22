@@ -645,6 +645,7 @@ export default function InstallmentPlans() {
               {pageData.map((plan) => {
                 const bestPlan = getBestPlan(plan);
                 const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
+                const hasFinance = plan.finance && (plan.finance.bankName || plan.finance.financeInfo);
                 
                 return (
                 <article key={plan._id} className="group bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100">
@@ -656,11 +657,18 @@ export default function InstallmentPlans() {
                       onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {hasMultiplePlans && (
-                      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-[rgb(183,36,42)]/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
-                        ⭐ Best Plan
-                      </div>
-                    )}
+                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1.5 sm:gap-2">
+                      {hasMultiplePlans && (
+                        <div className="bg-[rgb(183,36,42)]/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
+                          ⭐ Best Plan
+                        </div>
+                      )}
+                      {hasFinance && (
+                        <div className="bg-blue-600/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
+                          🏦 Bank Finance
+                        </div>
+                      )}
+                    </div>
                     <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                       <span className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm ${plan.status === "approved" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"}`}>
                         {plan.status}
@@ -706,6 +714,14 @@ export default function InstallmentPlans() {
                       {hasMultiplePlans && (
                         <div className="text-[9px] sm:text-[10px] text-gray-500 mt-1 pt-1 border-t border-red-200">
                           {plan.paymentPlans.length} plan{plan.paymentPlans.length > 1 ? 's' : ''} available
+                        </div>
+                      )}
+                      {hasFinance && (
+                        <div className="text-[9px] sm:text-[10px] text-blue-600 mt-1 pt-1 border-t border-blue-200 flex items-center gap-1">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          <span className="font-semibold">Bank Finance Available</span>
                         </div>
                       )}
                     </div>
