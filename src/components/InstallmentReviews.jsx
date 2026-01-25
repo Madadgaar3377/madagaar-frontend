@@ -296,42 +296,63 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
   return (
     <div className="w-full">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <div className="flex-1 w-full">
-          <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
-            <span className="text-xl sm:text-2xl">⭐</span>
-            <span>Customer Reviews</span>
-          </h3>
-          {statistics.total > 0 && (
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2">
-                <div className="flex items-center gap-1">
-                  <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">{statistics.averageRating.toFixed(1)}</span>
-                  <span className="text-sm sm:text-base text-gray-500">/ 5</span>
-                </div>
-                <div className="flex gap-0.5 sm:gap-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <svg
-                      key={star}
-                      className={`w-4 h-4 sm:w-5 sm:h-5 ${star <= Math.round(statistics.averageRating) ? 'text-yellow-400' : 'text-gray-300'}`}
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <span className="text-xs sm:text-sm text-gray-600">({statistics.total} {statistics.total === 1 ? 'review' : 'reviews'})</span>
+      {/* Header Section - Enhanced */}
+      <div className="bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-2xl p-6 sm:p-8 mb-6 border border-gray-200 shadow-sm">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div className="flex-1 w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
+                <span className="text-2xl sm:text-3xl">⭐</span>
               </div>
-          )}
-        </div>
-        {isAuthenticated() && !userReviews.length && (
+              <div>
+                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900">Customer Reviews</h3>
+                <p className="text-sm text-gray-600 mt-1">Share your experience with this product</p>
+              </div>
+            </div>
+            
+            {statistics.total > 0 ? (
+              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">{statistics.averageRating.toFixed(1)}</span>
+                  <span className="text-lg sm:text-xl text-gray-500 font-medium">/ 5</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <svg
+                        key={star}
+                        className={`w-6 h-6 sm:w-7 sm:h-7 ${star <= Math.round(statistics.averageRating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-gray-600">
+                    Based on {statistics.total} {statistics.total === 1 ? 'review' : 'reviews'}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-500 font-medium">No reviews yet</p>
+              </div>
+            )}
+          </div>
+          
+          {isAuthenticated() && !userReviews.length && (
             <button
               onClick={() => setShowReviewForm(true)}
-              className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 lg:py-3 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-xs sm:text-sm lg:text-base whitespace-nowrap"
+              className="w-full lg:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base whitespace-nowrap flex items-center gap-2"
             >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
               Write a Review
             </button>
           )}
+        </div>
       </div>
 
       {error && (
@@ -340,24 +361,37 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           </div>
         )}
 
-        {/* Rating Distribution */}
+        {/* Rating Distribution - Enhanced */}
         {statistics.total > 0 && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 lg:p-5 bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-200">
-            <h4 className="text-xs sm:text-sm lg:text-base font-semibold text-gray-700 mb-2 sm:mb-3">Rating Distribution</h4>
-            <div className="space-y-1.5 sm:space-y-2">
+          <div className="mb-6 p-5 sm:p-6 bg-white rounded-2xl border-2 border-gray-100 shadow-sm">
+            <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              Rating Distribution
+            </h4>
+            <div className="space-y-3">
               {[5, 4, 3, 2, 1].map((rating) => {
                 const count = statistics.ratingDistribution[rating] || 0;
                 const percentage = statistics.total > 0 ? (count / statistics.total) * 100 : 0;
                 return (
-                  <div key={rating} className="flex items-center gap-2 sm:gap-3">
-                    <span className="text-xs sm:text-sm text-gray-600 w-6 sm:w-8 flex-shrink-0">{rating} ⭐</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-1.5 sm:h-2 overflow-hidden">
+                  <div key={rating} className="flex items-center gap-3 sm:gap-4">
+                    <div className="flex items-center gap-2 w-20 sm:w-24 flex-shrink-0">
+                      <span className="text-sm sm:text-base font-bold text-gray-700">{rating}</span>
+                      <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 bg-gray-100 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
                       <div
-                        className="bg-yellow-400 h-full transition-all"
+                        className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full transition-all duration-500 rounded-full"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-500 w-8 sm:w-12 text-right flex-shrink-0">{count}</span>
+                    <div className="w-16 sm:w-20 text-right">
+                      <span className="text-sm font-bold text-gray-700">{count}</span>
+                      <span className="text-xs text-gray-500 ml-1">({percentage.toFixed(0)}%)</span>
+                    </div>
                   </div>
                 );
               })}
@@ -365,81 +399,130 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           </div>
         )}
 
-        {/* Review Form */}
+        {/* Review Form - Enhanced */}
         {showReviewForm && (
-          <div className="mb-4 sm:mb-6 p-3 sm:p-4 lg:p-6 bg-gradient-to-br from-gray-50 to-white rounded-lg sm:rounded-xl border border-gray-200">
-            <h4 className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 mb-3 sm:mb-4">
-              {editingReview ? "Edit Your Review" : "Write a Review"}
-            </h4>
-            <form onSubmit={handleSubmitReview} className="space-y-3 sm:space-y-4">
+          <div className="mb-6 p-5 sm:p-6 lg:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg">
+            <div className="flex items-center justify-between mb-6">
+              <h4 className="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 rounded-xl flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
+                </div>
+                {editingReview ? "Edit Your Review" : "Write a Review"}
+              </h4>
+              <button
+                onClick={() => {
+                  setShowReviewForm(false);
+                  setEditingReview(null);
+                  setFormData({
+                    rating: 5,
+                    title: "",
+                    comment: "",
+                    reviewCategories: { value: 5, quality: 5, service: 5, delivery: 5 },
+                    reviewImages: []
+                  });
+                }}
+                className="text-gray-400 hover:text-gray-600 transition"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleSubmitReview} className="space-y-5 sm:space-y-6">
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Rating *</label>
-                <div className="flex gap-1 sm:gap-2">
+                <label className="block text-sm sm:text-base font-bold text-gray-900 mb-3">Your Rating *</label>
+                <div className="flex gap-2 sm:gap-3 justify-center sm:justify-start">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setFormData({ ...formData, rating: star })}
-                      className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 ${star <= formData.rating ? 'text-yellow-400' : 'text-gray-300'} hover:scale-110 transition`}
+                      className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 ${
+                        star <= formData.rating 
+                          ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-white shadow-lg' 
+                          : 'bg-gray-100 text-gray-300 hover:bg-gray-200'
+                      }`}
                     >
-                      <svg fill="currentColor" viewBox="0 0 20 20" className="w-full h-full">
+                      <svg fill="currentColor" viewBox="0 0 20 20" className="w-7 h-7 sm:w-8 sm:h-8">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     </button>
                   ))}
                 </div>
+                <p className="text-xs text-gray-500 mt-2 text-center sm:text-left">
+                  {formData.rating === 5 && "Excellent"}
+                  {formData.rating === 4 && "Very Good"}
+                  {formData.rating === 3 && "Good"}
+                  {formData.rating === 2 && "Fair"}
+                  {formData.rating === 1 && "Poor"}
+                </p>
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Title (Optional)</label>
+                <label className="block text-sm sm:text-base font-bold text-gray-900 mb-2">Review Title (Optional)</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent"
-                  placeholder="Brief summary of your experience"
+                  className="w-full px-4 py-3 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all bg-white"
+                  placeholder="Give your review a catchy title..."
                   maxLength={200}
                 />
               </div>
 
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-gray-700 mb-1 sm:mb-2">Comment *</label>
+                <label className="block text-sm sm:text-base font-bold text-gray-900 mb-2">Your Review *</label>
                 <textarea
                   value={formData.comment}
                   onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                  className="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent resize-y"
-                  rows={4}
-                  placeholder="Share your experience with this product..."
+                  className="w-full px-4 py-3 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] resize-y transition-all bg-white"
+                  rows={6}
+                  placeholder="Share your detailed experience with this product. What did you like? What could be improved?"
                   required
                   maxLength={2000}
                 />
-                <div className="text-xs text-gray-500 mt-1">{formData.comment.length}/2000</div>
+                <div className="flex justify-between items-center mt-2">
+                  <div className="text-xs text-gray-500">
+                    {formData.comment.length > 0 && (
+                      <span className={formData.comment.length > 1800 ? 'text-red-500 font-semibold' : 'text-gray-500'}>
+                        {formData.comment.length}/2000 characters
+                      </span>
+                    )}
+                  </div>
+                  {formData.comment.length === 0 && (
+                    <span className="text-xs text-gray-400">Required field</span>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                 <button
                   type="submit"
-                  disabled={submitting}
-                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-50 text-sm sm:text-base"
+                  disabled={submitting || !formData.comment.trim()}
+                  className="flex-1 sm:flex-none px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm sm:text-base flex items-center justify-center gap-2"
                 >
-                  {submitting ? "Submitting..." : editingReview ? "Update Review" : "Submit Review"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowReviewForm(false);
-                    setEditingReview(null);
-                    setFormData({
-                      rating: 5,
-                      title: "",
-                      comment: "",
-                      reviewCategories: { value: 5, quality: 5, service: 5, delivery: 5 },
-                      reviewImages: []
-                    });
-                  }}
-                  className="flex-1 sm:flex-none px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition text-sm sm:text-base"
-                >
-                  Cancel
+                  {submitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Submitting...
+                    </>
+                  ) : editingReview ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Update Review
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Submit Review
+                    </>
+                  )}
                 </button>
               </div>
             </form>
@@ -448,27 +531,43 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
         {/* Reviews List - Always Show */}
         {loading ? (
-          <div className="text-center py-8 sm:py-12 text-gray-500 text-sm sm:text-base">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[rgb(183,36,42)] mb-2"></div>
-            <p>Loading reviews...</p>
+          <div className="text-center py-12 sm:py-16">
+            <div className="inline-flex flex-col items-center gap-4">
+              <div className="relative">
+                <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
+                <div className="w-16 h-16 border-4 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin absolute top-0"></div>
+              </div>
+              <p className="text-gray-600 font-medium">Loading reviews...</p>
+            </div>
           </div>
         ) : error && !reviews.length ? (
-          <div className="text-center py-8 sm:py-12">
-            <p className="mb-3 sm:mb-4 text-sm sm:text-base text-red-600">{error}</p>
+          <div className="text-center py-12 sm:py-16 bg-red-50 rounded-2xl border-2 border-red-200">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="mb-4 text-base font-semibold text-red-700">{error}</p>
             <button
               onClick={fetchReviews}
-              className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+              className="px-6 py-3 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl"
             >
               Retry Loading Reviews
             </button>
           </div>
         ) : reviews.length === 0 ? (
-          <div className="text-center py-8 sm:py-12 text-gray-500">
-            <p className="mb-3 sm:mb-4 text-sm sm:text-base">No reviews yet. Be the first to review this product!</p>
+          <div className="text-center py-12 sm:py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300">
+            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+              </svg>
+            </div>
+            <h4 className="text-xl font-bold text-gray-900 mb-2">No reviews yet</h4>
+            <p className="mb-6 text-gray-600">Be the first to share your experience with this product!</p>
             {isAuthenticated() && !showReviewForm && (
               <button
                 onClick={() => setShowReviewForm(true)}
-                className="px-4 sm:px-6 py-2 sm:py-2.5 bg-[rgb(183,36,42)] text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
+                className="px-6 py-3 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Write the First Review
               </button>
@@ -476,7 +575,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           </div>
         ) : (
           <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {reviews.map((review) => {
                 const isOwnReview = currentUser?.userId === review.userId;
                 const isHelpful = review.helpfulUsers?.includes(currentUser?.userId);
@@ -484,35 +583,44 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                 return (
                   <div 
                     key={review._id || review.reviewId} 
-                    className="bg-gradient-to-br from-white to-gray-50 rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 lg:p-5 hover:shadow-md hover:border-[rgb(183,36,42)] transition-all"
+                    className="group bg-white rounded-2xl border-2 border-gray-100 p-5 sm:p-6 hover:border-[rgb(183,36,42)] hover:shadow-xl transition-all duration-300"
                   >
-                    <div className="flex items-start gap-3 sm:gap-4">
-                      <div className="flex-shrink-0">
+                    {/* Review Header */}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="flex-shrink-0 relative">
                         {review.userProfileImage ? (
                           <img 
                             src={review.userProfileImage} 
                             alt={review.userName || "User"} 
-                            className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full object-cover border-2 border-gray-200"
+                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-200 shadow-md"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
                         ) : null}
-                        <div className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 flex items-center justify-center font-bold text-white text-sm sm:text-base lg:text-lg ${review.userProfileImage ? 'hidden' : ''}`}>
+                        <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg ${review.userProfileImage ? 'hidden' : ''}`}>
                           {review.userName?.charAt(0)?.toUpperCase() || "U"}
                         </div>
+                        {isOwnReview && (
+                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
+                      
                       <div className="flex-1 min-w-0">
-                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2 sm:mb-3">
+                        <div className="flex items-start justify-between gap-3 mb-2">
                           <div className="flex-1 min-w-0">
-                            <div className="font-semibold text-sm sm:text-base text-gray-900 truncate">{review.userName || "Anonymous"}</div>
-                            <div className="flex flex-wrap items-center gap-2 mt-1">
-                              <div className="flex gap-0.5 sm:gap-1">
+                            <h4 className="font-bold text-base sm:text-lg text-gray-900 truncate">{review.userName || "Anonymous"}</h4>
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="flex gap-0.5">
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <svg
                                     key={star}
-                                    className={`w-3 h-3 sm:w-4 sm:h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
                                   >
@@ -520,93 +628,145 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                                   </svg>
                                 ))}
                               </div>
-                              <span className="text-xs text-gray-500">
-                                {new Date(review.createdAt).toLocaleDateString()}
+                              <span className="text-xs text-gray-500 font-medium">
+                                {new Date(review.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                               </span>
                             </div>
                           </div>
+                          
                           {isOwnReview && (
                             <div className="flex gap-2 flex-shrink-0">
                               <button
                                 onClick={() => handleEditReview(review)}
-                                className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium px-2 py-1 hover:bg-blue-50 rounded transition"
+                                className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
+                                title="Edit review"
                               >
-                                Edit
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
                               </button>
                               <button
                                 onClick={() => handleDeleteReview(review.reviewId || review._id)}
-                                className="text-xs sm:text-sm text-red-600 hover:text-red-700 font-medium px-2 py-1 hover:bg-red-50 rounded transition"
+                                className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                                title="Delete review"
                               >
-                                Delete
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
                               </button>
                             </div>
                           )}
                         </div>
-                        
-                        {review.title && (
-                          <h5 className="font-semibold text-sm sm:text-base text-gray-900 mb-2">{review.title}</h5>
-                        )}
-                        
-                        <p className="text-xs sm:text-sm text-gray-700 leading-relaxed mb-3">{review.comment}</p>
-                        
-                        {review.reviewImages && review.reviewImages.length > 0 && (
-                          <div className="flex gap-2 mb-3 flex-wrap">
-                            {review.reviewImages.map((img, idx) => (
+                      </div>
+                    </div>
+                    
+                    {/* Review Content */}
+                    <div className="space-y-3">
+                      {review.title && (
+                        <h5 className="font-bold text-lg text-gray-900">{review.title}</h5>
+                      )}
+                      
+                      <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{review.comment}</p>
+                      
+                      {review.reviewImages && review.reviewImages.length > 0 && (
+                        <div className="flex gap-2 flex-wrap">
+                          {review.reviewImages.map((img, idx) => (
+                            <div key={idx} className="relative group/img">
                               <img
-                                key={idx}
                                 src={img}
                                 alt={`Review ${idx + 1}`}
-                                className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 object-cover rounded-lg border border-gray-200 hover:scale-105 transition"
+                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border-2 border-gray-200 hover:border-[rgb(183,36,42)] transition-all cursor-pointer hover:scale-105"
                               />
-                            ))}
-                          </div>
-                        )}
-                        
-                        <div className="flex items-center gap-3 sm:gap-4 pt-2 border-t border-gray-100">
-                          <button
-                            onClick={() => handleMarkHelpful(review.reviewId || review._id)}
-                            className={`flex items-center gap-1.5 text-xs sm:text-sm font-medium transition px-2 py-1 rounded-lg ${
-                              isHelpful 
-                                ? 'text-[rgb(183,36,42)] bg-red-50' 
-                                : 'text-gray-500 hover:text-[rgb(183,36,42)] hover:bg-gray-50'
-                            }`}
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
-                            </svg>
-                            Helpful ({review.helpfulCount || 0})
-                          </button>
+                            </div>
+                          ))}
                         </div>
-                      </div>
+                      )}
+                    </div>
+                    
+                    {/* Review Footer */}
+                    <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
+                      <button
+                        onClick={() => handleMarkHelpful(review.reviewId || review._id)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
+                          isHelpful 
+                            ? 'text-[rgb(183,36,42)] bg-red-50 border-2 border-red-200' 
+                            : 'text-gray-600 hover:text-[rgb(183,36,42)] hover:bg-gray-50 border-2 border-transparent hover:border-gray-200'
+                        }`}
+                      >
+                        <svg className={`w-5 h-5 ${isHelpful ? 'fill-current' : ''}`} fill={isHelpful ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+                        </svg>
+                        Helpful
+                        <span className="font-bold">({review.helpfulCount || 0})</span>
+                      </button>
+                      
+                      {review.isVerified && (
+                        <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Verified Purchase
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination - Enhanced */}
             {totalPages > 1 && (
-              <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-4 border-t border-gray-200">
-                <div className="text-xs sm:text-sm text-gray-600">
-                  Showing page {page} of {totalPages}
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t-2 border-gray-200">
+                <div className="text-sm font-semibold text-gray-700">
+                  Page <span className="text-[rgb(183,36,42)] font-black">{page}</span> of <span className="text-[rgb(183,36,42)] font-black">{totalPages}</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <button
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] transition"
+                    className="px-5 py-2.5 text-sm font-bold border-2 border-gray-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition-all disabled:hover:border-gray-300 disabled:hover:text-gray-500 flex items-center gap-2"
                   >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
                     Previous
                   </button>
-                  <span className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 bg-gray-50 rounded-lg">
-                    {page} / {totalPages}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (page <= 3) {
+                        pageNum = i + 1;
+                      } else if (page >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = page - 2 + i;
+                      }
+                      return (
+                        <button
+                          key={pageNum}
+                          onClick={() => setPage(pageNum)}
+                          className={`w-10 h-10 rounded-xl font-bold text-sm transition-all ${
+                            page === pageNum
+                              ? 'bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white shadow-lg'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          }`}
+                        >
+                          {pageNum}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <button
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
-                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] transition"
+                    className="px-5 py-2.5 text-sm font-bold border-2 border-gray-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition-all disabled:hover:border-gray-300 disabled:hover:text-gray-500 flex items-center gap-2"
                   >
                     Next
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </button>
                 </div>
               </div>
