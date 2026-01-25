@@ -81,13 +81,8 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
       }
       
       // Fetch approved reviews (all reviews are now auto-approved)
-      const res = await fetch(`${apiUrl}/getInstallmentReviews/${encodeURIComponent(String(id))}?status=approved&page=${page}&limit=10&sortBy=createdAt&sortOrder=desc&_t=${Date.now()}`, {
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      });
+      // Using timestamp in URL for cache-busting instead of headers to avoid CORS issues
+      const res = await fetch(`${apiUrl}/getInstallmentReviews/${encodeURIComponent(String(id))}?status=approved&page=${page}&limit=10&sortBy=createdAt&sortOrder=desc&_t=${Date.now()}`);
       const data = await res.json();
       
       // Debug logging
