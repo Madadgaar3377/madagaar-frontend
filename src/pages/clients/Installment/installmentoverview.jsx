@@ -55,6 +55,7 @@ export default function InstallmentDetail() {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [sellerExpanded, setSellerExpanded] = useState(false);
   const [expandedPlanIndex, setExpandedPlanIndex] = useState(null);
+  const [autoPlay, setAutoPlay] = useState(true);
 
   // fetch plan
   useEffect(() => {
@@ -146,6 +147,17 @@ export default function InstallmentDetail() {
     }
   }, [bestPlanIndex, plan]);
 
+  // Auto-rotate images
+  useEffect(() => {
+    if (!autoPlay || images.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 4000); // Change image every 4 seconds
+
+    return () => clearInterval(interval);
+  }, [autoPlay, images.length]);
+
   const togglePlan = (idx) => {
     setExpandedPlanIndex((prev) => (prev === idx ? null : idx));
   };
@@ -182,24 +194,43 @@ export default function InstallmentDetail() {
             {/* Left Column: Image Gallery */}
             <div className="space-y-3 sm:space-y-4">
               {/* Main Selected Image */}
-              <div className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden aspect-square lg:sticky lg:top-4">
-                <img
-                  src={images[index]}
-                  onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-                  alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
-                  className="w-full h-full object-contain p-2 sm:p-4"
-                />
+              <div 
+                className="relative bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg sm:rounded-xl overflow-hidden aspect-square lg:sticky lg:top-4"
+                onMouseEnter={() => setAutoPlay(false)}
+                onMouseLeave={() => setAutoPlay(true)}
+              >
+                <div className="relative w-full h-full">
+                  {images.map((imgSrc, imgIdx) => (
+                    <img
+                      key={imgIdx}
+                      src={imgSrc}
+                      onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
+                      alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
+                      className={`absolute inset-0 w-full h-full object-contain p-2 sm:p-4 transition-opacity duration-700 ${
+                        imgIdx === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                      }`}
+                    />
+                  ))}
+                </div>
                 {images.length > 1 && (
                   <>
                     <button
-                      onClick={() => setIndex((i) => (i - 1 + images.length) % images.length)}
+                      onClick={() => {
+                        setAutoPlay(false);
+                        setIndex((i) => (i - 1 + images.length) % images.length);
+                        setTimeout(() => setAutoPlay(true), 5000);
+                      }}
                       className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)] z-10"
                       aria-label="Previous image"
                     >
                       ‹
                     </button>
                     <button
-                      onClick={() => setIndex((i) => (i + 1) % images.length)}
+                      onClick={() => {
+                        setAutoPlay(false);
+                        setIndex((i) => (i + 1) % images.length);
+                        setTimeout(() => setAutoPlay(true), 5000);
+                      }}
                       className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg hover:bg-white transition text-xl sm:text-2xl font-bold text-gray-700 hover:text-[rgb(183,36,42)] z-10"
                       aria-label="Next image"
                     >
@@ -208,6 +239,13 @@ export default function InstallmentDetail() {
                     <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
                       {index + 1} / {images.length}
                     </div>
+                    {/* Auto-play indicator */}
+                    {autoPlay && (
+                      <div className="absolute top-2 sm:top-4 right-2 sm:right-4 bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <span>Auto</span>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
@@ -461,6 +499,27 @@ export default function InstallmentDetail() {
                               </details>
                             )}
 
+                            {/* Finance Information for this plan */}
+                            {p.finance && (p.finance.bankName || p.finance.financeInfo) && (
+                              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-3 space-y-2">
+                                {p.finance.bankName && (
+                                  <div>
+                                    <div className="text-[10px] text-gray-500 font-semibold uppercase mb-1">Bank Name</div>
+                                    <div className="text-sm font-bold text-blue-700">{p.finance.bankName}</div>
+                                  </div>
+                                )}
+                                {p.finance.financeInfo && (
+                                  <div>
+                                    <div className="text-[10px] text-gray-500 font-semibold uppercase mb-1">Finance Details</div>
+                                    <div 
+                                      className="text-xs text-gray-700 leading-relaxed"
+                                      dangerouslySetInnerHTML={{ __html: p.finance.financeInfo }}
+                                    />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
                             {p.otherChargesNote && (
                               <div className="text-xs text-gray-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                                 <span className="font-semibold">Note:</span> {p.otherChargesNote}
@@ -480,100 +539,163 @@ export default function InstallmentDetail() {
                   })}
                 </div>
 
-                {/* Desktop: Cards grid */}
-                <div className="hidden lg:grid grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-                  {plan.paymentPlans.map((p, idx) => {
-                    const cashPrice = Number(plan.price || 0);
-                    const downPayment = Number(p.downPayment || 0);
-                    const financedAmount = Math.max(0, cashPrice - downPayment);
-                    const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
-                    const totalMarkup = Number(p.markup || 0);
-                    const totalCost = cashPrice + totalMarkup;
-                    const isBestPlan = idx === bestPlanIndex;
+                {/* Desktop: Table view */}
+                <div className="hidden lg:block overflow-x-auto">
+                  <table className="w-full border-collapse bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <thead>
+                      <tr className="bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white">
+                        <th className="px-4 py-3 text-left text-sm font-bold">Plan</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Monthly Payment</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Tenure</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Down Payment</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Interest Rate</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Total Payable</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Total Cost</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Finance Info</th>
+                        <th className="px-4 py-3 text-center text-sm font-bold">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {plan.paymentPlans.map((p, idx) => {
+                        const cashPrice = Number(plan.price || 0);
+                        const downPayment = Number(p.downPayment || 0);
+                        const financedAmount = Math.max(0, cashPrice - downPayment);
+                        const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
+                        const totalMarkup = Number(p.markup || 0);
+                        const totalCost = cashPrice + totalMarkup;
+                        const isBestPlan = idx === bestPlanIndex;
+                        const hasFinance = p.finance && (p.finance.bankName || p.finance.financeInfo);
 
-                    return (
-                      <div
-                        key={idx}
-                        className={`bg-gradient-to-br from-white to-gray-50 border-2 ${
-                          isBestPlan ? "border-[rgb(183,36,42)] shadow-lg" : "border-gray-200"
-                        } rounded-xl overflow-hidden hover:shadow-xl transition-all flex flex-col ${
-                          isBestPlan ? "ring-2 ring-[rgb(183,36,42)] ring-opacity-20" : ""
-                        }`}
-                      >
-                        <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
-                          <div className="flex items-center justify-between gap-2 mb-2">
-                            <div className="text-sm font-bold text-[rgb(183,36,42)] uppercase truncate flex-1">
-                              {p.planName || `Plan ${idx + 1}`}
-                            </div>
-                            {isBestPlan && (
-                              <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full whitespace-nowrap flex-shrink-0">
-                                ⭐ BEST
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-black text-[rgb(183,36,42)]">
-                              PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
-                            </span>
-                            <span className="text-sm text-gray-500">/month</span>
-                          </div>
-                          <div className="text-sm text-gray-700 mt-1">
-                            {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
-                          </div>
-                        </div>
-
-                        <div className="p-4 flex-1 flex flex-col gap-3">
-                          <div className="bg-white rounded-xl p-3 border border-gray-200 space-y-2">
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600 font-semibold">Cash Price</span>
-                              <span className="font-bold text-gray-900">PKR {cashPrice.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Down Payment</span>
-                              <span className="font-semibold text-gray-900">PKR {downPayment.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Financed Amount</span>
-                              <span className="font-semibold text-gray-900">PKR {financedAmount.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600">Interest</span>
-                              <span className="font-semibold text-gray-900">
-                                {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"} {p.interestType ? `• ${p.interestType}` : ""}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600 font-semibold">Total Payable</span>
-                              <span className="font-bold text-gray-900">PKR {totalPayable.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-sm">
-                              <span className="text-gray-600 font-semibold">Total Markup</span>
-                              <span className="font-bold text-gray-900">PKR {totalMarkup.toLocaleString()}</span>
-                            </div>
-                            <div className="flex items-center justify-between text-base pt-2 border-t-2 border-[rgb(183,36,42)] bg-red-50 rounded-lg p-2">
-                              <span className="font-extrabold text-gray-900">Total Cost</span>
-                              <span className="font-black text-[rgb(183,36,42)]">PKR {totalCost.toLocaleString()}</span>
-                            </div>
-                          </div>
-
-                          {p.otherChargesNote && (
-                            <div className="text-xs text-gray-700 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                              <span className="font-semibold">Note:</span> {p.otherChargesNote}
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="p-4 pt-0 border-t border-gray-200">
-                          <NavLink
-                            to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
-                            className="block w-full text-center px-4 py-2.5 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
+                        return (
+                          <tr
+                            key={idx}
+                            className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${
+                              isBestPlan ? "bg-red-50 border-l-4 border-l-[rgb(183,36,42)]" : ""
+                            }`}
                           >
-                            Apply for This Plan
-                          </NavLink>
-                        </div>
-                      </div>
-                    );
-                  })}
+                            <td className="px-4 py-3">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-gray-900">{p.planName || `Plan ${idx + 1}`}</span>
+                                {isBestPlan && (
+                                  <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full">
+                                    ⭐ BEST
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <div className="font-black text-[rgb(183,36,42)] text-lg">
+                                PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-gray-500">/month</div>
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
+                              {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
+                              PKR {downPayment.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm">
+                              <div className="font-semibold text-gray-900">
+                                {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}
+                              </div>
+                              {p.interestType && (
+                                <div className="text-xs text-gray-500">{p.interestType}</div>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-center text-sm font-bold text-gray-900">
+                              PKR {totalPayable.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <div className="font-black text-[rgb(183,36,42)]">
+                                PKR {totalCost.toLocaleString()}
+                              </div>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              {hasFinance ? (
+                                <div className="flex flex-col gap-1">
+                                  {p.finance.bankName && (
+                                    <div className="text-xs font-semibold text-blue-700">{p.finance.bankName}</div>
+                                  )}
+                                  {p.finance.financeInfo && (
+                                    <div className="text-xs text-gray-600 line-clamp-2">
+                                      {p.finance.financeInfo.replace(/<[^>]*>/g, '').substring(0, 50)}
+                                      {p.finance.financeInfo.replace(/<[^>]*>/g, '').length > 50 ? '...' : ''}
+                                    </div>
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      const modal = document.getElementById(`finance-modal-${idx}`);
+                                      if (modal) modal.classList.remove('hidden');
+                                    }}
+                                    className="text-xs text-blue-600 hover:underline mt-1"
+                                  >
+                                    View Details
+                                  </button>
+                                  {/* Finance Details Modal */}
+                                  <div id={`finance-modal-${idx}`} className="hidden fixed inset-0 z-50 overflow-y-auto">
+                                    <div className="fixed inset-0 bg-black bg-opacity-50" onClick={() => {
+                                      document.getElementById(`finance-modal-${idx}`).classList.add('hidden');
+                                    }}></div>
+                                    <div className="flex items-center justify-center min-h-screen p-4">
+                                      <div className="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
+                                        <button
+                                          onClick={() => {
+                                            document.getElementById(`finance-modal-${idx}`).classList.add('hidden');
+                                          }}
+                                          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                                        >
+                                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                          </svg>
+                                        </button>
+                                        <h3 className="font-bold text-lg mb-4">Finance Information - {p.planName || `Plan ${idx + 1}`}</h3>
+                                        {p.finance.bankName && (
+                                          <div className="mb-4">
+                                            <div className="text-sm font-semibold text-gray-500 mb-1">Bank Name</div>
+                                            <div className="text-lg font-bold text-blue-700">{p.finance.bankName}</div>
+                                          </div>
+                                        )}
+                                        {p.finance.financeInfo && (
+                                          <div>
+                                            <div className="text-sm font-semibold text-gray-500 mb-2">Finance Details</div>
+                                            <div 
+                                              className="text-sm text-gray-700 leading-relaxed"
+                                              dangerouslySetInnerHTML={{ __html: p.finance.financeInfo }}
+                                            />
+                                          </div>
+                                        )}
+                                        <div className="mt-6 flex justify-end">
+                                          <button
+                                            onClick={() => {
+                                              document.getElementById(`finance-modal-${idx}`).classList.add('hidden');
+                                            }}
+                                            className="px-4 py-2 bg-[rgb(183,36,42)] text-white rounded-lg hover:bg-red-700 transition"
+                                          >
+                                            Close
+                                          </button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-sm">—</span>
+                              )}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <NavLink
+                                to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
+                                className="inline-block px-4 py-2 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-lg hover:bg-red-700 transition"
+                              >
+                                Apply
+                              </NavLink>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </section>
             ) : (
@@ -606,57 +728,67 @@ export default function InstallmentDetail() {
               </section>
             )}
 
-            {/* Finance Information - Separate from Installment Plans */}
-            {plan.finance && (plan.finance.bankName || plan.finance.financeInfo) && (
-              <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border-2 border-blue-200">
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
-                  <span className="text-xl sm:text-2xl">🏦</span>
-                  <span>Bank Finance Information</span>
-                </h3>
-                
-                <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-blue-200 shadow-sm">
-                  {plan.finance.bankName && (
-                    <div className="mb-4 sm:mb-5 pb-4 sm:pb-5 border-b border-gray-200">
-                      <div className="flex items-center gap-2 mb-2">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                        </svg>
-                        <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Bank Name</span>
-                      </div>
-                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700">
-                        {plan.finance.bankName}
-                      </div>
-                    </div>
-                  )}
+            {/* Finance Information - Only show main plan finance if NO individual plans have finance */}
+            {(() => {
+              // Check if any payment plan has finance info
+              const hasPlanFinance = Array.isArray(plan?.paymentPlans) && plan.paymentPlans.some(
+                p => p.finance && (p.finance.bankName || p.finance.financeInfo)
+              );
+              
+              // Only show main plan finance if no individual plans have finance
+              const shouldShowMainFinance = plan?.finance && (plan.finance.bankName || plan.finance.financeInfo) && !hasPlanFinance;
+              
+              return shouldShowMainFinance ? (
+                <section className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border-2 border-blue-200">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
+                    <span className="text-xl sm:text-2xl">🏦</span>
+                    <span>Bank Finance Information</span>
+                  </h3>
                   
-                  {plan.finance.financeInfo && (
-                    <div>
-                      <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                        <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Finance Details</span>
+                  <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-blue-200 shadow-sm">
+                    {plan.finance.bankName && (
+                      <div className="mb-4 sm:mb-5 pb-4 sm:pb-5 border-b border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Bank Name</span>
+                        </div>
+                        <div className="text-lg sm:text-xl lg:text-2xl font-bold text-blue-700">
+                          {plan.finance.bankName}
+                        </div>
                       </div>
-                      <div 
-                        className="finance-html-content text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-3 sm:p-4 lg:p-5 border border-gray-200"
-                        dangerouslySetInnerHTML={{ __html: plan.finance.financeInfo }}
-                      />
-                    </div>
-                  )}
-                  
-                  <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-gray-200">
-                    <div className="flex items-start gap-2 text-xs sm:text-sm text-gray-600">
-                      <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <p className="leading-relaxed">
-                        <span className="font-semibold">Note:</span> This is bank finance information. Please contact the bank directly for application procedures, eligibility criteria, and terms & conditions.
-                      </p>
+                    )}
+                    
+                    {plan.finance.financeInfo && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                          <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          <span className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider">Finance Details</span>
+                        </div>
+                        <div 
+                          className="finance-html-content text-sm sm:text-base lg:text-lg text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-3 sm:p-4 lg:p-5 border border-gray-200"
+                          dangerouslySetInnerHTML={{ __html: plan.finance.financeInfo }}
+                        />
+                      </div>
+                    )}
+                    
+                    <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-gray-200">
+                      <div className="flex items-start gap-2 text-xs sm:text-sm text-gray-600">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="leading-relaxed">
+                          <span className="font-semibold">Note:</span> This is bank finance information. Please contact the bank directly for application procedures, eligibility criteria, and terms & conditions.
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </section>
-            )}
+                </section>
+              ) : null;
+            })()}
 
             {/* Product Specifications */}
             {plan.productSpecifications && plan.productSpecifications.specifications && Array.isArray(plan.productSpecifications.specifications) && plan.productSpecifications.specifications.length > 0 && (

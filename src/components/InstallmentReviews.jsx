@@ -79,8 +79,15 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
         setLoading(false);
         return;
       }
-      // Use the ID directly - backend will handle both installmentPlanId string and _id ObjectId
-      const res = await fetch(`${apiUrl}/getInstallmentReviews/${encodeURIComponent(String(id))}?status=approved&page=${page}&limit=10&sortBy=createdAt&sortOrder=desc`);
+      
+      // Fetch approved reviews (all reviews are now auto-approved)
+      const res = await fetch(`${apiUrl}/getInstallmentReviews/${encodeURIComponent(String(id))}?status=approved&page=${page}&limit=10&sortBy=createdAt&sortOrder=desc&_t=${Date.now()}`, {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
       const data = await res.json();
       
       // Debug logging
@@ -95,7 +102,6 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
       
       // Handle different response structures
       if (data.success !== false) {
-        // Response is successful (could be data.success === true or data.success is undefined but has data)
         const reviewsData = data.data?.reviews || data.reviews || [];
         const existingStats = data.data?.statistics || data.statistics || {};
         const paginationData = data.data?.pagination || data.pagination || { totalPages: 1 };
@@ -213,7 +219,10 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           reviewCategories: { value: 5, quality: 5, service: 5, delivery: 5 },
           reviewImages: []
         });
-        fetchReviews();
+        // Wait a moment for backend to process, then refresh reviews
+        setTimeout(() => {
+          fetchReviews();
+        }, 500);
       } else {
         setError(data.message || "Failed to submit review");
       }
