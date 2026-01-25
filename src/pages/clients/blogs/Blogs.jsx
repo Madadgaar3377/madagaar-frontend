@@ -105,8 +105,9 @@ export default function BlogsPage() {
       }
       if (!q) return true;
       const title = (b.title || "").toLowerCase();
-      const txt = stripHtml(b.descripition || "").toLowerCase();
-      return title.includes(q) || txt.includes(q);
+      const content = stripHtml(b.content || b.description || b.descripition || "").toLowerCase();
+      const excerpt = stripHtml(b.excerpt || "").toLowerCase();
+      return title.includes(q) || content.includes(q) || excerpt.includes(q);
     });
   }, [blogs, search, selectedCategory]);
 
@@ -277,7 +278,7 @@ export default function BlogsPage() {
             {/* cards grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {pageData.map((b) => {
-                const excerpt = stripHtml(b.descripition || "").slice(
+                const excerpt = stripHtml(b.excerpt || b.content || b.description || b.descripition || "").slice(
                   0,
                   200
                 );
@@ -436,7 +437,7 @@ export default function BlogsPage() {
                 <div
                   dangerouslySetInnerHTML={{
                     __html:
-                      openBlog.descripition || "<p>No content</p>",
+                      openBlog.content || openBlog.description || openBlog.descripition || "<p>No content</p>",
                   }}
                 />
               </div>
