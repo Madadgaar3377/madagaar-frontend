@@ -1,16 +1,167 @@
 // src/pages/InsuranceInfo.jsx
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { backendBaseUrl } from "../../../constants/apiUrl";
 import SEO from "../../../components/SEO";
+import LoadingPage from "../../../compontents/Loader";
+import OurPartners from "../OverPartener";
 
 const ACCENT = "rgb(183,36,42)";
+const API = (backendBaseUrl || "").replace(/\/$/, "");
+
+const formatCurrency = (amount) => {
+  if (!amount) return 'N/A';
+  return new Intl.NumberFormat('en-PK', {
+    style: 'currency',
+    currency: 'PKR',
+    minimumFractionDigits: 0,
+  }).format(amount);
+};
 
 export default function InsuranceInfo() {
   const navigate = useNavigate();
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  
+  // Filter and search state
+  const [search, setSearch] = useState("");
+  const [selectedPolicyType, setSelectedPolicyType] = useState("");
+  const [selectedPlanStatus, setSelectedPlanStatus] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchPlans = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch(`${API}/getAllInsurancePlansPublic?limit=1000`, {
+          method: "GET",
+          headers: { 
+            "Content-Type": "application/json",
+            // Don't send Authorization header for public endpoint
+          },
+        });
+        
+        const payload = await res.json().catch(() => ({ success: false, message: 'Invalid response from server' }));
+        
+        if (!res.ok) {
+          // Handle different error status codes
+          if (res.status === 401 || res.status === 403) {
+            throw new Error('Access denied. Please try refreshing the page.');
+          } else if (res.status === 404) {
+            throw new Error('Insurance plans endpoint not found.');
+          } else if (res.status >= 500) {
+            throw new Error('Server error. Please try again later.');
+          } else {
+            throw new Error(payload?.message || `Failed to load insurance plans (${res.status})`);
+          }
+        }
+        
+        if (!payload.success) {
+          throw new Error(payload?.message || 'Failed to load insurance plans');
+        }
+        
+        if (mounted) {
+          const data = payload.data || [];
+          setPlans(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        if (mounted) {
+          // Show user-friendly error message
+          const errorMsg = err.message || "Network error — could not fetch insurance plans.";
+          setError(errorMsg);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    fetchPlans();
+    return () => { mounted = false; };
+  }, []);
+
+  // Filter plans
+  const filteredPlans = useMemo(() => {
+    return plans.filter((plan) => {
+      // Policy type filter
+      if (selectedPolicyType && plan.policyType !== selectedPolicyType) {
+        return false;
+      }
+      
+      // Plan status filter
+      if (selectedPlanStatus && plan.planStatus !== selectedPlanStatus) {
+        return false;
+      }
+      
+      // Search filter
+      const searchLower = search.toLowerCase();
+      if (searchLower) {
+        return (
+          (plan.planName || "").toLowerCase().includes(searchLower) ||
+          (plan.registeredCompanyName || "").toLowerCase().includes(searchLower) ||
+          (plan.policyType || "").toLowerCase().includes(searchLower) ||
+          (plan.planId || "").toLowerCase().includes(searchLower)
+        );
+      }
+      
+      return true;
+    });
+  }, [plans, search, selectedPolicyType, selectedPlanStatus]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredPlans.length / pageSize);
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedPlans = filteredPlans.slice(startIndex, startIndex + pageSize);
+
+  // Get unique policy types and plan statuses
+  const policyTypes = useMemo(() => {
+    const types = new Set();
+    plans.forEach((p) => {
+      if (p.policyType) types.add(p.policyType);
+    });
+    return Array.from(types).sort();
+  }, [plans]);
+
+  const planStatuses = useMemo(() => {
+    const statuses = new Set();
+    plans.forEach((p) => {
+      if (p.planStatus) statuses.add(p.planStatus);
+    });
+    return Array.from(statuses).sort();
+  }, [plans]);
 
   const handleApplyClick = () => {
-    // change route to wherever your insurance apply form is
-    navigate("/apply-insurance");
+    navigate("/insurance");
+  };
+
+  const handleSubmitClaim = () => {
+    navigate("/submit-claim");
+  };
+
+  const getPolicyDetails = (plan) => {
+    const policyType = plan.policyType;
+    switch (policyType) {
+      case 'Life':
+        return plan.lifeInsurancePlan;
+      case 'Health':
+        return plan.healthInsurancePlan;
+      case 'Motor':
+        return plan.motorInsurancePlan;
+      case 'Travel':
+        return plan.travelInsurancePlan;
+      case 'Property':
+        return plan.propertyInsurancePlan;
+      case 'Takaful':
+        return plan.takafulPlan;
+      default:
+        return null;
+    }
   };
 
   const structuredData = {
@@ -37,6 +188,10 @@ export default function InsuranceInfo() {
     }
   };
 
+  if (loading) {
+    return <LoadingPage />;
+  }
+
   return (
     <div className="bg-gray-50">
       <SEO
@@ -46,24 +201,34 @@ export default function InsuranceInfo() {
         canonicalUrl="https://madadgaar.com.pk/insurance"
         structuredData={structuredData}
       />
+      
       {/* top banner */}
       <div className="bg-white border-b">
-        <div className="container-content max-w-6xl py-4 sm:py-6 flex flex-col gap-3 sm:gap-4">
-          <div>
+        <div className="container-content max-w-6xl py-4 sm:py-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
+          <div className="flex-1">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
               Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
-              Protect your life, health, and assets with tailored insurance plans. <a href="/faq#insurance" className="text-red-600 hover:text-red-700 font-semibold">View insurance FAQs</a> or <a href="/contact" className="text-red-600 hover:text-red-700 font-semibold">contact our support team</a>. Explore our <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">property solutions</a> and <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">loan options</a> for comprehensive financial planning.
+              Protect your life, health, and assets with tailored insurance plans. <a href="/faq#insurance" className="text-red-600 hover:text-red-700 font-semibold">View insurance FAQs</a> or <a href="/contact" className="text-red-600 hover:text-red-700 font-semibold">contact our support team</a>.
             </p>
           </div>
-          <button
-            onClick={handleApplyClick}
-            className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm"
-            style={{ backgroundColor: ACCENT }}
-          >
-            Apply for Insurance
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleSubmitClaim}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
+              style={{ backgroundColor: ACCENT }}
+            >
+              Submit Claim / Maturity
+            </button>
+            <button
+              onClick={handleApplyClick}
+              className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
+              style={{ backgroundColor: ACCENT }}
+            >
+              Browse Plans
+            </button>
+          </div>
         </div>
       </div>
 
@@ -76,7 +241,7 @@ export default function InsuranceInfo() {
               Secure your future with the right coverage
             </h2>
             <p className="text-xs sm:text-sm md:text-base text-gray-600 mt-2 sm:mt-3">
-              We are offers reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease. With a focus on transparency and customer satisfaction, we are your go-to resource for resolving insurance complaints in Pakistan. Learn more about <a href="/about" className="text-red-600 hover:text-red-700 font-semibold">how Madadgaar works</a> or explore <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">installment plans</a> for flexible payment options.
+              We offer reliable support for addressing insurance-related issues. We partner with leading insurance companies to ensure your concerns are handled effectively and fairly. Our platform is dedicated to providing swift resolutions, helping you navigate the complexities of insurance claims with ease.
             </p>
 
             <div className="mt-3 sm:mt-4 lg:mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
@@ -106,126 +271,228 @@ export default function InsuranceInfo() {
               </div>
             </div>
 
-            <button
-              onClick={handleApplyClick}
-              className="mt-6 inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-sm"
-              style={{ backgroundColor: ACCENT }}
-            >
-              Get Started – Apply Now
-            </button>
-          </div>
-
-          {/* simple illustrative block (you can replace with real image) */}
-          <div className="w-full md:w-72 flex-shrink-0">
-            <div className="h-52 md:h-60 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 flex items-center justify-center">
-              <div className="text-center px-4">
-                <div className="h-52 md:h-60 rounded-2xl bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 flex items-center justify-center">
-  <img
-    src="Media/ins%20Frame.png"
-    alt="Insurance Services in Pakistan - Car, Life, Health and Property Insurance Support"
-    className="
-      max-h-full
-      max-w-full
-      object-contain
-    "
-  />
-</div>
-
-              </div>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={handleApplyClick}
+                className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
+                style={{ backgroundColor: ACCENT }}
+              >
+                Browse Insurance Plans
+              </button>
+              <button
+                onClick={handleSubmitClaim}
+                className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium border-2 hover:bg-gray-50 transition"
+                style={{ borderColor: ACCENT, color: ACCENT }}
+              >
+                Submit Claim / Maturity Request
+              </button>
             </div>
           </div>
         </div>
 
-        {/* types of insurance */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Types of Insurance We Facilitate
-            </h3>
-            <span className="text-xs text-gray-500">
-              (Example categories – connect with your live data later)
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Life Insurance */}
-            <div className="bg-white rounded-2xl shadow-sm border p-5 flex flex-col">
-              <div className="text-xs font-semibold text-gray-500">Life</div>
-              <h4 className="mt-1 text-sm font-semibold text-gray-800">
-                Life Insurance / Family Protection
-              </h4>
-              <p className="mt-2 text-xs text-gray-600">
-                Provides financial support to your family in case of any
-                unfortunate event. Ideal for salaried individuals and business
-                owners who want long-term protection.
-              </p>
-              <ul className="mt-3 text-xs text-gray-600 list-disc list-inside space-y-1">
-                <li>Fixed or flexible premium options</li>
-                <li>Lump-sum benefit to nominees</li>
-                <li>Optional riders for extra coverage</li>
-              </ul>
-              <button
-                onClick={handleApplyClick}
-                className="mt-4 inline-flex items-center justify-center px-4 py-2 text-xs font-medium rounded-full text-white"
-                style={{ backgroundColor: ACCENT }}
+        {/* Search and Filters */}
+        {plans.length > 0 && (
+          <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+              {/* Search */}
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search plans by name, company, or policy type..."
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+              </div>
+              
+              {/* Policy Type Filter */}
+              <select
+                value={selectedPolicyType}
+                onChange={(e) => {
+                  setSelectedPolicyType(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
               >
-                Apply for Life Insurance
-              </button>
+                <option value="">All Policy Types</option>
+                {policyTypes.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+              
+              {/* Plan Status Filter */}
+              <select
+                value={selectedPlanStatus}
+                onChange={(e) => {
+                  setSelectedPlanStatus(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              >
+                <option value="">All Statuses</option>
+                {planStatuses.map((status) => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
             </div>
-
-            {/* Health Insurance */}
-            <div className="bg-white rounded-2xl shadow-sm border p-5 flex flex-col">
-              <div className="text-xs font-semibold text-gray-500">Health</div>
-              <h4 className="mt-1 text-sm font-semibold text-gray-800">
-                Health & Medical Coverage
-              </h4>
-              <p className="mt-2 text-xs text-gray-600">
-                Helps you manage hospital and medical expenses without putting
-                pressure on your savings. Coverage for individuals and families.
-              </p>
-              <ul className="mt-3 text-xs text-gray-600 list-disc list-inside space-y-1">
-                <li>Cashless hospitalization (partner hospitals)</li>
-                <li>Emergency & planned treatment coverage</li>
-                <li>Critical illness add-on options</li>
-              </ul>
-              <button
-                onClick={handleApplyClick}
-                className="mt-4 inline-flex items-center justify-center px-4 py-2 text-xs font-medium rounded-full text-white"
-                style={{ backgroundColor: ACCENT }}
-              >
-                Apply for Health Insurance
-              </button>
-            </div>
-
-            {/* Asset / General Insurance */}
-            <div className="bg-white rounded-2xl shadow-sm border p-5 flex flex-col">
-              <div className="text-xs font-semibold text-gray-500">Assets</div>
-              <h4 className="mt-1 text-sm font-semibold text-gray-800">
-                Car / Home / Business Insurance
-              </h4>
-              <p className="mt-2 text-xs text-gray-600">
-                Protect valuable assets like your vehicle, home and business
-                property from accidental damage, theft and natural calamities.
-              </p>
-              <ul className="mt-3 text-xs text-gray-600 list-disc list-inside space-y-1">
-                <li>Third-party & comprehensive car coverage</li>
-                <li>Fire, theft & natural disaster protection</li>
-                <li>Business interruption add-ons</li>
-              </ul>
-              <button
-                onClick={handleApplyClick}
-                className="mt-4 inline-flex items-center justify-center px-4 py-2 text-xs font-medium rounded-full text-white"
-                style={{ backgroundColor: ACCENT }}
-              >
-                Apply for Asset Insurance
-              </button>
+            
+            {/* Results count */}
+            <div className="mt-4 text-sm text-gray-600">
+              Showing {paginatedPlans.length} of {filteredPlans.length} plans
             </div>
           </div>
-        </section>
+        )}
+
+        {/* Insurance Plans Grid */}
+        {error ? (
+          <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
+            <div className="text-red-500 text-4xl mb-4">⚠️</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Error Loading Plans</h3>
+            <p className="text-sm text-gray-600">{error}</p>
+          </div>
+        ) : filteredPlans.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
+            <div className="text-gray-400 text-4xl mb-4">📋</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">No Plans Found</h3>
+            <p className="text-sm text-gray-600">
+              {search || selectedPolicyType || selectedPlanStatus
+                ? "Try adjusting your filters to see more plans."
+                : "No insurance plans available at the moment."}
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {paginatedPlans.map((plan) => {
+                const policyDetails = getPolicyDetails(plan);
+                const premium = policyDetails?.premiumAmount || policyDetails?.annualPremium || policyDetails?.contributionAmount;
+                const sumAssured = policyDetails?.sumAssured || policyDetails?.annualCoverageLimit || policyDetails?.sumCovered;
+                
+                return (
+                  <div
+                    key={plan._id}
+                    className="bg-white rounded-xl shadow-sm border hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                  >
+                    {/* Plan Image */}
+                    <div className="relative h-48 overflow-hidden bg-gray-100">
+                      {plan.planImage ? (
+                        <img
+                          src={plan.planImage}
+                          alt={plan.planName}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div className="absolute inset-0 bg-gradient-to-br from-red-500/20 to-blue-500/20 flex items-center justify-center" style={{ display: plan.planImage ? 'none' : 'flex' }}>
+                        <div className="text-4xl">🛡️</div>
+                      </div>
+                      
+                      {/* Status Badge */}
+                      <div className="absolute top-2 right-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          plan.planStatus === 'Active' ? 'bg-green-100 text-green-800' :
+                          plan.planStatus === 'Limited' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {plan.planStatus || 'Active'}
+                        </span>
+                      </div>
+                      
+                      {/* Policy Type Badge */}
+                      <div className="absolute top-2 left-2">
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-white/90 text-gray-800">
+                          {plan.policyType}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    {/* Plan Details */}
+                    <div className="p-4 sm:p-5">
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+                        {plan.planName}
+                      </h3>
+                      
+                      <p className="text-sm text-gray-600 mb-2">
+                        {plan.registeredCompanyName}
+                      </p>
+                      
+                      {plan.description && (
+                        <p className="text-xs text-gray-500 mb-3 line-clamp-2">
+                          {plan.description}
+                        </p>
+                      )}
+                      
+                      {/* Quick Stats */}
+                      <div className="space-y-2 mb-4">
+                        {sumAssured && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Coverage:</span>
+                            <span className="font-semibold text-gray-900">{formatCurrency(sumAssured)}</span>
+                          </div>
+                        )}
+                        {premium && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Premium:</span>
+                            <span className="font-semibold text-red-600">{formatCurrency(premium)}</span>
+                          </div>
+                        )}
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      <div className="flex flex-col gap-2 mt-4">
+                        <button
+                          onClick={() => navigate(`/insurance/${plan._id}`)}
+                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          onClick={() => navigate(`/insurance/${plan._id}/apply`)}
+                          className="w-full px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition text-sm"
+                        >
+                          Apply Now
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-2 mt-6">
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 text-sm text-gray-600">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
         {/* How it works */}
         <section className="bg-white rounded-2xl shadow-sm border p-6 md:p-7">
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
             How the Insurance Process Works
           </h3>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
@@ -234,9 +501,9 @@ export default function InsuranceInfo() {
                    style={{ backgroundColor: ACCENT }}>
                 1
               </div>
-              <div className="mt-2 font-medium text-gray-800">Submit Details</div>
+              <div className="mt-2 font-medium text-gray-800">Browse Plans</div>
               <div className="mt-1 text-xs text-gray-600">
-                Fill a short form with your personal and financial information.
+                Compare insurance plans from different companies.
               </div>
             </div>
             <div className="flex flex-col">
@@ -244,9 +511,9 @@ export default function InsuranceInfo() {
                    style={{ backgroundColor: ACCENT }}>
                 2
               </div>
-              <div className="mt-2 font-medium text-gray-800">Get Plan Options</div>
+              <div className="mt-2 font-medium text-gray-800">Select & Apply</div>
               <div className="mt-1 text-xs text-gray-600">
-                Our team or partner will review your profile and share suitable plans.
+                Choose the plan that best fits your needs and apply online.
               </div>
             </div>
             <div className="flex flex-col">
@@ -254,9 +521,9 @@ export default function InsuranceInfo() {
                    style={{ backgroundColor: ACCENT }}>
                 3
               </div>
-              <div className="mt-2 font-medium text-gray-800">Finalize Coverage</div>
+              <div className="mt-2 font-medium text-gray-800">Get Approved</div>
               <div className="mt-1 text-xs text-gray-600">
-                Choose the coverage, tenure and premium that suits you best.
+                Our team reviews your application and connects you with the insurance company.
               </div>
             </div>
             <div className="flex flex-col">
@@ -273,19 +540,20 @@ export default function InsuranceInfo() {
 
           <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <p className="text-xs md:text-sm text-gray-600">
-              Need help choosing the right insurance? Our team can guide you based on your
-              profile and risk appetite.
+              Need help with claims or maturity requests? Submit your request and our team will assist you.
             </p>
             <button
-              onClick={handleApplyClick}
+              onClick={handleSubmitClaim}
               className="inline-flex items-center justify-center px-5 py-2 rounded-full text-sm font-medium text-white"
               style={{ backgroundColor: ACCENT }}
             >
-              Talk to an Advisor / Apply
+              Submit Claim / Maturity
             </button>
           </div>
         </section>
       </div>
+      
+      <OurPartners />
     </div>
   );
 }

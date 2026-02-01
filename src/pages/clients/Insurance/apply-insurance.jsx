@@ -4,7 +4,7 @@ import { getAuthToken } from "../../../utils/auth"; // optional: include auth if
 import { Navigate } from "react-router-dom";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
-const SUBMIT_API = `${API}/insuranceForm`; // change if your endpoint is different
+const SUBMIT_API = `${API}/applyForInsurance`; // Updated to use new insurance application endpoint
 
 const insuranceTypesTemplate = [
   "Life Insurance",

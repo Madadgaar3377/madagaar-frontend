@@ -27,7 +27,9 @@ import LoansPage from "./pages/clients/Loans/clientPageLoan.jsx";
 import LoanDetails from "./pages/clients/Loans/LoanDeailtsById.jsx";
 import ApplyLoan from "./pages/clients/Loans/ApplyLoan.jsx";
 import InsurancePage from "./pages/clients/Insurance/insurance.jsx";
-import ApplyInsurance from "./pages/clients/Insurance/apply-insurance.jsx";
+import InsurancePlanDetails from "./pages/clients/Insurance/InsurancePlanDetails.jsx";
+import ApplyInsurance from "./pages/clients/Insurance/ApplyInsurance.jsx";
+import SubmitClaim from "./pages/clients/Insurance/SubmitClaim.jsx";
 // import TeamMemberDetail from "./pages/clients/TeamMemberDetail.jsx"; // Phase 1: Disabled team detail pages
 import UserDashboard from "./pages/clients/Dashboard/UserDashboard.jsx";
 import DashboardProfile from "./pages/clients/Dashboard/DashboardProfile.jsx";
@@ -96,7 +98,9 @@ function App() {
 
             {/* Insurance */}
             <Route path="/insurance" element={<InsurancePage />} />
-            <Route path="/apply-insurance" element={<ApplyInsurance />} />
+            <Route path="/insurance/:id" element={<InsurancePlanDetails />} />
+            <Route path="/insurance/:id/apply" element={<ApplyInsurance />} />
+            <Route path="/submit-claim" element={<SubmitClaim />} />
 
             {/* PropertiesPage */}
             <Route path="/properties" element={<PropertiesPage />} />
