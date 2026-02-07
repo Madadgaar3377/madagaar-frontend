@@ -373,9 +373,10 @@ export default function InsurancePlanDetails() {
                     </svg>
                     Description
                   </h3>
-                  <div className="prose prose-sm max-w-none text-gray-700 whitespace-pre-line">
-                    {plan.description}
-                  </div>
+                  <div 
+                    className="prose prose-sm max-w-none text-gray-700"
+                    dangerouslySetInnerHTML={{ __html: plan.description }}
+                  />
                 </div>
               )}
 

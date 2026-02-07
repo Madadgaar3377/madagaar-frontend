@@ -423,9 +423,10 @@ export default function InsuranceInfo() {
                       </p>
                       
                       {plan.description && (
-                        <p className="text-xs text-gray-500 mb-3 line-clamp-2">
-                          {plan.description}
-                        </p>
+                        <div 
+                          className="text-xs text-gray-500 mb-3 line-clamp-2"
+                          dangerouslySetInnerHTML={{ __html: plan.description }}
+                        />
                       )}
                       
                       {/* Quick Stats */}
