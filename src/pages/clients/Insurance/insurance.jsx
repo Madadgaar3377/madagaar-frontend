@@ -370,6 +370,7 @@ export default function InsuranceInfo() {
                 const policyDetails = getPolicyDetails(plan);
                 const premium = policyDetails?.premiumAmount || policyDetails?.annualPremium || policyDetails?.contributionAmount;
                 const sumAssured = policyDetails?.sumAssured || policyDetails?.annualCoverageLimit || policyDetails?.sumCovered;
+                const isLifeInsurance = plan.policyType === 'Life';
                 
                 return (
                   <div
@@ -429,21 +430,58 @@ export default function InsuranceInfo() {
                         />
                       )}
                       
-                      {/* Quick Stats */}
-                      <div className="space-y-2 mb-4">
-                        {sumAssured && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Coverage:</span>
-                            <span className="font-semibold text-gray-900">{formatCurrency(sumAssured)}</span>
-                          </div>
-                        )}
-                        {premium && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Premium:</span>
-                            <span className="font-semibold text-red-600">{formatCurrency(premium)}</span>
-                          </div>
-                        )}
-                      </div>
+                      {/* Life Insurance Static Fields */}
+                      {isLifeInsurance ? (
+                        <div className="space-y-2 mb-4 bg-gradient-to-br from-red-50 to-orange-50 p-3 rounded-lg border border-red-100">
+                          <div className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Life Insurance Details</div>
+                          {policyDetails?.premiumAmount && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Premium Amount:</span>
+                              <span className="font-semibold text-red-600">{formatCurrency(policyDetails.premiumAmount)}</span>
+                            </div>
+                          )}
+                          {policyDetails?.paymentFrequency && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Payment Frequency:</span>
+                              <span className="font-semibold text-gray-900">{policyDetails.paymentFrequency}</span>
+                            </div>
+                          )}
+                          {policyDetails?.sumAssured && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Sum Assured:</span>
+                              <span className="font-semibold text-gray-900">{formatCurrency(policyDetails.sumAssured)}</span>
+                            </div>
+                          )}
+                          {plan.policyTerm && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Policy Term:</span>
+                              <span className="font-semibold text-gray-900">{plan.policyTerm}</span>
+                            </div>
+                          )}
+                          {plan.estimatedMaturity && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Estimated Maturity:</span>
+                              <span className="font-semibold text-gray-900">{formatCurrency(plan.estimatedMaturity)}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        /* Quick Stats for Non-Life Insurance */
+                        <div className="space-y-2 mb-4">
+                          {sumAssured && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500">Coverage:</span>
+                              <span className="font-semibold text-gray-900">{formatCurrency(sumAssured)}</span>
+                            </div>
+                          )}
+                          {premium && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-500">Premium:</span>
+                              <span className="font-semibold text-red-600">{formatCurrency(premium)}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
                       
                       {/* Action Buttons */}
                       <div className="flex flex-col gap-2 mt-4">

@@ -187,45 +187,90 @@ export default function InsurancePlanDetails() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-gray-50 border-b">
-              {policyDetails?.sumAssured && (
-                <div>
-                  <div className="text-xs text-gray-500 uppercase font-semibold">Sum Assured</div>
-                  <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-                    {formatCurrency(policyDetails.sumAssured)}
+            {plan.policyType === 'Life' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 p-6 bg-gradient-to-br from-red-50 to-orange-50 border-b">
+                {policyDetails?.premiumAmount && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Premium Amount</div>
+                    <div className="text-base sm:text-lg font-bold text-red-600 mt-1">
+                      {formatCurrency(policyDetails.premiumAmount)}
+                    </div>
                   </div>
-                </div>
-              )}
-              {policyDetails?.premiumAmount && (
-                <div>
-                  <div className="text-xs text-gray-500 uppercase font-semibold">Premium</div>
-                  <div className="text-base sm:text-lg font-bold text-red-600 mt-1">
-                    {formatCurrency(policyDetails.premiumAmount)}
+                )}
+                {policyDetails?.paymentFrequency && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Payment Frequency</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {policyDetails.paymentFrequency}
+                    </div>
                   </div>
-                  {policyDetails.paymentFrequency && (
-                    <div className="text-xs text-gray-500 mt-0.5">({policyDetails.paymentFrequency})</div>
-                  )}
-                </div>
-              )}
-              {policyDetails?.annualCoverageLimit && (
-                <div>
-                  <div className="text-xs text-gray-500 uppercase font-semibold">Coverage Limit</div>
-                  <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
-                    {formatCurrency(policyDetails.annualCoverageLimit)}
+                )}
+                {policyDetails?.sumAssured && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Sum Assured</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {formatCurrency(policyDetails.sumAssured)}
+                    </div>
                   </div>
-                </div>
-              )}
-              <div>
-                <div className="text-xs text-gray-500 uppercase font-semibold">Status</div>
-                <div className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
-                  plan.planStatus === 'Active' ? 'bg-green-100 text-green-800' : 
-                  plan.planStatus === 'Limited' ? 'bg-yellow-100 text-yellow-800' : 
-                  'bg-gray-100 text-gray-800'
-                }`}>
-                  {plan.planStatus || 'Active'}
+                )}
+                {plan.policyTerm && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Policy Term</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {plan.policyTerm}
+                    </div>
+                  </div>
+                )}
+                {plan.estimatedMaturity && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Estimated Maturity</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {formatCurrency(plan.estimatedMaturity)}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-gray-50 border-b">
+                {policyDetails?.sumAssured && (
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase font-semibold">Sum Assured</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {formatCurrency(policyDetails.sumAssured)}
+                    </div>
+                  </div>
+                )}
+                {policyDetails?.premiumAmount && (
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase font-semibold">Premium</div>
+                    <div className="text-base sm:text-lg font-bold text-red-600 mt-1">
+                      {formatCurrency(policyDetails.premiumAmount)}
+                    </div>
+                    {policyDetails.paymentFrequency && (
+                      <div className="text-xs text-gray-500 mt-0.5">({policyDetails.paymentFrequency})</div>
+                    )}
+                  </div>
+                )}
+                {policyDetails?.annualCoverageLimit && (
+                  <div>
+                    <div className="text-xs text-gray-500 uppercase font-semibold">Coverage Limit</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {formatCurrency(policyDetails.annualCoverageLimit)}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <div className="text-xs text-gray-500 uppercase font-semibold">Status</div>
+                  <div className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                    plan.planStatus === 'Active' ? 'bg-green-100 text-green-800' : 
+                    plan.planStatus === 'Limited' ? 'bg-yellow-100 text-yellow-800' : 
+                    'bg-gray-100 text-gray-800'
+                  }`}>
+                    {plan.planStatus || 'Active'}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Main Content */}
