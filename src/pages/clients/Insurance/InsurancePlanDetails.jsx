@@ -374,7 +374,7 @@ export default function InsurancePlanDetails() {
                     Description
                   </h3>
                   <div 
-                    className="prose prose-sm max-w-none text-gray-700"
+                    className="prose prose-sm max-w-none text-gray-700 [&_p]:mb-3 [&_ul]:list-disc [&_ul]:ml-6 [&_ol]:list-decimal [&_ol]:ml-6 [&_li]:mb-1 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mb-2 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mb-2 [&_strong]:font-bold [&_em]:italic [&_a]:text-blue-600 [&_a]:underline [&_img]:max-w-full [&_img]:rounded-lg [&_img]:my-2"
                     dangerouslySetInnerHTML={{ __html: plan.description }}
                   />
                 </div>
