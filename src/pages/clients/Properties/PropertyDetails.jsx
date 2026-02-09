@@ -205,11 +205,37 @@ const PropertyDetails = () => {
                                     </div>
                                 </div>
                                 <div className="sm:text-right">
-                                    <div className="text-2xl sm:text-3xl font-black text-red-600">
-                                        {typeof property.price === "number" 
-                                            ? `PKR ${property.price.toLocaleString()}` 
-                                            : property.price || "Contact for Price"}
-                                    </div>
+                                    {/* Price Display - Different for Individual vs Project */}
+                                    {property.type === "Individual" && property.transaction?.price && property.transaction.price > 0 ? (
+                                        <div>
+                                            <div className="text-2xl sm:text-3xl font-black text-red-600">
+                                                PKR {property.transaction.price.toLocaleString()}
+                                            </div>
+                                            {property.transaction?.priceRange && (
+                                                <div className="text-sm text-gray-600 mt-1">
+                                                    {property.transaction.priceRange}
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : property.type === "Project" && property.transaction?.priceRange ? (
+                                        <div>
+                                            <div className="text-2xl sm:text-3xl font-black text-red-600">
+                                                {property.transaction.priceRange}
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-1">Price Range</div>
+                                        </div>
+                                    ) : property.transaction?.monthlyRent ? (
+                                        <div>
+                                            <div className="text-2xl sm:text-3xl font-black text-red-600">
+                                                PKR {property.transaction.monthlyRent.toLocaleString()}
+                                            </div>
+                                            <div className="text-xs text-gray-500 mt-1">per month</div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-2xl sm:text-3xl font-black text-red-600">
+                                            Contact for Price
+                                        </div>
+                                    )}
                                     {property.propertyId && (
                                         <p className="text-xs text-gray-500 mt-1">ID: {property.propertyId}</p>
                                     )}
@@ -312,6 +338,141 @@ const PropertyDetails = () => {
                             </div>
                         )}
 
+                        {/* Transaction Details Section */}
+                        {property.transaction && (
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <h2 className="text-lg sm:text-xl font-black text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    Pricing & Transaction Details
+                                </h2>
+                                <div className="space-y-4">
+                                    {/* Transaction Type */}
+                                    {property.transaction.type && (
+                                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                            <span className="text-sm font-semibold text-gray-700">Transaction Type</span>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                                property.transaction.type === 'Sale' ? 'bg-green-100 text-green-800' :
+                                                property.transaction.type === 'Rent' ? 'bg-blue-100 text-blue-800' :
+                                                'bg-purple-100 text-purple-800'
+                                            }`}>
+                                                {property.transaction.type}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    {/* Sale Details */}
+                                    {property.transaction.type === 'Sale' && (
+                                        <>
+                                            {property.transaction.price && property.transaction.price > 0 && (
+                                                <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                                                    <div className="text-xs text-red-700 mb-1 font-semibold">Price</div>
+                                                    <div className="text-2xl font-black text-red-600">
+                                                        PKR {property.transaction.price.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.priceRange && (
+                                                <div className="p-4 bg-red-50 rounded-lg border border-red-100">
+                                                    <div className="text-xs text-red-700 mb-1 font-semibold">Price Range</div>
+                                                    <div className="text-xl font-bold text-red-600">
+                                                        {property.transaction.priceRange}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    )}
+
+                                    {/* Rent Details */}
+                                    {property.transaction.type === 'Rent' && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {property.transaction.monthlyRent && property.transaction.monthlyRent > 0 && (
+                                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                                    <div className="text-xs text-blue-700 mb-1 font-semibold">Monthly Rent</div>
+                                                    <div className="text-xl font-bold text-blue-900">
+                                                        PKR {property.transaction.monthlyRent.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.advanceAmount && property.transaction.advanceAmount > 0 && (
+                                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                                                    <div className="text-xs text-blue-700 mb-1 font-semibold">Advance Amount</div>
+                                                    <div className="text-xl font-bold text-blue-900">
+                                                        PKR {property.transaction.advanceAmount.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.contractDuration && (
+                                                <div className="p-4 bg-blue-50 rounded-lg border border-blue-100 sm:col-span-2">
+                                                    <div className="text-xs text-blue-700 mb-1 font-semibold">Contract Duration</div>
+                                                    <div className="text-base font-semibold text-blue-900">
+                                                        {property.transaction.contractDuration}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Installment Details */}
+                                    {property.transaction.type === 'Installment' && (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {property.transaction.bookingAmount && property.transaction.bookingAmount > 0 && (
+                                                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                                    <div className="text-xs text-green-700 mb-1 font-semibold">Booking Amount</div>
+                                                    <div className="text-xl font-bold text-green-900">
+                                                        PKR {property.transaction.bookingAmount.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.downPayment && property.transaction.downPayment > 0 && (
+                                                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                                    <div className="text-xs text-green-700 mb-1 font-semibold">Down Payment</div>
+                                                    <div className="text-xl font-bold text-green-900">
+                                                        PKR {property.transaction.downPayment.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.monthlyInstallment && property.transaction.monthlyInstallment > 0 && (
+                                                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                                    <div className="text-xs text-green-700 mb-1 font-semibold">Monthly Installment</div>
+                                                    <div className="text-xl font-bold text-green-900">
+                                                        PKR {property.transaction.monthlyInstallment.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.tenure && (
+                                                <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                                                    <div className="text-xs text-green-700 mb-1 font-semibold">Tenure</div>
+                                                    <div className="text-base font-semibold text-green-900">
+                                                        {property.transaction.tenure}
+                                                    </div>
+                                                </div>
+                                            )}
+                                            {property.transaction.totalPayable && property.transaction.totalPayable > 0 && (
+                                                <div className="p-4 bg-purple-50 rounded-lg border border-purple-100 sm:col-span-2">
+                                                    <div className="text-xs text-purple-700 mb-1 font-semibold">Total Payable</div>
+                                                    <div className="text-xl font-bold text-purple-900">
+                                                        PKR {property.transaction.totalPayable.toLocaleString()}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {/* Additional Info */}
+                                    {property.transaction.additionalInfo && (
+                                        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                                            <div className="text-xs text-gray-700 mb-1 font-semibold">Additional Information</div>
+                                            <div className="text-sm text-gray-900 whitespace-pre-line">
+                                                {property.transaction.additionalInfo}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Units & Pricing (for Projects) */}
                         {property.type === "Project" && property.units && property.units.length > 0 && (
                             <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
@@ -320,22 +481,55 @@ const PropertyDetails = () => {
                                     {property.units.map((unit, idx) => (
                                         <div key={idx} className="border-2 border-gray-100 rounded-xl p-4 hover:border-red-200 transition-colors">
                                             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                                                <div>
-                                                    <h3 className="font-bold text-gray-900">{unit.offeringType}</h3>
-                                                    <p className="text-sm text-gray-600 mt-1">
-                                                        {unit.unitSize} {unit.unitSizeUnit} • {unit.numberOfUnits} units available
-                                                    </p>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                                                            <span className="text-white text-sm font-bold">{idx + 1}</span>
+                                                        </div>
+                                                        <h3 className="font-bold text-gray-900">{unit.offeringType || `Unit ${idx + 1}`}</h3>
+                                                    </div>
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-600">
+                                                        {unit.unitSize && (
+                                                            <div>
+                                                                <span className="font-semibold">Size:</span> {unit.unitSize} {unit.unitSizeUnit || ''}
+                                                            </div>
+                                                        )}
+                                                        {unit.numberOfUnits && (
+                                                            <div>
+                                                                <span className="font-semibold">Available:</span> {unit.numberOfUnits} units
+                                                            </div>
+                                                        )}
+                                                        {unit.transaction?.type && (
+                                                            <div>
+                                                                <span className="font-semibold">Type:</span> {unit.transaction.type}
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    {unit.transaction?.price && (
-                                                        <div className="text-xl font-bold text-red-600">
-                                                            PKR {parseInt(unit.transaction.price).toLocaleString()}
+                                                <div className="text-right md:text-left md:min-w-[200px]">
+                                                    {unit.transaction?.priceRange ? (
+                                                        <div>
+                                                            <div className="text-xl font-bold text-red-600">
+                                                                {unit.transaction.priceRange}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1">Price Range</div>
                                                         </div>
-                                                    )}
-                                                    {unit.transaction?.priceRange && (
-                                                        <div className="text-sm text-gray-600 mt-1">
-                                                            {unit.transaction.priceRange}
+                                                    ) : unit.transaction?.monthlyRent ? (
+                                                        <div>
+                                                            <div className="text-xl font-bold text-red-600">
+                                                                PKR {unit.transaction.monthlyRent.toLocaleString()}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1">per month</div>
                                                         </div>
+                                                    ) : unit.transaction?.bookingAmount ? (
+                                                        <div>
+                                                            <div className="text-xl font-bold text-red-600">
+                                                                PKR {unit.transaction.bookingAmount.toLocaleString()}
+                                                            </div>
+                                                            <div className="text-xs text-gray-500 mt-1">Booking Amount</div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-sm text-gray-500">Contact for Price</div>
                                                     )}
                                                 </div>
                                             </div>

@@ -371,6 +371,7 @@ export default function InsuranceInfo() {
                 const premium = policyDetails?.premiumAmount || policyDetails?.annualPremium || policyDetails?.contributionAmount;
                 const sumAssured = policyDetails?.sumAssured || policyDetails?.annualCoverageLimit || policyDetails?.sumCovered;
                 const isLifeInsurance = plan.policyType === 'Life';
+                const isMotorInsurance = plan.policyType === 'Motor';
                 
                 return (
                   <div
@@ -462,6 +463,66 @@ export default function InsuranceInfo() {
                             <div className="flex justify-between text-sm">
                               <span className="text-gray-600">Estimated Maturity:</span>
                               <span className="font-semibold text-gray-900">{formatCurrency(plan.estimatedMaturity)}</span>
+                            </div>
+                          )}
+                        </div>
+                      ) : isMotorInsurance ? (
+                        /* Motor Insurance Static Fields */
+                        <div className="space-y-2 mb-4 bg-gradient-to-br from-purple-50 to-indigo-50 p-3 rounded-lg border border-purple-100">
+                          <div className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Motor Insurance Details</div>
+                          {policyDetails?.motorType && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Vehicle Type:</span>
+                              <span className="font-semibold text-gray-900">{policyDetails.motorType}</span>
+                            </div>
+                          )}
+                          {policyDetails?.coverageType && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Coverage Type:</span>
+                              <span className="font-semibold text-gray-900">{policyDetails.coverageType}</span>
+                            </div>
+                          )}
+                          {(policyDetails?.vehicleValueRange?.min || policyDetails?.vehicleValueRangeMin) && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Vehicle Value:</span>
+                              <span className="font-semibold text-gray-900">
+                                {formatCurrency(policyDetails.vehicleValueRange?.min || policyDetails.vehicleValueRangeMin)} - {formatCurrency(policyDetails.vehicleValueRange?.max || policyDetails.vehicleValueRangeMax)}
+                              </span>
+                            </div>
+                          )}
+                          {policyDetails?.annualPremium && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Annual Premium:</span>
+                              <span className="font-semibold text-gray-900">{formatCurrency(policyDetails.annualPremium)}</span>
+                            </div>
+                          )}
+                          
+                          {/* Coverage Checkmarks */}
+                          {(plan.motorInsurancePlan?.thirdPartyCoverage?.length > 0 || 
+                            plan.motorInsurancePlan?.totalLossCoverage?.length > 0 || 
+                            plan.motorInsurancePlan?.ownDamageCoverage?.length > 0) && (
+                            <div className="mt-3 pt-3 border-t border-purple-200">
+                              <div className="text-xs font-semibold text-gray-700 mb-2">Coverage Includes:</div>
+                              <div className="space-y-1">
+                                {plan.motorInsurancePlan?.thirdPartyCoverage?.length > 0 && (
+                                  <div className="flex items-center gap-1 text-xs">
+                                    <span className="text-green-600">✓</span>
+                                    <span className="text-gray-600">Third Party ({plan.motorInsurancePlan.thirdPartyCoverage.length} items)</span>
+                                  </div>
+                                )}
+                                {plan.motorInsurancePlan?.totalLossCoverage?.length > 0 && (
+                                  <div className="flex items-center gap-1 text-xs">
+                                    <span className="text-green-600">✓</span>
+                                    <span className="text-gray-600">Total Loss ({plan.motorInsurancePlan.totalLossCoverage.length} items)</span>
+                                  </div>
+                                )}
+                                {plan.motorInsurancePlan?.ownDamageCoverage?.length > 0 && (
+                                  <div className="flex items-center gap-1 text-xs">
+                                    <span className="text-green-600">✓</span>
+                                    <span className="text-gray-600">Own Damage ({plan.motorInsurancePlan.ownDamageCoverage.length} items)</span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           )}
                         </div>

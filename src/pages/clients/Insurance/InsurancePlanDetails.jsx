@@ -230,6 +230,41 @@ export default function InsurancePlanDetails() {
                   </div>
                 )}
               </div>
+            ) : plan.policyType === 'Motor' ? (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-gradient-to-br from-purple-50 to-indigo-50 border-b">
+                {policyDetails?.motorType && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Vehicle Type</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {policyDetails.motorType}
+                    </div>
+                  </div>
+                )}
+                {policyDetails?.coverageType && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Coverage Type</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {policyDetails.coverageType}
+                    </div>
+                  </div>
+                )}
+                {(policyDetails?.vehicleValueRange?.min || policyDetails?.vehicleValueRangeMin) && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Vehicle Value</div>
+                    <div className="text-base sm:text-lg font-bold text-gray-900 mt-1">
+                      {formatCurrency(policyDetails.vehicleValueRange?.min || policyDetails.vehicleValueRangeMin)} - {formatCurrency(policyDetails.vehicleValueRange?.max || policyDetails.vehicleValueRangeMax)}
+                    </div>
+                  </div>
+                )}
+                {policyDetails?.annualPremium && (
+                  <div>
+                    <div className="text-xs text-gray-600 uppercase font-semibold">Annual Premium</div>
+                    <div className="text-base sm:text-lg font-bold text-purple-600 mt-1">
+                      {formatCurrency(policyDetails.annualPremium)}
+                    </div>
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6 bg-gray-50 border-b">
                 {policyDetails?.sumAssured && (
@@ -425,8 +460,163 @@ export default function InsurancePlanDetails() {
                 </div>
               )}
 
+              {/* Motor Insurance Plan Data */}
+              {plan.policyType === 'Motor' && plan.motorInsurancePlan && (
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Motor Insurance Plan Details
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    {plan.motorInsurancePlan.motorType && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Vehicle Type</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {plan.motorInsurancePlan.motorType}
+                        </div>
+                      </div>
+                    )}
+                    {plan.motorInsurancePlan.coverageType && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Coverage Type</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {plan.motorInsurancePlan.coverageType}
+                        </div>
+                      </div>
+                    )}
+                    {(plan.motorInsurancePlan.vehicleValueRange?.min || plan.motorInsurancePlan.vehicleValueRangeMin) && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Vehicle Value Range</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {formatCurrency(plan.motorInsurancePlan.vehicleValueRange?.min || plan.motorInsurancePlan.vehicleValueRangeMin)} - {formatCurrency(plan.motorInsurancePlan.vehicleValueRange?.max || plan.motorInsurancePlan.vehicleValueRangeMax)}
+                        </div>
+                      </div>
+                    )}
+                    {plan.motorInsurancePlan.annualPremium && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Annual Premium</div>
+                        <div className="text-base font-bold text-purple-600 mt-1">
+                          {formatCurrency(plan.motorInsurancePlan.annualPremium)}
+                        </div>
+                      </div>
+                    )}
+                    {plan.motorInsurancePlan.theftCoverage !== undefined && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Theft Coverage</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {plan.motorInsurancePlan.theftCoverage ? 'Yes' : 'No'}
+                        </div>
+                      </div>
+                    )}
+                    {plan.motorInsurancePlan.floodCoverage !== undefined && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Flood Coverage</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {plan.motorInsurancePlan.floodCoverage ? 'Yes' : 'No'}
+                        </div>
+                      </div>
+                    )}
+                    {plan.motorInsurancePlan.naturalCalamities !== undefined && (
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="text-xs text-gray-500 uppercase font-semibold">Natural Calamities</div>
+                        <div className="text-base font-bold text-gray-900 mt-1">
+                          {plan.motorInsurancePlan.naturalCalamities ? 'Yes' : 'No'}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Motor Insurance Coverage Cards */}
+              {plan.policyType === 'Motor' && plan.motorInsurancePlan && (
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Coverage Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Third Party Coverage Card */}
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border-2 border-purple-200 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                        </div>
+                        <h4 className="text-xl font-bold text-gray-900">Third Party</h4>
+                      </div>
+                      {plan.motorInsurancePlan.thirdPartyCoverage && plan.motorInsurancePlan.thirdPartyCoverage.length > 0 ? (
+                        <ul className="space-y-2">
+                          {plan.motorInsurancePlan.thirdPartyCoverage.map((coverage, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                              <span className="text-purple-600 mt-0.5">•</span>
+                              <span>{coverage}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No third party coverage selected</p>
+                      )}
+                    </div>
+
+                    {/* Total Loss Coverage Card */}
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border-2 border-blue-200 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        </div>
+                        <h4 className="text-xl font-bold text-gray-900">Total Loss</h4>
+                      </div>
+                      {plan.motorInsurancePlan.totalLossCoverage && plan.motorInsurancePlan.totalLossCoverage.length > 0 ? (
+                        <ul className="space-y-2">
+                          {plan.motorInsurancePlan.totalLossCoverage.map((coverage, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                              <span className="text-blue-600 mt-0.5">•</span>
+                              <span>{coverage}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No total loss coverage selected</p>
+                      )}
+                    </div>
+
+                    {/* Own Damage Coverage Card */}
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6 border-2 border-green-200 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          </svg>
+                        </div>
+                        <h4 className="text-xl font-bold text-gray-900">Own Damage</h4>
+                      </div>
+                      {plan.motorInsurancePlan.ownDamageCoverage && plan.motorInsurancePlan.ownDamageCoverage.length > 0 ? (
+                        <ul className="space-y-2">
+                          {plan.motorInsurancePlan.ownDamageCoverage.map((coverage, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm text-gray-700">
+                              <span className="text-green-600 mt-0.5">•</span>
+                              <span>{coverage}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No own damage coverage selected</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Policy-Specific Details */}
-              {policyDetails && (
+              {policyDetails && plan.policyType !== 'Motor' && (
                 <div className="bg-white rounded-xl shadow-md p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
