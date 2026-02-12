@@ -1,11 +1,11 @@
 // src/pages/BlogsPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import SEO from "../../../components/SEO";
 
-const PAGE_SIZE = 6;
-const BRAND = "rgb(183,36,42)";
+const PAGE_SIZE = 9;
 
 function stripHtml(html = "") {
   try {
@@ -42,8 +42,6 @@ export default function BlogsPage() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [page, setPage] = useState(1);
 
-  const [openBlog, setOpenBlog] = useState(null);
-
   useEffect(() => {
     let mounted = true;
 
@@ -51,7 +49,7 @@ export default function BlogsPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`${apiUrl}/blog/public`, {
+        const res = await fetch(`${apiUrl}/getPublishedBlogs?limit=100&page=1`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -66,7 +64,7 @@ export default function BlogsPage() {
             setBlogs(Array.isArray(data) ? data : []);
             setTotalBlog(
               Number(
-                payload?.totalBlog ??
+                payload?.pagination?.total ??
                   (Array.isArray(data) ? data.length : 0)
               )
             );
@@ -121,14 +119,13 @@ export default function BlogsPage() {
     (page - 1) * PAGE_SIZE,
     page * PAGE_SIZE
   );
+
   if (loading) {
-    return (
-      <LoadingPage />
-    );
+    return <LoadingPage />;
   }
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 via-white to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <SEO
         title="Blog - Property, Insurance & Loan Tips | Madadgaar Expert Partner"
         description="Stay updated with the latest news, expert tips, and insights about property solutions, insurance, loans, and installment plans in Pakistan. Read our comprehensive guides and industry updates."
@@ -136,211 +133,255 @@ export default function BlogsPage() {
         canonicalUrl="https://madadgaar.com.pk/blog"
         structuredData={structuredData}
       />
-      {/* Hero / heading section */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-[rgb(183,36,42)] via-rose-500 to-orange-400 text-white">
-        <div className="container-content max-w-6xl py-10 lg:py-14 relative z-10">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            <div>
-              <p className="inline-flex items-center text-xs uppercase tracking-[0.2em] bg-white/10 px-3 py-1 rounded-full mb-3 backdrop-blur">
-                <span className="w-2 h-2 rounded-full bg-lime-300 mr-2" />
-                Madadgaar Insights
-              </p>
-              <h1 className="text-3xl lg:text-4xl font-extrabold leading-tight">
-                Insights, Guides & Updates
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm lg:text-base text-white/90">
-                Learn about property, insurance, loans and installment plans —
-                curated by Madadgaar Expert Partner to help you make smarter
-                financial decisions.
-              </p>
+
+      {/* Modern Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-red-600 via-rose-500 to-orange-500 text-white">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        </div>
+
+        <div className="relative container-content max-w-7xl py-16 sm:py-20 lg:py-24">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full mb-6 border border-white/30">
+              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+              <span className="text-sm font-semibold tracking-wide text-white">Latest Insights</span>
             </div>
 
-            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur border border-white/20 w-full lg:w-80">
-              <p className="text-xs uppercase tracking-wide text-white/70 mb-2">
-                Blog overview
-              </p>
-              <p className="text-3xl font-bold">
-                {totalBlog || blogs.length}
-                <span className="text-sm font-medium ml-1">articles</span>
-              </p>
-              <p className="mt-1 text-xs text-white/80">
-                Use filters below to quickly find relevant content.
-              </p>
-            </div>
-          </div>
+            {/* Main Heading */}
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-6 leading-tight text-white">
+              Discover Expert
+              <span className="block text-yellow-200">
+                Insights & Guides
+              </span>
+            </h1>
 
-          {/* search + filters */}
-          <div className="mt-8 bg-white/10 rounded-2xl p-3 lg:p-4 backdrop-blur border border-white/20">
-            <div className="flex flex-col lg:flex-row gap-3 lg:gap-4 items-start lg:items-center justify-between">
-              <div className="w-full lg:w-1/2 flex items-center gap-2 bg-white/90 rounded-xl px-3 py-2 shadow-sm">
-                <svg
-                  className="w-4 h-4 text-gray-400"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <circle cx="11" cy="11" r="7" strokeWidth="2" />
-                  <line
-                    x1="16"
-                    y1="16"
-                    x2="21"
-                    y2="21"
-                    strokeWidth="2"
-                  />
-                </svg>
-                <input
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
-                    setPage(1);
-                  }}
-                  placeholder="Search articles by title or content…"
-                  className="w-full bg-transparent outline-none text-sm text-gray-700 placeholder:text-gray-400"
-                />
+            {/* Description */}
+            <p className="text-lg sm:text-xl text-white/95 mb-8 max-w-2xl mx-auto leading-relaxed">
+              Stay ahead with the latest news, tips, and expert insights about property, insurance, loans, and installment plans in Pakistan.
+            </p>
+
+            {/* Stats */}
+            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 mt-10">
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-black mb-1 text-white">{totalBlog || blogs.length}</div>
+                <div className="text-sm text-white/90">Articles</div>
               </div>
-
-              <div className="w-full lg:w-1/2 flex flex-wrap gap-2 justify-start lg:justify-end">
-                <button
-                  onClick={() => {
-                    setSelectedCategory("");
-                    setPage(1);
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-xs border transition ${
-                    !selectedCategory
-                      ? "bg-white text-[rgb(183,36,42)] border-white shadow-sm"
-                      : "bg-white/10 text-white border-white/20 hover:bg-white/20"
-                  }`}
-                >
-                  All
-                </button>
-                {categories.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => {
-                      setSelectedCategory(c);
-                      setPage(1);
-                    }}
-                    className={`px-3 py-1.5 rounded-full text-xs border capitalize transition ${
-                      selectedCategory === c
-                        ? "bg-white text-[rgb(183,36,42)] border-white shadow-sm"
-                        : "bg-white/10 text-white border-white/30 hover:bg-white/20"
-                    }`}
-                  >
-                    {c}
-                  </button>
-                ))}
-                {(search || selectedCategory) && (
-                  <button
-                    onClick={() => {
-                      setSearch("");
-                      setSelectedCategory("");
-                      setPage(1);
-                    }}
-                    className="px-3 py-1.5 rounded-full text-xs bg-transparent text-white/80 border border-white/30 hover:bg-white/10"
-                  >
-                    Reset
-                  </button>
-                )}
+              <div className="w-px h-12 bg-white/30"></div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-black mb-1 text-white">{categories.length}</div>
+                <div className="text-sm text-white/90">Categories</div>
+              </div>
+              <div className="w-px h-12 bg-white/30"></div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-black mb-1 text-white">24/7</div>
+                <div className="text-sm text-white/90">Updated</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* gradient decoration */}
-        <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-black/10 rounded-full blur-3xl" />
+        {/* Wave Separator */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-12 sm:h-20">
+            <path d="M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="rgb(249, 250, 251)"/>
+          </svg>
+        </div>
       </section>
 
-      {/* content area */}
-      <main className="container-content max-w-6xl py-10">
-        {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-gray-500">
-            <div className="w-10 h-10 rounded-full border-2 border-gray-300 border-t-[rgb(183,36,42)] animate-spin mb-3" />
-            <p className="text-sm">Loading articles…</p>
+      {/* Modern Search & Filter Section */}
+      <section className="container-content max-w-7xl -mt-8 sm:-mt-12 relative z-10">
+        <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 sm:p-8">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300"></div>
+              <div className="relative flex items-center">
+                <div className="absolute left-4 text-gray-400 group-focus-within:text-red-500 transition-colors">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => {
+                    setSearch(e.target.value);
+                    setPage(1);
+                  }}
+                  placeholder="Search articles, topics, or keywords..."
+                  className="w-full pl-14 pr-4 py-4 text-base text-gray-900 border-2 border-gray-200 rounded-xl focus:border-red-500 focus:ring-4 focus:ring-red-500/20 outline-none transition-all bg-gray-50 focus:bg-white placeholder:text-gray-400"
+                />
+              </div>
+            </div>
           </div>
-        ) : error ? (
-          <div className="py-16 text-center">
-            <p className="text-red-600 text-sm mb-3">{error}</p>
+
+          {/* Category Pills */}
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm font-semibold text-gray-700 mr-2">Filter by:</span>
+            <button
+              onClick={() => {
+                setSelectedCategory("");
+                setPage(1);
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 ${
+                !selectedCategory
+                  ? "bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg shadow-red-500/30"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              All Articles
+            </button>
+            {categories.map((c) => (
+              <button
+                key={c}
+                onClick={() => {
+                  setSelectedCategory(c);
+                  setPage(1);
+                }}
+                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 transform hover:scale-105 capitalize ${
+                  selectedCategory === c
+                    ? "bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg shadow-red-500/30"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {c}
+              </button>
+            ))}
+            {(search || selectedCategory) && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setSelectedCategory("");
+                  setPage(1);
+                }}
+                className="ml-auto px-5 py-2.5 rounded-full text-sm font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all duration-300 transform hover:scale-105"
+              >
+                ✕ Clear All
+              </button>
+            )}
+          </div>
+
+          {/* Results Info */}
+          <div className="mt-6 pt-6 border-t border-gray-200 flex items-center justify-between">
+            <div className="text-sm text-gray-700">
+              Found <span className="font-bold text-gray-900">{filtered.length}</span> of <span className="font-bold text-gray-900">{totalBlog}</span> articles
+            </div>
+            {filtered.length > 0 && (
+              <div className="text-sm text-gray-700">
+                Page <span className="font-bold text-gray-900">{page}</span> of <span className="font-bold text-gray-900">{totalPages}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Modern Blog Grid */}
+      <main className="container-content max-w-7xl py-8 sm:py-12">
+        {error ? (
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <p className="text-red-600 font-semibold mb-3 text-lg">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+              className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105"
             >
-              Reload
+              Reload Page
             </button>
           </div>
         ) : filtered.length === 0 ? (
-          <div className="py-20 text-center text-gray-500">
-            No blog posts match your filters.
+          <div className="text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
+              <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">No articles found</h3>
+            <p className="text-gray-600 mb-6">Try adjusting your search or filters</p>
+            <button
+              onClick={() => {
+                setSearch("");
+                setSelectedCategory("");
+                setPage(1);
+              }}
+              className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+            >
+              Clear Filters
+            </button>
           </div>
         ) : (
           <>
-            {/* cards grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {pageData.map((b) => {
-                const excerpt = stripHtml(b.excerpt || b.content || b.description || b.descripition || "").slice(
-                  0,
-                  200
-                );
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+              {pageData.map((b, index) => {
+                const excerpt = stripHtml(b.excerpt || b.content || "").slice(0, 120);
                 return (
                   <article
                     key={b._id}
-                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col overflow-hidden"
+                    className="group bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden border border-gray-200"
                   >
-                    {/* top accent bar */}
-                    <div
-                      className="h-1 w-full"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, rgba(183,36,42,0.95), rgba(244,114,182,0.85))",
-                      }}
-                    />
-
-                    <div className="p-5 flex flex-col flex-1">
-                      <div className="flex items-center justify-between gap-3 mb-3">
-                        <span className="inline-flex items-center text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-rose-50 text-[rgb(183,36,42)] border border-rose-100">
+                    {/* Image Container */}
+                    <div className="relative h-56 w-full overflow-hidden bg-gray-100">
+                      {b.featuredImage ? (
+                        <img
+                          src={b.featuredImage}
+                          alt={b.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
+                          <svg className="w-16 h-16 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                          </svg>
+                        </div>
+                      )}
+                      
+                      {/* Category Badge on Image */}
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1.5 bg-white text-red-600 text-xs font-bold rounded-full shadow-md">
                           {b.category || "General"}
-                        </span>
-                        <span className="text-[11px] text-gray-400">
-                          {b.blogId || "Blog"}
                         </span>
                       </div>
 
-                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[rgb(183,36,42)]">
+                      {/* Reading Time Badge */}
+                      {b.readingTime && (
+                        <div className="absolute top-4 right-4">
+                          <span className="px-3 py-1.5 bg-black/60 text-white text-xs font-semibold rounded-full">
+                            {b.readingTime} min
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Content */}
+                    <div className="p-6 flex flex-col flex-1">
+                      {/* Title */}
+                      <h3 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2">
                         {b.title}
                       </h3>
 
-                      <p className="text-sm text-gray-600 mb-4 line-clamp-4">
+                      {/* Excerpt */}
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-1 leading-relaxed">
                         {excerpt}
-                        {excerpt.length >= 200 ? "…" : ""}
+                        {excerpt.length >= 120 ? "…" : ""}
                       </p>
 
-                      <div className="mt-auto flex items-center justify-between">
-                        <button
-                          onClick={() => setOpenBlog(b)}
-                          className="inline-flex items-center text-xs font-medium px-3 py-1.5 rounded-full bg-gray-50 text-gray-800 border border-gray-200 group-hover:bg-[rgb(183,36,42)] group-hover:text-white group-hover:border-[rgb(183,36,42)] transition"
+                      {/* Footer with Read More */}
+                      <div className="mt-auto pt-4 border-t border-gray-100">
+                        <Link
+                          to={`/blog/${b.slug || b._id}`}
+                          className="inline-flex items-center gap-2 text-red-600 font-semibold text-sm hover:text-red-700"
                         >
-                          Read more
-                          <svg
-                            className="w-3 h-3 ml-1"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                          >
-                            <path
-                              d="M9 5l7 7-7 7"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
+                          <span>Read Article</span>
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                           </svg>
-                        </button>
-
-                        <span className="text-[11px] text-gray-400 text-right">
-                          {/* placeholder for createdAt or author if you expose it later */}
-                          Madadgaar
-                        </span>
+                        </Link>
                       </div>
                     </div>
                   </article>
@@ -348,116 +389,36 @@ export default function BlogsPage() {
               })}
             </div>
 
-            {/* pagination */}
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-gray-500">
-                Showing{" "}
-                <span className="font-semibold">
-                  {(page - 1) * PAGE_SIZE + 1}
-                </span>{" "}
-                –{" "}
-                <span className="font-semibold">
-                  {Math.min(page * PAGE_SIZE, filtered.length)}
-                </span>{" "}
-                of{" "}
-                <span className="font-semibold">{filtered.length}</span>{" "}
-                articles
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  className="px-3 py-1.5 rounded-full text-xs border bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <div className="px-4 py-1.5 rounded-full text-xs bg-gray-100 text-gray-700 border border-gray-200">
-                  Page {page} / {totalPages}
+            {/* Modern Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="text-sm text-gray-700">
+                  Showing <span className="font-bold text-gray-900">{(page - 1) * PAGE_SIZE + 1}</span> - <span className="font-bold text-gray-900">{Math.min(page * PAGE_SIZE, filtered.length)}</span> of <span className="font-bold text-gray-900">{filtered.length}</span> articles
                 </div>
-                <button
-                  onClick={() =>
-                    setPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={page === totalPages}
-                  className="px-3 py-1.5 rounded-full text-xs border bg-white hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-5 py-2.5 rounded-xl font-semibold border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-red-500 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
+                  >
+                    ← Previous
+                  </button>
+                  <div className="px-6 py-2.5 rounded-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg">
+                    {page} / {totalPages}
+                  </div>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                    className="px-5 py-2.5 rounded-xl font-semibold border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-red-500 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
+                  >
+                    Next →
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
       </main>
-
-      {/* Blog Modal */}
-      {openBlog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setOpenBlog(null)}
-          />
-
-          <div className="relative z-10 max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden">
-            {/* header gradient bar */}
-            <div
-              className="h-1 w-full"
-              style={{
-                background:
-                  "linear-gradient(90deg, rgba(183,36,42,0.96), rgba(248,113,113,0.9))",
-              }}
-            />
-
-            <div className="p-6 md:p-7 max-h-[80vh] overflow-y-auto">
-              <div className="flex items-start justify-between gap-4 mb-4">
-                <div>
-                  <p className="text-[11px] text-gray-400 uppercase tracking-[0.2em] mb-1">
-                    Madadgaar Blog
-                  </p>
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900">
-                    {openBlog.title}
-                  </h2>
-                  {openBlog.category && (
-                    <span className="inline-flex mt-2 text-[11px] px-2 py-1 rounded-full bg-rose-50 text-[rgb(183,36,42)] border border-rose-100">
-                      {openBlog.category}
-                    </span>
-                  )}
-                </div>
-
-                <button
-                  onClick={() => setOpenBlog(null)}
-                  className="shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
-                >
-                  ✕
-                </button>
-              </div>
-
-              <div className="prose prose-sm max-w-none text-gray-800">
-                {/* Make sure backend sanitizes this HTML */}
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      openBlog.content || openBlog.description || openBlog.descripition || "<p>No content</p>",
-                  }}
-                />
-              </div>
-
-              <div className="mt-6 flex items-center justify-between gap-3">
-                <p className="text-[11px] text-gray-400">
-                  Powered by Madadgaar Expert Partner
-                </p>
-                <button
-                  onClick={() => setOpenBlog(null)}
-                  className="px-4 py-2 rounded-full text-xs font-medium text-white shadow-sm"
-                  style={{ background: BRAND }}
-                >
-                  Close article
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

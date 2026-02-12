@@ -14,6 +14,7 @@ import SignupPage from "./Accounts/SignupPages";
 import OtpVerifyPage from "./Accounts/OtpVerifications";
 import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
+import BlogDetail from "./pages/clients/blogs/BlogDetail.jsx";
 import PropertiesPage from "./pages/clients/Properties/properties.jsx";
 import PropertyDetails from "./pages/clients/Properties/PropertyDetails.jsx";
 import ApplyProperty from "./pages/clients/Properties/ApplyProperty.jsx";
@@ -95,6 +96,7 @@ function App() {
             <Route path="/installment/product/CompareProduct/:id" element={<CompareProducts />} />
             {/* blogs */}
             <Route path="/blog" element={<BlogsPage />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
 
             {/* Insurance */}
             <Route path="/insurance" element={<InsurancePage />} />
