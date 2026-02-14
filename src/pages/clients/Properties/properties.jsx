@@ -469,6 +469,13 @@ function PropertiesPage() {
                         compact
                         url={p._id ? `https://madadgaar.com.pk/property/${p._id}` : ""}
                         title={p.title || "Property"}
+                        details={[
+                          [p.city, p.location].filter(Boolean).join(", "),
+                          p.propertyType || null,
+                          p.price ? `${p.transactionType === "Rent" ? "Rent" : "Price"}: ${typeof p.price === "number" ? `PKR ${p.price.toLocaleString()}` : p.price}` : null,
+                          p.areaSize ? `Area: ${p.areaSize} ${p.areaUnit || "sq. ft"}` : null,
+                          (p.bedrooms || p.bathrooms) ? `🛏️ ${p.bedrooms || "—"} Bed • 🚿 ${p.bathrooms || "—"} Bath` : null,
+                        ].filter(Boolean).join("\n")}
                         label="Share this property"
                       />
                     </div>

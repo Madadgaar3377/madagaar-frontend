@@ -6,15 +6,16 @@ const BASE_URL = "https://madadgaar.com.pk";
  * Single "Share" button; on click opens a popup with WhatsApp, Facebook, X, LinkedIn, etc.
  * @param {string} url - Full URL to share
  * @param {string} title - Title for the shared item
+ * @param {string} details - Optional card/summary data (e.g. location, price, beds) - included in share text
  * @param {string} label - Optional label (e.g. "Share this plan") - used in popup
  * @param {boolean} compact - If true, smaller button for use on listing cards next to View
  */
-export default function ShareButtons({ url, title = "", label = "Share with friends", compact = false }) {
+export default function ShareButtons({ url, title = "", details = "", label = "Share with friends", compact = false }) {
   const [open, setOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  // Clean share format: Title + link only (e.g. "Zameen Jade\nhttps://madadgaar.com.pk/property/...")
-  const shareText = title ? `${title}\n${url}` : url;
+  // Share format: Title + optional card details + link (e.g. "Zameen Jade\n3 Bed · DHA Lahore · PKR 5Cr\nhttps://...")
+  const shareText = [title, details, url].filter(Boolean).join("\n");
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,

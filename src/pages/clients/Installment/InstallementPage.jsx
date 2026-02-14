@@ -738,6 +738,14 @@ export default function InstallmentPlans() {
                         compact
                         url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
                         title={plan.productName || "Installment plan"}
+                        details={[
+                          plan.city || "Pakistan",
+                          "Monthly Payment",
+                          `Down: ${currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}`,
+                          `${currency(bestPlan.monthlyInstallment || plan.installment || 0)}/month`,
+                          `Cash Price: ${currency(plan.price)}`,
+                          typeof bestPlan.tenureMonths === "number" ? `${bestPlan.tenureMonths} Months` : null,
+                        ].filter(Boolean).join("\n")}
                         label="Share this plan"
                       />
                     </div>

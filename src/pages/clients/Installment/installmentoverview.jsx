@@ -361,6 +361,22 @@ export default function InstallmentDetail() {
                 <ShareButtons
                   url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
                   title={plan.productName || "Installment plan"}
+                  details={(() => {
+                    const plans = plan.paymentPlans || [];
+                    const best = plans.length ? plans[findBestPlanIndex(plans)] : {};
+                    const down = Number(best.downPayment ?? plan.downpayment ?? 0);
+                    const monthly = Number(best.monthlyInstallment ?? plan.installment ?? 0);
+                    const cash = Number(plan.price ?? 0);
+                    const tenure = best.tenureMonths ?? best.tenure ?? "";
+                    return [
+                      plan.city || "Pakistan",
+                      "Monthly Payment",
+                      `Down: Rs ${down.toLocaleString()}`,
+                      `Rs ${monthly.toLocaleString()}/month`,
+                      `Cash Price: Rs ${cash.toLocaleString()}`,
+                      tenure ? `${tenure} Months` : null,
+                    ].filter(Boolean).join("\n");
+                  })()}
                   label="Share this plan"
                 />
               </div>
