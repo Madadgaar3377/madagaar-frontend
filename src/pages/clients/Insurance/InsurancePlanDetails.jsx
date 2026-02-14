@@ -129,7 +129,9 @@ export default function InsurancePlanDetails() {
     <>
       <SEO
         title={`${plan.planName || 'Insurance Plan'} | Madadgaar`}
-        description={`${plan.planName} - ${plan.policyType} insurance plan from ${plan.registeredCompanyName}. View details, coverage, and apply now.`}
+        description={[plan.planName, plan.policyType, plan.registeredCompanyName, "View coverage & apply on Madadgaar."].filter(Boolean).join(" · ")}
+        canonicalUrl={`https://madadgaar.com.pk/insurance/${id}`}
+        ogImage={plan.planImage || plan.planDocuments?.productBrochure}
         noIndex={false}
       />
 

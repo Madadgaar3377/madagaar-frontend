@@ -140,9 +140,10 @@ export default function BlogDetail() {
     <div className="bg-gradient-to-b from-gray-50 via-white to-gray-100 min-h-screen">
       <SEO
         title={`${blog.title} | Madadgaar Blog`}
-        description={blog.excerpt || blog.metaDescription || blog.title}
+        description={blog.excerpt || blog.metaDescription || (blog.title + (blog.category ? ` · ${blog.category}` : "") + " · Madadgaar Blog")}
         keywords={blog.seoKeywords?.join(", ") || blog.category || "madadgaar blog"}
         canonicalUrl={`https://madadgaar.com.pk/blog/${blog.slug}`}
+        ogImage={blog.featuredImage}
         structuredData={structuredData}
       />
 

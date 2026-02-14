@@ -4,6 +4,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import InstallmentReviews from "../../../components/InstallmentReviews";
 import ShareButtons from "../../../components/ShareButtons";
+import SEO from "../../../components/SEO";
 
 // Helper to find best plan index
 const findBestPlanIndex = (paymentPlans) => {
@@ -186,8 +187,19 @@ export default function InstallmentDetail() {
     );
 
 
+  const firstImage = Array.isArray(plan.productImages) && plan.productImages.length ? plan.productImages[0] : null;
+  const plainDesc = plan.description && typeof plan.description === "string" ? plan.description.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
+  const detailDesc = [plan.productName, plan.category, plan.city, plan.companyName || plan.companyNameOther].filter(Boolean).join(" · ");
+  const priceInfo = plan.price ? `From PKR ${Number(plan.price).toLocaleString()}` : (plan.paymentPlans?.[0]?.monthlyInstallment ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo` : "");
+  const seoDescription = plainDesc || [detailDesc, priceInfo, "Compare & apply on Madadgaar."].filter(Boolean).join(" ");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
+      <SEO
+        title={`${plan.productName || "Installment Plan"} | Madadgaar`}
+        description={seoDescription}
+        canonicalUrl={`https://madadgaar.com.pk/installment/${plan._id}`}
+        ogImage={firstImage}
+      />
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
           {/* Main Content: Left (Images) + Right (Details) */}

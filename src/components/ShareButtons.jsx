@@ -13,7 +13,8 @@ export default function ShareButtons({ url, title = "", label = "Share with frie
   const [open, setOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
-  const shareText = title ? `${title} ${url}` : url;
+  // Clean share format: Title + link only (e.g. "Zameen Jade\nhttps://madadgaar.com.pk/property/...")
+  const shareText = title ? `${title}\n${url}` : url;
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
@@ -43,7 +44,7 @@ export default function ShareButtons({ url, title = "", label = "Share with frie
     }
     navigator.share({
       title: title || "Check this out",
-      text: title || "",
+      text: shareText,
       url: url,
     }).then(() => setOpen(false)).catch(() => handleCopyLink());
   };

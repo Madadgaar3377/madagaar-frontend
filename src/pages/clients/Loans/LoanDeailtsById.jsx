@@ -161,7 +161,9 @@ export default function LoanDetails() {
     <>
       <SEO
         title={`${plan.productName || 'Loan Details'} | Madadgaar`}
-        description={extractPlainText(plan.description) || `View details for ${plan.productName}. ${plan.majorCategory} financing option from ${plan.bankName}.`}
+        description={extractPlainText(plan.description) || [plan.productName, plan.bankName, plan.majorCategory, plan.indicativeRate && `Rate: ${plan.indicativeRate}`, 'View details & apply on Madadgaar.'].filter(Boolean).join(' · ')}
+        canonicalUrl={`https://madadgaar.com.pk/loans/${id}`}
+        ogImage={plan.planImage}
         noIndex={false}
       />
 

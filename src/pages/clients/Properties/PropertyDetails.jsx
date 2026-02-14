@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import LoadingPage from '../../../compontents/Loader';
 import ShareButtons from '../../../components/ShareButtons';
+import SEO from '../../../components/SEO';
 
 const PropertyDetails = () => {
     const { id } = useParams();
@@ -153,6 +154,20 @@ const PropertyDetails = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            <SEO
+                title={`${property.title} | Madadgaar Properties`}
+                description={(function () {
+                    const plain = property.description ? String(property.description).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
+                    if (plain) return plain;
+                    const parts = [property.title, property.type, property.transactionType, property.city, property.location];
+                    const price = property.transaction?.price || property.transaction?.monthlyRent;
+                    if (price) parts.push(`PKR ${Number(price).toLocaleString()}`);
+                    parts.push("View details on Madadgaar.");
+                    return parts.filter(Boolean).join(" · ");
+                })()}
+                canonicalUrl={`https://madadgaar.com.pk/property/${property._id}`}
+                ogImage={property.images?.[0]}
+            />
             {/* Breadcrumb */}
             <div className="bg-white border-b">
                 <div className="container-content py-3 sm:py-4">
