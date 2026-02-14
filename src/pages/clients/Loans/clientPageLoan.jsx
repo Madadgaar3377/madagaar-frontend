@@ -4,6 +4,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if ne
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
+import ShareButtons from "../../../components/ShareButtons";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
@@ -396,13 +397,21 @@ export default function LoansPage() {
                       )}
                     </div>
 
-                    <NavLink
-                      to={`/loans/${plan._id || plan.planId}`}
-                      className="w-full block px-3 py-2 rounded-md bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-semibold hover:shadow-lg transition text-center"
-                      aria-label={`View details for ${plan.productName || 'loan plan'}`}
-                    >
-                      View Details
-                    </NavLink>
+                    <div className="flex items-center gap-2 w-full">
+                      <NavLink
+                        to={`/loans/${plan._id || plan.planId}`}
+                        className="flex-1 min-w-0 px-3 py-2 rounded-md bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-semibold hover:shadow-lg transition text-center"
+                        aria-label={`View details for ${plan.productName || 'loan plan'}`}
+                      >
+                        View
+                      </NavLink>
+                      <ShareButtons
+                        compact
+                        url={plan._id || plan.planId ? `https://madadgaar.com.pk/loans/${plan._id || plan.planId}` : ""}
+                        title={plan.productName || "Loan plan"}
+                        label="Share this loan"
+                      />
+                    </div>
                   </div>
                 </div>
               </article>

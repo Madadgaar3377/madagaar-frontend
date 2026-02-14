@@ -5,6 +5,7 @@ import VideoPage from "../youtube/YoutubeVide";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
 import citiesList from "../../../constants/cities";
+import ShareButtons from "../../../components/ShareButtons";
 
 // Category options - comprehensive list
 const CATEGORY_OPTIONS = [
@@ -726,13 +727,19 @@ export default function InstallmentPlans() {
                       )}
                     </div>
 
-                    <div className="mt-1 sm:mt-2">
+                    <div className="mt-1 sm:mt-2 flex items-center gap-2">
                       <Link
                         to={`/installment/${plan._id}`}
-                        className="block w-full px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-medium hover:shadow-lg transition text-center"
+                        className="flex-1 min-w-0 px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-medium hover:shadow-lg transition text-center"
                       >
-                        View Details
+                        View
                       </Link>
+                      <ShareButtons
+                        compact
+                        url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
+                        title={plan.productName || "Installment plan"}
+                        label="Share this plan"
+                      />
                     </div>
                   </div>
                 </article>

@@ -5,6 +5,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import cities from "../../../constants/cities";
 import SEO from "../../../components/SEO";
+import ShareButtons from "../../../components/ShareButtons";
 
 const PAGE_SIZE = 6;
 
@@ -457,12 +458,20 @@ function PropertiesPage() {
                       </span>
                     )}
 
-                    <Link
-                      to={`/property/${p._id}`}
-                      className="mt-auto pt-2 sm:pt-3 text-xs sm:text-sm font-medium text-white bg-red-700 hover:bg-red-800 px-3 py-2 rounded-lg transition text-center block"
-                    >
-                      View Details
-                    </Link>
+                    <div className="mt-auto pt-2 sm:pt-3 flex items-center gap-2">
+                      <Link
+                        to={`/property/${p._id}`}
+                        className="flex-1 min-w-0 text-xs sm:text-sm font-medium text-white bg-red-700 hover:bg-red-800 px-3 py-2 rounded-lg transition text-center block"
+                      >
+                        View
+                      </Link>
+                      <ShareButtons
+                        compact
+                        url={p._id ? `https://madadgaar.com.pk/property/${p._id}` : ""}
+                        title={p.title || "Property"}
+                        label="Share this property"
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
