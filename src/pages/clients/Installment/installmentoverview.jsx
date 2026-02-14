@@ -3,6 +3,7 @@ import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import InstallmentReviews from "../../../components/InstallmentReviews";
+import ShareButtons from "../../../components/ShareButtons";
 
 // Helper to find best plan index
 const findBestPlanIndex = (paymentPlans) => {
@@ -345,6 +346,11 @@ export default function InstallmentDetail() {
                     Back to List
                   </NavLink>
                 </div>
+                <ShareButtons
+                  url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
+                  title={plan.productName || "Installment plan"}
+                  label="Share this plan"
+                />
               </div>
 
               {/* Description */}

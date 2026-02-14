@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import LoadingPage from '../../../compontents/Loader';
+import ShareButtons from '../../../components/ShareButtons';
 
 const PropertyDetails = () => {
     const { id } = useParams();
@@ -269,6 +270,11 @@ const PropertyDetails = () => {
                                     </div>
                                 )}
                             </div>
+                            <ShareButtons
+                                url={property._id ? `https://madadgaar.com.pk/property/${property._id}` : ""}
+                                title={property.title || "Property"}
+                                label="Share this property"
+                            />
                         </div>
 
                         {/* Image Gallery */}

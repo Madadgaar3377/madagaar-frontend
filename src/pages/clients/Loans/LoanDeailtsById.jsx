@@ -4,6 +4,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
+import ShareButtons from "../../../components/ShareButtons";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -557,6 +558,11 @@ export default function LoanDetails() {
               </div>
             </div>
           </div>
+          <ShareButtons
+            url={id ? `https://madadgaar.com.pk/loans/${id}` : ""}
+            title={plan?.productName || "Loan plan"}
+            label="Share this loan"
+          />
         </div>
       </div>
 
