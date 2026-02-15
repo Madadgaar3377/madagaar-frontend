@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -13,8 +14,6 @@ export default function ResetPassword() {
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -27,13 +26,23 @@ export default function ResetPassword() {
 
   async function handleReset(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
-    if (!email.trim()) return setError("Please enter your email.");
-    if (!otp.trim()) return setError("Please enter the OTP sent to your email.");
-    if (!validatePassword(password)) return setError("Password must be at least 8 characters.");
-    if (password !== confirm) return setError("Passwords do not match.");
+    if (!email.trim()) {
+      toast.error("Please enter your email.");
+      return;
+    }
+    if (!otp.trim()) {
+      toast.error("Please enter the OTP sent to your email.");
+      return;
+    }
+    if (!validatePassword(password)) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("Passwords do not match.");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -50,14 +59,14 @@ export default function ResetPassword() {
       const body = await res.json().catch(() => null);
 
       if (!res.ok || (body && body.success === false)) {
-        setError(body?.message || "Reset failed. Please check OTP and try again.");
+        toast.error(body?.message || "Reset failed. Please check OTP and try again.");
       } else {
-        setSuccess(body?.message || "Password reset successfully! Redirecting to login...");
+        toast.success(body?.message || "Password reset successfully! Redirecting to login...");
         setTimeout(() => navigate("/account"), 1500);
       }
     } catch (err) {
       console.error(err);
-      setError("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -70,9 +79,6 @@ export default function ResetPassword() {
         <p className="text-sm text-gray-500 mb-4">
           Enter the OTP we sent to your email and choose a new password.
         </p>
-
-        {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
-        {success && <div className="mb-3 text-sm text-green-600">{success}</div>}
 
         <form onSubmit={handleReset} className="space-y-4">
           <div>

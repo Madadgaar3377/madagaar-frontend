@@ -1,7 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X } from "lucide-react";
+import { SIGNUP_DECLARATIONS } from "../constants/signupDeclarations";
+import toast from "react-hot-toast";
+
+const getInitialDeclarations = () => {
+  const obj = {};
+  SIGNUP_DECLARATIONS.forEach((sec, si) => {
+    sec.items.forEach((_, ii) => {
+      obj[`${sec.section}-${ii}`] = false;
+    });
+  });
+  return obj;
+};
 
 export default function SignupPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -16,8 +28,16 @@ export default function SignupPage() {
   });
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [message, setMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [declarationsChecked, setDeclarationsChecked] = useState(getInitialDeclarations);
+
+  const allDeclarationsAccepted = useMemo(() => {
+    return Object.values(declarationsChecked).every(Boolean);
+  }, [declarationsChecked]);
+
+  const setDeclaration = (key, value) => {
+    setDeclarationsChecked((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleChange = (e) =>
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -27,17 +47,16 @@ export default function SignupPage() {
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      setMessage("Please select a valid image file");
+      toast.error("Please select a valid image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      setMessage("Image size should be less than 5MB");
+      toast.error("Image size should be less than 5MB");
       return;
     }
 
     setUploadingImage(true);
-    setMessage("");
 
     try {
       const formData = new FormData();
@@ -52,13 +71,12 @@ export default function SignupPage() {
       if (res.ok && (data.imageUrl || data.url || data.data?.url || data.data)) {
         const imageUrl = data.imageUrl || data.url || data.data?.url || data.data;
         setFormData((prev) => ({ ...prev, profilePic: imageUrl }));
-        setMessage("");
       } else {
-        setMessage(data.message || "Image upload failed");
+        toast.error(data.message || "Image upload failed");
       }
     } catch (err) {
       console.error("Image upload error:", err);
-      setMessage("Failed to upload image. Please try again.");
+      toast.error("Failed to upload image. Please try again.");
     } finally {
       setUploadingImage(false);
     }
@@ -70,11 +88,15 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
 
     if (formData.password.length < 8) {
-      setMessage("Password must be at least 8 characters long");
+      toast.error("Password must be at least 8 characters long");
+      setLoading(false);
+      return;
+    }
+    if (!allDeclarationsAccepted) {
+      toast.error("You must accept Terms & Conditions and Privacy Policy to sign up");
       setLoading(false);
       return;
     }
@@ -87,6 +109,7 @@ export default function SignupPage() {
         password: formData.password,
         profilePic: formData.profilePic || undefined,
         UserType: "user",
+        termsAccepted: true,
       };
 
       const res = await fetch(`${apiUrl}/signup`, {
@@ -99,18 +122,18 @@ export default function SignupPage() {
 
       if (!res.ok || (data && data.success === false)) {
         const errMsg = data?.message || data?.error || `Signup failed (${res.status})`;
-        setMessage(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
+        toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         setLoading(false);
         return;
       }
 
-      setMessage(data?.message || "Signup successful! Check your email for OTP.");
+      toast.success(data?.message || "Signup successful! Check your email for OTP.");
       setTimeout(() => {
-        navigate("/account", { state: { email: formData.email } });
+        navigate("/account/verify-otp", { state: { email: formData.email } });
       }, 1500);
     } catch (err) {
       console.error("Signup error:", err);
-      setMessage("Network error — please try again.");
+      toast.error("Network error — please try again.");
     } finally {
       setLoading(false);
     }
@@ -125,9 +148,9 @@ export default function SignupPage() {
       <div className="w-full max-w-md relative z-10">
         {/* Logo and Title */}
         <div className="text-center mb-8">
-          <div className="inline-block p-3 bg-gradient-to-br from-[rgb(183,36,42)] to-red-700 rounded-2xl mb-4 shadow-xl">
-            <img src="/madadgaar-logo.jpg" alt="logo" className="w-16 h-16 rounded-xl object-cover" />
-          </div>
+          {/* <div className="inline-block p-3 bg-gradient-to-br from-[rgb(183,36,42)] to-red-700 rounded-2xl mb-4 shadow-xl">
+            <img src="/Media/Group%2033.png" alt="logo" className="w-16 h-16 rounded-xl object-cover" />
+          </div> */}
           <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[rgb(183,36,42)] to-red-700 bg-clip-text text-transparent mb-2">
             Create Account
           </h1>
@@ -136,16 +159,6 @@ export default function SignupPage() {
 
         {/* Signup Form Card */}
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
-          {message && (
-            <div className={`mb-6 p-4 rounded-xl text-sm font-medium ${
-              message.includes("successful") || message.includes("Check your email")
-                ? "bg-green-50 text-green-700 border border-green-200"
-                : "bg-red-50 text-red-700 border border-red-200"
-            }`}>
-              {message}
-            </div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Profile Image Upload */}
             <div className="flex flex-col items-center">
@@ -279,10 +292,46 @@ export default function SignupPage() {
               <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
             </div>
 
-            {/* Submit Button */}
+            {/* Terms & Privacy – checkboxes only */}
+            <div className="space-y-3 border border-gray-200 rounded-xl p-4 bg-gray-50/50">
+              {SIGNUP_DECLARATIONS.map((sec) =>
+                sec.items.map((label, idx) => {
+                  const key = `${sec.section}-${idx}`;
+                  const isTerms = idx === 0;
+                  const isPrivacy = idx === 1;
+                  return (
+                    <div key={key} className="flex items-start gap-2">
+                      <input
+                        type="checkbox"
+                        id={key}
+                        checked={declarationsChecked[key] || false}
+                        onChange={(e) => setDeclaration(key, e.target.checked)}
+                        className="mt-1 w-4 h-4 rounded border-gray-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
+                      />
+                      <label htmlFor={key} className="text-sm text-gray-700 cursor-pointer">
+                        {isTerms && (
+                          <>
+                            I agree to the{" "}
+                            <Link to="/terms-and-conditions" className="text-[rgb(183,36,42)] font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link>
+                          </>
+                        )}
+                        {isPrivacy && (
+                          <>
+                            I agree to the{" "}
+                            <Link to="/privacy-policy" className="text-[rgb(183,36,42)] font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy & Data Protection Policy</Link>
+                          </>
+                        )}
+                      </label>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Submit Button - enabled only when all declarations checked */}
             <button
               type="submit"
-              disabled={loading || uploadingImage}
+              disabled={loading || uploadingImage || !allDeclarationsAccepted}
               className="w-full bg-gradient-to-r from-[rgb(183,36,42)] to-red-700 text-white py-3.5 rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {loading ? (

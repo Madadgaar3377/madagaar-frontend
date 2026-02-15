@@ -1,6 +1,6 @@
 // src/pages/CompareProducts.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
@@ -34,7 +34,7 @@ export default function CompareProducts() {
     return () => clearTimeout(t);
   }, [query]);
 
-  // search endpoint (native fetch)
+  // search endpoint: optional filter by category (when base product has category)
   useEffect(() => {
     if (!debouncedQuery) {
       setSearchResults([]);
@@ -44,10 +44,13 @@ export default function CompareProducts() {
     (async () => {
       setLoadingSearch(true);
       try {
-        const url = `${API}/getAllInstallments?q=${encodeURIComponent(
-          debouncedQuery
-        )}&limit=12`;
-        const res = await fetch(url);
+        const params = new URLSearchParams();
+        params.set("q", debouncedQuery);
+        params.set("limit", "12");
+        if (baseProduct?.category || baseProduct?.customCategory) {
+          params.set("category", (baseProduct.category || baseProduct.customCategory || "").toString());
+        }
+        const res = await fetch(`${API}/getAllInstallments?${params.toString()}`);
         const body = await res.json().catch(() => null);
         let items = (body && (body.data || body)) || [];
         if (!Array.isArray(items) && items) items = [items];
@@ -59,7 +62,7 @@ export default function CompareProducts() {
       }
     })();
     return () => (cancelled = true);
-  }, [debouncedQuery]);
+  }, [debouncedQuery, baseProduct?.category, baseProduct?.customCategory]);
 
   // fetch a single product by id
   async function fetchProduct(identifier) {
@@ -212,12 +215,8 @@ export default function CompareProducts() {
     navigate("/installments", { replace: true });
   };
 
-  // dynamic rows depending on categories in compareList
+  // Comparison rows: standard fields + Product Specifications (by category) from admin
   const comparisonRows = useMemo(() => {
-    const cats = new Set(compareList.map((p) => (p.category || p.customCategory || "").toString().toLowerCase()));
-    const isMobile = [...cats].some((c) => /phone|mobile|smartphone|cell/i.test(c));
-    const isAC = [...cats].some((c) => /air|ac|conditioner/i.test(c));
-    const isBike = [...cats].some((c) => /bike|motorcycle|bikes/i.test(c));
     const rows = [
       { key: "productImages", label: "Images" },
       { key: "productName", label: "Name" },
@@ -228,25 +227,20 @@ export default function CompareProducts() {
       { key: "installment", label: "Monthly Installment" },
       { key: "tenure", label: "Tenure" },
     ];
-    if (isMobile) {
-      rows.push(
-        { key: "generalFeatures.operatingSystem", label: "OS" },
-        { key: "performance.processor", label: "Processor" },
-        { key: "display.screenSize", label: "Screen" },
-        { key: "memory.internalMemory", label: "Storage" },
-        { key: "memory.ram", label: "RAM" }
-      );
-    }
-    if (isAC) {
-      rows.push(
-        { key: "airConditioner.brand", label: "AC Brand" },
-        { key: "airConditioner.capacityInTon", label: "Capacity" }
-      );
-    }
-    if (isBike) {
-      rows.push({ key: "electricalBike.motorRatedPower", label: "Motor Power" });
-      rows.push({ key: "mechanicalBike.generalFeatures.dimensions", label: "Dimensions" });
-    }
+    // Dynamic spec rows from productSpecifications.specifications (same structure as admin)
+    const specFields = new Set();
+    compareList.forEach((p) => {
+      const specs = p.productSpecifications?.specifications;
+      if (Array.isArray(specs)) {
+        specs.forEach((s) => {
+          const name = (s.field || s.label || "").toString().trim();
+          if (name) specFields.add(name);
+        });
+      }
+    });
+    [...specFields].sort().forEach((field) => {
+      rows.push({ key: `__spec_${field}`, label: field });
+    });
     rows.push({ key: "description", label: "Short Description" });
     rows.push({ key: "__paymentPlans", label: "Payment Plans" });
     return rows;
@@ -268,14 +262,25 @@ export default function CompareProducts() {
   function renderCell(product, key) {
     if (!product) return null;
     if (key === "__paymentPlans") return null;
+    // Product Specifications (from admin): __spec_FieldName
+    if (key.startsWith("__spec_")) {
+      const fieldName = key.replace(/^__spec_/, "");
+      const specs = product.productSpecifications?.specifications;
+      if (!Array.isArray(specs)) return <span className="text-xs text-gray-400">—</span>;
+      const spec = specs.find((s) => (s.field || s.label || "").toString().trim() === fieldName);
+      const v = spec?.value;
+      return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400">—</span>}</div>;
+    }
     const v = getByPath(product, key);
     if (key === "productImages") {
       const imgs = Array.isArray(product.productImages) ? product.productImages : [];
       if (!imgs.length) return <span className="text-xs text-gray-400">—</span>;
       return (
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {imgs.slice(0, 3).map((s, i) => (
-            <img key={i} src={s} alt={`${product.productName || "Product"} - Image ${i + 1} - ${product.category || "Installment Plan"} in ${product.city || "Pakistan"}`} className="w-16 h-12 object-cover rounded cursor-pointer" onClick={() => setImgPreview(s)} />
+            <button key={i} type="button" onClick={() => setImgPreview(s)} className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 hover:border-red-300 transition shrink-0">
+              <img src={s} alt="" className="w-full h-full object-cover" />
+            </button>
           ))}
         </div>
       );
@@ -294,98 +299,114 @@ export default function CompareProducts() {
   const showComparison = compareList.length > 1;
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
-      <div className="container-content space-y-3 sm:space-y-4 lg:space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 section-padding-sm">
+      <div className="container-content space-y-4 sm:space-y-5 lg:space-y-6 max-w-7xl mx-auto">
         {/* header */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-          <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 bg-clip-text text-transparent">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <Link to="/installments" className="text-sm text-gray-500 hover:text-[rgb(183,36,42)] mb-2 inline-flex items-center gap-1">
+              ← Back to Installments
+            </Link>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
               Compare Products
             </h1>
-            <p className="text-xs sm:text-sm text-gray-600 mt-1 sm:mt-2">Compare up to {MAX_COMPARE} products side by side</p>
+            <p className="text-sm text-gray-500 mt-1">Compare up to {MAX_COMPARE} products side by side by category</p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <button onClick={clearAll} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg bg-red-100 text-red-700 font-medium hover:bg-red-200 transition">
+          <div className="flex gap-2 w-full sm:w-auto shrink-0">
+            <button onClick={clearAll} className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-semibold rounded-xl border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition">
               Clear All
             </button>
           </div>
         </div>
 
         {/* base product hero card */}
-        <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-lg border-2 border-gray-200 flex flex-col gap-3 sm:gap-4 lg:gap-6">
-          <div className="w-full flex-shrink-0">
-            <div className="rounded-lg sm:rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 h-48 sm:h-56 lg:h-64 flex items-center justify-center">
-              <img src={(baseProduct && baseProduct.productImages && baseProduct.productImages[0]) || ""} alt={`${baseProduct?.productName || "Product"} - ${baseProduct?.category || "Installment Plan"} for comparison in ${baseProduct?.city || "Pakistan"}`} className="w-full h-full object-cover" />
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm border border-gray-200 overflow-hidden">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
+            <div className="w-full lg:w-80 flex-shrink-0">
+              <div className="rounded-xl overflow-hidden bg-gray-100 aspect-square max-h-64 lg:max-h-none lg:h-56 flex items-center justify-center">
+                {(baseProduct?.productImages?.[0]) ? (
+                  <img src={baseProduct.productImages[0]} alt={baseProduct?.productName || "Product"} className="w-full h-full object-contain p-2" />
+                ) : (
+                  <span className="text-gray-400 text-sm">No image</span>
+                )}
+              </div>
             </div>
-          </div>
-
-          <div className="flex-1">
-            {loadingProduct ? (
-              <div className="p-4 sm:p-6 text-center text-sm sm:text-base text-gray-500">Loading product...</div>
-            ) : baseProduct ? (
-              <>
-                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4">
-                  <div className="flex-1">
-                    <h2 className="text-base sm:text-lg lg:text-xl font-semibold text-gray-800 flex flex-wrap items-center gap-2 sm:gap-3">
-                      <span className="break-words">{baseProduct.productName}</span>
-                      <span className="px-2 py-0.5 text-xs font-medium rounded bg-[rgba(183,36,42,0.12)] text-[rgb(183,36,42)] whitespace-nowrap">Base</span>
-                    </h2>
-                    <div className="text-xs sm:text-sm text-gray-500 mt-1 break-words">{baseProduct.companyName} • {baseProduct.category} • {baseProduct.city}</div>
-                    <div className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-800 font-semibold">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</div>
-                    <div className="mt-2 text-xs sm:text-sm text-gray-600 line-clamp-3">{(baseProduct.description || "").slice(0, 220).replace(/<\/?[^>]+(>|$)/g, "")}</div>
-                  </div>
-
-                  <div className="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
-                    <button onClick={() => addToCompare(baseProduct)} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition whitespace-nowrap">
-                      ⚖️ Compare
-                    </button>
-                    <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="flex-1 sm:flex-none px-3 sm:px-4 py-2 text-sm rounded-lg border-2 border-gray-300 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition font-medium whitespace-nowrap">
-                      View Details
-                    </button>
+            <div className="flex-1 min-w-0">
+              {loadingProduct ? (
+                <div className="p-6 flex items-center justify-center">
+                  <div className="animate-pulse flex flex-col gap-3 w-full max-w-sm">
+                    <div className="h-6 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-100 rounded w-1/2" />
+                    <div className="h-5 bg-gray-200 rounded w-1/3 mt-2" />
                   </div>
                 </div>
-
-                {/* small specs row */}
-                <div className="mt-3 sm:mt-4 lg:mt-5 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                  <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                    <div className="text-xs text-gray-400">Monthly</div>
-                    <div className="font-medium">Rs. {Number(baseProduct.installment || 0).toLocaleString("en-PK")}</div>
+              ) : baseProduct ? (
+                <>
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg sm:text-xl font-bold text-gray-900 break-words">{baseProduct.productName}</h2>
+                        <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700 border border-red-100">Base product</span>
+                      </div>
+                      <p className="text-sm text-gray-500 mt-1">{[baseProduct.companyName, baseProduct.category, baseProduct.city].filter(Boolean).join(" • ") || "—"}</p>
+                      <p className="mt-2 text-lg font-bold text-red-600">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</p>
+                      <p className="mt-1 text-sm text-gray-600 line-clamp-2">{(baseProduct.description || "").replace(/<[^>]+>/g, "").slice(0, 180)}</p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => addToCompare(baseProduct)} className="px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shadow-sm">
+                        Add to compare
+                      </button>
+                      <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-300 text-gray-700 hover:border-red-300 hover:text-red-600 transition">
+                        View details
+                      </button>
+                    </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                    <div className="text-xs text-gray-400">Downpayment</div>
-                    <div className="font-medium">Rs. {Number(baseProduct.downpayment || 0).toLocaleString("en-PK")}</div>
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <div className="text-xs text-gray-500 font-medium">Monthly</div>
+                      <div className="text-sm font-semibold text-gray-800">Rs. {Number(baseProduct.installment || 0).toLocaleString("en-PK")}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <div className="text-xs text-gray-500 font-medium">Down payment</div>
+                      <div className="text-sm font-semibold text-gray-800">Rs. {Number(baseProduct.downpayment || 0).toLocaleString("en-PK")}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <div className="text-xs text-gray-500 font-medium">Tenure</div>
+                      <div className="text-sm font-semibold text-gray-800">{baseProduct.tenure || "—"}</div>
+                    </div>
+                    <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                      <div className="text-xs text-gray-500 font-medium">City</div>
+                      <div className="text-sm font-semibold text-gray-800">{baseProduct.city || "—"}</div>
+                    </div>
                   </div>
-                  <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                    <div className="text-xs text-gray-400">Tenure</div>
-                    <div className="font-medium">{baseProduct.tenure || "-"}</div>
-                  </div>
-                  <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700">
-                    <div className="text-xs text-gray-400">City</div>
-                    <div className="font-medium">{baseProduct.city || "-"}</div>
-                  </div>
+                </>
+              ) : (
+                <div className="py-8 sm:py-12 text-center">
+                  <p className="text-gray-500 mb-2">No product selected to compare.</p>
+                  <p className="text-sm text-gray-400">Search below or open a product from the installments page and click Compare.</p>
+                  <Link to="/installments" className="inline-block mt-4 px-4 py-2 text-sm font-medium rounded-xl bg-red-600 text-white hover:bg-red-700 transition">Browse installments</Link>
                 </div>
-              </>
-            ) : (
-              <div className="p-6 text-gray-500">No base product selected. Use search below or open `/compare/:id`.</div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Search / Add other products area */}
-        <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 lg:p-6 shadow-sm border">
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-stretch sm:items-center">
+        {/* Search / Add other products */}
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-sm border border-gray-200">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">Add more products to compare</h3>
+          <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <svg className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search products to compare..."
-                className="w-full pl-10 sm:pl-12 pr-3 sm:pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-transparent transition"
+                placeholder="Search by name or category..."
+                className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
-            <button onClick={() => setDebouncedQuery(query)} className="px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg sm:rounded-xl bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white font-medium hover:shadow-lg transition whitespace-nowrap">
+            <button onClick={() => setDebouncedQuery(query)} className="px-5 py-3 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shrink-0">
               Search
             </button>
           </div>
@@ -393,34 +414,33 @@ export default function CompareProducts() {
           {loadingSearch && <div className="mt-3 text-sm text-gray-500">Searching…</div>}
 
           {!loadingSearch && searchResults.length > 0 && (
-            <div className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {searchResults.map((s) => (
-                <div key={getId(s)} className="p-2 sm:p-3 rounded-lg border bg-white flex gap-2 sm:gap-3 items-start">
-                  <img src={(s.productImages && s.productImages[0]) || ""} alt={`${s.productName || "Product"} - ${s.category || "Installment Plan"} in ${s.city || "Pakistan"}`} className="w-16 h-12 sm:w-20 sm:h-14 object-cover rounded flex-shrink-0" />
+                <div key={getId(s)} className="p-3 rounded-xl border border-gray-200 bg-gray-50/50 hover:border-red-200 hover:bg-red-50/30 transition flex gap-3">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shrink-0 flex items-center justify-center">
+                    {s.productImages?.[0] ? (
+                      <img src={s.productImages[0]} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-gray-400 text-xs">No image</span>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-xs sm:text-sm truncate">{s.productName}</div>
-                    <div className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</div>
-                    <div className="mt-2 sm:mt-3 flex gap-1 sm:gap-2">
+                    <p className="font-medium text-sm text-gray-900 truncate">{s.productName}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</p>
+                    <div className="mt-2 flex gap-2 flex-wrap">
                       <button
-                        onClick={async () => {
-                          const id = getId(s);
-                          if (id && id.length <= 24 && /^[0-9a-fA-F]+$/.test(id)) {
-                            navigate(`/compare/${encodeURIComponent(id)}`);
-                          } else if (s._id) {
-                            navigate(`/compare/${encodeURIComponent(s._id)}`);
-                          } else if (s.installmentPlanId) {
-                            navigate(`/compare/${encodeURIComponent(s.installmentPlanId)}`);
-                          } else {
-                            // fallback: set as base locally
-                            setBaseProduct(s);
-                          }
+                        onClick={() => {
+                          const id = s._id || s.installmentPlanId || getId(s);
+                          if (id) navigate(`/installment/product/CompareProduct/${encodeURIComponent(id)}`);
+                          else setBaseProduct(s);
                         }}
-                        className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-xs bg-[rgb(183,36,42)] text-white whitespace-nowrap"
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-600 text-white hover:bg-red-700"
                       >
-                        Set base
+                        Set as base
                       </button>
-
-                      <button onClick={() => addToCompare(s)} className="px-2 sm:px-3 py-1 rounded text-[10px] sm:text-xs border whitespace-nowrap">Add</button>
+                      <button onClick={() => addToCompare(s)} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                        Add to compare
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -429,22 +449,31 @@ export default function CompareProducts() {
           )}
 
           {!loadingSearch && debouncedQuery && searchResults.length === 0 && (
-            <div className="mt-4 text-sm text-gray-500">No results found.</div>
+            <p className="mt-4 text-sm text-gray-500">No results found. Try another search.</p>
           )}
 
-          {/* related quick suggestions (only if base exists) */}
           {baseProduct && related.length > 0 && (
-            <div className="mt-6">
-              <div className="text-sm font-medium text-gray-700 mb-2">Suggested</div>
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <p className="text-sm font-semibold text-gray-700 mb-3">
+                {baseProduct.category || baseProduct.customCategory ? "Same category – add to compare" : "Suggested products"}
+              </p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {related.map((r) => (
-                  <div key={getId(r)} className="p-2 rounded-lg border bg-white">
-                    <img src={(r.productImages && r.productImages[0]) || ""} alt={`${r.productName || "Product"} - Related ${r.category || "Installment Plan"} in ${r.city || "Pakistan"}`} className="w-full h-28 object-cover rounded" />
-                    <div className="mt-2 text-xs font-medium">{r.productName}</div>
-                    <div className="text-xs text-gray-500">Rs. {Number(r.price||0).toLocaleString("en-PK")}</div>
-                    <div className="mt-2 flex gap-2">
-                      <button onClick={() => addToCompare(r)} className="flex-1 text-xs py-1 rounded bg-[rgb(183,36,42)] text-white">Compare</button>
-                      <button onClick={() => navigate(`/compare/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1 rounded border">Open</button>
+                  <div key={getId(r)} className="rounded-xl border border-gray-200 bg-white overflow-hidden hover:border-red-200 hover:shadow-sm transition">
+                    <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                      {r.productImages?.[0] ? (
+                        <img src={r.productImages[0]} alt="" className="w-full h-full object-contain p-2" />
+                      ) : (
+                        <span className="text-gray-400 text-xs">No image</span>
+                      )}
+                    </div>
+                    <div className="p-2.5">
+                      <p className="text-xs font-medium text-gray-900 line-clamp-2 min-h-[2rem]">{r.productName}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Rs. {Number(r.price || 0).toLocaleString("en-PK")}</p>
+                      <div className="mt-2 flex gap-1.5">
+                        <button onClick={() => addToCompare(r)} className="flex-1 text-xs py-1.5 rounded-lg bg-red-600 text-white font-medium">Add</button>
+                        <button onClick={() => navigate(`/installment/product/CompareProduct/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-300 font-medium">Open</button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -453,76 +482,107 @@ export default function CompareProducts() {
           )}
         </div>
 
-        {/* compact compare chips */}
-        <div className="flex gap-2 flex-wrap items-center">
-          {compareList.slice(0, MAX_COMPARE).map((p, idx) => (
-            <div key={getId(p)} className={`flex items-center gap-2 bg-white px-3 py-1 rounded-full border ${idx===0 ? "ring-2 ring-[rgba(183,36,42,0.12)]" : ""}`}>
-              <img src={(p.productImages && p.productImages[0]) || ""} alt={`${p.productName || "Product"} thumbnail - ${p.category || "Installment Plan"}`} className="w-8 h-6 object-cover rounded" />
-              <div className="text-sm font-medium">{p.productName}</div>
-              {idx !== 0 && <button onClick={() => removeFromCompare(p)} className="text-xs px-2 py-0.5 rounded border">Remove</button>}
-            </div>
-          ))}
-          {compareList.length < MAX_COMPARE && <div className="text-sm text-gray-500">Add up to {MAX_COMPARE} items to compare</div>}
+        {/* compare list chips */}
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 shadow-sm border border-gray-200">
+          <p className="text-sm font-semibold text-gray-700 mb-3">Comparing ({compareList.length} of {MAX_COMPARE})</p>
+          <div className="flex flex-wrap gap-2">
+            {compareList.slice(0, MAX_COMPARE).map((p, idx) => (
+              <div
+                key={getId(p)}
+                className={`flex items-center gap-2 pl-2 pr-1 py-1.5 rounded-xl border bg-gray-50 ${idx === 0 ? "border-red-200 ring-1 ring-red-100" : "border-gray-200"}`}
+              >
+                <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-200 shrink-0">
+                  {p.productImages?.[0] ? (
+                    <img src={p.productImages[0]} alt="" className="w-full h-full object-cover" />
+                  ) : null}
+                </div>
+                <span className="text-sm font-medium text-gray-800 max-w-[120px] sm:max-w-[180px] truncate">{p.productName}</span>
+                {idx !== 0 ? (
+                  <button onClick={() => removeFromCompare(p)} className="p-1 rounded-lg text-gray-500 hover:bg-red-100 hover:text-red-600 transition" aria-label="Remove">×</button>
+                ) : (
+                  <span className="text-xs text-red-600 font-medium px-1.5">Base</span>
+                )}
+              </div>
+            ))}
+            {compareList.length < MAX_COMPARE && (
+              <span className="text-sm text-gray-500 self-center">Add more from search above (max {MAX_COMPARE})</span>
+            )}
+          </div>
         </div>
 
-        {/* comparison table appears only when > 1 item */}
+        {/* comparison table */}
         {showComparison && (
-          <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-4 shadow-sm border overflow-hidden">
-            <div className="text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 px-2 sm:px-0">Comparison</div>
-            <div className="overflow-x-auto -mx-2 sm:mx-0">
-            <table className="min-w-full">
-              <thead>
-                <tr>
-                    <th className="text-left p-2 sm:p-3 w-24 sm:w-32 lg:w-44 text-xs sm:text-sm text-gray-600 sticky left-0 bg-white z-10">Feature</th>
-                  {compareList.map((p) => (
-                      <th key={getId(p)} className="p-2 sm:p-3 text-left" style={{ minWidth: 180, maxWidth: 220 }}>
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <img src={(p.productImages && p.productImages[0]) || ""} alt={`${p.productName || "Product"} - ${p.category || "Installment Plan"} comparison`} className="w-10 h-8 sm:w-14 sm:h-11 object-cover rounded flex-shrink-0" />
-                          <div className="min-w-0">
-                            <div className="font-semibold text-xs sm:text-sm truncate">{p.productName}</div>
-                            <div className="text-[10px] sm:text-xs text-gray-500 truncate">{p.companyName}</div>
-                        </div>
-                      </div>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparisonRows.map((row) => (
-                  <tr key={row.key} className="">
-                      <td className="p-2 sm:p-3 text-xs sm:text-sm font-medium text-gray-700 bg-gray-50 border-r sticky left-0 z-10">{row.label}</td>
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+              <h3 className="text-base font-semibold text-gray-900">Side-by-side comparison</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Features and specifications</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-left">
+                <thead>
+                  <tr className="border-b border-gray-200 bg-gray-50">
+                    <th className="p-3 sm:p-4 w-36 sm:w-44 text-sm font-semibold text-gray-700 sticky left-0 bg-gray-50 z-10 border-r border-gray-200">Feature</th>
                     {compareList.map((p) => (
-                        <td key={getId(p) + row.key} className="p-2 sm:p-3 align-top">
-                        {row.key === "__paymentPlans" ? (
-                          Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
-                              <ul className="text-xs sm:text-sm space-y-1">
-                              {p.paymentPlans.map((pl, i) => (
-                                  <li key={i}><div className="font-medium text-xs sm:text-sm">{pl.planName || `Plan ${i+1}`}</div><div className="text-[10px] sm:text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment||pl.installmentPrice||0).toLocaleString("en-PK")}</div></li>
-                              ))}
-                            </ul>
-                            ) : <div className="text-xs sm:text-sm text-gray-400">No plans</div>
-                        ) : (
-                          renderCell(p, row.key)
-                        )}
-                      </td>
+                      <th key={getId(p)} className="p-3 sm:p-4 min-w-[200px] max-w-[260px] align-top border-r border-gray-100 last:border-r-0">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 shrink-0">
+                            {p.productImages?.[0] ? <img src={p.productImages[0]} alt="" className="w-full h-full object-cover" /> : null}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm text-gray-900 truncate">{p.productName}</p>
+                            <p className="text-xs text-gray-500 truncate">{p.companyName}</p>
+                          </div>
+                        </div>
+                      </th>
                     ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {comparisonRows.map((row, rowIdx) => (
+                    <tr key={row.key} className={rowIdx % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
+                      <td className="p-3 sm:p-4 text-sm font-medium text-gray-700 sticky left-0 z-10 border-r border-gray-200 bg-inherit">{row.label}</td>
+                      {compareList.map((p) => (
+                        <td key={getId(p) + row.key} className="p-3 sm:p-4 align-top border-r border-gray-100 last:border-r-0">
+                          {row.key === "__paymentPlans" ? (
+                            Array.isArray(p.paymentPlans) && p.paymentPlans.length ? (
+                              <ul className="text-sm space-y-2">
+                                {p.paymentPlans.map((pl, i) => (
+                                  <li key={i} className="border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                                    <span className="font-medium text-gray-800">{pl.planName || `Plan ${i + 1}`}</span>
+                                    <span className="block text-xs text-gray-600">Monthly: Rs. {Number(pl.monthlyInstallment || pl.installmentPrice || 0).toLocaleString("en-PK")}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : <span className="text-sm text-gray-400">No plans</span>
+                          ) : (
+                            renderCell(p, row.key)
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {error && <div className="text-sm text-red-500 mt-3">{error}</div>}
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        )}
       </div>
 
       {/* image preview modal */}
       {imgPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setImgPreview(null)}>
-          <div className="bg-white rounded-lg p-3 max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-end"><button onClick={() => setImgPreview(null)} className="px-3 py-1 rounded border">Close</button></div>
-            <img src={imgPreview} alt={`Product image preview - ${baseProduct?.productName || compareList[0]?.productName || "Installment Plan"} in ${baseProduct?.city || compareList[0]?.city || "Pakistan"}`} className="w-full h-[60vh] object-contain mt-3" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4" onClick={() => setImgPreview(null)}>
+          <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-3 border-b border-gray-200">
+              <span className="text-sm font-medium text-gray-600">Image preview</span>
+              <button onClick={() => setImgPreview(null)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600">✕</button>
+            </div>
+            <img src={imgPreview} alt="Preview" className="w-full max-h-[70vh] object-contain p-4" />
           </div>
         </div>
       )}

@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { getUser } from "../utils/auth";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
+  const location = useLocation();
+  const verifiedMessage = location.state?.message || (location.state?.verified ? "Account verified. Please sign in." : null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -20,7 +23,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [generalError, setGeneralError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
 
   const validate = () => {
@@ -34,7 +36,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setGeneralError("");
     setFieldErrors({});
     if (!validate()) return;
 
@@ -50,7 +51,7 @@ export default function LoginPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
-        setGeneralError(data?.message || `Login failed (${res.status})`);
+        toast.error(data?.message || `Login failed (${res.status})`);
         setLoading(false);
         return;
       }
@@ -73,13 +74,14 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(safeUser));
       }
 
+      toast.success("Signed in successfully");
       // Navigate to dashboard after successful login
       const userType = data?.user?.UserType || data?.user?.userType || "user";
       // Redirect all users to the dashboard
       window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login error:", err);
-      setGeneralError("Network error — please try again.");
+      toast.error("Network error — please try again.");
     } finally {
       setLoading(false);
     }
@@ -94,9 +96,9 @@ export default function LoginPage() {
           <p className="text-sm text-gray-500 mt-1">Enter your credentials to continue</p>
         </div>
 
-        {generalError && (
-          <div className="mb-4 text-sm text-red-700 bg-red-100 px-3 py-2 rounded">
-            {generalError}
+        {verifiedMessage && (
+          <div className="mb-4 text-sm text-green-700 bg-green-100 px-3 py-2 rounded">
+            {verifiedMessage}
           </div>
         )}
 

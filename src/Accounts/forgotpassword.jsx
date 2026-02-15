@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import { backendBaseUrl } from "../constants/apiUrl"; // adjust path if needed
+import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const navigate = useNavigate();
 
   function validateEmail(e) {
@@ -17,15 +16,13 @@ export default function ForgotPassword() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     if (!email.trim()) {
-      setError("Please enter your email.");
+      toast.error("Please enter your email.");
       return;
     }
     if (!validateEmail(email)) {
-      setError("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
       return;
     }
 
@@ -40,17 +37,16 @@ export default function ForgotPassword() {
       const body = await res.json().catch(() => null);
 
       if (!res.ok || (body && body.success === false)) {
-        setError(body?.message || "Failed to send reset OTP.");
+        toast.error(body?.message || "Failed to send reset OTP.");
       } else {
-        setSuccess(body?.message || "OTP sent to your email. Check your inbox.");
-        // Navigate to reset page with email
+        toast.success(body?.message || "OTP sent to your email. Check your inbox.");
         setTimeout(() => {
           navigate("/account/reset", { state: { email: email.trim() } });
         }, 1200);
       }
     } catch (err) {
       console.error(err);
-      setError("Network error. Please try again.");
+      toast.error("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -63,9 +59,6 @@ export default function ForgotPassword() {
         <p className="text-sm text-gray-500 mb-4">
           Enter the email tied to your account. We'll send a one-time code (OTP) to reset your password.
         </p>
-
-        {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
-        {success && <div className="mb-3 text-sm text-green-600">{success}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block text-sm text-gray-600">Email</label>

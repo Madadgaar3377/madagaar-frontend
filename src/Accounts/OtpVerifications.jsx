@@ -1,6 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+
+const OTP_LENGTH = 6;
 
 export default function OtpVerifyPage() {
   const apiUrl = backendBaseUrl.replace(/\/$/, "");
@@ -8,21 +11,111 @@ export default function OtpVerifyPage() {
   const location = useLocation();
   const prefilledEmail = location.state?.email || "";
 
-  const [email, setEmail] = useState(prefilledEmail);
-  const [otp, setOtp] = useState("");
+  const [email] = useState(prefilledEmail);
+  const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
-  const [msg, setMsg] = useState({ type: "", text: "" });
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const inputRefs = useRef([]);
+  const formRef = useRef(null);
+  const hasAutoSubmitted = useRef(false);
+  /** After "Invalid OTP" (or any verify error), auto-verify is disabled; only button click will submit */
+  const autoVerifyDisabled = useRef(false);
 
+  const otp = otpDigits.join("");
+
+  // Auto-verify when all 6 digits are entered (or pasted) – only once; after error, only button click
   useEffect(() => {
-    if (prefilledEmail) setEmail(prefilledEmail);
-  }, [prefilledEmail]);
+    if (otp.length < OTP_LENGTH) {
+      hasAutoSubmitted.current = false;
+      return;
+    }
+    if (!email || loading || hasAutoSubmitted.current || autoVerifyDisabled.current) return;
+    hasAutoSubmitted.current = true;
+    const timer = setTimeout(() => {
+      formRef.current?.requestSubmit();
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [otp, email, loading]);
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
+
+  const handleResendOtp = async () => {
+    if (!email) {
+      toast.error("Email is required to resend OTP");
+      return;
+    }
+    if (resendLoading || resendCooldown > 0) return;
+    setResendLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/reSendOtp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.success === false)) {
+        toast.error(data?.message || "Failed to resend OTP");
+      } else {
+        toast.success(data?.message || "OTP sent to your email.");
+        setResendCooldown(60);
+      }
+    } catch (err) {
+      console.error("Resend OTP error:", err);
+      toast.error("Network error — please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const setDigit = (index, value) => {
+    const digit = value.replace(/\D/g, "").slice(-1);
+    setOtpDigits((prev) => {
+      const next = [...prev];
+      next[index] = digit;
+      return next;
+    });
+    if (digit && index < OTP_LENGTH - 1) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !otpDigits[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
+    if (!pasted) return;
+    const chars = pasted.split("");
+    setOtpDigits((prev) => {
+      const next = [...prev];
+      chars.forEach((c, i) => { next[i] = c; });
+      return next;
+    });
+    const nextFocus = Math.min(chars.length, OTP_LENGTH - 1);
+    inputRefs.current[nextFocus]?.focus();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMsg({ type: "", text: "" });
 
-    if (!email) return setMsg({ type: "error", text: "Email is required" });
-    if (!otp) return setMsg({ type: "error", text: "OTP is required" });
+    if (!email) {
+      toast.error("Email is required");
+      return;
+    }
+    if (otp.length !== OTP_LENGTH) {
+      toast.error("Please enter the 6-digit OTP");
+      return;
+    }
 
     setLoading(true);
     try {
@@ -35,42 +128,21 @@ export default function OtpVerifyPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
-        setMsg({ type: "error", text: data?.message || "Verification failed" });
+        autoVerifyDisabled.current = true;
+        toast.error(data?.message || "Verification failed");
         setLoading(false);
         return;
       }
 
-      // Success: { success, message, user, token }
-      const token = data?.token;
-      if (token) {
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("access_token", token);
-      }
-      
-      if (data?.user) {
-        const safeUser = { ...data.user };
-        delete safeUser.password;
-        delete safeUser.verificationOtp;
-        delete safeUser.passwordResetOtp;
-        delete safeUser.verificationOtpExpiryTime;
-        delete safeUser.passwordResetOtpExpiryTime;
-        localStorage.setItem("user", JSON.stringify(safeUser));
-      }
+      toast.success("Account verified successfully! Redirecting to sign in...");
 
-      setMsg({ type: "success", text: "Account verified successfully! Redirecting..." });
-      
-      // Navigate based on user type
-      const userType = data?.user?.UserType || data?.user?.userType || "user";
       setTimeout(() => {
-        if (userType === "user") {
-          navigate("/client/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
-      }, 1000);
+        navigate("/account", { state: { verified: true, message: "Account verified. Please sign in." } });
+      }, 1500);
     } catch (err) {
       console.error("OTP verify error:", err);
-      setMsg({ type: "error", text: "Network error — please try again." });
+      autoVerifyDisabled.current = true;
+      toast.error("Network error — please try again.");
     } finally {
       setLoading(false);
     }
@@ -81,21 +153,35 @@ export default function OtpVerifyPage() {
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
 
-        {msg.text && (
-          <div className={`mb-4 px-3 py-2 rounded text-sm ${msg.type === "error" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>
-            {msg.text}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
+          {/* Email – read-only, display only */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full px-3 py-2 border rounded-md" placeholder="you@example.com" required />
+            <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700 font-medium">
+              {email || "—"}
+            </div>
           </div>
 
+          {/* OTP – one digit per box */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">OTP</label>
-            <input type="text" value={otp} onChange={(e) => setOtp(e.target.value)} className="w-full px-3 py-2 border rounded-md" placeholder="Enter 6-digit OTP" maxLength="6" required />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Enter 6-digit OTP</label>
+            <div className="flex justify-center gap-2" onPaste={handlePaste}>
+              {otpDigits.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={1}
+                  value={digit}
+                  onChange={(e) => setDigit(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
+                  className="w-11 h-12 text-center text-lg font-bold border-2 border-gray-300 rounded-lg focus:border-[rgb(183,36,42)] focus:ring-2 focus:ring-[rgb(183,36,42)]/20 outline-none"
+                  aria-label={`Digit ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
           <button type="submit" disabled={loading} className={`w-full py-2 rounded-md text-white font-medium ${loading ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed" : "bg-[rgb(183,36,42)] hover:opacity-95"}`}>
@@ -104,7 +190,15 @@ export default function OtpVerifyPage() {
         </form>
 
         <div className="mt-4 text-center text-sm text-gray-500">
-          Didn't get OTP? <button onClick={() => navigate("/resend-otp")} className="text-[rgb(183,36,42)] underline">Resend</button>
+          Didn't get OTP?{" "}
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={!email || resendLoading || resendCooldown > 0}
+            className="text-[rgb(183,36,42)] font-semibold underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+          >
+            {resendLoading ? "Sending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
+          </button>
         </div>
       </div>
     </div>

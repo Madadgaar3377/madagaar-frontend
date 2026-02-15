@@ -854,10 +854,10 @@ export default function InstallmentDetail() {
                         >
                           <div className="flex flex-col gap-2">
                             <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                              {spec.field || "—"}
+                              {spec.label || spec.field || "—"}
                             </div>
                             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 group-hover:text-[rgb(183,36,42)] transition-colors">
-                              {spec.value || "—"}
+                              {spec.value ?? "—"}
                             </div>
                           </div>
                         </div>

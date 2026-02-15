@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
+import { Toaster } from 'react-hot-toast';
 
 import Navbar from "./compontents/Navbar";
 // import TopBar from "./compontents/TopBar";
@@ -38,6 +39,8 @@ import DashboardSecurity from "./pages/clients/Dashboard/DashboardSecurity.jsx";
 import NotFound from "./pages/404Page.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
+import TermsAndConditions from "./pages/clients/TermsAndConditions.jsx";
+import PrivacyPolicy from "./pages/clients/PrivacyPolicy.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -63,6 +66,7 @@ function App() {
 
   return (
     <HelmetProvider>
+      <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
       <Router>
         <ScrollToTop />
         <LayoutWrapper>
@@ -114,6 +118,10 @@ function App() {
             
             {/* FAQ */}
             <Route path="/faq" element={<FAQPage />} />
+
+            {/* Terms & Privacy */}
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
             {/* user panel routes */}
 
