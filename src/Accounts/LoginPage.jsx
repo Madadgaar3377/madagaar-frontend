@@ -56,14 +56,23 @@ export default function LoginPage() {
         return;
       }
 
-      // Success - Backend returns: { success, message, token, user }
       const token = data?.token;
+      const userType = (data?.user?.UserType || data?.user?.userType || "user").toLowerCase();
+
+      // If partner, redirect to partner panel with Bearer token (no login on main site)
+      if (userType === "partner" && token) {
+        const partnerPanelUrl = "https://partner.madadgaar.com.pk";
+        const url = `${partnerPanelUrl}?token=${encodeURIComponent(token)}`;
+        toast.success("Redirecting to partner dashboard...");
+        window.location.href = url;
+        return;
+      }
+
+      // Store token and user for non-partner
       if (token) {
         localStorage.setItem("authToken", token);
         localStorage.setItem("access_token", token);
       }
-
-      // Store user data (sanitized)
       if (data?.user) {
         const safeUser = { ...data.user };
         delete safeUser.password;
@@ -75,9 +84,6 @@ export default function LoginPage() {
       }
 
       toast.success("Signed in successfully");
-      // Navigate to dashboard after successful login
-      const userType = data?.user?.UserType || data?.user?.userType || "user";
-      // Redirect all users to the dashboard
       window.location.href = "/dashboard";
     } catch (err) {
       console.error("Login error:", err);
