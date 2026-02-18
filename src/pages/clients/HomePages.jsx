@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import FeatureCards from "./Cards";
 import Services from "./Services";
 import SecondCards from "./SecondCards";
+import OfferBanner from "../../components/OfferBanner";
 // import MobileAppPage from "./MadadghaarAppPage"; // Commented out as per user preference
 import VideoPage from "./youtube/YoutubeVide";
 import InfoBoxes from "./ChosewhyPAge";
@@ -247,6 +248,7 @@ export default function HomePage() {
           />
         </div>
       </section>
+      <OfferBanner />
       <FeatureCards />
       <Services />
       <SecondCards />

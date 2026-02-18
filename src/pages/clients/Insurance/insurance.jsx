@@ -3,6 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import SEO from "../../../components/SEO";
+import OfferBanner from "../../../components/OfferBanner";
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
 
@@ -231,6 +232,8 @@ export default function InsuranceInfo() {
           </div>
         </div>
       </div>
+
+      <OfferBanner />
 
       {/* main content */}
       <div className="container-content max-w-6xl py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6 lg:space-y-8">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const OTP_LENGTH = 6;
@@ -10,8 +10,11 @@ export default function OtpVerifyPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefilledEmail = location.state?.email || "";
+  const previousFormData = location.state?.previousFormData || null;
+  const fromUnverified = location.state?.fromUnverified === true;
 
-  const [email] = useState(prefilledEmail);
+  const [email, setEmail] = useState(prefilledEmail);
+  const [emailForResend, setEmailForResend] = useState(""); // when no email in state, user types here first
   const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -22,6 +25,8 @@ export default function OtpVerifyPage() {
   /** After "Invalid OTP" (or any verify error), auto-verify is disabled; only button click will submit */
   const autoVerifyDisabled = useRef(false);
 
+  const effectiveEmail = email || emailForResend.trim();
+
   const otp = otpDigits.join("");
 
   // Auto-verify when all 6 digits are entered (or pasted) – only once; after error, only button click
@@ -30,13 +35,13 @@ export default function OtpVerifyPage() {
       hasAutoSubmitted.current = false;
       return;
     }
-    if (!email || loading || hasAutoSubmitted.current || autoVerifyDisabled.current) return;
+    if (!effectiveEmail || loading || hasAutoSubmitted.current || autoVerifyDisabled.current) return;
     hasAutoSubmitted.current = true;
     const timer = setTimeout(() => {
       formRef.current?.requestSubmit();
     }, 400);
     return () => clearTimeout(timer);
-  }, [otp, email, loading]);
+  }, [otp, effectiveEmail, loading]);
 
   // Resend cooldown timer
   useEffect(() => {
@@ -46,7 +51,8 @@ export default function OtpVerifyPage() {
   }, [resendCooldown]);
 
   const handleResendOtp = async () => {
-    if (!email) {
+    const toUse = effectiveEmail || emailForResend.trim();
+    if (!toUse) {
       toast.error("Email is required to resend OTP");
       return;
     }
@@ -56,17 +62,48 @@ export default function OtpVerifyPage() {
       const res = await fetch(`${apiUrl}/reSendOtp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: toUse }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || (data && data.success === false)) {
         toast.error(data?.message || "Failed to resend OTP");
       } else {
+        if (!email) setEmail(toUse);
         toast.success(data?.message || "OTP sent to your email.");
         setResendCooldown(60);
       }
     } catch (err) {
       console.error("Resend OTP error:", err);
+      toast.error("Network error — please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleRequestOtpForEmail = async (e) => {
+    e.preventDefault();
+    const toUse = emailForResend.trim();
+    if (!toUse) {
+      toast.error("Please enter your email");
+      return;
+    }
+    setResendLoading(true);
+    try {
+      const res = await fetch(`${apiUrl}/reSendOtp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: toUse }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || (data && data.success === false)) {
+        toast.error(data?.message || "Failed to send OTP. Check if this email is registered.");
+        setResendLoading(false);
+        return;
+      }
+      setEmail(toUse);
+      toast.success("OTP sent. Enter the code below.");
+      setResendCooldown(60);
+    } catch (err) {
       toast.error("Network error — please try again.");
     } finally {
       setResendLoading(false);
@@ -108,7 +145,7 @@ export default function OtpVerifyPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email) {
+    if (!effectiveEmail) {
       toast.error("Email is required");
       return;
     }
@@ -122,7 +159,7 @@ export default function OtpVerifyPage() {
       const res = await fetch(`${apiUrl}/verifyAccount`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email: effectiveEmail, otp }),
       });
 
       const data = await res.json().catch(() => null);
@@ -148,17 +185,72 @@ export default function OtpVerifyPage() {
     }
   };
 
+  // No email: show "Enter email" to request OTP first (e.g. user opened verify-otp in new tab)
+  if (!effectiveEmail) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
+          <h2 className="text-xl font-semibold mb-2 text-center">Verify Your Account</h2>
+          <p className="text-center text-gray-600 text-sm mb-4">
+            Enter the email you used to sign up. We&apos;ll send you an OTP to verify.
+          </p>
+          <form onSubmit={handleRequestOtpForEmail} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={emailForResend}
+                onChange={(e) => setEmailForResend(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[rgb(183,36,42)] focus:ring-1 focus:ring-[rgb(183,36,42)] outline-none"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={resendLoading}
+              className="w-full py-2.5 rounded-md text-white font-medium bg-[rgb(183,36,42)] hover:opacity-95 disabled:opacity-70"
+            >
+              {resendLoading ? "Sending OTP..." : "Send OTP"}
+            </button>
+          </form>
+          <p className="mt-4 text-center text-sm text-gray-500">
+            Already have an account?{" "}
+            <Link to="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">Sign In</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
+        {fromUnverified && (
+          <p className="text-center text-amber-700 text-sm mb-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+            This email is registered but not verified. Enter the OTP sent to your email or resend below.
+          </p>
+        )}
 
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-          {/* Email – read-only, display only */}
+          {/* Email – display with option to change */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700 font-medium">
-              {email || "—"}
+            <div className="flex items-center gap-2">
+              <div className="flex-1 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700 font-medium">
+                {effectiveEmail}
+              </div>
+              <Link
+                to="/account/register"
+                state={{
+                  previousFormData: previousFormData || { email: effectiveEmail },
+                  currentUnverifiedEmail: effectiveEmail,
+                }}
+                className="shrink-0 text-sm font-semibold text-[rgb(183,36,42)] hover:underline whitespace-nowrap"
+              >
+                Change email
+              </Link>
             </div>
           </div>
 
@@ -190,11 +282,11 @@ export default function OtpVerifyPage() {
         </form>
 
         <div className="mt-4 text-center text-sm text-gray-500">
-          Didn't get OTP?{" "}
+          Didn&apos;t get OTP?{" "}
           <button
             type="button"
             onClick={handleResendOtp}
-            disabled={!email || resendLoading || resendCooldown > 0}
+            disabled={resendLoading || resendCooldown > 0}
             className="text-[rgb(183,36,42)] font-semibold underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
           >
             {resendLoading ? "Sending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}

@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X } from "lucide-react";
 import { SIGNUP_DECLARATIONS } from "../constants/signupDeclarations";
 import toast from "react-hot-toast";
@@ -15,17 +15,34 @@ const getInitialDeclarations = () => {
   return obj;
 };
 
+const initialFormData = {
+  name: "",
+  userName: "",
+  email: "",
+  password: "",
+  profilePic: "",
+};
+
 export default function SignupPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [formData, setFormData] = useState({
-    name: "",
-    userName: "",
-    email: "",
-    password: "",
-    profilePic: "",
-  });
+  const [formData, setFormData] = useState(initialFormData);
+
+  // Prefill form when returning from OTP "Change email" (keep previous data, user can change email)
+  const hasPrefilled = useRef(false);
+  useEffect(() => {
+    const prev = location.state?.previousFormData;
+    if (prev && typeof prev === "object" && !hasPrefilled.current) {
+      hasPrefilled.current = true;
+      setFormData({
+        ...initialFormData,
+        ...prev,
+        email: prev.email || "",
+      });
+    }
+  }, [location.state]);
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -101,7 +118,45 @@ export default function SignupPage() {
       return;
     }
 
+    const currentUnverifiedEmail = location.state?.currentUnverifiedEmail;
+
     try {
+      // "Change email" flow: update existing unverified account (same data, only email can change). No new account.
+      if (currentUnverifiedEmail) {
+        const updatePayload = {
+          currentEmail: currentUnverifiedEmail,
+          newEmail: formData.email.trim(),
+          name: formData.name,
+          userName: formData.userName || undefined,
+          password: formData.password,
+          profilePic: formData.profilePic || undefined,
+        };
+
+        const res = await fetch(`${apiUrl}/updateUnverifiedEmail`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatePayload),
+        });
+
+        const data = await res.json().catch(() => null);
+
+        if (!res.ok || (data && data.success === false)) {
+          toast.error(data?.message || "Update failed");
+          setLoading(false);
+          return;
+        }
+
+        toast.success(data?.message || "Account updated. Check your email for OTP.");
+        const emailToVerify = data?.email || formData.email;
+        setTimeout(() => {
+          navigate("/account/verify-otp", {
+            state: { email: emailToVerify, previousFormData: { ...formData, email: emailToVerify } },
+          });
+        }, 1500);
+        setLoading(false);
+        return;
+      }
+
       const payload = {
         name: formData.name,
         userName: formData.userName || undefined,
@@ -121,6 +176,21 @@ export default function SignupPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
+        const isUnverified = data?.code === "USER_NOT_VERIFIED" ||
+          (data?.message && String(data.message).toLowerCase().includes("not verified"));
+        if (isUnverified) {
+          toast.error(data?.message || "Account not verified. Please verify with OTP.");
+          navigate("/account/verify-otp", {
+            state: {
+              email: formData.email,
+              fromUnverified: true,
+              previousFormData: { ...formData },
+              currentUnverifiedEmail: formData.email,
+            },
+          });
+          setLoading(false);
+          return;
+        }
         const errMsg = data?.message || data?.error || `Signup failed (${res.status})`;
         toast.error(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
         setLoading(false);

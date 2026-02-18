@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import VideoPage from "../youtube/YoutubeVide";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
+import OfferBanner from "../../../components/OfferBanner";
 import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 
@@ -320,6 +321,7 @@ export default function InstallmentPlans() {
       structuredData={structuredData}
     />
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
+      <OfferBanner />
       <div className="container-content">
         <header className="mb-4 sm:mb-6 lg:mb-8 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 lg:p-6">
           <div className="flex flex-col gap-4 sm:gap-5 lg:gap-6">

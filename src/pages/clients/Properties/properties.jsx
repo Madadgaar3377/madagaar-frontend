@@ -5,6 +5,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import cities from "../../../constants/cities";
 import SEO from "../../../components/SEO";
+import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 
 const PAGE_SIZE = 6;
@@ -215,6 +216,8 @@ function PropertiesPage() {
           </p>
         </div>
       </header>
+
+      <OfferBanner />
 
       {/* Filters */}
       <section className="container-content max-w-6xl py-4 sm:py-6">

@@ -4,6 +4,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if ne
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
+import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
@@ -186,6 +187,7 @@ export default function LoansPage() {
         structuredData={structuredData}
       />
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding-sm">
+        <OfferBanner />
         <div className="container-content space-y-4 sm:space-y-6">
         {/* Header */}
         <header className="flex flex-col gap-3 sm:gap-4">
