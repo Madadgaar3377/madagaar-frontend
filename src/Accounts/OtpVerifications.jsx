@@ -12,6 +12,7 @@ export default function OtpVerifyPage() {
   const prefilledEmail = location.state?.email || "";
   const previousFormData = location.state?.previousFormData || null;
   const fromUnverified = location.state?.fromUnverified === true;
+  const verifyMessage = location.state?.message || "Please verify your email before logging in. We've sent you a verification code.";
 
   const [email, setEmail] = useState(prefilledEmail);
   const [emailForResend, setEmailForResend] = useState(""); // when no email in state, user types here first
@@ -22,12 +23,33 @@ export default function OtpVerifyPage() {
   const inputRefs = useRef([]);
   const formRef = useRef(null);
   const hasAutoSubmitted = useRef(false);
+  const autoResendDone = useRef(false);
   /** After "Invalid OTP" (or any verify error), auto-verify is disabled; only button click will submit */
   const autoVerifyDisabled = useRef(false);
 
   const effectiveEmail = email || emailForResend.trim();
 
   const otp = otpDigits.join("");
+
+  // Auto resend OTP once when page loads with email (e.g. redirect from login)
+  useEffect(() => {
+    const emailToUse = prefilledEmail?.trim();
+    if (!emailToUse || autoResendDone.current) return;
+    autoResendDone.current = true;
+    fetch(`${apiUrl}/reSendOtp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailToUse }),
+    })
+      .then((r) => r.json().catch(() => null))
+      .then((data) => {
+        if (data?.success) {
+          toast.success(data?.message || "Verification code sent to your email.");
+          setResendCooldown(60);
+        }
+      })
+      .catch(() => { /* silent; user can click Resend OTP */ });
+  }, [apiUrl, prefilledEmail]);
 
   // Auto-verify when all 6 digits are entered (or pasted) – only once; after error, only button click
   useEffect(() => {
@@ -227,9 +249,9 @@ export default function OtpVerifyPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
-        {fromUnverified && (
+        {(fromUnverified || location.state?.message) && (
           <p className="text-center text-amber-700 text-sm mb-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            This email is registered but not verified. Enter the OTP sent to your email or resend below.
+            {verifyMessage}
           </p>
         )}
 

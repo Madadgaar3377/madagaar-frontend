@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { getUser } from "../utils/auth";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const location = useLocation();
+  const navigate = useNavigate();
   const verifiedMessage = location.state?.message || (location.state?.verified ? "Account verified. Please sign in." : null);
 
   useEffect(() => {
@@ -51,6 +52,13 @@ export default function LoginPage() {
       const data = await res.json().catch(() => null);
 
       if (!res.ok || (data && data.success === false)) {
+        if (data?.code === "EMAIL_NOT_VERIFIED" && data?.email) {
+          const message = data?.message || "Please verify your email before logging in. We've sent you a verification code.";
+          toast(message, { icon: "📧", duration: 5000 });
+          navigate("/account/verify-otp", { state: { email: data.email, fromUnverified: true, message } });
+          setLoading(false);
+          return;
+        }
         toast.error(data?.message || `Login failed (${res.status})`);
         setLoading(false);
         return;
