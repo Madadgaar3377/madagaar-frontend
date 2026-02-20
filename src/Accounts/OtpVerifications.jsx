@@ -23,33 +23,12 @@ export default function OtpVerifyPage() {
   const inputRefs = useRef([]);
   const formRef = useRef(null);
   const hasAutoSubmitted = useRef(false);
-  const autoResendDone = useRef(false);
   /** After "Invalid OTP" (or any verify error), auto-verify is disabled; only button click will submit */
   const autoVerifyDisabled = useRef(false);
 
   const effectiveEmail = email || emailForResend.trim();
 
   const otp = otpDigits.join("");
-
-  // Auto resend OTP once when page loads with email (e.g. redirect from login)
-  useEffect(() => {
-    const emailToUse = prefilledEmail?.trim();
-    if (!emailToUse || autoResendDone.current) return;
-    autoResendDone.current = true;
-    fetch(`${apiUrl}/reSendOtp`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: emailToUse }),
-    })
-      .then((r) => r.json().catch(() => null))
-      .then((data) => {
-        if (data?.success) {
-          toast.success(data?.message || "Verification code sent to your email.");
-          setResendCooldown(60);
-        }
-      })
-      .catch(() => { /* silent; user can click Resend OTP */ });
-  }, [apiUrl, prefilledEmail]);
 
   // Auto-verify when all 6 digits are entered (or pasted) – only once; after error, only button click
   useEffect(() => {
