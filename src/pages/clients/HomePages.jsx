@@ -248,7 +248,7 @@ export default function HomePage() {
           />
         </div>
       </section>
-      <OfferBanner />
+      {/* <OfferBanner /> */}
       <FeatureCards />
       <Services />
       <SecondCards />

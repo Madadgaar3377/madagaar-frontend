@@ -197,7 +197,7 @@ export default function InstallmentDetail() {
       <SEO
         title={`${plan.productName || "Installment Plan"} | Madadgaar`}
         description={seoDescription}
-        canonicalUrl={`https://madadgaar.com.pk/installment/${plan._id}`}
+        canonicalUrl={`https://madadgaar.com.pk/installment/${encodeURIComponent(id)}`}
         ogImage={firstImage}
       />
       <div className="container-content">
@@ -340,14 +340,14 @@ export default function InstallmentDetail() {
               <div className="space-y-3">
                 <NavLink 
                   className="block w-full px-4 py-3 text-sm sm:text-base rounded-lg bg-[rgb(183,36,42)] text-white font-semibold hover:bg-red-700 transition-colors text-center" 
-                  to={`/installment/${encodeURIComponent(plan._id)}/apply`}
+                  to={`/installment/${encodeURIComponent(id)}/apply`}
                 >
                   Apply Now
                 </NavLink>
                 <div className="grid grid-cols-2 gap-3">
                   <NavLink 
                     className="px-4 py-3 text-sm sm:text-base rounded-lg border border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-[rgb(183,36,42)] hover:text-white transition-colors text-center" 
-                    to={`${plan._id ? `/installment/product/CompareProduct/${encodeURIComponent(plan._id)}` : "#"}`}
+                    to={id ? `/installment/product/CompareProduct/${encodeURIComponent(id)}` : "#"}
                   >
                     Compare
                   </NavLink>
@@ -359,7 +359,7 @@ export default function InstallmentDetail() {
                   </NavLink>
                 </div>
                 <ShareButtons
-                  url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
+                  url={id ? `https://madadgaar.com.pk/installment/${encodeURIComponent(id)}` : ""}
                   title={plan.productName || "Installment plan"}
                   details={(() => {
                     const plans = plan.paymentPlans || [];
@@ -561,7 +561,7 @@ export default function InstallmentDetail() {
                             )}
 
                             <NavLink
-                              to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
+                              to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}`}
                               className="block w-full text-center px-4 py-3 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
                             >
                               Apply for This Plan
@@ -719,7 +719,7 @@ export default function InstallmentDetail() {
                             </td>
                             <td className="px-4 py-3 text-center">
                               <NavLink
-                                to={`/installment/${encodeURIComponent(plan._id)}/apply?planIndex=${idx}`}
+                                to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}`}
                                 className="inline-block px-4 py-2 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-lg hover:bg-red-700 transition"
                               >
                                 Apply
@@ -1068,8 +1068,8 @@ export default function InstallmentDetail() {
             <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
               {plan ? (
                 <InstallmentReviews 
-                  installmentPlanId={plan.installmentPlanId} 
-                  planId={plan._id} 
+                  installmentPlanId={plan?.installmentPlanId ?? id} 
+                  planId={plan?._id} 
                 />
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -1089,7 +1089,7 @@ export default function InstallmentDetail() {
               {relatedProducts.map((product) => (
                 <NavLink
                   key={product._id}
-                  to={`/installment/${product._id}`}
+                  to={`/installment/${encodeURIComponent(product.installmentPlanId || product._id)}`}
                   className="group bg-white rounded-lg sm:rounded-xl border-2 border-gray-200 overflow-hidden hover:border-[rgb(183,36,42)] hover:shadow-xl transition-all transform hover:-translate-y-1"
                 >
                   {/* Product Image */}

@@ -731,14 +731,14 @@ export default function InstallmentPlans() {
 
                     <div className="mt-1 sm:mt-2 flex items-center gap-2">
                       <Link
-                        to={`/installment/${plan._id}`}
+                        to={`/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}`}
                         className="flex-1 min-w-0 px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-medium hover:shadow-lg transition text-center"
                       >
                         View
                       </Link>
                       <ShareButtons
                         compact
-                        url={plan._id ? `https://madadgaar.com.pk/installment/${plan._id}` : ""}
+                        url={(plan.installmentPlanId || plan._id) ? `https://madadgaar.com.pk/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}` : ""}
                         title={plan.productName || "Installment plan"}
                         details={[
                           plan.city || "Pakistan",

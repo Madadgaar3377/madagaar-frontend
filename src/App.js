@@ -41,6 +41,7 @@ import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
 import TermsAndConditions from "./pages/clients/TermsAndConditions.jsx";
 import PrivacyPolicy from "./pages/clients/PrivacyPolicy.jsx";
+import OffersPage from "./pages/clients/Offers.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -75,6 +76,7 @@ function App() {
             {/* Public pages */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/offers" element={<OffersPage />} />
             {/* Phase 1: Team detail route disabled - contact via email only */}
             {/* <Route path="/team/:id" element={<TeamMemberDetail />} /> */}
             <Route path="/loans" element={<LoansPage />} />

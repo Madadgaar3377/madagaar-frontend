@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
+import SaleCountdown from "./SaleCountdown";
 
 /**
  * Offer banners carousel – same data as mobile app (getAllOffers).
@@ -84,7 +85,7 @@ export default function OfferBanner() {
     return (
       <section className="w-full py-6 sm:py-8" aria-hidden>
         <div className="container-safe px-4 sm:px-6 max-w-5xl mx-auto">
-          <div className="rounded-2xl overflow-hidden bg-gray-200 animate-pulse aspect-[3/1] min-h-[140px] sm:min-h-[200px]" />
+          <div className="rounded-2xl overflow-hidden bg-gray-200 animate-pulse aspect-[2.2/1] min-h-[180px] sm:min-h-[240px]" />
         </div>
       </section>
     );
@@ -95,6 +96,7 @@ export default function OfferBanner() {
   return (
     <section className="w-full py-6 sm:py-8" aria-label="Offers and promotions">
       <div className="container-safe px-4 sm:px-6 max-w-5xl mx-auto">
+        <SaleCountdown />
         {/* Heading – only when we have banners */}
         <div className="flex items-center gap-3 mb-4 sm:mb-5">
           <span
@@ -185,11 +187,11 @@ function BannerSlide({ banner, onClick }) {
       onClick={onClick}
       className="group w-full text-left block focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#b7242a] focus:ring-offset-0"
     >
-      <div className="relative w-full aspect-[3/1] min-h-[160px] sm:min-h-[200px]">
+      <div className="relative w-full aspect-[2.2/1] min-h-[180px] sm:min-h-[240px] bg-gray-100 flex items-center justify-center">
         <img
           src={banner.imageUrl}
           alt={hasRealTitle ? banner.title : "Offer"}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
         {showOverlay && (
           <div className="absolute inset-x-0 bottom-0 pt-12 pb-3 sm:pb-4 px-4 sm:px-5 bg-gradient-to-t from-black/70 via-black/30 to-transparent">

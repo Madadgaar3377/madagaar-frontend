@@ -352,7 +352,7 @@ export default function AdminInstallment() {
 
                   <div className="mt-4 flex gap-3">
                     <a href={`tel:${openPlan.user?.number || ""}`} className="flex-1 text-center px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white font-semibold">Call to Buy</a>
-                    <a href={`/#/installment/${openPlan._id}`} className="flex-1 text-center px-4 py-2 rounded-md border border-gray-200">View listing</a>
+                    <a href={`/#/installment/${encodeURIComponent(openPlan.installmentPlanId || openPlan._id)}`} className="flex-1 text-center px-4 py-2 rounded-md border border-gray-200">View listing</a>
                   </div>
                 </div>
               </div>

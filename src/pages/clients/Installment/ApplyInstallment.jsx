@@ -39,7 +39,7 @@ const ApplyInstallment = () => {
   const fetchPlanDetails = useCallback(async () => {
     try {
       setLoadingPlan(true);
-      const response = await fetch(`${backendBaseUrl}/getInstallment/${id}`);
+      const response = await fetch(`${backendBaseUrl}/getInstallment/${encodeURIComponent(id)}`);
       const data = await response.json();
 
       if (!response.ok || !data.success) {

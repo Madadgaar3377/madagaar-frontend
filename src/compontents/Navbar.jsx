@@ -71,6 +71,9 @@ export default function Navbar({
             <NavLink to="/about" className="text-gray-700 hover:text-gray-900">
               About Us
             </NavLink>
+            {/* <NavLink to="/offers" className="text-gray-700 hover:text-gray-900">
+              Offers
+            </NavLink> */}
 
             {/* Desktop dropdown */}
             <div
@@ -242,6 +245,9 @@ export default function Navbar({
 
           <NavLink to="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             About Us
+          </NavLink>
+          <NavLink to="/offers" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
+            Offers
           </NavLink>
           <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
             Blog
