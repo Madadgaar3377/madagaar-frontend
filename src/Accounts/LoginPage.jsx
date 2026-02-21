@@ -35,6 +35,16 @@ export default function LoginPage() {
     return Object.keys(errs).length === 0;
   };
 
+  const fetchClientIp = async () => {
+    try {
+      const r = await fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout(3000) });
+      const d = await r.json();
+      return d?.ip || null;
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setFieldErrors({});
@@ -42,10 +52,11 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
+      const clientIp = await fetchClientIp();
       const res = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, loginSource: "madadgaar", ...(clientIp && { clientIp }) }),
         credentials: "include",
       });
 
