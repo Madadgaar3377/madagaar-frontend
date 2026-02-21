@@ -966,8 +966,10 @@ const UserDashboard = () => {
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-600">Agent ID</p>
-                      <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.assigenAgent}</p>
+                      <>
+                        <p className="text-sm text-gray-600">Agent ID</p>
+                        <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.assigenAgent}</p>
+                      </>
                     )}
                   </div>
                 </div>
