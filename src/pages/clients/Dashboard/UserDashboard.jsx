@@ -13,6 +13,7 @@ const UserDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState({
     user: null,
     installments: [],
@@ -169,9 +170,27 @@ const UserDashboard = () => {
     }).format(amount);
   };
 
-  const handleViewDetails = (application) => {
-    setSelectedApplication(application);
-    setShowDetailsModal(true);
+  const handleViewDetails = async (application) => {
+    if (application?.installmentPlanId != null && application?.applicationId) {
+      setDetailsLoading(true);
+      setShowDetailsModal(true);
+      setSelectedApplication(application);
+      try {
+        const token = getAuthToken();
+        const res = await fetch(`${backendBaseUrl}/getApplication/${application.applicationId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const json = await res.json();
+        if (json.success && json.data) setSelectedApplication(json.data);
+      } catch (err) {
+        console.error('Failed to load application details', err);
+      } finally {
+        setDetailsLoading(false);
+      }
+    } else {
+      setSelectedApplication(application);
+      setShowDetailsModal(true);
+    }
   };
 
   const closeDetailsModal = () => {
@@ -905,8 +924,8 @@ const UserDashboard = () => {
                 </div>
               )}
 
-              {/* Agent Information */}
-              {selectedApplication.assigenAgent && (
+              {/* Assigned Agent - full details */}
+              {(selectedApplication.agentDetails || selectedApplication.assigenAgent) && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -915,8 +934,98 @@ const UserDashboard = () => {
                     Assigned Agent
                   </h3>
                   <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                    <p className="text-sm text-gray-600">Agent ID</p>
-                    <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.assigenAgent}</p>
+                    {detailsLoading ? (
+                      <p className="text-sm text-gray-500">Loading agent details...</p>
+                    ) : selectedApplication.agentDetails ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-xs font-semibold text-gray-600 uppercase">Name</p>
+                          <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.agentDetails.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-600 uppercase">Agent ID</p>
+                          <p className="text-base font-mono text-gray-900 mt-1">{selectedApplication.agentDetails.userId || selectedApplication.assigenAgent || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-600 uppercase">Email</p>
+                          <a href={`mailto:${selectedApplication.agentDetails.email}`} className="text-base text-blue-600 hover:underline mt-1 block">{selectedApplication.agentDetails.email || 'N/A'}</a>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-600 uppercase">Phone</p>
+                          <a href={`tel:${selectedApplication.agentDetails.phoneNumber}`} className="text-base text-gray-900 mt-1 block">{selectedApplication.agentDetails.phoneNumber || 'N/A'}</a>
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-gray-600 uppercase">WhatsApp</p>
+                          <p className="text-base text-gray-900 mt-1">{selectedApplication.agentDetails.WhatsappNumber || 'N/A'}</p>
+                        </div>
+                        {selectedApplication.agentDetails.Address && (
+                          <div className="sm:col-span-2">
+                            <p className="text-xs font-semibold text-gray-600 uppercase">Address</p>
+                            <p className="text-base text-gray-900 mt-1">{selectedApplication.agentDetails.Address}</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600">Agent ID</p>
+                      <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.assigenAgent}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Assigned Partner - full details */}
+              {selectedApplication.partnerDetails && !detailsLoading && (
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Partner
+                  </h3>
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-xs font-semibold text-gray-600 uppercase">Company / Partner Name</p>
+                        <p className="text-base font-bold text-gray-900 mt-1">
+                          {selectedApplication.partnerDetails.companyDetails?.RegisteredCompanyName || selectedApplication.partnerDetails.name || 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-600 uppercase">Contact Name</p>
+                        <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.name || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-600 uppercase">Email</p>
+                        <a href={`mailto:${selectedApplication.partnerDetails.email}`} className="text-base text-blue-600 hover:underline mt-1 block">{selectedApplication.partnerDetails.email || 'N/A'}</a>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-600 uppercase">Phone</p>
+                        <a href={`tel:${selectedApplication.partnerDetails.phoneNumber}`} className="text-base text-gray-900 mt-1 block">{selectedApplication.partnerDetails.phoneNumber || 'N/A'}</a>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-600 uppercase">WhatsApp</p>
+                        <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.WhatsappNumber || 'N/A'}</p>
+                      </div>
+                      {selectedApplication.partnerDetails.companyDetails?.HeadOfficeAddress && (
+                        <div className="sm:col-span-2">
+                          <p className="text-xs font-semibold text-gray-600 uppercase">Head Office Address</p>
+                          <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.companyDetails.HeadOfficeAddress}</p>
+                        </div>
+                      )}
+                      {selectedApplication.partnerDetails.companyDetails?.AuthorizedContactPerson?.length > 0 && (
+                        <div className="sm:col-span-2 mt-2 pt-2 border-t border-amber-200">
+                          <p className="text-xs font-semibold text-gray-600 uppercase mb-2">Authorized Contact</p>
+                          {selectedApplication.partnerDetails.companyDetails.AuthorizedContactPerson.slice(0, 2).map((person, idx) => (
+                            <div key={idx} className="text-sm text-gray-700 mb-1">
+                              <span className="font-medium">{person.fullName || 'N/A'}</span>
+                              {person.Designation && <span className="text-gray-500"> ({person.Designation})</span>}
+                              {person.phoneNumber && <span> · {person.phoneNumber}</span>}
+                              {person.email && <span> · {person.email}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
