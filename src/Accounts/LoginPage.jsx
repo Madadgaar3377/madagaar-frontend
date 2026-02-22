@@ -78,7 +78,16 @@ export default function LoginPage() {
       const token = data?.token;
       const userType = (data?.user?.UserType || data?.user?.userType || "user").toLowerCase();
 
-      // If partner, redirect to partner panel with Bearer token (no login on main site)
+      // If agent, redirect to agent panel with token for auto-login
+      if (userType === "agent" && token) {
+        const agentPanelUrl = "https://agent.madadgaar.com.pk";
+        const url = `${agentPanelUrl}/login?token=${encodeURIComponent(token)}`;
+        toast.success("Redirecting to agent panel...");
+        window.location.href = url;
+        return;
+      }
+
+      // If partner, redirect to partner panel with token for auto-login
       if (userType === "partner" && token) {
         const partnerPanelUrl = "https://partner.madadgaar.com.pk";
         const url = `${partnerPanelUrl}?token=${encodeURIComponent(token)}`;

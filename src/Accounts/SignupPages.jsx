@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X, Phone } from "lucide-react";
 import { SIGNUP_DECLARATIONS } from "../constants/signupDeclarations";
 import toast from "react-hot-toast";
 
@@ -15,12 +15,20 @@ const getInitialDeclarations = () => {
   return obj;
 };
 
+const USER_TYPES = [
+  { value: "user", label: "User", desc: "Browse and apply for products" },
+  { value: "agent", label: "Agent", desc: "Assist users and earn commission" },
+  { value: "partner", label: "Partner", desc: "List your business products" },
+];
+
 const initialFormData = {
   name: "",
   userName: "",
   email: "",
+  phoneNumber: "",
   password: "",
   profilePic: "",
+  userType: "user",
 };
 
 export default function SignupPage() {
@@ -128,6 +136,7 @@ export default function SignupPage() {
           newEmail: formData.email.trim(),
           name: formData.name,
           userName: formData.userName || undefined,
+          phoneNumber: formData.phoneNumber || undefined,
           password: formData.password,
           profilePic: formData.profilePic || undefined,
         };
@@ -161,9 +170,10 @@ export default function SignupPage() {
         name: formData.name,
         userName: formData.userName || undefined,
         email: formData.email,
+        phoneNumber: (formData.phoneNumber || "").trim() || undefined,
         password: formData.password,
         profilePic: formData.profilePic || undefined,
-        UserType: "user",
+        UserType: formData.userType || "user",
         termsAccepted: true,
       };
 
@@ -209,232 +219,254 @@ export default function SignupPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center py-12 px-4 relative overflow-hidden">
-      {/* Background Decoration */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-red-200 rounded-full opacity-10 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-300 rounded-full opacity-10 blur-3xl"></div>
+  const inputBase =
+    "w-full pl-11 pr-4 py-3 bg-gray-50/80 border border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]/30 focus:border-[rgb(183,36,42)] focus:bg-white transition-all duration-200";
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo and Title */}
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50/30 flex items-center justify-center py-10 sm:py-14 px-4 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[rgb(183,36,42)]/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-32 w-72 h-72 bg-red-100/40 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-1/4 w-48 h-48 bg-amber-100/30 rounded-full blur-2xl" />
+      </div>
+
+      <div className="w-full max-w-lg relative z-10">
+        {/* Header */}
         <div className="text-center mb-8">
-          {/* <div className="inline-block p-3 bg-gradient-to-br from-[rgb(183,36,42)] to-red-700 rounded-2xl mb-4 shadow-xl">
-            <img src="/Media/Group%2033.png" alt="logo" className="w-16 h-16 rounded-xl object-cover" />
-          </div> */}
-          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[rgb(183,36,42)] to-red-700 bg-clip-text text-transparent mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-1">
             Create Account
           </h1>
-          <p className="text-gray-600 font-medium">Join Madadgaar today</p>
+          <p className="text-gray-500 text-sm sm:text-base">Join Madadgaar — one account for users, agents & partners</p>
         </div>
 
-        {/* Signup Form Card */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Profile Image Upload */}
-            <div className="flex flex-col items-center">
-              <div className="relative">
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden">
+          <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+            {/* Profile Photo */}
+            <div className="flex flex-col items-center mb-7">
+              <div className="relative group">
                 {formData.profilePic ? (
-                  <div className="relative group">
+                  <>
                     <img
                       src={formData.profilePic}
                       alt="Profile"
-                      className="w-24 h-24 rounded-full object-cover border-4 border-red-100 shadow-lg"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-gray-100 shadow-md"
                     />
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="absolute -top-2 -right-2 w-8 h-8 bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-700"
+                      className="absolute -top-0.5 -right-0.5 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5" />
                     </button>
-                  </div>
+                  </>
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-100 to-red-200 border-4 border-red-100 flex items-center justify-center shadow-lg">
-                    <UserCircle className="w-12 h-12 text-red-600" />
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center">
+                    <UserCircle className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
                   </div>
                 )}
               </div>
-              <label className="mt-4 cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  disabled={uploadingImage}
-                />
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors">
-                  {uploadingImage ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                      Uploading...
-                    </>
-                  ) : (
-                    <>
-                      <Upload className="w-4 h-4" />
-                      {formData.profilePic ? "Change Photo" : "Upload Photo"}
-                    </>
-                  )}
+              <label className="mt-3 cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium transition-colors">
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploadingImage} />
+                {uploadingImage ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4" />
+                    {formData.profilePic ? "Change photo" : "Upload photo"}
+                  </>
+                )}
+              </label>
+            </div>
+
+            <div className="space-y-5">
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Full name <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    className={inputBase}
+                  />
                 </div>
-              </label>
-            </div>
-
-            {/* Full Name */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Full Name <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  name="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
-                />
               </div>
-            </div>
 
-            {/* Username */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  name="userName"
-                  type="text"
-                  placeholder="Choose a username (optional)"
-                  value={formData.userName}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
-                />
+              {/* Username */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Username <span className="text-gray-400 font-normal">(optional)</span></label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    name="userName"
+                    type="text"
+                    placeholder="Choose a username"
+                    value={formData.userName}
+                    onChange={handleChange}
+                    className={inputBase}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
-                />
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone number</label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    name="phoneNumber"
+                    type="tel"
+                    placeholder="e.g. 03001234567"
+                    value={formData.phoneNumber}
+                    onChange={handleChange}
+                    className={inputBase}
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Password <span className="text-red-500">*</span>
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Minimum 8 characters"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                  className="w-full pl-10 pr-12 py-3 bg-white border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none transition-all font-medium"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-600 transition-colors"
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    className={inputBase}
+                  />
+                </div>
               </div>
-              <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters</p>
-            </div>
 
-            {/* Terms & Privacy – checkboxes only */}
-            <div className="space-y-3 border border-gray-200 rounded-xl p-4 bg-gray-50/50">
-              {SIGNUP_DECLARATIONS.map((sec) =>
-                sec.items.map((label, idx) => {
-                  const key = `${sec.section}-${idx}`;
-                  const isTerms = idx === 0;
-                  const isPrivacy = idx === 1;
-                  return (
-                    <div key={key} className="flex items-start gap-2">
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="At least 8 characters"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    minLength={8}
+                    className={`${inputBase} pr-12`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((s) => !s)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <p className="mt-1 text-xs text-gray-400">Must be at least 8 characters</p>
+              </div>
+
+              {/* Account type — moved to end before terms */}
+              <div className="pt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">I am signing up as <span className="text-red-500">*</span></label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  {USER_TYPES.map((opt) => (
+                    <label
+                      key={opt.value}
+                      className={`relative flex flex-col p-3.5 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                        formData.userType === opt.value
+                          ? "border-[rgb(183,36,42)] bg-red-50/80 shadow-sm"
+                          : "border-gray-200 bg-gray-50/50 hover:border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
                       <input
-                        type="checkbox"
-                        id={key}
-                        checked={declarationsChecked[key] || false}
-                        onChange={(e) => setDeclaration(key, e.target.checked)}
-                        className="mt-1 w-4 h-4 rounded border-gray-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
+                        type="radio"
+                        name="userType"
+                        value={opt.value}
+                        checked={formData.userType === opt.value}
+                        onChange={handleChange}
+                        className="sr-only"
                       />
-                      <label htmlFor={key} className="text-sm text-gray-700 cursor-pointer">
-                        {isTerms && (
-                          <>
-                            I agree to the{" "}
-                            <Link to="/terms-and-conditions" className="text-[rgb(183,36,42)] font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link>
-                          </>
-                        )}
-                        {isPrivacy && (
-                          <>
-                            I agree to the{" "}
-                            <Link to="/privacy-policy" className="text-[rgb(183,36,42)] font-semibold hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy & Data Protection Policy</Link>
-                          </>
-                        )}
-                      </label>
-                    </div>
-                  );
-                })
-              )}
+                      <span className={`font-semibold ${formData.userType === opt.value ? "text-[rgb(183,36,42)]" : "text-gray-800"}`}>
+                        {opt.label}
+                      </span>
+                      <span className="text-xs text-gray-500 mt-0.5 leading-snug">{opt.desc}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Terms & Privacy */}
+              <div className="space-y-3 rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+                {SIGNUP_DECLARATIONS.map((sec) =>
+                  sec.items.map((label, idx) => {
+                    const key = `${sec.section}-${idx}`;
+                    const isTerms = idx === 0;
+                    const isPrivacy = idx === 1;
+                    return (
+                      <div key={key} className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          id={key}
+                          checked={declarationsChecked[key] || false}
+                          onChange={(e) => setDeclaration(key, e.target.checked)}
+                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
+                        />
+                        <label htmlFor={key} className="text-sm text-gray-600 cursor-pointer leading-snug">
+                          {isTerms && (
+                            <>I agree to the <Link to="/terms-and-conditions" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link></>
+                          )}
+                          {isPrivacy && (
+                            <>I agree to the <Link to="/privacy-policy" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link></>
+                          )}
+                        </label>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
 
-            {/* Submit Button - enabled only when all declarations checked */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading || uploadingImage || !allDeclarationsAccepted}
-              className="w-full bg-gradient-to-r from-[rgb(183,36,42)] to-red-700 text-white py-3.5 rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+              className="mt-6 w-full py-3.5 rounded-xl bg-[rgb(183,36,42)] text-white font-semibold shadow-lg shadow-red-900/20 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Creating Account...
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Creating account...
                 </span>
               ) : (
-                "Create Account"
+                "Create account"
               )}
             </button>
           </form>
 
-          {/* Login Link */}
-          <div className="mt-6 text-center">
-            <p className="text-gray-600 text-sm">
+          <div className="px-6 sm:px-8 pb-6 pt-2 text-center border-t border-gray-100">
+            <p className="text-gray-500 text-sm">
               Already have an account?{" "}
-              <Link
-                to="/account"
-                className="text-[rgb(183,36,42)] hover:text-red-700 font-bold transition-colors hover:underline"
-              >
-                Sign In
+              <Link to="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">
+                Sign in
               </Link>
             </p>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-gray-500 text-sm font-medium">
-            © {new Date().getFullYear()} Madadgaar. All rights reserved.
-          </p>
-        </div>
+        <p className="text-center text-gray-400 text-xs mt-6">
+          © {new Date().getFullYear()} Madadgaar. All rights reserved.
+        </p>
       </div>
     </div>
   );
