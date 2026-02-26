@@ -8,7 +8,7 @@ import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 50;
 
 function PropertiesPage() {
   const structuredData = {
@@ -350,13 +350,14 @@ function PropertiesPage() {
           </div>
           </div>
 
-          {/* Results Count */}
+          {/* Results Count — 50 per page */}
           <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
             <p className="text-xs sm:text-sm text-gray-600">
               Showing <span className="font-semibold text-red-700">{filteredProperties.length}</span> properties
               {filteredProperties.length !== properties.length && (
                 <span> out of <span className="font-semibold">{properties.length}</span> total</span>
               )}
+              <span className="text-gray-500"> • {PAGE_SIZE} per page</span>
             </p>
           </div>
         </div>
@@ -487,8 +488,11 @@ function PropertiesPage() {
               ))}
             </div>
 
-            {/* Pagination */}
+            {/* Pagination — 50 cards per page */}
             <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3">
+              <p className="text-xs sm:text-sm text-gray-500 order-first sm:order-none w-full sm:w-auto text-center sm:text-left">
+                Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, filteredProperties.length)} of {filteredProperties.length} (50 per page)
+              </p>
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -496,7 +500,7 @@ function PropertiesPage() {
               >
                 Previous
               </button>
-              <span className="text-xs sm:text-sm">
+              <span className="text-xs sm:text-sm font-medium">
                 Page {page} / {totalPages}
               </span>
               <button
