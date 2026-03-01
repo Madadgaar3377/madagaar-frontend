@@ -6,6 +6,7 @@ import Navbar from "./compontents/Navbar";
 // import TopBar from "./compontents/TopBar";
 import Footer from "./compontents/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import WhatsAppButton from "./components/WhatsAppButton";
 
 // Pages
 import HomePage from "./pages/clients/HomePages";
@@ -55,9 +56,13 @@ function LayoutWrapper({ children }) {
       {/* {!hideLayout && <TopBar />} */}
       {!hideLayout && <Navbar />}
 
-      {children}
+      {/* Spacer for fixed navbar so content is not hidden under it */}
+      <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem]" : ""}>
+        {children}
+      </main>
 
       {!hideLayout && <Footer />}
+      {!hideLayout && <WhatsAppButton />}
     </>
   );
 }

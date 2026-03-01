@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { isAuthenticated } from "../utils/auth";
 
 export default function Navbar({
@@ -9,8 +10,19 @@ export default function Navbar({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false); // Desktop dropdown
   const [mobileServicesOpen, setMobileServicesOpen] = useState(false); // Mobile collapsible
+  const [isScrolled, setIsScrolled] = useState(false);
   const servicesRef = useRef(null);
   const closeTimeout = useRef(null);
+
+  // Scroll: expanded (original size) at top, compact when scrolled
+  useEffect(() => {
+    function handleScroll() {
+      setIsScrolled(window.scrollY > 24);
+    }
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Close desktop dropdown when clicking outside (still useful for clicks)
   useEffect(() => {
@@ -52,23 +64,44 @@ export default function Navbar({
     }, 150); // 150ms works well; tweak if you want it slower/faster
   };
 
+  const expanded = !isScrolled;
+
   return (
-    <header className="w-full bg-white shadow-sm z-50 safe-area-top">
-      <nav className="container-content">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <NavLink to="/" className="flex items-center gap-3">
-              <img src={logoSrc} alt="logo" className="h-10 rounded-md object-cover" />
+    <header
+      className={`w-full z-50 safe-area-top fixed top-0 left-0 right-0 transition-[padding] duration-300 ease-out ${
+        expanded ? "pt-3 px-3 sm:pt-4 sm:px-4 md:pt-4 md:px-6" : "pt-2 px-3 sm:pt-2 sm:px-4 md:pt-2 md:px-6"
+      }`}
+    >
+      {/* Tube-style navbar: rounded bar; original size when expanded, compact when scrolled */}
+      <nav
+        className={`container-content max-w-6xl mx-auto bg-white/95 backdrop-blur-sm border border-gray-200 rounded-2xl shadow-soft transition-all duration-300 ease-out ${
+          expanded ? "px-3 py-2 sm:px-4 sm:py-2 md:px-5 md:py-2" : "px-3 py-1.5 sm:px-4 sm:py-1.5 md:px-5 md:py-1.5"
+        }`}
+      >
+        <div
+          className={`flex justify-between items-center transition-[min-height] duration-300 ease-out ${
+            expanded ? "min-h-[3.25rem] sm:min-h-14" : "min-h-[2.75rem] sm:min-h-12"
+          }`}
+        >
+          {/* Logo - original size when expanded, slightly smaller when scrolled */}
+          <div className="flex items-center shrink-0">
+            <NavLink to="/" className="flex items-center gap-2 sm:gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2">
+              <img
+                src={logoSrc}
+                alt="Madadgaar logo"
+                className={`rounded-lg object-cover w-auto transition-[height] duration-300 ease-out ${
+                  expanded ? "h-8 sm:h-9" : "h-7 sm:h-8"
+                }`}
+              />
             </NavLink>
           </div>
 
           {/* Desktop menu */}
-          <div className="hidden md:flex items-center space-x-6">
-            <NavLink to="/" className="text-gray-700 hover:text-gray-900">
+          <div className="hidden md:flex items-center gap-0.5 lg:gap-1">
+            <NavLink to="/" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               Home
             </NavLink>
-            <NavLink to="/about" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/about" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               About Us
             </NavLink>
             {/* <NavLink to="/offers" className="text-gray-700 hover:text-gray-900">
@@ -86,7 +119,7 @@ export default function Navbar({
                 type="button"
                 aria-expanded={servicesOpen}
                 aria-controls="services-dropdown"
-                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 focus:outline-none"
+                className="flex items-center gap-2 px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 text-sm font-medium"
               >
                 Services
                 <svg
@@ -105,7 +138,7 @@ export default function Navbar({
               {/* Dropdown */}
               <div
                 id="services-dropdown"
-                className={`absolute left-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-2 z-20 transition-all duration-200 transform ${
+                className={`absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-2xl shadow-soft py-2 z-20 transition-all duration-200 transform origin-top-left ${
                   servicesOpen ? "opacity-100 scale-100" : "opacity-0 scale-95 pointer-events-none"
                 }`}
                 // also keep mouse enter/leave on dropdown itself to avoid accidental close
@@ -116,7 +149,7 @@ export default function Navbar({
                   <NavLink
                     key={s}
                     to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
-                    className="block px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+                    className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-primary-50 hover:text-primary transition-colors duration-200 rounded-xl mx-1.5 text-sm font-medium"
                     onClick={() => setServicesOpen(false)}
                   >
                     {s}
@@ -126,26 +159,25 @@ export default function Navbar({
             </div>
 
             
-            <NavLink to="/blog" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/blog" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               Blog
             </NavLink>
-            <NavLink to="/faq" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/faq" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               FAQs
             </NavLink>
-            <NavLink to="/contact" className="text-gray-700 hover:text-gray-900">
+            <NavLink to="/contact" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               Contact
             </NavLink>
           </div>
 
           {/* Account/Dashboard & mobile button */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {isAuthenticated() ? (
               <NavLink
                 to="/dashboard"
-                className="hidden md:inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white"
-                style={{ background: "rgb(183, 36, 42)" }}
+                className="btn-primary hidden md:inline-flex gap-2"
               >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                 </svg>
                 Dashboard
@@ -153,8 +185,7 @@ export default function Navbar({
             ) : (
               <NavLink
                 to="/account"
-                className="hidden md:inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white"
-                style={{ background: "rgb(183, 36, 42)" }}
+                className="btn-primary hidden md:inline-flex"
               >
                 Account
               </NavLink>
@@ -164,7 +195,7 @@ export default function Navbar({
               type="button"
               onClick={() => setMobileOpen((prev) => !prev)}
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
-              className="md:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+              className="md:hidden inline-flex items-center justify-center min-h-touch min-w-touch p-2 rounded-xl text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {mobileOpen ? (
@@ -178,100 +209,112 @@ export default function Navbar({
         </div>
       </nav>
 
-      {/* Mobile sidebar overlay */}
-      <div
-        onClick={() => setMobileOpen(false)}
-        className={`fixed inset-0 z-40 transition-opacity duration-200 ${mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"} bg-black/30`}
-      />
-
-      {/* Mobile sidebar */}
-      <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-white z-50 transform transition-transform duration-300 ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
-        aria-hidden={!mobileOpen}
-      >
-        <div className="flex items-center justify-between px-4 py-4 border-b">
-          <NavLink to="/" className="flex items-center gap-3" onClick={() => setMobileOpen(false)}>
-            <img src={logoSrc} alt="logo" className="h-10 rounded-md object-cover" />
-          </NavLink>
-          <button
-            type="button"
+      {/* Mobile sidebar overlay - animated */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={() => setMobileOpen(false)}
-            className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
-            aria-label="Close menu"
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Mobile sidebar - slide animation */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.aside
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "tween", duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+            className="fixed top-0 left-0 h-full w-[min(18rem,85vw)] max-w-[18rem] bg-white z-50 shadow-2xl safe-area-left"
+            aria-hidden={!mobileOpen}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <nav className="px-4 py-4 overflow-auto h-[calc(100%-80px)]">
-          <NavLink to="/" className="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            Home
-          </NavLink>
-
-          {/* Mobile Services collapsible */}
-          <div className="mt-2 border-t pt-3">
-            <button
-              type="button"
-              onClick={() => setMobileServicesOpen((s) => !s)}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none"
-              aria-expanded={mobileServicesOpen}
-            >
-              <span className="font-medium">Services</span>
-              <svg className={`w-4 h-4 transform transition-transform duration-300 ${mobileServicesOpen ? "rotate-180" : "rotate-0"}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
-
-            <div className={`mt-1 px-1 overflow-hidden transition-all duration-300 ${mobileServicesOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
-              {services.map((s) => (
-                <NavLink
-                  key={s}
-                  to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
-                  className="block px-4 py-2 text-gray-700 rounded-md hover:bg-gray-50"
-                  onClick={() => {
-                    setMobileOpen(false);
-                    setMobileServicesOpen(false);
-                  }}
-                >
-                  {s}
-                </NavLink>
-              ))}
+            <div className="flex items-center justify-between px-4 py-4 border-b border-gray-100">
+              <NavLink to="/" className="flex items-center gap-3 rounded-lg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" onClick={() => setMobileOpen(false)}>
+                <img src={logoSrc} alt="Madadgaar logo" className="h-10 rounded-md object-cover" />
+              </NavLink>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="inline-flex items-center justify-center min-h-touch min-w-touch p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Close menu"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-          </div>
 
-          <NavLink to="/about" className="block mt-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            About Us
-          </NavLink>
-          <NavLink to="/offers" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            Offers
-          </NavLink>
-          <NavLink to="/blog" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            Blog
-          </NavLink>
-          <NavLink to="/faq" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            FAQs
-          </NavLink>
-          <NavLink to="/contact" className="block mt-1 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-50" onClick={() => setMobileOpen(false)}>
-            Contact
-          </NavLink>
+            <nav className="px-4 py-4 overflow-y-auto h-[calc(100%-5rem)]">
+              <NavLink to="/" className="flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors min-h-touch" onClick={() => setMobileOpen(false)}>
+                Home
+              </NavLink>
 
-          <div className="mt-6 px-3">
-            {isAuthenticated() ? (
-              <NavLink to="/dashboard" className="block text-center px-4 py-2 border rounded-md bg-[rgb(183,36,42)] text-white font-medium" onClick={() => setMobileOpen(false)}>
-                Dashboard
-              </NavLink>
-            ) : (
-              <NavLink to="/account" className="block text-center px-4 py-2 border rounded-md bg-[rgb(183,36,42)] text-white font-medium" onClick={() => setMobileOpen(false)}>
-                Account
-              </NavLink>
-            )}
-          </div>
-        </nav>
-      </aside>
+              {/* Mobile Services collapsible */}
+              <div className="mt-2 border-t border-gray-100 pt-3">
+                <button
+                  type="button"
+                  onClick={() => setMobileServicesOpen((s) => !s)}
+                  className="w-full flex items-center justify-between px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary min-h-touch"
+                  aria-expanded={mobileServicesOpen}
+                >
+                  <span className="font-medium">Services</span>
+                  <svg className={`w-5 h-5 transform transition-transform duration-300 ${mobileServicesOpen ? "rotate-180" : "rotate-0"}`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <motion.div
+                  initial={false}
+                  animate={{ height: mobileServicesOpen ? "auto" : 0, opacity: mobileServicesOpen ? 1 : 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-1 px-1 pb-2">
+                    {services.map((s) => (
+                      <NavLink
+                        key={s}
+                        to={`/${s.replace(/\s+/g, "-").toLowerCase()}`}
+                        className="flex items-center px-4 py-2.5 text-gray-600 rounded-lg hover:bg-primary-50 hover:text-primary transition-colors min-h-touch"
+                        onClick={() => {
+                          setMobileOpen(false);
+                          setMobileServicesOpen(false);
+                        }}
+                      >
+                        {s}
+                      </NavLink>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+
+              <NavLink to="/about" className="flex items-center mt-1 px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>About Us</NavLink>
+              <NavLink to="/offers" className="flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Offers</NavLink>
+              <NavLink to="/blog" className="flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Blog</NavLink>
+              <NavLink to="/faq" className="flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>FAQs</NavLink>
+              <NavLink to="/contact" className="flex items-center px-3 py-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Contact</NavLink>
+
+              <div className="mt-6 px-3">
+                {isAuthenticated() ? (
+                  <NavLink to="/dashboard" className="btn-primary w-full justify-center" onClick={() => setMobileOpen(false)}>
+                    Dashboard
+                  </NavLink>
+                ) : (
+                  <NavLink to="/account" className="btn-primary w-full justify-center" onClick={() => setMobileOpen(false)}>
+                    Account
+                  </NavLink>
+                )}
+              </div>
+            </nav>
+          </motion.aside>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
