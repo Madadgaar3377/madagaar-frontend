@@ -16,13 +16,13 @@ export default function LoadingPage({
   message = "Hang tight — preparing things for you...",
   logoSrc = null, // if you have a small logo URL set it here
 }) {
-  const accent = "rgb(183,36,42)";
+  const accent = "var(--color-primary, rgb(183,36,42))";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4 sm:p-6 safe-area-top safe-area-bottom">
       <div className="w-full max-w-2xl text-center space-y-6">
         {/* Floating brand / hero */}
-        <div className="mx-auto w-40 h-40 rounded-3xl bg-white shadow-2xl flex items-center justify-center relative overflow-hidden">
+        <div className="mx-auto w-36 h-36 sm:w-40 sm:h-40 rounded-3xl bg-white shadow-soft flex items-center justify-center relative overflow-hidden">
           {/* Animated concentric rings (SVG) */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <defs>

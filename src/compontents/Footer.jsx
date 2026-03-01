@@ -1,100 +1,145 @@
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+
+const footerLinks = [
+  { to: "/offers", label: "Offers" },
+  { to: "/properties", label: "Properties" },
+  { to: "/loans", label: "Loans" },
+  { to: "/installments", label: "Installments" },
+  { to: "/insurance", label: "Insurance" },
+  { to: "/about", label: "How It Works" },
+  { to: "/faq", label: "FAQs" },
+];
+
+const container = {
+  hidden: { opacity: 0 },
+  visible: (i = 1) => ({
+    opacity: 1,
+    transition: { staggerChildren: 0.06, delayChildren: 0.05 * i },
+  }),
+};
+
+const item = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0 },
+};
+
 const Footer = () => {
-    return (
-      <>
-      <footer className="bg-gray-900 text-white pt-12 sm:pt-16 pb-6 safe-area-bottom">
-        <div className="container-content">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
-          
+  return (
+    <footer className="bg-gray-900 text-white pt-10 sm:pt-14 lg:pt-16 pb-6 safe-area-bottom">
+      <div className="container-content">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-10">
           {/* Logo + Description */}
-          <div>
-            <img
-              src="/Media/Group%2033.png"
-              alt="Madadgaar Logo"
-              className="w-48 mb-4"
-            />
-            <p className="text-gray-300 leading-relaxed">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
+            className="min-w-0"
+          >
+            <Link to="/" className="inline-block focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">
+              <img
+                src="/Media/Group%2033.png"
+                alt="Madadgaar Logo"
+                className="w-40 sm:w-48 mb-4 h-auto"
+              />
+            </Link>
+            <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-sm">
               Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's property solutions, insurance support, loans, or installment plans, we make your journey simple, reliable, and stress-free.
             </p>
-          </div>
-  
+          </motion.div>
+
           {/* Quick Links */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+            className="min-w-0"
+          >
+            <h3 className="text-base sm:text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-2 text-gray-300">
-              <li><a href="/offers" className="hover:text-red-500 transition">Offers</a></li>
-              <li><a href="/properties" className="hover:text-red-500 transition">Properties</a></li>
-              <li><a href="/loans" className="hover:text-red-500 transition">Loans</a></li>
-              <li><a href="/installments" className="hover:text-red-500 transition">Installments</a></li>
-              <li><a href="/insurance" className="hover:text-red-500 transition">Insurance</a></li>
-              <li><a href="/about" className="hover:text-red-500 transition">How It Works</a></li>
-              <li><a href="/faq" className="hover:text-red-500 transition">FAQs</a></li>
+              {footerLinks.map((link, i) => (
+                <motion.li key={link.to} variants={item}>
+                  <Link
+                    to={link.to}
+                    className="inline-block py-1.5 text-sm sm:text-base hover:text-primary transition-colors duration-200 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                  >
+                    {link.label}
+                  </Link>
+                </motion.li>
+              ))}
             </ul>
-          </div>
-  
+          </motion.div>
+
           {/* Our Services */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Our Services</h3>
+          <motion.div
+            variants={container}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-30px" }}
+            className="min-w-0"
+          >
+            <h3 className="text-base sm:text-lg font-semibold mb-4 text-white">Our Services</h3>
             <ul className="space-y-2 text-gray-300">
-              <li className="hover:text-red-500 cursor-pointer">Travel Insurance</li>
-              <li className="hover:text-red-500 cursor-pointer">Life Insurance</li>
-              <li className="hover:text-red-500 cursor-pointer">House Insurance</li>
-              <li className="hover:text-red-500 cursor-pointer">Car Insurance</li>
-              <li className="hover:text-red-500 cursor-pointer">Family Insurance</li>
+              {["Travel Insurance", "Life Insurance", "House Insurance", "Car Insurance", "Family Insurance"].map((label, i) => (
+                <motion.li key={label} variants={item} className="text-sm sm:text-base">
+                  <span className="py-1.5 inline-block hover:text-primary transition-colors duration-200">{label}</span>
+                </motion.li>
+              ))}
             </ul>
-          </div>
-  
+          </motion.div>
+
           {/* Contact Info */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Get In Touch</h3>
-            <ul className="space-y-3 text-gray-300">
-              <li className="flex items-start">
-                <span className="mr-2">📍</span>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-30px" }}
+            transition={{ duration: 0.4 }}
+            className="min-w-0"
+          >
+            <h3 className="text-base sm:text-lg font-semibold mb-4 text-white">Get In Touch</h3>
+            <ul className="space-y-3 text-gray-300 text-sm sm:text-base">
+              <li className="flex items-start gap-2">
+                <span className="shrink-0" aria-hidden>📍</span>
                 <span>Gulberg III, Lahore, Pakistan</span>
               </li>
-              <li className="flex items-start">
-                <span className="mr-2">📞</span>
-                <a href="tel:+923071113330" className="hover:text-red-500">+92 307 111 333 0</a>
+              <li className="flex items-start gap-2">
+                <span className="shrink-0" aria-hidden>📞</span>
+                <a href="tel:+923071113330" className="hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">+92 307 111 333 0</a>
               </li>
-              <li className="flex items-start">
-                <span className="mr-2">✉️</span>
-                <a href="mailto:help.madadgaar@gmail.com" className="hover:text-red-500">help.madadgaar@gmail.com</a>
+              <li className="flex items-start gap-2">
+                <span className="shrink-0" aria-hidden>✉️</span>
+                <a href="mailto:help.madadgaar@gmail.com" className="hover:text-primary transition-colors break-all focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">help.madadgaar@gmail.com</a>
               </li>
-              <li className="flex items-start">
-                <span className="mr-2">🌐</span>
-                <a href="https://madadgaar.com.pk" target="_blank" rel="noopener noreferrer" className="hover:text-red-500">
+              <li className="flex items-start gap-2">
+                <span className="shrink-0" aria-hidden>🌐</span>
+                <a href="https://madadgaar.com.pk" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">
                   madadgaar.com.pk
                 </a>
               </li>
             </ul>
-          </div>
-  
+          </motion.div>
         </div>
-  
-        {/* Divider */}
-        <div className="border-t border-gray-700 my-6"></div>
-  
-        {/* Bottom Section */}
-        <div className="flex flex-col md:flex-row justify-between text-gray-400 text-sm">
-          
-          <p className="mb-4 md:mb-0">
-            © 2024 Madadgaar Expert Partner. Designed & Developed By <span className="text-red-500">Code-XA</span>
+
+        <div className="border-t border-gray-700 mt-8 sm:mt-10 pt-6" />
+
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-gray-400 text-xs sm:text-sm">
+          <p className="text-center sm:text-left order-2 sm:order-1">
+            © 2024 Madadgaar Expert Partner. Designed & Developed By <span className="text-primary">Code-XA</span>
           </p>
-  
-          <div className="flex space-x-3">
-            <a href="/" className="hover:text-red-500">Sitemap</a>
-            <span>|</span>
-            <a href="/" className="hover:text-red-500">Privacy Policy</a>
-            <span>|</span>
-            <a href="/" className="hover:text-red-500">Terms of Use</a>
+          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-1 sm:order-2">
+            <Link to="/" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Sitemap</Link>
+            <span className="text-gray-600" aria-hidden>|</span>
+            <Link to="/privacy-policy" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Privacy Policy</Link>
+            <span className="text-gray-600" aria-hidden>|</span>
+            <Link to="/terms-and-conditions" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Terms of Use</Link>
           </div>
-  
         </div>
       </div>
-      </footer>
-      </>
+    </footer>
+  );
+};
 
-    );
-  };
-  
-  export default Footer;
+export default Footer;
   

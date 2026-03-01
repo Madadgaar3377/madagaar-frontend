@@ -1,6 +1,7 @@
 // src/pages/PropertiesPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import cities from "../../../constants/cities";
@@ -197,6 +198,15 @@ function PropertiesPage() {
     );
   }
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.04, duration: 0.35 },
+    }),
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SEO
@@ -206,35 +216,46 @@ function PropertiesPage() {
         canonicalUrl="https://madadgaar.com.pk/properties"
         structuredData={structuredData}
       />
-      <header className="bg-gradient-to-r from-red-700 via-rose-500 to-orange-400 text-white section-padding-sm">
+      <motion.header
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="bg-gradient-to-r from-primary-700 via-primary to-primary-600 text-white section-padding-sm"
+      >
         <div className="container-content max-w-6xl">
           <h1 className="text-responsive-xl font-extrabold mb-1 sm:mb-2">
             Madadgaar Properties | Buy, Rent & Invest Easily
           </h1>
           <p className="text-responsive-sm text-white/90">
-            Browse properties filtered by city, location, type, or budget. <a href="/faq#property" className="underline hover:text-white/80">Learn more about property services</a> or <a href="/loans" className="underline hover:text-white/80">explore financing options</a>.
+            Browse properties filtered by city, location, type, or budget. <a href="/faq#property" className="underline hover:text-white/80 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-white">Learn more about property services</a> or <a href="/loans" className="underline hover:text-white/80 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-white">explore financing options</a>.
           </p>
         </div>
-      </header>
+      </motion.header>
 
       <OfferBanner />
 
       {/* Filters */}
-      <section className="container-content max-w-6xl py-4 sm:py-6">
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-3 sm:p-4 lg:p-6">
+      <motion.section
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, delay: 0.1 }}
+        className="container-content max-w-6xl py-4 sm:py-6"
+      >
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 p-3 sm:p-4 lg:p-6">
           {/* Filter Header with Toggle Button */}
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-bold text-gray-900">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 inline-block mr-2 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="flex items-center justify-between gap-3 mb-3 sm:mb-4">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 flex items-center">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 shrink-0 mr-2 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
               Filter Properties
             </h2>
             <button
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center gap-2 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-semibold"
+              className="lg:hidden btn-primary flex items-center gap-2 text-sm font-semibold shrink-0"
             >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
               {showFilters ? "Hide" : "Filters"}
@@ -251,7 +272,7 @@ function PropertiesPage() {
               placeholder="Search location (e.g., DHA, Gulberg)"
           value={location}
           onChange={(e) => { setLocation(e.target.value); setPage(1); }}
-              className="px-3 py-2 text-sm rounded-lg sm:rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="px-3 py-2.5 text-sm rounded-lg sm:rounded-xl border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow"
             />
           </div>
 
@@ -263,7 +284,7 @@ function PropertiesPage() {
               <select
                 value={typeFilter}
                 onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow min-h-touch"
               >
                 <option value="All">All</option>
                 <option value="Individual">Individual</option>
@@ -277,7 +298,7 @@ function PropertiesPage() {
         <select
           value={city}
           onChange={(e) => { setCity(e.target.value); setPage(1); }}
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow min-h-touch"
         >
                 <option value="All">All Cities</option>
                 {cities.map((cityItem) => (
@@ -294,7 +315,7 @@ function PropertiesPage() {
         <select
           value={propertyType}
           onChange={(e) => { setPropertyType(e.target.value); setPage(1); }}
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow min-h-touch"
         >
                 <option value="All">All Types</option>
                 <option value="Apartment">Apartment / Flat</option>
@@ -314,7 +335,7 @@ function PropertiesPage() {
                 placeholder="e.g., 5000000"
             value={budgetMin}
             onChange={(e) => { setBudgetMin(e.target.value); setPage(1); }}
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow min-h-touch"
           />
             </div>
 
@@ -326,7 +347,7 @@ function PropertiesPage() {
                 placeholder="e.g., 50000000"
             value={budgetMax}
             onChange={(e) => { setBudgetMax(e.target.value); setPage(1); }}
-                className="px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="px-2 sm:px-3 py-2.5 text-xs sm:text-sm rounded-lg border border-gray-300 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-shadow min-h-touch"
               />
             </div>
 
@@ -342,7 +363,7 @@ function PropertiesPage() {
                   setBudgetMax("");
                   setPage(1);
                 }}
-                className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition"
+                className="w-full min-h-touch px-3 py-2.5 text-xs sm:text-sm font-medium text-primary bg-primary-50 hover:bg-primary-100 rounded-lg border border-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Clear Filters
               </button>
@@ -351,9 +372,9 @@ function PropertiesPage() {
           </div>
 
           {/* Results Count — 50 per page */}
-          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t">
+          <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100">
             <p className="text-xs sm:text-sm text-gray-600">
-              Showing <span className="font-semibold text-red-700">{filteredProperties.length}</span> properties
+              Showing <span className="font-semibold text-primary">{filteredProperties.length}</span> properties
               {filteredProperties.length !== properties.length && (
                 <span> out of <span className="font-semibold">{properties.length}</span> total</span>
               )}
@@ -361,7 +382,7 @@ function PropertiesPage() {
             </p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">
@@ -375,11 +396,15 @@ function PropertiesPage() {
           </p>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 lg:gap-6">
-              {pageData.map((p) => (
-                <div
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+              {pageData.map((p, index) => (
+                <motion.div
                   key={p._id}
-                  className="bg-white rounded-xl sm:rounded-2xl shadow-sm border hover:shadow-lg transition flex flex-col overflow-hidden relative"
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 hover:shadow-card-hover transition-shadow duration-300 flex flex-col overflow-hidden relative"
                 >
                   {/* Property Type Badge */}
                   <div className="absolute top-2 left-2 z-10">
@@ -420,7 +445,7 @@ function PropertiesPage() {
 
                     {/* Price */}
                     {p.price && (
-                      <p className="text-xs sm:text-sm font-medium text-red-700 mb-2">
+                      <p className="text-xs sm:text-sm font-medium text-primary mb-2">
                         {p.transactionType === "Rent" ? "Rent: " : "Price: "}
                         {typeof p.price === "number" 
                           ? `PKR ${p.price.toLocaleString()}` 
@@ -484,7 +509,7 @@ function PropertiesPage() {
                       />
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
 
@@ -494,19 +519,21 @@ function PropertiesPage() {
                 Showing {((page - 1) * PAGE_SIZE) + 1}–{Math.min(page * PAGE_SIZE, filteredProperties.length)} of {filteredProperties.length} (50 per page)
               </p>
               <button
+                type="button"
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm border rounded-full disabled:opacity-40"
+                className="w-full sm:w-auto min-h-touch px-4 py-2.5 text-xs sm:text-sm border border-gray-300 rounded-full disabled:opacity-40 hover:bg-gray-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 Previous
               </button>
-              <span className="text-xs sm:text-sm font-medium">
+              <span className="text-xs sm:text-sm font-medium text-gray-700">
                 Page {page} / {totalPages}
               </span>
               <button
+                type="button"
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                className="w-full sm:w-auto px-3 py-1.5 text-xs sm:text-sm border rounded-full disabled:opacity-40"
+                className="w-full sm:w-auto min-h-touch px-4 py-2.5 text-xs sm:text-sm border border-gray-300 rounded-full disabled:opacity-40 hover:bg-gray-50 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
               >
                 Next
               </button>
