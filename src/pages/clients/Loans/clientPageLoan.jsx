@@ -6,6 +6,7 @@ import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
+import AnimatedSection from "../../../components/AnimatedSection";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
@@ -190,6 +191,7 @@ export default function LoansPage() {
         <OfferBanner />
         <div className="container-content space-y-4 sm:space-y-6">
         {/* Header */}
+        <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
         <header className="flex flex-col gap-3 sm:gap-4">
           <div className="flex-1">
             <h1 className="text-responsive-xl font-extrabold text-gray-800">Madadgaar Financing | Get the funds you need, faster and smarter</h1>
@@ -216,7 +218,7 @@ export default function LoansPage() {
 
             <button
               onClick={() => navigate("/loan/apply")}
-              className="hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2 bg-[rgb(183,36,42)] text-white font-semibold shadow hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-red-300"
+              className="hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2 btn-primary"
             >
               Apply for Loan
             </button>
@@ -224,16 +226,18 @@ export default function LoansPage() {
             {/* mobile quick action */}
             <button
               onClick={() => navigate("/loan/apply")}
-              className="sm:hidden inline-flex items-center justify-center rounded-full p-2 bg-[rgb(183,36,42)] text-white font-semibold shadow focus:outline-none focus:ring-2 focus:ring-red-300"
+              className="sm:hidden inline-flex items-center justify-center rounded-full p-2 btn-primary min-h-touch min-w-touch"
               aria-label="Apply for loan"
             >
               Apply
             </button>
           </div>
         </header>
+        </AnimatedSection>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-4">
+        <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
+        <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-3 sm:p-4">
           <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
             <div className="flex-1">
               <label htmlFor="category-filter" className="block text-xs font-medium text-gray-700 mb-1">
@@ -294,6 +298,7 @@ export default function LoansPage() {
             </div>
           </div>
         </div>
+        </AnimatedSection>
 
         {/* Error */}
         {error && (
@@ -308,7 +313,7 @@ export default function LoansPage() {
             <div className="col-span-full rounded-lg bg-white border p-4 sm:p-6 text-center text-sm sm:text-base text-gray-600 shadow-sm">No loan plans found.</div>
           )}
 
-          {visible.map((plan) => {
+          {visible.map((plan, index) => {
             const tenureDisplay = plan.minTenure && plan.maxTenure 
               ? `${plan.minTenure}-${plan.maxTenure} ${plan.tenureUnit || 'Months'}`
               : plan.minTenure
@@ -326,9 +331,9 @@ export default function LoansPage() {
               : "—";
 
             return (
+              <AnimatedSection key={plan._id || plan.planId} animation="fadeInUp" delay={index * 80} className="w-full">
               <article
-                key={plan._id || plan.planId}
-                className="bg-white rounded-xl sm:rounded-2xl shadow-sm border overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-150"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 overflow-hidden flex flex-col card-hover-lift"
               >
                 {/* image */}
                 <div className="h-36 sm:h-44 bg-gray-100 overflow-hidden relative">
@@ -402,7 +407,7 @@ export default function LoansPage() {
                     <div className="flex items-center gap-2 w-full">
                       <NavLink
                         to={`/loans/${plan._id || plan.planId}`}
-                        className="flex-1 min-w-0 px-3 py-2 rounded-md bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-semibold hover:shadow-lg transition text-center"
+                        className="flex-1 min-w-0 px-3 py-2 rounded-lg btn-primary text-xs sm:text-sm font-semibold text-center"
                         aria-label={`View details for ${plan.productName || 'loan plan'}`}
                       >
                         View
@@ -417,6 +422,7 @@ export default function LoansPage() {
                   </div>
                 </div>
               </article>
+              </AnimatedSection>
             );
           })}
         </section>
@@ -490,16 +496,18 @@ export default function LoansPage() {
         )}
 
         {/* Footer small CTA */}
-        <div className="rounded-2xl bg-white p-6 border shadow-sm flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
+        <div className="rounded-2xl bg-white p-6 border shadow-soft flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h4 className="font-semibold text-gray-800">Need advice? Talk with our loan consultants</h4>
             <p className="text-sm text-gray-600">We’ll match you with the right plan and help with documentation.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => navigate("/contact")} className="px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200">Contact Us</button>
-            <button onClick={() => navigate("/loan/apply")} className="px-4 py-2 rounded-md bg-[rgb(183,36,42)] text-white focus:outline-none focus:ring-2 focus:ring-red-300">Start Application</button>
+            <button onClick={() => navigate("/contact")} className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200 min-h-touch">Contact Us</button>
+            <button onClick={() => navigate("/loan/apply")} className="btn-primary px-4 py-2 rounded-lg">Start Application</button>
           </div>
         </div>
+        </AnimatedSection>
 
         {/* Details Modal / Partners component */}
         <OurPartners />

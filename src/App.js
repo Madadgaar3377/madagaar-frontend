@@ -56,9 +56,11 @@ function LayoutWrapper({ children }) {
       {/* {!hideLayout && <TopBar />} */}
       {!hideLayout && <Navbar />}
 
-      {/* Spacer for fixed navbar so content is not hidden under it */}
-      <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem]" : ""}>
-        {children}
+      {/* Spacer for fixed navbar so content is not hidden under it; subtle route fade */}
+      <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden" : "overflow-x-hidden"}>
+        <div key={location.pathname} className="route-transition-enter">
+          {children}
+        </div>
       </main>
 
       {!hideLayout && <Footer />}

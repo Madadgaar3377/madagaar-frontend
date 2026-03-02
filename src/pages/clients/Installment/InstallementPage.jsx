@@ -7,6 +7,7 @@ import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
+import AnimatedSection from "../../../components/AnimatedSection";
 
 // Category options - comprehensive list
 const CATEGORY_OPTIONS = [
@@ -323,6 +324,7 @@ export default function InstallmentPlans() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <OfferBanner />
       <div className="container-content">
+        <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
         <header className="mb-4 sm:mb-6 lg:mb-8 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 p-4 sm:p-5 lg:p-6">
           <div className="flex flex-col gap-4 sm:gap-5 lg:gap-6">
             <div>
@@ -622,6 +624,7 @@ export default function InstallmentPlans() {
             </div>
           </div>
         </header>
+        </AnimatedSection>
 
         {/* content */}
         {loading ? (
@@ -645,13 +648,14 @@ export default function InstallmentPlans() {
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
-              {pageData.map((plan) => {
+              {pageData.map((plan, index) => {
                 const bestPlan = getBestPlan(plan);
                 const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
                 const hasFinance = plan.finance && (plan.finance.bankName || plan.finance.financeInfo);
                 
                 return (
-                <article key={plan._id} className="group bg-white rounded-lg sm:rounded-xl shadow-sm hover:shadow-xl overflow-hidden transition-all duration-300 border border-gray-100">
+                <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full">
+                <article className="group bg-white rounded-lg sm:rounded-xl shadow-soft card-hover-lift overflow-hidden border border-gray-100">
                   <div className="relative overflow-hidden">
                     <img
                       src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
@@ -753,11 +757,13 @@ export default function InstallmentPlans() {
                     </div>
                   </div>
                 </article>
+                </AnimatedSection>
                 );
               })}
             </div>
 
             {/* pagination */}
+            <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
             <div className="mt-4 sm:mt-6 lg:mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium text-center sm:text-left">
                 Showing <span className="text-[rgb(183,36,42)] font-bold">{(page - 1) * PAGE_SIZE + 1}</span> to <span className="text-[rgb(183,36,42)] font-bold">{Math.min(page * PAGE_SIZE, filtered.length)}</span> of <span className="text-[rgb(183,36,42)] font-bold">{filtered.length}</span> {filtered.length === 1 ? 'plan' : 'plans'}
@@ -783,6 +789,7 @@ export default function InstallmentPlans() {
                 </button>
               </div>
             </div>
+            </AnimatedSection>
           </>
         )}
       </div>

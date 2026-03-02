@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { backendBaseUrl } from "../../constants/apiUrl";
 import SEO from "../../components/SEO";
 import OfferBanner from "../../components/OfferBanner";
+import AnimatedSection from "../../components/AnimatedSection";
 
 const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -61,8 +62,10 @@ export default function OffersPage() {
       <div className="min-h-screen bg-gray-50">
         <div className="section-padding container-content py-8 sm:py-12">
           <div className="max-w-5xl mx-auto">
+            <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Offers &amp; Promotions</h1>
             <p className="text-gray-600 mb-8">Limited-time offers on installments, loans, properties, and insurance.</p>
+            </AnimatedSection>
 
             {/* Offer items – products marked as on offer (sale countdown is inside OfferBanner below) */}
             {loading ? (
@@ -70,6 +73,7 @@ export default function OffersPage() {
                 Loading offers…
               </div>
             ) : offerItems.length > 0 ? (
+              <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
               <div className="mb-10">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Products on offer</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -83,7 +87,7 @@ export default function OffersPage() {
                       <Link
                         key={item._id}
                         to={link}
-                        className="block bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md hover:border-red-200 transition-all text-left"
+                        className="block bg-white rounded-xl border border-gray-100 overflow-hidden shadow-soft card-hover-lift text-left"
                       >
                         <div className="relative w-full aspect-[4/3] min-h-[180px] bg-gray-100 flex items-center justify-center">
                           {imageUrl ? (
@@ -121,6 +125,7 @@ export default function OffersPage() {
                   })}
                 </div>
               </div>
+              </AnimatedSection>
             ) : null}
 
             {/* Banners / promotions carousel */}

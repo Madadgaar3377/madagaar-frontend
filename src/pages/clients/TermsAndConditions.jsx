@@ -1,17 +1,19 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import AnimatedSection from "../../components/AnimatedSection";
 
 export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-gray-50 section-padding py-12">
       <div className="container-content max-w-3xl mx-auto">
+        <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
           TERMS & CONDITIONS
         </h1>
         <p className="text-sm text-gray-600 mb-2">Madadgaar Expert Partner Platform</p>
         <p className="text-sm text-gray-500 mb-8">Effective Date: [Insert Date] · Last Updated: [Insert Date]</p>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8 space-y-6 text-gray-700">
+        <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-6 sm:p-8 space-y-6 text-gray-700">
           <section>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">1. Introduction</h2>
             <p className="mb-2">Madadgaar Expert Partner (“Madadgaar”, “Platform”, “We”, “Us”) operates a digital commission-based marketplace that connects Clients (End Users), Madadgaar Expert Partners (Agents), and Partner Companies offering services in:</p>
@@ -216,6 +218,7 @@ export default function TermsAndConditions() {
           <Link to="/account/register" className="text-[rgb(183,36,42)] font-semibold hover:underline">← Back to Sign up</Link>
           <Link to="/privacy-policy" className="text-[rgb(183,36,42)] font-semibold hover:underline">Privacy Policy →</Link>
         </div>
+        </AnimatedSection>
       </div>
     </div>
   );

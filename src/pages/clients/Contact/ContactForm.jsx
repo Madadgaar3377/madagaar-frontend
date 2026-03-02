@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import SEO from '../../../components/SEO';
 import { Toast, useToast } from '../../../components/Toast';
+import AnimatedSection from '../../../components/AnimatedSection';
 
 const ContactForm = () => {
   const navigate = useNavigate();
@@ -105,6 +106,7 @@ const ContactForm = () => {
       <div className="min-h-screen bg-gray-50 section-padding">
         <div className="container-content max-w-4xl">
           {/* Header */}
+          <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-responsive-3xl font-bold text-gray-900 mb-4">
               Contact Us
@@ -113,6 +115,7 @@ const ContactForm = () => {
               Have a question or need assistance? Fill out the form below and we'll get back to you as soon as possible.
             </p>
           </div>
+          </AnimatedSection>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Information Sidebar */}
@@ -288,7 +291,7 @@ const ContactForm = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="w-full btn-primary px-6 py-3 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-touch"
                     >
                       {loading ? (
                         <>

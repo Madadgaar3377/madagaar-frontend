@@ -404,7 +404,7 @@ function PropertiesPage() {
                   variants={cardVariants}
                   initial="hidden"
                   animate="visible"
-                  className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 hover:shadow-card-hover transition-shadow duration-300 flex flex-col overflow-hidden relative"
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 card-hover-lift flex flex-col overflow-hidden relative"
                 >
                   {/* Property Type Badge */}
                   <div className="absolute top-2 left-2 z-10">
@@ -490,7 +490,7 @@ function PropertiesPage() {
                     <div className="mt-auto pt-2 sm:pt-3 flex items-center gap-2">
                       <Link
                         to={`/property/${p._id}`}
-                        className="flex-1 min-w-0 text-xs sm:text-sm font-medium text-white bg-red-700 hover:bg-red-800 px-3 py-2 rounded-lg transition text-center block"
+                        className="flex-1 min-w-0 text-xs sm:text-sm font-medium btn-primary px-3 py-2 rounded-lg text-center block"
                       >
                         View
                       </Link>

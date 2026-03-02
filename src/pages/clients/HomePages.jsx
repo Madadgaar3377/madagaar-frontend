@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import FeatureCards from "./Cards";
 import Services from "./Services";
 import SecondCards from "./SecondCards";
-import OfferBanner from "../../components/OfferBanner";
 // import MobileAppPage from "./MadadghaarAppPage"; // Commented out as per user preference
 import VideoPage from "./youtube/YoutubeVide";
 import InfoBoxes from "./ChosewhyPAge";
@@ -13,6 +12,7 @@ import teamMembers from "../../constants/teamMembers";
 import { Toast, useToast } from "../../components/Toast";
 import { backendBaseUrl } from "../../constants/apiUrl";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
+import AnimatedSection from "../../components/AnimatedSection";
 
 export default function HomePage() {
   const [loading, setLoading] = useState(false);
@@ -249,11 +249,18 @@ export default function HomePage() {
         </div>
       </section>
       {/* <OfferBanner /> */}
-      <FeatureCards />
-      <Services />
-      <SecondCards />
+      <AnimatedSection animation="fadeInUp" delay={0}>
+        <FeatureCards />
+      </AnimatedSection>
+      <AnimatedSection animation="fadeInUp" delay={80}>
+        <Services />
+      </AnimatedSection>
+      <AnimatedSection animation="fadeInUp" delay={120}>
+        <SecondCards />
+      </AnimatedSection>
 
       {/* Team Members Section */}
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
       <section className="w-full bg-gray-50 section-padding">
         <div className="container-content">
           <div className="text-center mb-8 sm:mb-12">
@@ -272,12 +279,18 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* <MobileAppPage /> */}
-      <VideoPage />
-      <OurPartners />
+      <AnimatedSection animation="fadeInUp" delay={0}>
+        <VideoPage />
+      </AnimatedSection>
+      <AnimatedSection animation="fadeInUp" delay={80}>
+        <OurPartners />
+      </AnimatedSection>
 
       {/* Strategy Section */}
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
       <section className="w-full bg-white section-padding">
         <div className="container-content">
           <div className="text-center mb-8 sm:mb-12">
@@ -346,10 +359,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-    
+      </AnimatedSection>
 
       {/* Contact Section */}
+      <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
       <section className="w-full bg-gradient-to-br from-gray-50 via-red-50 to-gray-50 section-padding">
         <div className="container-content max-w-6xl">
           <div className="text-center mb-8 sm:mb-12">
@@ -521,7 +534,10 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-      <InfoBoxes />
+      </AnimatedSection>
+      <AnimatedSection animation="fadeInUp" delay={0}>
+        <InfoBoxes />
+      </AnimatedSection>
 
     </>
   );
