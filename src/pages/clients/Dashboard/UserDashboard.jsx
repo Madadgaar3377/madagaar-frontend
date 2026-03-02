@@ -4,6 +4,7 @@ import { getAuthToken, getUser, logout } from '../../../utils/auth';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import DashboardNavbar from '../../../components/DashboardNavbar';
 import SEO from '../../../components/SEO';
+import AnimatedSection from '../../../components/AnimatedSection';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -244,7 +245,8 @@ const UserDashboard = () => {
       <div className="min-h-screen bg-gray-50 section-padding">
         <div className="container-content">
           {/* Header */}
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 lg:p-8 mb-6">
+          <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
+          <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6 lg:p-8 mb-6">
             <div className="flex justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
@@ -272,8 +274,10 @@ const UserDashboard = () => {
               </button>
             </div>
           </div>
+          </AnimatedSection>
 
           {/* Stats Cards */}
+          <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-red-600">
               <div className="flex items-center justify-between">
@@ -317,7 +321,7 @@ const UserDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-purple-600">
+            <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6 border-l-4 border-purple-600">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-xs sm:text-sm font-semibold uppercase">Loans</p>
@@ -331,6 +335,7 @@ const UserDashboard = () => {
               </div>
             </div>
           </div>
+          </AnimatedSection>
 
           {/* Tabs */}
           <div className="bg-white rounded-lg shadow-md mb-6">

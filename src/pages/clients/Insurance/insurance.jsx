@@ -6,6 +6,7 @@ import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
+import AnimatedSection from "../../../components/AnimatedSection";
 
 const ACCENT = "rgb(183,36,42)";
 const API = (backendBaseUrl || "").replace(/\/$/, "");
@@ -204,8 +205,9 @@ export default function InsuranceInfo() {
       />
       
       {/* top banner */}
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
       <div className="bg-white border-b">
-        <div className="container-content max-w-6xl py-4 sm:py-6 flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
+        <div className="container-content max-w-6xl section-padding flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
           <div className="flex-1">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
               Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support
@@ -217,28 +219,28 @@ export default function InsuranceInfo() {
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <button
               onClick={handleSubmitClaim}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
-              style={{ backgroundColor: ACCENT }}
+              className="w-full sm:w-auto btn-primary rounded-full text-xs sm:text-sm font-medium min-h-touch"
             >
               Submit Claim / Maturity
             </button>
             <button
               onClick={handleApplyClick}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
-              style={{ backgroundColor: ACCENT }}
+              className="w-full sm:w-auto btn-primary rounded-full text-xs sm:text-sm font-medium min-h-touch"
             >
               Browse Plans
             </button>
           </div>
         </div>
       </div>
+      </AnimatedSection>
 
       <OfferBanner />
 
       {/* main content */}
-      <div className="container-content max-w-6xl py-4 sm:py-6 lg:py-8 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="container-content max-w-6xl section-padding space-y-4 sm:space-y-6 lg:space-y-8">
         {/* hero card */}
-        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
+        <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-soft border border-gray-100 p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6">
           <div className="flex-1">
             <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800">
               Secure your future with the right coverage
@@ -277,14 +279,13 @@ export default function InsuranceInfo() {
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
               <button
                 onClick={handleApplyClick}
-                className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium text-white shadow-sm hover:opacity-90 transition"
-                style={{ backgroundColor: ACCENT }}
+                className="btn-primary rounded-full text-sm font-medium"
               >
                 Browse Insurance Plans
               </button>
               <button
                 onClick={handleSubmitClaim}
-                className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium border-2 hover:bg-gray-50 transition"
+                className="inline-flex items-center px-5 py-2.5 rounded-full text-sm font-medium border-2 hover:bg-gray-50 transition min-h-touch"
                 style={{ borderColor: ACCENT, color: ACCENT }}
               >
                 Submit Claim / Maturity Request
@@ -292,10 +293,12 @@ export default function InsuranceInfo() {
             </div>
           </div>
         </div>
+        </AnimatedSection>
 
         {/* Search and Filters */}
         {plans.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border p-4 sm:p-6">
+          <AnimatedSection animation="fadeInUp" delay={120} className="w-full">
+          <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               {/* Search */}
               <div className="flex-1">
@@ -347,6 +350,7 @@ export default function InsuranceInfo() {
               Showing {paginatedPlans.length} of {filteredPlans.length} plans
             </div>
           </div>
+          </AnimatedSection>
         )}
 
         {/* Insurance Plans Grid */}
@@ -369,7 +373,7 @@ export default function InsuranceInfo() {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {paginatedPlans.map((plan) => {
+              {paginatedPlans.map((plan, index) => {
                 const policyDetails = getPolicyDetails(plan);
                 const premium = policyDetails?.premiumAmount || policyDetails?.annualPremium || policyDetails?.contributionAmount;
                 const sumAssured = policyDetails?.sumAssured || policyDetails?.annualCoverageLimit || policyDetails?.sumCovered;
@@ -377,9 +381,9 @@ export default function InsuranceInfo() {
                 const isMotorInsurance = plan.policyType === 'Motor';
                 
                 return (
+                  <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full">
                   <div
-                    key={plan._id}
-                    className="bg-white rounded-xl shadow-sm border hover:shadow-lg transition-all duration-300 overflow-hidden group"
+                    className="bg-white rounded-xl shadow-soft border border-gray-100 card-hover-lift overflow-hidden group"
                   >
                     {/* Plan Image */}
                     <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -551,19 +555,20 @@ export default function InsuranceInfo() {
                       <div className="flex flex-col gap-2 mt-4">
                         <button
                           onClick={() => navigate(`/insurance/${plan._id}`)}
-                          className="w-full px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+                          className="w-full btn-primary rounded-lg font-semibold text-sm min-h-touch"
                         >
                           View Details
                         </button>
                         <button
                           onClick={() => navigate(`/insurance/${plan._id}/apply`)}
-                          className="w-full px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition text-sm"
+                          className="w-full px-4 py-2 border-2 border-red-600 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition text-sm min-h-touch"
                         >
                           Apply Now
                         </button>
                       </div>
                     </div>
                   </div>
+                  </AnimatedSection>
                 );
               })}
             </div>

@@ -3,6 +3,7 @@ import { backendBaseUrl } from "../constants/apiUrl";
 import { getUser } from "../utils/auth";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import AnimatedSection from "../components/AnimatedSection";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -123,7 +124,8 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
+      <AnimatedSection animation="fadeIn" delay={0} className="w-full max-w-md mx-auto">
+      <div className="w-full bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6 safe-margin">
         <div className="mb-6 text-center">
           <img src="Media/Group%2033.png" alt="Logo" className="mx-auto h-12 mb-3" />
           <h1 className="text-2xl font-semibold">Sign in to your account</h1>
@@ -181,9 +183,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-md text-white font-medium ${
-              loading ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed" : "bg-[rgb(183,36,42)] hover:opacity-95"
-            }`}
+            className="w-full py-2 rounded-lg btn-primary font-medium min-h-touch disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -194,6 +194,7 @@ export default function LoginPage() {
           <a href="/account/register" className="text-[rgb(183,36,42)] hover:underline">Sign up</a>
         </div>
       </div>
+      </AnimatedSection>
     </div>
   );
 }

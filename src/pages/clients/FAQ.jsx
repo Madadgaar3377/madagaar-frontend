@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import SEO from "../../components/SEO";
 import { Link } from "react-router-dom";
+import AnimatedSection from "../../components/AnimatedSection";
 
 const FAQPage = () => {
   // State to track which FAQ items are expanded
@@ -211,6 +212,7 @@ const FAQPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white section-padding">
         <div className="container-content max-w-4xl">
           {/* Header */}
+          <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
           <div className="text-center mb-8 sm:mb-12">
             <h1 className="text-responsive-2xl font-bold text-gray-900 mb-4">
               Frequently Asked Questions
@@ -219,9 +221,11 @@ const FAQPage = () => {
               Find answers to common questions about our services. Can't find what you're looking for? <Link to="/contact" className="text-red-600 hover:text-red-700 font-semibold">Contact us</Link>.
             </p>
           </div>
+          </AnimatedSection>
 
           {/* Quick Navigation */}
-          <div className="mb-8 sm:mb-10 bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+          <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
+          <div className="mb-8 sm:mb-10 bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6">
             <h2 className="text-sm sm:text-base font-semibold text-gray-700 mb-3 sm:mb-4">Quick Navigation</h2>
             <div className="flex flex-wrap gap-2 sm:gap-3">
               <a href="#general" className="px-3 sm:px-4 py-2 text-xs sm:text-sm bg-gray-100 hover:bg-red-100 text-gray-700 hover:text-red-700 rounded-lg font-medium transition">
@@ -241,6 +245,7 @@ const FAQPage = () => {
               </a>
             </div>
           </div>
+          </AnimatedSection>
 
           {/* General FAQs */}
           <section id="general" className="mb-8 sm:mb-12">

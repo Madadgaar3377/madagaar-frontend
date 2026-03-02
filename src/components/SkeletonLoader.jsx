@@ -8,7 +8,7 @@ import React from 'react';
 // Team Member Card Skeleton
 export const TeamMemberSkeleton = () => {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg animate-pulse">
+    <div className="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 skeleton-pulse">
       {/* Image Section */}
       <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
       
@@ -31,7 +31,7 @@ export const TeamMemberSkeleton = () => {
 // Property Card Skeleton
 export const PropertyCardSkeleton = () => {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse">
+    <div className="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 skeleton-pulse">
       {/* Image */}
       <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
       
@@ -53,7 +53,7 @@ export const PropertyCardSkeleton = () => {
 // Installment Card Skeleton
 export const InstallmentCardSkeleton = () => {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse">
+    <div className="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 skeleton-pulse">
       {/* Image */}
       <div className="h-40 sm:h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
       
@@ -76,7 +76,7 @@ export const InstallmentCardSkeleton = () => {
 // Loan Card Skeleton
 export const LoanCardSkeleton = () => {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md animate-pulse">
+    <div className="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 skeleton-pulse">
       <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gray-200"></div>
@@ -103,7 +103,7 @@ export const LoanCardSkeleton = () => {
 // Generic Card Skeleton
 export const CardSkeleton = ({ className = "" }) => {
   return (
-    <div className={`bg-white rounded-xl shadow-md animate-pulse ${className}`}>
+    <div className={`bg-white rounded-xl shadow-soft border border-gray-100 skeleton-pulse ${className}`}>
       <div className="p-4 sm:p-6 space-y-3">
         <div className="h-6 bg-gray-200 rounded w-3/4"></div>
         <div className="h-4 bg-gray-200 rounded w-full"></div>

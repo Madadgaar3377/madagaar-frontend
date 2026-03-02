@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import SEO from "../../../components/SEO";
+import AnimatedSection from "../../../components/AnimatedSection";
 
 const PAGE_SIZE = 9;
 
@@ -135,6 +136,7 @@ export default function BlogsPage() {
       />
 
       {/* Modern Hero Section */}
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
       <section className="relative overflow-hidden bg-gradient-to-br from-red-600 via-rose-500 to-orange-500 text-white">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -190,8 +192,10 @@ export default function BlogsPage() {
           </svg>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* Modern Search & Filter Section */}
+      <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
       <section className="container-content max-w-7xl -mt-8 sm:-mt-12 relative z-10">
         <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 sm:p-8">
           {/* Search Bar */}
@@ -277,6 +281,7 @@ export default function BlogsPage() {
           </div>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* Modern Blog Grid */}
       <main className="container-content max-w-7xl py-8 sm:py-12">
@@ -290,7 +295,7 @@ export default function BlogsPage() {
             <p className="text-red-600 font-semibold mb-3 text-lg">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+              className="btn-primary px-6 py-3 rounded-xl font-semibold"
             >
               Reload Page
             </button>
@@ -310,7 +315,7 @@ export default function BlogsPage() {
                 setSelectedCategory("");
                 setPage(1);
               }}
-              className="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all transform hover:scale-105"
+              className="btn-primary px-6 py-3 rounded-xl font-semibold"
             >
               Clear Filters
             </button>
@@ -321,9 +326,9 @@ export default function BlogsPage() {
               {pageData.map((b, index) => {
                 const excerpt = stripHtml(b.excerpt || b.content || "").slice(0, 120);
                 return (
+                  <AnimatedSection key={b._id} animation="fadeInUp" delay={index * 80} className="w-full">
                   <article
-                    key={b._id}
-                    className="group bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden border border-gray-200"
+                    className="group bg-white rounded-2xl shadow-soft border border-gray-100 card-hover-lift flex flex-col overflow-hidden"
                   >
                     {/* Image Container */}
                     <div className="relative h-56 w-full overflow-hidden bg-gray-100">
@@ -385,6 +390,7 @@ export default function BlogsPage() {
                       </div>
                     </div>
                   </article>
+                  </AnimatedSection>
                 );
               })}
             </div>

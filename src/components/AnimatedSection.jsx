@@ -1,11 +1,21 @@
 import React from 'react';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
 
+/** Map animation type to CSS class (kebab-case) to match index.css */
+const ANIMATION_CLASS = {
+  fadeInUp: 'animate-fade-in-up',
+  fadeInDown: 'animate-fade-in-down',
+  fadeInLeft: 'animate-fade-in-left',
+  fadeInRight: 'animate-fade-in-right',
+  fadeIn: 'animate-fade-in',
+  scaleIn: 'animate-scale-in',
+};
+
 /**
  * AnimatedSection - Wrapper component that animates on scroll
  * @param {React.ReactNode} children - Content to animate
- * @param {string} animation - Animation type
- * @param {number} delay - Animation delay
+ * @param {string} animation - Animation type (fadeInUp, fadeIn, scaleIn, etc.)
+ * @param {number} delay - Animation delay in ms
  * @param {string} className - Additional CSS classes
  */
 const AnimatedSection = ({
@@ -22,6 +32,7 @@ const AnimatedSection = ({
     once: true,
   });
 
+  const animationClass = ANIMATION_CLASS[animation] || ANIMATION_CLASS.fadeInUp;
   const combinedStyle = {
     ...style,
     ...(delay > 0 && { animationDelay: `${delay}ms` }),
@@ -30,7 +41,7 @@ const AnimatedSection = ({
   return (
     <div
       ref={ref}
-      className={`${isVisible ? `animate-${animation}` : 'animate-on-scroll'} ${className}`}
+      className={`${isVisible ? animationClass : 'animate-on-scroll'} ${className}`}
       style={combinedStyle}
       {...props}
     >

@@ -2,8 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import SEO from "../components/SEO";
-
-const ACCENT = "rgb(183,36,42)";
+import AnimatedSection from "../components/AnimatedSection";
 
 export default function NotFound() {
   const navigate = useNavigate();
@@ -16,7 +15,8 @@ export default function NotFound() {
         canonicalUrl="https://madadgaar.com.pk/404"
         noIndex={true}
       />
-      <div className="max-w-xl w-full bg-white rounded-3xl shadow-sm border border-gray-100 p-6 sm:p-8 text-center space-y-6 safe-margin">
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full max-w-xl mx-auto">
+      <div className="w-full bg-white rounded-3xl shadow-soft border border-gray-100 p-6 sm:p-8 text-center space-y-6 safe-margin">
         {/* Icon / Badge */}
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-50">
           <span className="text-3xl" role="img" aria-label="broken link">
@@ -44,8 +44,7 @@ export default function NotFound() {
           </button>
           <button
             onClick={() => navigate("/")}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-full text-sm font-semibold text-white shadow-sm transition"
-            style={{ backgroundColor: ACCENT }}
+            className="w-full sm:w-auto btn-primary px-5 py-2.5 rounded-full text-sm font-semibold min-h-touch"
           >
             Go to Home
           </button>
@@ -56,6 +55,7 @@ export default function NotFound() {
           If you typed the URL manually, please check the spelling and try again.
         </div>
       </div>
+      </AnimatedSection>
     </div>
   );
 }

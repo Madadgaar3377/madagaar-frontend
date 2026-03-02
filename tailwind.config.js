@@ -41,9 +41,12 @@ module.exports = {
       transitionDuration: {
         400: "400ms",
       },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
       boxShadow: {
         "soft": "0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)",
-        "card-hover": "0 10px 40px -10px rgba(0, 0, 0, 0.15)",
+        "card-hover": "0 10px 40px -10px rgba(0, 0, 0, 0.12)",
       },
       container: {
         center: true,

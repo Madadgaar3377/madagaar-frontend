@@ -2,6 +2,7 @@ import React from "react";
 import SEO from "../../components/SEO";
 import TeamMemberCard from "../../components/TeamMemberCard";
 import teamMembers from "../../constants/teamMembers";
+import AnimatedSection from "../../components/AnimatedSection";
 
 /**
  * AboutPage.jsx
@@ -55,6 +56,7 @@ export default function AboutPage() {
        structuredData={structuredData}
      />
    {/* About Company Section */}
+   <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
    <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding">
        <div className="md:w-1/2 mt-6 sm:mt-8 md:mt-0 flex justify-center w-full md:order-first">
           <img
@@ -79,13 +81,15 @@ export default function AboutPage() {
            Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">property solutions</a>, <a href="/insurance" className="text-red-600 hover:text-red-700 font-semibold">insurance support</a>, <a href="/loans" className="text-red-600 hover:text-red-700 font-semibold">loans</a>, or <a href="/installments" className="text-red-600 hover:text-red-700 font-semibold">installment plans</a>, we make your journey simple, reliable, and stress-free. Our platform lets you compare multiple options across Pakistan to find the perfect fit. Together, let's make things easier and make them happen!
           </p>
          
-          <button  style={{ backgroundColor: "rgb(183, 36, 42)" }} className="mt-4 sm:mt-6 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base text-white rounded-full font-medium hover:bg-red-700 transition">
+          <a href="/contact" className="btn-primary mt-4 sm:mt-6 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base rounded-full font-medium inline-block">
             Get Started
-          </button>
+          </a>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* How Madadgaar Works Section */}
+      <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
       <section className="w-full bg-gradient-to-br from-gray-50 to-white section-padding">
         <div className="container-content">
           <div className="text-center mb-10 sm:mb-12">
@@ -145,16 +149,17 @@ export default function AboutPage() {
             </p>
             <a
               href="/contact"
-              style={{ backgroundColor: "rgb(183, 36, 42)" }}
-              className="inline-block px-6 sm:px-8 py-3 sm:py-4 text-white rounded-lg font-semibold hover:bg-red-700 transition text-responsive-sm"
+              className="btn-primary inline-block px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold text-responsive-sm"
             >
               Get Started Today
             </a>
           </div>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* Mission and Vision Section */}
+      <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
       <section className="w-full bg-white section-padding">
         <div className="container-content">
           <div className="text-center mb-8 sm:mb-12">
@@ -195,6 +200,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+      </AnimatedSection>
 
       {/* Our Goals Section */}
       <section className="w-full bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
