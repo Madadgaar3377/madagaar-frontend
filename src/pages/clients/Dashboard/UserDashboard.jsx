@@ -77,9 +77,16 @@ const UserDashboard = () => {
       });
 
       const data = await response.json();
+      const apiMessage = data.message || '';
 
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch dashboard data');
+        throw new Error(apiMessage || 'Failed to fetch dashboard data');
+      }
+
+      // Backend returned 200 but user not found / invalid session
+      if (!data.success && apiMessage.toLowerCase().includes('user not found')) {
+        logout('/account');
+        return;
       }
 
       if (data.success) {
@@ -97,18 +104,26 @@ const UserDashboard = () => {
       }
     } catch (err) {
       console.error('Dashboard fetch error:', err);
-      setError(err.message);
-      
-      // If unauthorized, redirect to login
-      if (err.message.includes('Unauthorized') || err.message.includes('401')) {
+      const msg = err?.message || '';
+      // User not found or Unauthorized: clear session and redirect to login
+      if (msg.toLowerCase().includes('user not found') || msg.includes('Unauthorized') || msg.includes('401')) {
         logout('/account');
+        return;
       }
+      setError(msg);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Auto logout and redirect to login when error is "User not found"
+  useEffect(() => {
+    if (error && String(error).toLowerCase().includes('user not found')) {
+      logout('/account');
+    }
+  }, [error]);
 
   useEffect(() => {
     // Check authentication
