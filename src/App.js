@@ -3,7 +3,6 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from 'react-hot-toast';
 
 import Navbar from "./compontents/Navbar";
-// import TopBar from "./compontents/TopBar";
 import Footer from "./compontents/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsAppButton";
@@ -48,15 +47,21 @@ import OffersPage from "./pages/clients/Offers.jsx";
 function LayoutWrapper({ children }) {
   const location = useLocation();
 
-  // Hide Navbar + Topbar + Footer on dashboard ONLY
-  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") ||location.pathname.startsWith("/dashboard/*")||location.pathname.startsWith("/client/dashboard")||location.pathname.startsWith("/client/loans")||location.pathname.startsWith("/client/insurance");
+  // Hide Navbar + Footer on dashboard ONLY
+  const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") || location.pathname.startsWith("/dashboard/*") || location.pathname.startsWith("/client/dashboard") || location.pathname.startsWith("/client/loans") || location.pathname.startsWith("/client/insurance");
 
   return (
     <>
-      {/* {!hideLayout && <TopBar />} */}
       {!hideLayout && <Navbar />}
 
-      {/* Spacer for fixed navbar so content is not hidden under it; subtle route fade */}
+      {/* Toaster: under navbar when layout visible, near top when navbar hidden (e.g. dashboard) */}
+      <Toaster
+        position="top-center"
+        toastOptions={{ duration: 4000 }}
+        containerStyle={{ top: hideLayout ? "1rem" : "5.5rem" }}
+      />
+
+      {/* Spacer for fixed navbar so content is not hidden under it */}
       <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden" : "overflow-x-hidden"}>
         <div key={location.pathname} className="route-transition-enter">
           {children}
@@ -74,7 +79,6 @@ function App() {
 
   return (
     <HelmetProvider>
-      <Toaster position="top-center" toastOptions={{ duration: 4000 }} />
       <Router>
         <ScrollToTop />
         <LayoutWrapper>
