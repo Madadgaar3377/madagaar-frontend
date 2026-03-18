@@ -14,9 +14,16 @@ const ApplyLoan = () => {
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [plan, setPlan] = useState(null);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
-  
+  const [uploadingDoc, setUploadingDoc] = useState('');
+  const [documents, setDocuments] = useState({
+    cnicFront: '',
+    cnicBack: '',
+    salarySlip: '',
+    bankStatement: '',
+  });
+
   const [formData, setFormData] = useState({
     fullName: currentUser?.name || '',
     fatherOrHusbandName: '',
@@ -117,6 +124,34 @@ const ApplyLoan = () => {
     }));
   };
 
+  const handleDocumentUpload = async (fieldName, file) => {
+    if (!file) return;
+    try {
+      setUploadingDoc(fieldName);
+      const token = getAuthToken();
+      const formDataObj = new FormData();
+      formDataObj.append('image', file);
+      const response = await fetch(`${backendBaseUrl}/upload-image`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formDataObj,
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || 'Upload failed');
+      }
+      const url = data.url || data.imageUrl || data.data?.url;
+      if (url) {
+        setDocuments(prev => ({ ...prev, [fieldName]: url }));
+        showSuccess(`${fieldName === 'cnicFront' ? 'CNIC Front' : fieldName === 'cnicBack' ? 'CNIC Back' : fieldName === 'salarySlip' ? 'Salary slip' : 'Bank statement'} uploaded`);
+      }
+    } catch (err) {
+      showError(err.message || 'Failed to upload file');
+    } finally {
+      setUploadingDoc('');
+    }
+  };
+
   const validateStep = (step) => {
     switch (step) {
       case 1:
@@ -141,7 +176,7 @@ const ApplyLoan = () => {
           return false;
         }
         break;
-      case 5:
+      case 6:
         if (!formData.creditCheckConsent || !formData.informationConfirmed) {
           showError('Please accept all declarations');
           return false;
@@ -242,6 +277,12 @@ const ApplyLoan = () => {
           signedAt: new Date(),
         },
         applicationNote: formData.applicationNote || undefined,
+        documents: {
+          cnicFront: documents.cnicFront || undefined,
+          cnicBack: documents.cnicBack || undefined,
+          salarySlip: documents.salarySlip || undefined,
+          bankStatement: documents.bankStatement || undefined,
+        },
       };
 
       const response = await fetch(`${backendBaseUrl}/applyLoan`, {
@@ -327,7 +368,8 @@ const ApplyLoan = () => {
     { number: 2, title: 'Income', desc: 'Employment' },
     { number: 3, title: 'Loan', desc: 'Requirements' },
     { number: 4, title: 'Banking', desc: 'Security' },
-    { number: 5, title: 'Review', desc: 'Submit' },
+    { number: 5, title: 'Documents', desc: 'CNIC & supporting docs' },
+    { number: 6, title: 'Review', desc: 'Submit' },
   ];
 
   return (
@@ -1061,8 +1103,52 @@ const ApplyLoan = () => {
                   </div>
                 )}
 
-                {/* Step 5: Declarations & Review */}
+                {/* Step 5: Documents */}
                 {currentStep === 5 && (
+                  <div className="p-6">
+                    <h2 className="text-xl font-bold text-gray-900 mb-2">Documents</h2>
+                    <p className="text-sm text-gray-600 mb-6">Upload CNIC and supporting documents (images or PDFs, max 5MB each).</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {[
+                        { key: 'cnicFront', label: 'CNIC Front *', hint: 'Front side of CNIC' },
+                        { key: 'cnicBack', label: 'CNIC Back *', hint: 'Back side of CNIC' },
+                        { key: 'salarySlip', label: 'Salary Slip', hint: 'Latest salary slip (if salaried)' },
+                        { key: 'bankStatement', label: 'Bank Statement', hint: 'Recent bank statement' },
+                      ].map(({ key, label, hint }) => (
+                        <div key={key}>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                          <p className="text-xs text-gray-500 mb-2">{hint}</p>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="file"
+                              accept="image/*,.pdf"
+                              className="hidden"
+                              id={`doc-${key}`}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleDocumentUpload(key, file);
+                                e.target.value = '';
+                              }}
+                              disabled={!!uploadingDoc}
+                            />
+                            <label
+                              htmlFor={`doc-${key}`}
+                              className={`px-4 py-2 rounded-lg border text-sm font-medium cursor-pointer transition ${uploadingDoc ? 'bg-gray-100 border-gray-200 text-gray-500 cursor-not-allowed' : 'bg-white border-red-600 text-red-600 hover:bg-red-50'}`}
+                            >
+                              {uploadingDoc === key ? 'Uploading...' : documents[key] ? 'Change file' : 'Choose file'}
+                            </label>
+                            {documents[key] && (
+                              <span className="text-sm text-green-600 font-medium">Uploaded</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 6: Declarations & Review */}
+                {currentStep === 6 && (
                   <div className="p-6">
                     <h2 className="text-xl font-bold text-gray-900 mb-6">Declarations & Consent</h2>
                     <div className="space-y-4">
@@ -1173,6 +1259,17 @@ const ApplyLoan = () => {
                   <p className="text-xs text-gray-500 mt-3 text-center">
                     Step {currentStep} of {totalSteps} {currentStep === totalSteps && '- Review and submit your application'}
                   </p>
+                  {currentStep === 6 && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-semibold text-gray-800 mb-2">Documents summary</h3>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>CNIC Front: {documents.cnicFront ? '✓ Uploaded' : 'Not provided'}</li>
+                        <li>CNIC Back: {documents.cnicBack ? '✓ Uploaded' : 'Not provided'}</li>
+                        <li>Salary Slip: {documents.salarySlip ? '✓ Uploaded' : 'Not provided'}</li>
+                        <li>Bank Statement: {documents.bankStatement ? '✓ Uploaded' : 'Not provided'}</li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </form>
             </div>
