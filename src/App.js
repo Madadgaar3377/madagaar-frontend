@@ -6,6 +6,7 @@ import Navbar from "./compontents/Navbar";
 import Footer from "./compontents/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsAppButton";
+import useAdSenseRouteRefresh from "./hooks/useAdSenseRouteRefresh";
 
 // Pages
 import HomePage from "./pages/clients/HomePages";
@@ -46,6 +47,7 @@ import OffersPage from "./pages/clients/Offers.jsx";
 
 function LayoutWrapper({ children }) {
   const location = useLocation();
+  useAdSenseRouteRefresh();
 
   // Hide Navbar + Footer on dashboard ONLY
   const hideLayout = location.pathname.startsWith("/dashboard") || location.pathname.startsWith("/dashboard/Installments/create") || location.pathname.startsWith("/dashboard/Installments/update") || location.pathname.startsWith("/dashboard/*") || location.pathname.startsWith("/client/dashboard") || location.pathname.startsWith("/client/loans") || location.pathname.startsWith("/client/insurance");
