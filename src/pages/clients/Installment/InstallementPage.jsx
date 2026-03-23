@@ -8,6 +8,7 @@ import OfferBanner from "../../../components/OfferBanner";
 import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
+import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
 
 // Category options - comprehensive list
 const CATEGORY_OPTIONS = [
@@ -625,6 +626,8 @@ export default function InstallmentPlans() {
           </div>
         </header>
         </AnimatedSection>
+
+        <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
         {/* content */}
         {loading ? (

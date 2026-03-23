@@ -8,6 +8,7 @@ import cities from "../../../constants/cities";
 import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
+import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
 
 const PAGE_SIZE = 50;
 
@@ -383,6 +384,10 @@ function PropertiesPage() {
           </div>
         </div>
       </motion.section>
+
+      <div className="container-content max-w-6xl">
+        <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
+      </div>
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">

@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import SEO from "../../../components/SEO";
+import BlogAdSenseInArticle from "../../../components/BlogAdSenseInArticle";
 
 const BRAND = "rgb(183,36,42)";
 const BLOG_BASE_URL = "https://madadgaar.com.pk";
@@ -256,6 +257,11 @@ export default function BlogDetail() {
               lineHeight: "1.8",
               color: "#374151",
             }}
+          />
+
+          <BlogAdSenseInArticle
+            key={blog.slug || slug}
+            className="my-8 flex justify-center not-prose"
           />
 
           {/* Tags */}

@@ -7,6 +7,7 @@ import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
+import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
@@ -299,6 +300,8 @@ export default function LoansPage() {
           </div>
         </div>
         </AnimatedSection>
+
+        <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
         {/* Error */}
         {error && (

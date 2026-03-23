@@ -5,6 +5,7 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import SEO from "../../../components/SEO";
 import AnimatedSection from "../../../components/AnimatedSection";
+import BlogAdSenseInArticle from "../../../components/BlogAdSenseInArticle";
 
 const PAGE_SIZE = 9;
 
@@ -282,6 +283,10 @@ export default function BlogsPage() {
         </div>
       </section>
       </AnimatedSection>
+
+      <div className="container-content max-w-7xl px-0 sm:px-0">
+        <BlogAdSenseInArticle className="my-6 sm:my-8 flex justify-center" />
+      </div>
 
       {/* Modern Blog Grid */}
       <main className="container-content max-w-7xl py-8 sm:py-12">
