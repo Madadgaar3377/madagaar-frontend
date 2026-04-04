@@ -165,8 +165,8 @@ const ContactForm = () => {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
-                      <a href="mailto:help.madadgaar@gmail.com" className="text-red-600 hover:text-red-700 text-sm break-all">
-                        help.madadgaar@gmail.com
+                      <a href="mailto:support@madadgaar.com.pk" className="text-red-600 hover:text-red-700 text-sm break-all">
+                        support@madadgaar.com.pk
                       </a>
                     </div>
                   </div>
