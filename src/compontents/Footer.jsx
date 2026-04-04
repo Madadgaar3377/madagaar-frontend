@@ -110,7 +110,7 @@ const Footer = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="shrink-0" aria-hidden>✉️</span>
-                <a href="mailto:help.madadgaar@gmail.com" className="hover:text-primary transition-colors break-all focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">help.madadgaar@gmail.com</a>
+                <a href="mailto:support@madadgaar.com.pk" className="hover:text-primary transition-colors break-all focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">support@madadgaar.com.pk</a>
               </li>
               <li className="flex items-start gap-2">
                 <span className="shrink-0" aria-hidden>🌐</span>
