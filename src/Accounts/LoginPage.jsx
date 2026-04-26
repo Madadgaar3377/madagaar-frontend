@@ -200,7 +200,7 @@ export default function LoginPage() {
 
         <button
           onClick={() => window.location.href = `${apiUrl}/auth/google`}
-          className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm"
+          className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed opacity-75 font-medium hover:bg-gray-50 transition-colors shadow-sm"
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path
@@ -232,3 +232,6 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
+
