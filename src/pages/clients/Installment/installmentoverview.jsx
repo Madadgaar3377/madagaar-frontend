@@ -140,6 +140,8 @@ export default function InstallmentDetail() {
     return findBestPlanIndex(plan?.paymentPlans || []);
   }, [plan]);
 
+
+
   // Mobile: open BEST plan by default
   useEffect(() => {
     if (Array.isArray(plan?.paymentPlans) && plan.paymentPlans.length > 0) {
@@ -404,8 +406,9 @@ export default function InstallmentDetail() {
                 </h3>
 
                 {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
-                <div className="lg:hidden space-y-3">
+                <div className="lg:hidden space-y-3 mb-4">
                   {plan.paymentPlans.map((p, idx) => {
+                    const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
                     const cashPrice = Number(plan.price || 0);
                     const downPayment = Number(p.downPayment || 0);
                     const financedAmount = Math.max(0, cashPrice - downPayment);
@@ -431,6 +434,13 @@ export default function InstallmentDetail() {
                           className="w-full p-4 flex items-start justify-between gap-3 text-left"
                         >
                           <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              {p.companyLogo ? (
+                                <img src={p.companyLogo} alt={vendorName} className="h-4 object-contain" />
+                              ) : (
+                                <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">{vendorName}</span>
+                              )}
+                            </div>
                             <div className="flex items-center gap-2">
                               <div className="font-bold text-gray-900 truncate">
                                 {p.planName || `Plan ${idx + 1}`}
@@ -578,6 +588,7 @@ export default function InstallmentDetail() {
                   <table className="w-full border-collapse bg-white rounded-xl overflow-hidden border border-gray-200">
                     <thead>
                       <tr className="bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white">
+                        <th className="px-4 py-3 text-center text-sm font-bold">Plan By</th>
                         <th className="px-4 py-3 text-left text-sm font-bold">Plan</th>
                         <th className="px-4 py-3 text-center text-sm font-bold">Monthly Payment</th>
                         <th className="px-4 py-3 text-center text-sm font-bold">Tenure</th>
@@ -599,6 +610,7 @@ export default function InstallmentDetail() {
                         const totalCost = cashPrice + totalMarkup;
                         const isBestPlan = idx === bestPlanIndex;
                         const hasFinance = p.finance && (p.finance.bankName || p.finance.financeInfo);
+                        const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
 
                         return (
                           <tr
@@ -607,6 +619,15 @@ export default function InstallmentDetail() {
                               isBestPlan ? "bg-red-50 border-l-4 border-l-[rgb(183,36,42)]" : ""
                             }`}
                           >
+                            <td className="px-4 py-3 text-center">
+                               <div className="flex flex-col items-center justify-center">
+                                  {p.companyLogo ? (
+                                     <img src={p.companyLogo} alt={vendorName} className="w-16 h-8 object-contain" />
+                                  ) : (
+                                     <span className="text-xs font-bold text-gray-700 bg-gray-100 px-2 py-1 rounded">{vendorName}</span>
+                                  )}
+                               </div>
+                            </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-gray-900">{p.planName || `Plan ${idx + 1}`}</span>

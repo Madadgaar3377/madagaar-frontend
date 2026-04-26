@@ -14,6 +14,7 @@ import AboutPage from "./pages/clients/About";
 import LoginPage from "./Accounts/LoginPage";
 import SignupPage from "./Accounts/SignupPages";
 import OtpVerifyPage from "./Accounts/OtpVerifications";
+import GoogleAuthSuccess from "./Accounts/GoogleAuthSuccess";
 import InstallmentPlans from "./pages/clients/Installment/InstallementPage.jsx";
 import BlogsPage from "./pages/clients/blogs/Blogs.jsx";
 import BlogDetail from "./pages/clients/blogs/BlogDetail.jsx";
@@ -98,6 +99,7 @@ function App() {
 
             {/* account login */}
             <Route path="/account" element={<LoginPage />} />
+            <Route path="/auth/success" element={<GoogleAuthSuccess />} />
             <Route path="/account/register" element={<SignupPage />} />
             <Route path="/account/verify-otp" element={<OtpVerifyPage />} />
             <Route path="/account/forgot" element={<ForgotPassword />} />
