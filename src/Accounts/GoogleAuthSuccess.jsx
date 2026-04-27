@@ -10,14 +10,22 @@ export default function GoogleAuthSuccess() {
   useEffect(() => {
     const token = searchParams.get("token");
     const userId = searchParams.get("userId");
+    const name = searchParams.get("name");
+    const email = searchParams.get("email");
+    const userType = searchParams.get("userType");
+    const profilePic = searchParams.get("profilePic");
 
     if (token) {
       try {
-        // We'll set a standard user object manually since we'll fetch full data later or backend redirect logic already provided it
-        // The token itself contains the user data in the payload
         const userData = {
           userId,
-          UserType: "user"
+          name,
+          email,
+          UserType: userType || "user",
+          profilePic,
+          emailVerify: true,
+          isActive: true,
+          isVerified: true
         };
         
         // Save to localStorage using the existing auth utility
