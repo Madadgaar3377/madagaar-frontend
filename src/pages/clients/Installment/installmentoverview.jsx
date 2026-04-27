@@ -58,6 +58,7 @@ export default function InstallmentDetail() {
   const [sellerExpanded, setSellerExpanded] = useState(false);
   const [expandedPlanIndex, setExpandedPlanIndex] = useState(null);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
 
   // fetch plan
   useEffect(() => {
@@ -139,6 +140,21 @@ export default function InstallmentDetail() {
   const bestPlanIndex = useMemo(() => {
     return findBestPlanIndex(plan?.paymentPlans || []);
   }, [plan]);
+
+  // Current displayed data based on variant selection
+  const currentPrice = useMemo(() => {
+    if (selectedVariantIndex !== null && plan?.variants?.[selectedVariantIndex]) {
+      return plan.variants[selectedVariantIndex].price;
+    }
+    return plan?.price || 0;
+  }, [plan, selectedVariantIndex]);
+
+  const currentPlans = useMemo(() => {
+    if (selectedVariantIndex !== null && plan?.variants?.[selectedVariantIndex]?.paymentPlans?.length > 0) {
+      return plan.variants[selectedVariantIndex].paymentPlans;
+    }
+    return plan?.paymentPlans || [];
+  }, [plan, selectedVariantIndex]);
 
 
 
@@ -326,7 +342,7 @@ export default function InstallmentDetail() {
                   <div>
                     <div className="text-xs text-gray-500 mb-1 font-medium">Cash Price</div>
                     <div className="text-2xl sm:text-3xl font-bold text-[rgb(183,36,42)]">
-                      PKR {Number(plan.price || 0).toLocaleString()}
+                      PKR {Number(currentPrice).toLocaleString()}
                     </div>
                   </div>
                   <div>
@@ -338,11 +354,43 @@ export default function InstallmentDetail() {
                 </div>
               </div>
 
+              {/* Variant Selection */}
+              {Array.isArray(plan.variants) && plan.variants.length > 0 && (
+                <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Select Specification</h3>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      onClick={() => setSelectedVariantIndex(null)}
+                      className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
+                        selectedVariantIndex === null
+                          ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white shadow-lg shadow-red-100"
+                          : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-white"
+                      }`}
+                    >
+                      Standard
+                    </button>
+                    {plan.variants.map((variant, vIdx) => (
+                      <button
+                        key={vIdx}
+                        onClick={() => setSelectedVariantIndex(vIdx)}
+                        className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
+                          selectedVariantIndex === vIdx
+                            ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white shadow-lg shadow-red-100"
+                            : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-white"
+                        }`}
+                      >
+                        {variant.variantName}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Action Buttons */}
               <div className="space-y-3">
                 <NavLink 
                   className="block w-full px-4 py-3 text-sm sm:text-base rounded-lg bg-[rgb(183,36,42)] text-white font-semibold hover:bg-red-700 transition-colors text-center" 
-                  to={`/installment/${encodeURIComponent(id)}/apply`}
+                  to={`/installment/${encodeURIComponent(id)}/apply${selectedVariantIndex !== null ? `?variantIndex=${selectedVariantIndex}` : ""}`}
                 >
                   Apply Now
                 </NavLink>
@@ -398,18 +446,18 @@ export default function InstallmentDetail() {
           <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-6 lg:pb-8 space-y-4 sm:space-y-6">
 
               {/* payment plans */}
-            {Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 0 ? (
+            {Array.isArray(currentPlans) && currentPlans.length > 0 ? (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
                   <span className="text-xl sm:text-2xl">💳</span>
-                  Available Payment Plans ({plan.paymentPlans.length})
+                  Available Payment Plans ({currentPlans.length})
                 </h3>
 
                 {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
                 <div className="lg:hidden space-y-3 mb-4">
-                  {plan.paymentPlans.map((p, idx) => {
+                  {currentPlans.map((p, idx) => {
                     const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
-                    const cashPrice = Number(plan.price || 0);
+                    const cashPrice = Number(currentPrice);
                     const downPayment = Number(p.downPayment || 0);
                     const financedAmount = Math.max(0, cashPrice - downPayment);
                     const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
@@ -571,7 +619,7 @@ export default function InstallmentDetail() {
                             )}
 
                             <NavLink
-                              to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}`}
+                              to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}${selectedVariantIndex !== null ? `&variantIndex=${selectedVariantIndex}` : ""}`}
                               className="block w-full text-center px-4 py-3 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
                             >
                               Apply for This Plan
@@ -601,8 +649,8 @@ export default function InstallmentDetail() {
                       </tr>
                     </thead>
                     <tbody>
-                      {plan.paymentPlans.map((p, idx) => {
-                        const cashPrice = Number(plan.price || 0);
+                      {currentPlans.map((p, idx) => {
+                        const cashPrice = Number(currentPrice);
                         const downPayment = Number(p.downPayment || 0);
                         const financedAmount = Math.max(0, cashPrice - downPayment);
                         const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
@@ -740,7 +788,7 @@ export default function InstallmentDetail() {
                             </td>
                             <td className="px-4 py-3 text-center">
                               <NavLink
-                                to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}`}
+                                to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}${selectedVariantIndex !== null ? `&variantIndex=${selectedVariantIndex}` : ""}`}
                                 className="inline-block px-4 py-2 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-lg hover:bg-red-700 transition"
                               >
                                 Apply

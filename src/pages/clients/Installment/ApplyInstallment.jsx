@@ -14,6 +14,7 @@ const ApplyInstallment = () => {
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [plan, setPlan] = useState(null);
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -71,6 +72,13 @@ const ApplyInstallment = () => {
       return;
     }
 
+    // Extract indices from URL
+    const params = new URLSearchParams(window.location.search);
+    const pIdx = params.get('planIndex');
+    const vIdx = params.get('variantIndex');
+    if (pIdx !== null) setSelectedPlanIndex(parseInt(pIdx));
+    if (vIdx !== null) setSelectedVariantIndex(parseInt(vIdx));
+
     // Fetch installment plan details
     fetchPlanDetails();
   }, [fetchPlanDetails, navigate]);
@@ -121,6 +129,7 @@ const ApplyInstallment = () => {
       const applicationData = {
         installmentPlanId: planId,
         selectedPlanIndex: selectedPlanIndex,
+        selectedVariantIndex: selectedVariantIndex, // Pass the variant index
         applicationNote: formData.applicationNote,
         userInfo: {
           address: formData.address,
@@ -243,7 +252,10 @@ const ApplyInstallment = () => {
     );
   }
 
-  const selectedPlan = plan.paymentPlans?.[selectedPlanIndex] || null;
+  const selectedVariant = selectedVariantIndex !== null ? plan.variants?.[selectedVariantIndex] : null;
+  const selectedPlan = (selectedVariant && selectedVariant.paymentPlans?.length > 0)
+    ? selectedVariant.paymentPlans[selectedPlanIndex]
+    : (plan.paymentPlans?.[selectedPlanIndex] || null);
 
   return (
     <>
@@ -305,7 +317,10 @@ const ApplyInstallment = () => {
                   />
                 </div>
 
-                <h3 className="font-semibold text-gray-900 mb-2">{plan.productName}</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">
+                  {plan.productName} 
+                  {selectedVariant && <span className="text-[rgb(183,36,42)]"> - {selectedVariant.variantName}</span>}
+                </h3>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">{plan.description}</p>
 
                 {/* Payment Plan Selector */}
@@ -319,7 +334,7 @@ const ApplyInstallment = () => {
                       onChange={(e) => setSelectedPlanIndex(parseInt(e.target.value))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
                     >
-                      {plan.paymentPlans.map((paymentPlan, index) => (
+                      {(selectedVariant && selectedVariant.paymentPlans?.length > 0 ? selectedVariant.paymentPlans : plan.paymentPlans).map((paymentPlan, index) => (
                         <option key={index} value={index}>
                           {paymentPlan.planName} - {paymentPlan.tenureMonths} months
                         </option>
@@ -336,7 +351,7 @@ const ApplyInstallment = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Price:</span>
-                      <span className="font-semibold text-gray-900">PKR {selectedPlan.installmentPrice?.toLocaleString()}</span>
+                      <span className="font-semibold text-gray-900">PKR {(selectedPlan?.installmentPrice || selectedVariant?.price || plan.price || 0).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Down Payment:</span>
