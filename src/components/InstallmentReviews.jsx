@@ -296,32 +296,29 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
   return (
     <div className="w-full">
-      {/* Header Section - Enhanced */}
-      <div className="bg-gradient-to-r from-gray-50 via-white to-gray-50 rounded-2xl p-6 sm:p-8 mb-6 border border-gray-200 shadow-sm">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-          <div className="flex-1 w-full">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl sm:text-3xl">⭐</span>
-              </div>
-              <div>
-                <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900">Customer Reviews</h3>
-                <p className="text-sm text-gray-600 mt-1">Share your experience with this product</p>
-              </div>
+      <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 mb-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
             </div>
-            
-            {statistics.total > 0 ? (
-              <div className="flex flex-wrap items-center gap-4 sm:gap-6">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl sm:text-5xl lg:text-6xl font-black text-gray-900">{statistics.averageRating.toFixed(1)}</span>
-                  <span className="text-lg sm:text-xl text-gray-500 font-medium">/ 5</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="flex gap-1">
+            <div className="min-w-0">
+              <h3 className="text-lg font-semibold text-gray-900">Customer Reviews</h3>
+              <p className="text-sm text-gray-500 mt-0.5">Share your experience with this product</p>
+
+              {statistics.total > 0 && (
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold text-gray-900 tabular-nums">{statistics.averageRating.toFixed(1)}</span>
+                    <span className="text-sm text-gray-500">/ 5</span>
+                  </div>
+                  <div className="flex gap-0.5" aria-hidden>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg
                         key={star}
-                        className={`w-6 h-6 sm:w-7 sm:h-7 ${star <= Math.round(statistics.averageRating) ? 'text-yellow-400' : 'text-gray-300'}`}
+                        className={`w-4 h-4 ${star <= Math.round(statistics.averageRating) ? "text-amber-400" : "text-gray-200"}`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -329,27 +326,24 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                       </svg>
                     ))}
                   </div>
-                  <span className="text-sm font-semibold text-gray-600">
-                    Based on {statistics.total} {statistics.total === 1 ? 'review' : 'reviews'}
+                  <span className="text-sm text-gray-600">
+                    {statistics.total} {statistics.total === 1 ? "review" : "reviews"}
                   </span>
                 </div>
-              </div>
-            ) : (
-              <div className="text-center py-4">
-                <p className="text-gray-500 font-medium">No reviews yet</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-          
+
           {isAuthenticated() && !userReviews.length && (
             <button
+              type="button"
               onClick={() => setShowReviewForm(true)}
-              className="w-full lg:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base whitespace-nowrap flex items-center gap-2"
+              className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[rgb(183,36,42)] text-white text-sm font-semibold hover:bg-red-700 transition-colors w-full sm:w-auto"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
-              Write a Review
+              Write a review
             </button>
           )}
         </div>
@@ -361,36 +355,30 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           </div>
         )}
 
-        {/* Rating Distribution - Enhanced */}
         {statistics.total > 0 && (
-          <div className="mb-6 p-5 sm:p-6 bg-white rounded-2xl border-2 border-gray-100 shadow-sm">
-            <h4 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-              Rating Distribution
-            </h4>
-            <div className="space-y-3">
+          <div className="mb-4 p-4 sm:p-5 bg-white rounded-xl border border-gray-200">
+            <h4 className="text-sm font-semibold text-gray-900 mb-3">Rating breakdown</h4>
+            <div className="space-y-2">
               {[5, 4, 3, 2, 1].map((rating) => {
                 const count = statistics.ratingDistribution[rating] || 0;
                 const percentage = statistics.total > 0 ? (count / statistics.total) * 100 : 0;
                 return (
-                  <div key={rating} className="flex items-center gap-3 sm:gap-4">
-                    <div className="flex items-center gap-2 w-20 sm:w-24 flex-shrink-0">
-                      <span className="text-sm sm:text-base font-bold text-gray-700">{rating}</span>
-                      <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <div key={rating} className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center gap-1 w-14 sm:w-16 shrink-0 text-xs text-gray-600">
+                      <span className="font-medium tabular-nums">{rating}</span>
+                      <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     </div>
-                    <div className="flex-1 bg-gray-100 rounded-full h-3 sm:h-4 overflow-hidden shadow-inner">
+                    <div className="flex-1 bg-gray-100 rounded-full h-2 overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-full transition-all duration-500 rounded-full"
+                        className="bg-amber-400 h-full rounded-full transition-all duration-300"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
-                    <div className="w-16 sm:w-20 text-right">
-                      <span className="text-sm font-bold text-gray-700">{count}</span>
-                      <span className="text-xs text-gray-500 ml-1">({percentage.toFixed(0)}%)</span>
+                    <div className="w-14 sm:w-16 text-right text-xs text-gray-600 tabular-nums">
+                      {count}{" "}
+                      <span className="text-gray-400">({percentage.toFixed(0)}%)</span>
                     </div>
                   </div>
                 );
@@ -531,47 +519,29 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
         {/* Reviews List - Always Show */}
         {loading ? (
-          <div className="text-center py-12 sm:py-16">
-            <div className="inline-flex flex-col items-center gap-4">
-              <div className="relative">
-                <div className="w-16 h-16 border-4 border-gray-200 rounded-full"></div>
-                <div className="w-16 h-16 border-4 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin absolute top-0"></div>
-              </div>
-              <p className="text-gray-600 font-medium">Loading reviews...</p>
+          <div className="flex flex-col items-center justify-center gap-3 py-10">
+            <div className="relative h-10 w-10">
+              <div className="absolute inset-0 rounded-full border-2 border-gray-200" />
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[rgb(183,36,42)] animate-spin" />
             </div>
+            <p className="text-sm text-gray-600">Loading reviews…</p>
           </div>
         ) : error && !reviews.length ? (
-          <div className="text-center py-12 sm:py-16 bg-red-50 rounded-2xl border-2 border-red-200">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <p className="mb-4 text-base font-semibold text-red-700">{error}</p>
+          <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-center">
+            <p className="text-sm font-medium text-red-800">{error}</p>
             <button
+              type="button"
               onClick={fetchReviews}
-              className="px-6 py-3 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl"
+              className="mt-4 inline-flex items-center justify-center px-4 py-2 rounded-lg bg-[rgb(183,36,42)] text-white text-sm font-semibold hover:bg-red-700 transition-colors"
             >
-              Retry Loading Reviews
+              Retry
             </button>
           </div>
         ) : reviews.length === 0 ? (
-          <div className="text-center py-12 sm:py-16 bg-gradient-to-br from-gray-50 to-white rounded-2xl border-2 border-dashed border-gray-300">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
-            </div>
-            <h4 className="text-xl font-bold text-gray-900 mb-2">No reviews yet</h4>
-            <p className="mb-6 text-gray-600">Be the first to share your experience with this product!</p>
-            {isAuthenticated() && !showReviewForm && (
-              <button
-                onClick={() => setShowReviewForm(true)}
-                className="px-6 py-3 bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Write the First Review
-              </button>
-            )}
+          <div className="rounded-lg border border-gray-200 bg-gray-50/80 px-4 py-6 text-center">
+            <p className="text-sm text-gray-600">
+              No reviews yet. Be the first to share your experience with this product.
+            </p>
           </div>
         ) : (
           <div>

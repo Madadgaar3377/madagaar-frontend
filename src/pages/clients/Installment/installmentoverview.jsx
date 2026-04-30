@@ -56,6 +56,7 @@ export default function InstallmentDetail() {
   const [index, setIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [sellerExpanded, setSellerExpanded] = useState(false);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
   const [expandedPlanIndex, setExpandedPlanIndex] = useState(null);
   const [autoPlay, setAutoPlay] = useState(true);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
@@ -90,6 +91,10 @@ export default function InstallmentDetail() {
     fetchPlan();
     return () => (mounted = false);
   }, [apiUrl, id]);
+
+  useEffect(() => {
+    setDescriptionExpanded(false);
+  }, [id]);
 
   // fetch related products
   useEffect(() => {
@@ -136,6 +141,16 @@ export default function InstallmentDetail() {
     if (!plan || !plan.videoUrl) return null;
     return isYouTubeUrl(plan.videoUrl) ? getYouTubeEmbed(plan.videoUrl) : plan.videoUrl;
   }, [plan]);
+
+  const descriptionSource = plan?.description != null ? String(plan.description) : "";
+  const descriptionPlain = useMemo(
+    () => descriptionSource.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim(),
+    [descriptionSource]
+  );
+  const descriptionFallback = plan?.productName || "No description available";
+  const descriptionDisplayPlain = descriptionPlain || descriptionFallback;
+  const descriptionHasHtml = /<[a-z][\s\S]*>/i.test(descriptionSource);
+  const needsDescriptionToggle = descriptionDisplayPlain.length > 130;
 
   const bestPlanIndex = useMemo(() => {
     return findBestPlanIndex(plan?.paymentPlans || []);
@@ -437,7 +452,29 @@ export default function InstallmentDetail() {
                   <span>📋</span>
                   Product Description
                 </h3>
-                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{plan.description || plan.productName || "No description available"}</p>
+                {descriptionExpanded ? (
+                  descriptionHasHtml ? (
+                    <div
+                      className="text-sm text-gray-700 leading-relaxed [&_a]:text-[rgb(183,36,42)] [&_a]:underline [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 space-y-2"
+                      dangerouslySetInnerHTML={{ __html: descriptionSource || descriptionFallback }}
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{descriptionDisplayPlain}</p>
+                  )
+                ) : (
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line line-clamp-3">
+                    {descriptionDisplayPlain}
+                  </p>
+                )}
+                {needsDescriptionToggle && (
+                  <button
+                    type="button"
+                    onClick={() => setDescriptionExpanded((v) => !v)}
+                    className="mt-3 text-sm font-semibold text-[rgb(183,36,42)] hover:text-red-700 underline decoration-2 underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(183,36,42)] focus-visible:ring-offset-2 rounded"
+                  >
+                    {descriptionExpanded ? "Show less" : "Show more"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -1133,8 +1170,8 @@ export default function InstallmentDetail() {
               </section>
             ) : null}
 
-            {/* Reviews Section - Always Show */}
-            <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+            {/* Reviews — layout owned by InstallmentReviews (single visual stack) */}
+            <section className="mt-2">
               {plan ? (
                 <InstallmentReviews 
                   installmentPlanId={plan?.installmentPlanId ?? id} 

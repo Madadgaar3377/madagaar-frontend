@@ -631,11 +631,11 @@ export default function InstallmentPlans() {
 
         {/* content */}
         {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 items-stretch">
             {[...Array(12)].map((_, idx) => (
-              <div key={idx} className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse">
-                <div className="h-40 sm:h-48 bg-gray-200"></div>
-                <div className="p-3 sm:p-4 lg:p-5 space-y-3">
+              <div key={idx} className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse flex flex-col min-h-0">
+                <div className="aspect-[4/3] sm:aspect-[5/4] shrink-0 bg-gray-200"></div>
+                <div className="p-3 sm:p-4 lg:p-5 space-y-3 flex-1 flex flex-col">
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                   <div className="h-20 bg-gray-200 rounded"></div>
@@ -650,20 +650,26 @@ export default function InstallmentPlans() {
           <div className="py-16 sm:py-24 text-center text-gray-500 text-sm sm:text-base">No plans found.</div>
         ) : (
           <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 items-stretch">
               {pageData.map((plan, index) => {
                 const bestPlan = getBestPlan(plan);
                 const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
                 const hasFinance = plan.finance && (plan.finance.bankName || plan.finance.financeInfo);
+                const tenureLabel =
+                  typeof bestPlan.tenureMonths === "number"
+                    ? `${bestPlan.tenureMonths} Months`
+                    : bestPlan.tenureMonths != null && String(bestPlan.tenureMonths).trim() !== ""
+                      ? `${bestPlan.tenureMonths} Months`
+                      : null;
                 
                 return (
-                <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full">
-                <article className="group bg-white rounded-lg sm:rounded-xl shadow-soft card-hover-lift overflow-hidden border border-gray-100">
-                  <div className="relative overflow-hidden">
+                <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full h-full min-h-0 flex">
+                <article className="group bg-white rounded-lg sm:rounded-xl shadow-soft card-hover-lift overflow-hidden border border-gray-100 flex flex-col w-full min-h-0 min-w-0">
+                  <div className="relative shrink-0 w-full aspect-[4/3] sm:aspect-[5/4] bg-gray-100 overflow-hidden">
                     <img
                       src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
                       alt={`${plan.productName} - Installment Plan in ${plan.city || "Pakistan"}`}
-                      className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="absolute inset-0 w-full h-full object-contain object-center group-hover:scale-[1.03] transition-transform duration-300"
                       onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -686,38 +692,39 @@ export default function InstallmentPlans() {
                     </div>
                   </div>
 
-                  <div className="p-3 sm:p-4 lg:p-5 flex flex-col gap-2 sm:gap-3">
-                    <h3 className="text-sm sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem]">{plan.productName}</h3>
+                  <div className="p-2 sm:p-4 lg:p-5 flex flex-col gap-1.5 sm:gap-3 flex-1 min-h-0 min-w-0">
+                    <h3 className="text-xs sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.25rem] sm:min-h-[3rem] leading-snug">{plan.productName}</h3>
 
-                    <div className="flex items-center justify-between text-xs sm:text-sm">
-                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    <div className="flex items-center justify-between gap-2 text-xs sm:text-sm min-w-0">
+                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 min-w-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         <span className="font-medium truncate">{plan.city || "N/A"}</span>
                       </div>
                     </div>
 
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100">
-                      <div className="flex items-center justify-between mb-1 sm:mb-2">
-                        <div className="text-[10px] sm:text-xs text-gray-600 font-medium">
+                      <div className="flex items-start sm:items-center justify-between gap-2 mb-1 sm:mb-2">
+                        <div className="text-[10px] sm:text-xs text-gray-600 font-medium min-w-0 line-clamp-2">
                           {hasMultiplePlans ? `Best: ${bestPlan.planName}` : "Monthly Payment"}
                         </div>
-                        <div className="text-[10px] sm:text-xs text-gray-500">
+                        <div className="text-[10px] sm:text-xs text-gray-500 flex-shrink-0 text-right">
                           Down: {currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}
                         </div>
                       </div>
-                      <div className="flex items-baseline gap-1 sm:gap-2">
-                        <span className="text-lg sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)]">
+                      <div className="flex items-baseline gap-1 sm:gap-2 flex-wrap">
+                        <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums break-all">
                           {currency(bestPlan.monthlyInstallment || plan.installment || 0)}
                         </span>
-                        <span className="text-xs sm:text-sm text-gray-500">/month</span>
+                        <span className="text-[11px] sm:text-sm text-gray-500">/month</span>
                       </div>
-                      <div className="flex items-center justify-between mt-1">
-                        <div className="text-[15px] sm:text-x text-gray-600">
-                          <span className="font-extrabold text-black">Cash Price:</span> {currency(plan.price)}
+                      <div className="flex flex-row flex-wrap items-center justify-between gap-x-1 gap-y-0.5 mt-1.5 pt-1 border-t border-red-100/60">
+                        <div className="text-[11px] sm:text-xs text-gray-700 min-w-0">
+                          <span className="font-extrabold text-gray-900">Cash:</span>{" "}
+                          <span className="tabular-nums">{currency(plan.price)}</span>
                         </div>
-                        {typeof bestPlan.tenureMonths === 'number' && (
-                          <div className="text-[15px] sm:text-xs text-black font-medium">
-                            {bestPlan.tenureMonths} Months
+                        {tenureLabel && (
+                          <div className="text-[11px] sm:text-xs text-gray-900 font-semibold whitespace-nowrap">
+                            {tenureLabel}
                           </div>
                         )}
                       </div>
@@ -736,15 +743,16 @@ export default function InstallmentPlans() {
                       )}
                     </div>
 
-                    <div className="mt-1 sm:mt-2 flex items-center gap-2">
+                    <div className="mt-auto pt-2 grid grid-cols-2 gap-1.5 sm:gap-2 items-stretch min-h-0">
                       <Link
                         to={`/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}`}
-                        className="flex-1 min-w-0 px-2 sm:px-3 lg:px-4 py-2 sm:py-2.5 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-xs sm:text-sm font-medium hover:shadow-lg transition text-center"
+                        className="min-w-0 min-h-[40px] px-1.5 sm:px-3 lg:px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-[11px] sm:text-sm font-semibold hover:shadow-lg transition text-center inline-flex items-center justify-center leading-tight"
                       >
                         View
                       </Link>
                       <ShareButtons
                         compact
+                        fullWidth
                         url={(plan.installmentPlanId || plan._id) ? `https://madadgaar.com.pk/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}` : ""}
                         title={plan.productName || "Installment plan"}
                         details={[
@@ -753,7 +761,7 @@ export default function InstallmentPlans() {
                           `Down: ${currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}`,
                           `${currency(bestPlan.monthlyInstallment || plan.installment || 0)}/month`,
                           `Cash Price: ${currency(plan.price)}`,
-                          typeof bestPlan.tenureMonths === "number" ? `${bestPlan.tenureMonths} Months` : null,
+                          tenureLabel,
                         ].filter(Boolean).join("\n")}
                         label="Share this plan"
                       />

@@ -9,8 +9,9 @@ const BASE_URL = "https://madadgaar.com.pk";
  * @param {string} details - Optional card/summary data (e.g. location, price, beds) - included in share text
  * @param {string} label - Optional label (e.g. "Share this plan") - used in popup
  * @param {boolean} compact - If true, smaller button for use on listing cards next to View
+ * @param {boolean} fullWidth - With compact, stretch button to full cell width (e.g. 2-col card grid)
  */
-export default function ShareButtons({ url, title = "", details = "", label = "Share with friends", compact = false }) {
+export default function ShareButtons({ url, title = "", details = "", label = "Share with friends", compact = false, fullWidth = false }) {
   const [open, setOpen] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
 
@@ -61,11 +62,11 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
   ];
 
   const btnClass = compact
-    ? "inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg border-2 border-gray-300 text-gray-700 text-xs font-semibold hover:border-gray-400 hover:bg-gray-50 transition shrink-0"
+    ? `inline-flex items-center justify-center gap-1 px-1.5 sm:gap-1.5 sm:px-2.5 py-2 rounded-lg border-2 border-gray-300 text-gray-700 text-[11px] sm:text-xs font-semibold hover:border-gray-400 hover:bg-gray-50 transition min-h-[40px] ${fullWidth ? "w-full" : "shrink-0"}`
     : "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 text-sm font-semibold hover:border-gray-400 hover:bg-gray-50 transition shadow-sm";
 
   return (
-    <div className="share-buttons inline-block">
+    <div className={`share-buttons ${fullWidth ? "block w-full min-w-0" : "inline-block"}`}>
       <button
         type="button"
         onClick={() => setOpen(true)}
