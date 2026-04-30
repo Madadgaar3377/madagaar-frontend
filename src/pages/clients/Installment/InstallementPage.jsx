@@ -80,12 +80,17 @@ const SORT_OPTIONS = [
  */
 
 const PAGE_SIZE = 36; // Show 36 items per page (6x6 grid on large screens)
+const API_PAGE_LIMIT = 20;
 
 export default function InstallmentPlans() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
+  const [apiPage, setApiPage] = useState(1);
+  const [apiTotalPages, setApiTotalPages] = useState(1);
+  const [apiTotalCount, setApiTotalCount] = useState(0);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -126,11 +131,11 @@ export default function InstallmentPlans() {
 
   useEffect(() => {
     let mounted = true;
-    async function fetchPlans() {
+    async function fetchPlans(fetchPage = 1) {
       setLoading(true);
       setError("");
       try {
-        const res = await fetch(`${apiUrl}/getAllInstallments`, {
+        const res = await fetch(`${apiUrl}/getAllInstallments?page=${fetchPage}&limit=${API_PAGE_LIMIT}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -139,7 +144,16 @@ export default function InstallmentPlans() {
           setError(payload?.message || `Failed to load (${res.status})`);
         } else {
           const data = payload?.data ?? payload ?? [];
-          if (mounted) setPlans(Array.isArray(data) ? data : []);
+          const extractedPlans = Array.isArray(data)
+            ? data
+            : (data?.plans || data?.installments || payload?.plans || payload?.installments || []);
+          const extractedPagination = payload?.pagination || data?.pagination || null;
+          if (mounted) {
+            setPlans(Array.isArray(extractedPlans) ? extractedPlans : []);
+            setApiPage(fetchPage);
+            setApiTotalPages(Number(extractedPagination?.totalPages || 1));
+            setApiTotalCount(Number(extractedPagination?.total || 0));
+          }
         }
       } catch (err) {
         console.error("Fetch error:", err);
@@ -148,9 +162,79 @@ export default function InstallmentPlans() {
         if (mounted) setLoading(false);
       }
     }
-    fetchPlans();
+    fetchPlans(1);
     return () => (mounted = false);
   }, [apiUrl]);
+
+  const goToNextApiPage = async () => {
+    if (loadingMore || apiPage >= apiTotalPages) return;
+    setLoadingMore(true);
+    setError("");
+    const nextPage = apiPage + 1;
+    try {
+      const res = await fetch(`${apiUrl}/getAllInstallments?page=${nextPage}&limit=${API_PAGE_LIMIT}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || (payload && payload.success === false)) {
+        setError(payload?.message || `Failed to load more (${res.status})`);
+        return;
+      }
+      const data = payload?.data ?? payload ?? [];
+      const extractedPlans = Array.isArray(data)
+        ? data
+        : (data?.plans || data?.installments || payload?.plans || payload?.installments || []);
+      const extractedPagination = payload?.pagination || data?.pagination || null;
+
+      const incomingPlans = Array.isArray(extractedPlans) ? extractedPlans : [];
+      setPlans(incomingPlans);
+      setApiPage(nextPage);
+      setApiTotalPages(Number(extractedPagination?.totalPages || apiTotalPages || nextPage));
+      setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
+      setPage(1);
+    } catch (err) {
+      console.error("Next page fetch error:", err);
+      setError("Network error — could not load next page.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const goToPreviousApiPage = async () => {
+    if (loadingMore || apiPage <= 1) return;
+    setLoadingMore(true);
+    setError("");
+    const prevPage = apiPage - 1;
+    try {
+      const res = await fetch(`${apiUrl}/getAllInstallments?page=${prevPage}&limit=${API_PAGE_LIMIT}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || (payload && payload.success === false)) {
+        setError(payload?.message || `Failed to load previous (${res.status})`);
+        return;
+      }
+
+      const data = payload?.data ?? payload ?? [];
+      const extractedPlans = Array.isArray(data)
+        ? data
+        : (data?.plans || data?.installments || payload?.plans || payload?.installments || []);
+      const extractedPagination = payload?.pagination || data?.pagination || null;
+
+      setPlans(Array.isArray(extractedPlans) ? extractedPlans : []);
+      setApiPage(prevPage);
+      setApiTotalPages(Number(extractedPagination?.totalPages || apiTotalPages || prevPage));
+      setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
+      setPage(1);
+    } catch (err) {
+      console.error("Previous page fetch error:", err);
+      setError("Network error — could not load previous page.");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   // derived lists for filters
   const availableCategories = useMemo(() => {
@@ -777,26 +861,26 @@ export default function InstallmentPlans() {
             <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
             <div className="mt-4 sm:mt-6 lg:mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium text-center sm:text-left">
-                Showing <span className="text-[rgb(183,36,42)] font-bold">{(page - 1) * PAGE_SIZE + 1}</span> to <span className="text-[rgb(183,36,42)] font-bold">{Math.min(page * PAGE_SIZE, filtered.length)}</span> of <span className="text-[rgb(183,36,42)] font-bold">{filtered.length}</span> {filtered.length === 1 ? 'plan' : 'plans'}
+                Showing <span className="text-[rgb(183,36,42)] font-bold">{plans.length ? ((apiPage - 1) * API_PAGE_LIMIT) + 1 : 0}</span> to <span className="text-[rgb(183,36,42)] font-bold">{plans.length ? ((apiPage - 1) * API_PAGE_LIMIT) + plans.length : 0}</span> of <span className="text-[rgb(183,36,42)] font-bold">{apiTotalCount || filtered.length}</span> {(apiTotalCount || filtered.length) === 1 ? 'plan' : 'plans'}
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
                 <button 
-                  onClick={() => setPage((p) => Math.max(1, p - 1))} 
-                  disabled={page === 1} 
+                  onClick={goToPreviousApiPage} 
+                  disabled={loadingMore || apiPage === 1} 
                   className="px-4 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-300 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] hover:bg-red-50 transition-all font-semibold active:scale-95"
                 >
                   Previous
                 </button>
                 <div className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold shadow-sm">
-                  {page} / {totalPages}
+                  {apiPage} / {apiTotalPages}
                 </div>
                 <button 
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))} 
-                  disabled={page === totalPages} 
+                  onClick={goToNextApiPage} 
+                  disabled={loadingMore || apiPage === apiTotalPages} 
                   className="px-4 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-300 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] hover:bg-red-50 transition-all font-semibold active:scale-95"
                 >
-                  Next
+                  {loadingMore ? "Loading..." : "Next"}
                 </button>
               </div>
             </div>
