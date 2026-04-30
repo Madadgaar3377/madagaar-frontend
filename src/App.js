@@ -38,6 +38,7 @@ import SubmitClaim from "./pages/clients/Insurance/SubmitClaim.jsx";
 import UserDashboard from "./pages/clients/Dashboard/UserDashboard.jsx";
 import DashboardProfile from "./pages/clients/Dashboard/DashboardProfile.jsx";
 import DashboardSecurity from "./pages/clients/Dashboard/DashboardSecurity.jsx";
+import DashboardDeleteAccount from "./pages/clients/Dashboard/DashboardDeleteAccount.jsx";
 import NotFound from "./pages/404Page.jsx";
 import ForgotPassword from "./Accounts/forgotpassword.jsx";
 import ResetPassword from "./Accounts/NewPassword.jsx";
@@ -109,6 +110,7 @@ function App() {
             <Route path="/dashboard" element={<UserDashboard />} />
             <Route path="/dashboard/profile" element={<DashboardProfile />} />
             <Route path="/dashboard/security" element={<DashboardSecurity />} />
+            <Route path="/dashboard/delete-account" element={<DashboardDeleteAccount />} />
 
             {/* installement router  */}
             <Route path="/installments" element={<InstallmentPlans />} />
