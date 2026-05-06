@@ -80,7 +80,7 @@ const SORT_OPTIONS = [
  */
 
 const PAGE_SIZE = 36; // Show 36 items per page (6x6 grid on large screens)
-const API_PAGE_LIMIT = 20;
+const API_PAGE_LIMIT = 100;
 
 export default function InstallmentPlans() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
