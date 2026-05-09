@@ -60,6 +60,7 @@ export default function InstallmentDetail() {
   const [expandedPlanIndex, setExpandedPlanIndex] = useState(null);
   const [autoPlay, setAutoPlay] = useState(true);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
+  const [pricingView, setPricingView] = useState("installments"); // "cash" | "installments"
 
   // fetch plan
   useEffect(() => {
@@ -170,6 +171,90 @@ export default function InstallmentDetail() {
     }
     return plan?.paymentPlans || [];
   }, [plan, selectedVariantIndex]);
+
+  const cashOffers = useMemo(() => {
+    if (!plan) return [];
+
+    const safeStr = (v) => (v == null ? "" : String(v));
+    const byKey = new Map();
+
+    const upsert = ({ partnerId, companyName, companyLogo, price, source }) => {
+      const pid = safeStr(partnerId);
+      const key = pid || `__global__:${safeStr(companyName)}`;
+      const next = {
+        partnerId: pid,
+        companyName: companyName || "Partner",
+        companyLogo: companyLogo || "",
+        price: Number(price) || 0,
+        source,
+      };
+      const prev = byKey.get(key);
+      if (!prev) {
+        byKey.set(key, next);
+        return;
+      }
+      // Prefer non-zero price
+      if ((Number(prev.price) || 0) === 0 && next.price > 0) byKey.set(key, next);
+      // Prefer richer metadata
+      if (!prev.companyName && next.companyName) prev.companyName = next.companyName;
+      if (!prev.companyLogo && next.companyLogo) prev.companyLogo = next.companyLogo;
+      byKey.set(key, prev);
+    };
+
+    // Partner-specific base price override entries (new backend feature)
+    if (Array.isArray(plan.partnerPricing)) {
+      for (const pp of plan.partnerPricing) {
+        upsert({
+          partnerId: pp?.partnerId,
+          companyName: null,
+          companyLogo: null,
+          price: pp?.basePrice,
+          source: "partnerBasePrice",
+        });
+      }
+    }
+
+    // Pull any explicit cashPrice overrides from plans
+    const plansToScan = Array.isArray(currentPlans) ? currentPlans : [];
+    for (const p of plansToScan) {
+      const cash = Number(p?.cashPrice) || 0;
+      if (cash > 0) {
+        upsert({
+          partnerId: p?.partnerId,
+          companyName: p?.companyName,
+          companyLogo: p?.companyLogo,
+          price: cash,
+          source: "planCashPrice",
+        });
+      }
+    }
+
+    // Always include the global/base price
+    upsert({
+      partnerId: "",
+      companyName: plan.companyName || plan.companyNameOther || plan.category || "Standard",
+      companyLogo: "",
+      price: Number(currentPrice) || 0,
+      source: "global",
+    });
+
+    // Backfill names/logos using plans (when only partnerPricing exists)
+    for (const p of plansToScan) {
+      const pid = safeStr(p?.partnerId);
+      if (!pid) continue;
+      for (const [key, v] of byKey.entries()) {
+        if (v.partnerId === pid) {
+          if (!v.companyName && p?.companyName) v.companyName = p.companyName;
+          if (!v.companyLogo && p?.companyLogo) v.companyLogo = p.companyLogo;
+          byKey.set(key, v);
+        }
+      }
+    }
+
+    return Array.from(byKey.values())
+      .filter((x) => Number(x.price) > 0)
+      .sort((a, b) => Number(a.price) - Number(b.price));
+  }, [plan, currentPlans, currentPrice]);
 
 
 
@@ -482,8 +567,74 @@ export default function InstallmentDetail() {
           {/* Full Width Sections Below */}
           <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-6 lg:pb-8 space-y-4 sm:space-y-6">
 
-              {/* payment plans */}
-            {Array.isArray(currentPlans) && currentPlans.length > 0 ? (
+            {/* Pricing view toggle */}
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setPricingView("cash")}
+                className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest border-2 transition-all ${
+                  pricingView === "cash"
+                    ? "bg-gray-900 border-gray-900 text-white shadow-lg"
+                    : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Cash
+              </button>
+              <button
+                type="button"
+                onClick={() => setPricingView("installments")}
+                className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest border-2 transition-all ${
+                  pricingView === "installments"
+                    ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white shadow-lg shadow-red-100"
+                    : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                Installments
+              </button>
+            </div>
+
+            {pricingView === "cash" && (
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <span className="text-xl sm:text-2xl">💰</span>
+                  Cash Prices by Partner ({cashOffers.length})
+                </h3>
+
+                {cashOffers.length === 0 ? (
+                  <div className="text-sm text-gray-600">No partner cash prices available yet.</div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {cashOffers.map((offer, idx) => (
+                      <div
+                        key={`${offer.partnerId || "global"}-${idx}`}
+                        className="border border-gray-200 rounded-xl p-4 bg-gradient-to-br from-gray-50 to-white"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          {offer.companyLogo ? (
+                            <img src={offer.companyLogo} alt={offer.companyName} className="h-5 object-contain" />
+                          ) : (
+                            <span className="text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
+                              {offer.companyName}
+                            </span>
+                          )}
+                          {offer.source === "partnerBasePrice" && (
+                            <span className="ml-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">BASE</span>
+                          )}
+                          {offer.source === "planCashPrice" && (
+                            <span className="ml-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">CASH</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500 mb-1">Cash Price</div>
+                        <div className="text-xl font-black text-gray-900">PKR {Number(offer.price || 0).toLocaleString()}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </section>
+            )}
+
+            {/* payment plans */}
+            {pricingView === "installments" && Array.isArray(currentPlans) && currentPlans.length > 0 ? (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
                   <span className="text-xl sm:text-2xl">💳</span>
@@ -838,7 +989,7 @@ export default function InstallmentDetail() {
                   </table>
                 </div>
               </section>
-            ) : (
+            ) : pricingView === "installments" ? (
               /* Fallback for legacy plans without paymentPlans array */
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
@@ -866,7 +1017,7 @@ export default function InstallmentDetail() {
                 </div>
                 </div>
               </section>
-            )}
+            ) : null}
 
             {/* Finance Information - Only show main plan finance if NO individual plans have finance */}
             {(() => {

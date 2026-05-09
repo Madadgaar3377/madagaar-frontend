@@ -35,7 +35,7 @@ export default function GoogleAuthSuccess() {
         
         // Redirect to dashboard or home
         setTimeout(() => {
-          window.location.href = "/dashboard";
+          window.location.href = "/";
         }, 1000);
       } catch (error) {
         console.error("Error saving auth data:", error);
