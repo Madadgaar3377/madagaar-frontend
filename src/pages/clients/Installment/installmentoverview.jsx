@@ -508,6 +508,30 @@ export default function InstallmentDetail() {
                     Back to List
                   </NavLink>
                 </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setPricingView("cash")}
+                    className={`px-4 py-3 text-sm sm:text-base rounded-lg border font-semibold transition-colors text-center ${
+                      pricingView === "cash"
+                        ? "bg-gray-900 border-gray-900 text-white"
+                        : "border-gray-300 text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    Cash
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPricingView("installments")}
+                    className={`px-4 py-3 text-sm sm:text-base rounded-lg border font-semibold transition-colors text-center ${
+                      pricingView === "installments"
+                        ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white hover:bg-red-700"
+                        : "border-[rgb(183,36,42)] text-[rgb(183,36,42)] hover:bg-[rgb(183,36,42)] hover:text-white"
+                    }`}
+                  >
+                    Installments
+                  </button>
+                </div>
                 <ShareButtons
                   url={id ? `https://madadgaar.com.pk/installment/${encodeURIComponent(id)}` : ""}
                   title={plan.productName || "Installment plan"}
@@ -566,32 +590,6 @@ export default function InstallmentDetail() {
 
           {/* Full Width Sections Below */}
           <div className="px-3 sm:px-4 md:px-6 lg:px-8 pb-3 sm:pb-4 md:pb-6 lg:pb-8 space-y-4 sm:space-y-6">
-
-            {/* Pricing view toggle */}
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => setPricingView("cash")}
-                className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest border-2 transition-all ${
-                  pricingView === "cash"
-                    ? "bg-gray-900 border-gray-900 text-white shadow-lg"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                Cash
-              </button>
-              <button
-                type="button"
-                onClick={() => setPricingView("installments")}
-                className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-black uppercase tracking-widest border-2 transition-all ${
-                  pricingView === "installments"
-                    ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white shadow-lg shadow-red-100"
-                    : "bg-white border-gray-200 text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                Installments
-              </button>
-            </div>
 
             {pricingView === "cash" && (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
