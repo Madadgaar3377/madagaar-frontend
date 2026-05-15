@@ -20,6 +20,7 @@ const UserDashboard = () => {
     installments: [],
     properties: [],
     loans: [],
+    insurance: [],
   });
 
   // Load cached data from localStorage
@@ -95,6 +96,7 @@ const UserDashboard = () => {
           installments: data.data.installnments || [],
           properties: data.data.properties || [],
           loans: data.data.loans || [],
+          insurance: data.data.insurance || [],
         };
         
         setDashboardData(newData);
@@ -243,8 +245,8 @@ const UserDashboard = () => {
     );
   }
 
-  const { user, installments, properties, loans } = dashboardData;
-  const totalApplications = installments.length + properties.length + loans.length;
+  const { user, installments, properties, loans, insurance } = dashboardData;
+  const totalApplications = installments.length + properties.length + loans.length + insurance.length;
 
   return (
     <>
@@ -293,7 +295,7 @@ const UserDashboard = () => {
 
           {/* Stats Cards */}
           <AnimatedSection animation="fadeInUp" delay={80} className="w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-6">
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-red-600">
               <div className="flex items-center justify-between">
                 <div>
@@ -349,6 +351,20 @@ const UserDashboard = () => {
                 </div>
               </div>
             </div>
+
+            <div className="bg-white rounded-xl shadow-soft border border-gray-100 p-4 sm:p-6 border-l-4 border-amber-600">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-xs sm:text-sm font-semibold uppercase">Insurance</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{insurance.length}</p>
+                </div>
+                <div className="bg-amber-100 rounded-full p-3">
+                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
           </div>
           </AnimatedSection>
 
@@ -395,6 +411,16 @@ const UserDashboard = () => {
                   }`}
                 >
                   Loans ({loans.length})
+                </button>
+                <button
+                  onClick={() => setActiveTab('insurance')}
+                  className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
+                    activeTab === 'insurance'
+                      ? 'border-red-600 text-red-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Insurance ({insurance.length})
                 </button>
                 <button
                   onClick={() => setActiveTab('profile')}
@@ -663,6 +689,73 @@ const UserDashboard = () => {
                               </td>
                               <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(item.createdAt)}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'insurance' && (
+                <div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">Your insurance applications</h2>
+                  {insurance.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500 mb-4">No insurance applications yet</p>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/insurance')}
+                        className="bg-amber-600 text-white px-6 py-2 rounded-lg hover:bg-amber-700 transition"
+                      >
+                        Browse insurance plans
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Application ID</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {insurance.map((item, index) => (
+                            <tr key={item._id || index} className="hover:bg-gray-50">
+                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-amber-700">
+                                #{item.applicationId || item._id || 'N/A'}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                                {item.planName || 'Insurance plan'}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {item.policyType || '—'}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                                {getStatusBadge(item.status)}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {formatDate(item.createdAt)}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                                {item.planId ? (
+                                  <button
+                                    type="button"
+                                    onClick={() => navigate(`/insurance/${item.planId}`)}
+                                    className="text-amber-700 font-medium hover:underline"
+                                  >
+                                    View plan
+                                  </button>
+                                ) : (
+                                  '—'
+                                )}
                               </td>
                             </tr>
                           ))}

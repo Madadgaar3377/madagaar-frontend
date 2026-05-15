@@ -333,6 +333,14 @@ const SubmitClaim = () => {
     return true;
   };
 
+  /** Web form uses Yes/No strings; backend expects booleans */
+  const yesNoToBoolean = (value) => {
+    if (value === true || value === false) return value;
+    if (value === 'Yes') return true;
+    if (value === 'No') return false;
+    return undefined;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -373,19 +381,24 @@ const SubmitClaim = () => {
           dateOfIncident: formData.dateOfIncident || undefined,
           placeOfIncident: formData.placeOfIncident || undefined,
           briefDescription: formData.briefDescription || undefined,
-          firPoliceReportAvailable: formData.firPoliceReportAvailable || undefined,
+          firPoliceReportAvailable: yesNoToBoolean(formData.firPoliceReportAvailable),
           estimatedClaimAmount: formData.estimatedClaimAmount ? Number(formData.estimatedClaimAmount) : undefined,
           hospitalWorkshopVendorName: formData.hospitalWorkshopVendorName || undefined,
-          panelProvider: formData.panelProvider || undefined,
-          serviceDate: formData.serviceDate || undefined,
-          serviceDateEnd: formData.serviceDateEnd || undefined,
+          panelProvider: yesNoToBoolean(formData.panelProvider),
+          serviceDates:
+            formData.serviceDate || formData.serviceDateEnd
+              ? {
+                  start: formData.serviceDate || undefined,
+                  end: formData.serviceDateEnd || undefined,
+                }
+              : undefined,
           paymentStatus: formData.paymentStatus || undefined,
         } : undefined,
         maturityDetails: serviceType === 'maturity' ? {
           maturityType: formData.maturityType,
           maturityDate: formData.maturityDate || undefined,
           expectedMaturityAmount: formData.expectedMaturityAmount ? Number(formData.expectedMaturityAmount) : undefined,
-          bonusProfitExpected: formData.bonusProfitExpected || undefined,
+          bonusProfitExpected: yesNoToBoolean(formData.bonusProfitExpected),
           nomineeBeneficiaryName: formData.nomineeBeneficiaryName || undefined,
           relationshipWithPolicyholder: formData.relationshipWithPolicyholder || undefined,
           paymentMode: formData.paymentMode || undefined,
