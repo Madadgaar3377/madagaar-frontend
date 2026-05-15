@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 // Toast component for displaying notifications
 export function Toast({ toasts, onClose }) {
   return (
-    <div className="fixed right-4 top-4 z-[9999] flex flex-col gap-3 max-w-sm">
+    <div className="madadgaar-page-toast fixed right-4 top-24 z-[2147483000] flex flex-col gap-3 max-w-sm sm:top-28 pointer-events-none [&>*]:pointer-events-auto">
       {toasts.map((t) => (
         <div
           key={t.id}

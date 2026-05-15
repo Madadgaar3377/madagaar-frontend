@@ -238,6 +238,15 @@
   }
 }
 
+/* react-hot-toast: ensure above fixed navbar (z-50) and WhatsApp FAB */
+.madadgaar-hot-toast {
+  pointer-events: none;
+}
+
+.madadgaar-hot-toast > * {
+  pointer-events: auto;
+}
+
 /* Toast animations */
 @keyframes slide-in-right {
   from {

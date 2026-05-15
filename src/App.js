@@ -59,13 +59,6 @@ function LayoutWrapper({ children }) {
     <>
       {!hideLayout && <Navbar />}
 
-      {/* Toaster: under navbar when layout visible, near top when navbar hidden (e.g. dashboard) */}
-      <Toaster
-        position="top-center"
-        toastOptions={{ duration: 4000 }}
-        containerStyle={{ top: hideLayout ? "1rem" : "5.5rem" }}
-      />
-
       {/* Spacer for fixed navbar so content is not hidden under it */}
       <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden" : "overflow-x-hidden"}>
         <div key={location.pathname} className="route-transition-enter">
@@ -75,6 +68,25 @@ function LayoutWrapper({ children }) {
 
       {!hideLayout && <Footer />}
       {!hideLayout && <WhatsAppButton />}
+
+      {/* Toaster last so it stacks above navbar (z-50), footer, and FAB; containerStyle overrides lib default z-index 9999 */}
+      <Toaster
+        position="top-center"
+        gutter={12}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            maxWidth: "min(100vw - 2rem, 28rem)",
+          },
+        }}
+        containerStyle={{
+          zIndex: 2147483000,
+          top: hideLayout
+            ? "max(1rem, env(safe-area-inset-top, 0px))"
+            : "max(5.75rem, calc(5.25rem + env(safe-area-inset-top, 0px)))",
+        }}
+        containerClassName="madadgaar-hot-toast"
+      />
     </>
   );
 }
