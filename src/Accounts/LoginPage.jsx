@@ -16,7 +16,7 @@ export default function LoginPage() {
     if (getUser()){
       const userType = getUser().userType || getUser().UserType;
       if (userType === "user") {
-        window.location.href = "/";
+        window.location.href = "/dashboard";
       } else {
         window.location.href = "/"; // Admin/other types can use same dashboard for now
       }
@@ -113,7 +113,7 @@ export default function LoginPage() {
       }
 
       toast.success("Signed in successfully");
-      window.location.href = "/dashboard";
+      window.location.href = "/";
     } catch (err) {
       console.error("Login error:", err);
       toast.error("Network error — please try again.");
