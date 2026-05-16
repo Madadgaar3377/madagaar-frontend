@@ -16,9 +16,9 @@ export default function LoginPage() {
     if (getUser()){
       const userType = getUser().userType || getUser().UserType;
       if (userType === "user") {
-        window.location.href = "/dashboard";
+        window.location.href = "/";
       } else {
-        window.location.href = "/dashboard"; // Admin/other types can use same dashboard for now
+        window.location.href = "/"; // Admin/other types can use same dashboard for now
       }
     }
   }, []);
