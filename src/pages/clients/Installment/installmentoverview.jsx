@@ -5,15 +5,27 @@ import LoadingPage from "../../../compontents/Loader";
 import InstallmentReviews from "../../../components/InstallmentReviews";
 import ShareButtons from "../../../components/ShareButtons";
 import SEO from "../../../components/SEO";
+import {
+  getBestPaymentPlan,
+  buildInstallmentShareLines,
+  isCashOnlyInstallment,
+  formatTenureDisplay,
+} from "../../../utils/installmentPricing";
 
-// Helper to find best plan index
-const findBestPlanIndex = (paymentPlans) => {
-  if (!paymentPlans || paymentPlans.length === 0) return 0;
-  return paymentPlans.reduce((bestIdx, current, currentIdx) => {
-    const currentMonthly = Number(current.monthlyInstallment || 0);
-    const bestMonthly = Number(paymentPlans[bestIdx].monthlyInstallment || 0);
-    return currentMonthly > 0 && (bestMonthly === 0 || currentMonthly < bestMonthly) ? currentIdx : bestIdx;
-  }, 0);
+const findBestPlanIndex = (paymentPlans, plan = {}) => {
+  if (!paymentPlans?.length) return 0;
+  const best = getBestPaymentPlan(paymentPlans, plan);
+  const withMonthly = paymentPlans.filter((p) => Number(p.monthlyInstallment || 0) > 0);
+  if (withMonthly.length > 0) {
+    const idx = paymentPlans.findIndex(
+      (p) => Number(p.monthlyInstallment || 0) === Number(best.monthlyInstallment)
+    );
+    return idx >= 0 ? idx : 0;
+  }
+  const idx = paymentPlans.findIndex(
+    (p) => Number(p.cashPrice || plan.price || 0) === Number(best.cashPrice)
+  );
+  return idx >= 0 ? idx : 0;
 };
 
 /** Build plan list: Standard = all plans; specific variant = that variant's plans only */
@@ -191,7 +203,7 @@ export default function InstallmentDetail() {
 
   const currentPlans = useMemo(() => planEntries.map((e) => e.plan), [planEntries]);
 
-  const bestPlanIndex = useMemo(() => findBestPlanIndex(currentPlans), [currentPlans]);
+  const bestPlanIndex = useMemo(() => findBestPlanIndex(currentPlans, plan), [currentPlans, plan]);
 
   // Current displayed data based on variant selection
   const currentPrice = useMemo(() => {
@@ -574,19 +586,8 @@ export default function InstallmentDetail() {
                   title={plan.productName || "Installment plan"}
                   details={(() => {
                     const plans = plan.paymentPlans || [];
-                    const best = plans.length ? plans[findBestPlanIndex(plans)] : {};
-                    const down = Number(best.downPayment ?? plan.downpayment ?? 0);
-                    const monthly = Number(best.monthlyInstallment ?? plan.installment ?? 0);
-                    const cash = Number(plan.price ?? 0);
-                    const tenure = best.tenureMonths ?? best.tenure ?? "";
-                    return [
-                      plan.city || "Pakistan",
-                      "Monthly Payment",
-                      `Down: Rs ${down.toLocaleString()}`,
-                      `Rs ${monthly.toLocaleString()}/month`,
-                      `Cash Price: Rs ${cash.toLocaleString()}`,
-                      tenure ? `${tenure} Months` : null,
-                    ].filter(Boolean).join("\n");
+                    const best = plans.length ? plans[findBestPlanIndex(plans, plan)] : {};
+                    return buildInstallmentShareLines(plan, best);
                   })()}
                   label="Share this plan"
                 />
@@ -740,14 +741,25 @@ export default function InstallmentDetail() {
                                 </span>
                               )}
                             </div>
-                            <div className="mt-1 flex items-baseline gap-2">
-                              <span className="text-lg font-black text-[rgb(183,36,42)]">
-                                PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
-                              </span>
-                              <span className="text-xs text-gray-500">/month</span>
-                              <span className="ml-auto text-xs font-semibold text-gray-700 whitespace-nowrap">
-                                {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
-                              </span>
+                            <div className="mt-1 flex items-baseline gap-2 flex-wrap">
+                              {isCashOnlyInstallment(p.monthlyInstallment) ? (
+                                <>
+                                  <span className="text-lg font-black text-[rgb(183,36,42)]">
+                                    PKR {cashPrice.toLocaleString()}
+                                  </span>
+                                  <span className="text-xs text-gray-500">Cash Price</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-lg font-black text-[rgb(183,36,42)]">
+                                    PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                                  </span>
+                                  <span className="text-xs text-gray-500">/month</span>
+                                  <span className="ml-auto text-xs font-semibold text-gray-700 whitespace-nowrap">
+                                    {formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || "—"}
+                                  </span>
+                                </>
+                              )}
                             </div>
                             <div className="mt-1 text-xs text-gray-600">
                               <span className="font-bold">Cash Price:</span> PKR {cashPrice.toLocaleString()}
@@ -939,12 +951,18 @@ export default function InstallmentDetail() {
                             </td>
                             <td className="px-4 py-3 text-center">
                               <div className="font-black text-[rgb(183,36,42)] text-lg">
-                                PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                                {isCashOnlyInstallment(p.monthlyInstallment)
+                                  ? `PKR ${cashPrice.toLocaleString()}`
+                                  : `PKR ${Number(p.monthlyInstallment || 0).toLocaleString()}`}
                               </div>
-                              <div className="text-xs text-gray-500">/month</div>
+                              <div className="text-xs text-gray-500">
+                                {isCashOnlyInstallment(p.monthlyInstallment) ? "Cash Price" : "/month"}
+                              </div>
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                              {p.tenureMonths ? `${p.tenureMonths} Months` : (p.customTenureLabel || "—")}
+                              {isCashOnlyInstallment(p.monthlyInstallment)
+                                ? "—"
+                                : formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || "—"}
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
                               PKR {downPayment.toLocaleString()}

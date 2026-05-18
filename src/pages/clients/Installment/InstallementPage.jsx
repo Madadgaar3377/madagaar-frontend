@@ -9,6 +9,11 @@ import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
+import {
+  getBestPaymentPlan,
+  getInstallmentCardPricing,
+  buildInstallmentShareLines,
+} from "../../../utils/installmentPricing";
 
 // Category options - comprehensive list
 const CATEGORY_OPTIONS = [
@@ -259,34 +264,7 @@ export default function InstallmentPlans() {
     return Array.from(setCity).filter(Boolean).sort();
   }, [plans]);
 
-  // Helper to get the best (lowest monthly installment) plan
-  const getBestPlan = (plan) => {
-    if (!plan.paymentPlans || !Array.isArray(plan.paymentPlans) || plan.paymentPlans.length === 0) {
-      // Fallback to legacy fields
-      return {
-        monthlyInstallment: plan.installment || 0,
-        downPayment: plan.downpayment || 0,
-        tenureMonths: plan.tenure || plan.customTenure || "—",
-        planName: "Standard Plan"
-      };
-    }
-    
-    // Find plan with lowest monthly installment
-    const bestPlan = plan.paymentPlans.reduce((best, current) => {
-      const currentMonthly = Number(current.monthlyInstallment || 0);
-      const bestMonthly = Number(best.monthlyInstallment || 0);
-      return currentMonthly > 0 && (bestMonthly === 0 || currentMonthly < bestMonthly) ? current : best;
-    }, plan.paymentPlans[0]);
-    
-    return {
-      monthlyInstallment: bestPlan.monthlyInstallment || 0,
-      downPayment: bestPlan.downPayment || 0,
-      tenureMonths: bestPlan.tenureMonths || bestPlan.customTenureLabel || plan.tenure || plan.customTenure || "—",
-      planName: bestPlan.planName || "Best Plan",
-      interestRatePercent: bestPlan.interestRatePercent || 0,
-      interestType: bestPlan.interestType || ""
-    };
-  };
+  const getBestPlan = (plan) => getBestPaymentPlan(plan.paymentPlans, plan);
 
   // Get price range from plans for filter limits
   const priceRange = useMemo(() => {
@@ -737,14 +715,9 @@ export default function InstallmentPlans() {
             <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 items-stretch">
               {pageData.map((plan, index) => {
                 const bestPlan = getBestPlan(plan);
+                const pricing = getInstallmentCardPricing(plan, bestPlan);
                 const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
                 const hasFinance = plan.finance && (plan.finance.bankName || plan.finance.financeInfo);
-                const tenureLabel =
-                  typeof bestPlan.tenureMonths === "number"
-                    ? `${bestPlan.tenureMonths} Months`
-                    : bestPlan.tenureMonths != null && String(bestPlan.tenureMonths).trim() !== ""
-                      ? `${bestPlan.tenureMonths} Months`
-                      : null;
                 
                 return (
                 <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full h-full min-h-0 flex">
@@ -789,29 +762,37 @@ export default function InstallmentPlans() {
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100">
                       <div className="flex items-start sm:items-center justify-between gap-2 mb-1 sm:mb-2">
                         <div className="text-[10px] sm:text-xs text-gray-600 font-medium min-w-0 line-clamp-2">
-                          {hasMultiplePlans ? `Best: ${bestPlan.planName}` : "Monthly Payment"}
+                          {hasMultiplePlans ? `Best: ${bestPlan.planName}` : pricing.primaryLabel}
                         </div>
+                        {pricing.downPayment > 0 && (
                         <div className="text-[10px] sm:text-xs text-gray-500 flex-shrink-0 text-right">
-                          Down: {currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}
+                          Down: {currency(pricing.downPayment)}
                         </div>
+                        )}
                       </div>
                       <div className="flex items-baseline gap-1 sm:gap-2 flex-wrap">
                         <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums break-all">
-                          {currency(bestPlan.monthlyInstallment || plan.installment || 0)}
+                          {currency(pricing.primaryAmount)}
                         </span>
+                        {pricing.showPerMonth && (
                         <span className="text-[11px] sm:text-sm text-gray-500">/month</span>
+                        )}
                       </div>
+                      {(pricing.showCashLine || pricing.tenureLabel) && (
                       <div className="flex flex-row flex-wrap items-center justify-between gap-x-1 gap-y-0.5 mt-1.5 pt-1 border-t border-red-100/60">
+                        {pricing.showCashLine && (
                         <div className="text-[11px] sm:text-xs text-gray-700 min-w-0">
                           <span className="font-extrabold text-gray-900">Cash:</span>{" "}
-                          <span className="tabular-nums">{currency(plan.price)}</span>
+                          <span className="tabular-nums">{currency(pricing.cashPrice)}</span>
                         </div>
-                        {tenureLabel && (
+                        )}
+                        {pricing.tenureLabel && (
                           <div className="text-[11px] sm:text-xs text-gray-900 font-semibold whitespace-nowrap">
-                            {tenureLabel}
+                            {pricing.tenureLabel}
                           </div>
                         )}
                       </div>
+                      )}
                       {hasMultiplePlans && (
                         <div className="text-[9px] sm:text-[10px] text-gray-500 mt-1 pt-1 border-t border-red-200">
                           {plan.paymentPlans.length} plan{plan.paymentPlans.length > 1 ? 's' : ''} available
@@ -839,14 +820,7 @@ export default function InstallmentPlans() {
                         fullWidth
                         url={(plan.installmentPlanId || plan._id) ? `https://madadgaar.com.pk/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}` : ""}
                         title={plan.productName || "Installment plan"}
-                        details={[
-                          plan.city || "Pakistan",
-                          "Monthly Payment",
-                          `Down: ${currency(bestPlan.downPayment || plan.downpayment || plan.price * 0.2)}`,
-                          `${currency(bestPlan.monthlyInstallment || plan.installment || 0)}/month`,
-                          `Cash Price: ${currency(plan.price)}`,
-                          tenureLabel,
-                        ].filter(Boolean).join("\n")}
+                        details={buildInstallmentShareLines(plan, bestPlan)}
                         label="Share this plan"
                       />
                     </div>
