@@ -489,7 +489,12 @@ export default function InstallmentDetail() {
               {/* Variant Selection */}
               {Array.isArray(plan.variants) && plan.variants.length > 0 && (
                 <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Select Specification</h3>
+                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Select Specification</h3>
+                  <p className="text-xs text-gray-500 mb-4">
+                    {selectedVariantIndex === null
+                      ? "Standard shows all payment plans. Pick a specification to see plans for that option only."
+                      : `Showing plans for ${plan.variants[selectedVariantIndex]?.variantName || "this option"}.`}
+                  </p>
                   <div className="flex flex-wrap gap-3">
                     <button
                       onClick={() => setSelectedVariantIndex(null)}
@@ -664,6 +669,14 @@ export default function InstallmentDetail() {
             )}
 
             {/* payment plans */}
+            {pricingView === "installments" && Array.isArray(plan.variants) && plan.variants.length > 0 && selectedVariantIndex !== null && currentPlans.length === 0 && (
+              <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 border border-gray-200">
+                <p className="text-sm text-gray-600">
+                  No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet. Select <strong>Standard</strong> to see all plans, or choose another specification.
+                </p>
+              </section>
+            )}
+
             {pricingView === "installments" && Array.isArray(currentPlans) && currentPlans.length > 0 ? (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
