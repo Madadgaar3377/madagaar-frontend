@@ -716,6 +716,11 @@ export default function InstallmentDetail() {
                               <div className="font-bold text-gray-900 truncate">
                                 {p.planName || `Plan ${idx + 1}`}
                               </div>
+                              {variantLabel && (
+                                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full whitespace-nowrap">
+                                  {variantLabel}
+                                </span>
+                              )}
                               {isBestPlan && (
                                 <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full whitespace-nowrap">
                                   ⭐ BEST
@@ -872,7 +877,12 @@ export default function InstallmentDetail() {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentPlans.map((p, idx) => {
+                      {planEntries.map((entry, idx) => {
+                        const p = entry.plan;
+                        const variantLabel =
+                          selectedVariantIndex === null &&
+                          entry.variantIndex !== null &&
+                          plan.variants?.[entry.variantIndex]?.variantName;
                         const cashPrice = Number(currentPrice);
                         const downPayment = Number(p.downPayment || 0);
                         const financedAmount = Math.max(0, cashPrice - downPayment);
@@ -885,7 +895,7 @@ export default function InstallmentDetail() {
 
                         return (
                           <tr
-                            key={idx}
+                            key={`${entry.variantIndex ?? "std"}-${entry.planIndex}-${idx}`}
                             className={`border-b border-gray-200 hover:bg-gray-50 transition-colors ${
                               isBestPlan ? "bg-red-50 border-l-4 border-l-[rgb(183,36,42)]" : ""
                             }`}
@@ -902,6 +912,11 @@ export default function InstallmentDetail() {
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-2">
                                 <span className="font-bold text-gray-900">{p.planName || `Plan ${idx + 1}`}</span>
+                                {variantLabel && (
+                                  <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded-full">
+                                    {variantLabel}
+                                  </span>
+                                )}
                                 {isBestPlan && (
                                   <span className="px-2 py-0.5 bg-[rgb(183,36,42)] text-white text-[10px] font-bold rounded-full">
                                     ⭐ BEST
