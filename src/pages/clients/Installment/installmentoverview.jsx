@@ -16,6 +16,37 @@ const findBestPlanIndex = (paymentPlans) => {
   }, 0);
 };
 
+/** Build plan list: Standard = all plans; specific variant = that variant's plans only */
+const buildPlanEntries = (plan, selectedVariantIndex) => {
+  if (!plan) return [];
+  if (selectedVariantIndex !== null && plan.variants?.[selectedVariantIndex]) {
+    return (plan.variants[selectedVariantIndex].paymentPlans || []).map((p, planIndex) => ({
+      plan: p,
+      variantIndex: selectedVariantIndex,
+      planIndex,
+    }));
+  }
+  const entries = [];
+  (plan.paymentPlans || []).forEach((p, planIndex) => {
+    entries.push({ plan: p, variantIndex: null, planIndex });
+  });
+  (plan.variants || []).forEach((v, variantIndex) => {
+    (v.paymentPlans || []).forEach((p, planIndex) => {
+      entries.push({ plan: p, variantIndex, planIndex });
+    });
+  });
+  return entries;
+};
+
+const getApplyPlanQuery = (entry) => {
+  const params = new URLSearchParams();
+  params.set("planIndex", String(entry.planIndex));
+  if (entry.variantIndex !== null && entry.variantIndex !== undefined) {
+    params.set("variantIndex", String(entry.variantIndex));
+  }
+  return `?${params.toString()}`;
+};
+
 const PLACEHOLDER = "/placeholder.png";
 
 /* ---------- helpers ---------- */
@@ -153,23 +184,24 @@ export default function InstallmentDetail() {
   const descriptionHasHtml = /<[a-z][\s\S]*>/i.test(descriptionSource);
   const needsDescriptionToggle = descriptionDisplayPlain.length > 130;
 
-  const bestPlanIndex = useMemo(() => {
-    return findBestPlanIndex(plan?.paymentPlans || []);
-  }, [plan]);
+  const planEntries = useMemo(
+    () => buildPlanEntries(plan, selectedVariantIndex),
+    [plan, selectedVariantIndex]
+  );
+
+  const currentPlans = useMemo(() => planEntries.map((e) => e.plan), [planEntries]);
+
+  const bestPlanIndex = useMemo(() => findBestPlanIndex(currentPlans), [currentPlans]);
 
   // Current displayed data based on variant selection
   const currentPrice = useMemo(() => {
     if (selectedVariantIndex !== null && plan?.variants?.[selectedVariantIndex]) {
-      return plan.variants[selectedVariantIndex].price;
+      const v = plan.variants[selectedVariantIndex];
+      const base = Number(v.price) || 0;
+      const disc = Math.min(100, Math.max(0, Number(v.discountPercent) || 0));
+      return Math.round(base * (1 - disc / 100)) || base;
     }
     return plan?.price || 0;
-  }, [plan, selectedVariantIndex]);
-
-  const currentPlans = useMemo(() => {
-    if (selectedVariantIndex !== null && plan?.variants?.[selectedVariantIndex]?.paymentPlans?.length > 0) {
-      return plan.variants[selectedVariantIndex].paymentPlans;
-    }
-    return plan?.paymentPlans || [];
   }, [plan, selectedVariantIndex]);
 
   const cashOffers = useMemo(() => {
@@ -258,14 +290,14 @@ export default function InstallmentDetail() {
 
 
 
-  // Mobile: open BEST plan by default
+  // Mobile: open BEST plan by default (resets when specification changes)
   useEffect(() => {
-    if (Array.isArray(plan?.paymentPlans) && plan.paymentPlans.length > 0) {
+    if (currentPlans.length > 0) {
       setExpandedPlanIndex(bestPlanIndex);
     } else {
       setExpandedPlanIndex(null);
     }
-  }, [bestPlanIndex, plan]);
+  }, [bestPlanIndex, currentPlans, selectedVariantIndex]);
 
   // Auto-rotate images
   useEffect(() => {
@@ -641,7 +673,8 @@ export default function InstallmentDetail() {
 
                 {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
                 <div className="lg:hidden space-y-3 mb-4">
-                  {currentPlans.map((p, idx) => {
+                  {planEntries.map((entry, idx) => {
+                    const p = entry.plan;
                     const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
                     const cashPrice = Number(currentPrice);
                     const downPayment = Number(p.downPayment || 0);
@@ -652,10 +685,14 @@ export default function InstallmentDetail() {
                     const isBestPlan = idx === bestPlanIndex;
                     const isOpen = expandedPlanIndex === idx;
                     const panelId = `plan-panel-${idx}`;
+                    const variantLabel =
+                      selectedVariantIndex === null &&
+                      entry.variantIndex !== null &&
+                      plan.variants?.[entry.variantIndex]?.variantName;
 
                     return (
                       <div
-                        key={idx}
+                        key={`${entry.variantIndex ?? "std"}-${entry.planIndex}-${idx}`}
                         className={`border-2 rounded-xl overflow-hidden bg-white transition ${
                           isBestPlan ? "border-[rgb(183,36,42)] shadow-md" : "border-gray-200"
                         }`}
@@ -805,7 +842,7 @@ export default function InstallmentDetail() {
                             )}
 
                             <NavLink
-                              to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}${selectedVariantIndex !== null ? `&variantIndex=${selectedVariantIndex}` : ""}`}
+                              to={`/installment/${encodeURIComponent(id)}/apply${getApplyPlanQuery(entry)}`}
                               className="block w-full text-center px-4 py-3 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-xl hover:bg-red-700 transition active:scale-95"
                             >
                               Apply for This Plan
@@ -974,7 +1011,7 @@ export default function InstallmentDetail() {
                             </td>
                             <td className="px-4 py-3 text-center">
                               <NavLink
-                                to={`/installment/${encodeURIComponent(id)}/apply?planIndex=${idx}${selectedVariantIndex !== null ? `&variantIndex=${selectedVariantIndex}` : ""}`}
+                                to={`/installment/${encodeURIComponent(id)}/apply${getApplyPlanQuery(entry)}`}
                                 className="inline-block px-4 py-2 bg-[rgb(183,36,42)] text-white text-sm font-bold rounded-lg hover:bg-red-700 transition"
                               >
                                 Apply
