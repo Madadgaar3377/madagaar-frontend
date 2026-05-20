@@ -28,7 +28,7 @@ const findBestPlanIndex = (paymentPlans, plan = {}) => {
   return idx >= 0 ? idx : 0;
 };
 
-/** Build plan list: Standard = all plans; specific variant = that variant's plans only */
+/** Build plan list: All Plans = every plan; specific variant = that variant's plans only */
 const buildPlanEntries = (plan, selectedVariantIndex) => {
   if (!plan) return [];
   if (selectedVariantIndex !== null && plan.variants?.[selectedVariantIndex]) {
@@ -489,12 +489,14 @@ export default function InstallmentDetail() {
                       PKR {Number(currentPrice).toLocaleString()}
                     </div>
                   </div>
+                  {Number(plan.downpayment || 0) > 0 && (
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Down Payment:</div>
                     <div className="text-base font-semibold text-gray-900">
-                      PKR {Number(plan.downpayment || 0).toLocaleString()}
+                      PKR {Number(plan.downpayment).toLocaleString()}
                     </div>
                   </div>
+                  )}
                 </div>
               </div>
 
@@ -504,7 +506,7 @@ export default function InstallmentDetail() {
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Select Specification</h3>
                   <p className="text-xs text-gray-500 mb-4">
                     {selectedVariantIndex === null
-                      ? "Standard shows all payment plans. Pick a specification to see plans for that option only."
+                      ? "All Plans shows every payment option. Pick a specification to see plans for that option only."
                       : `Showing plans for ${plan.variants[selectedVariantIndex]?.variantName || "this option"}.`}
                   </p>
                   <div className="flex flex-wrap gap-3">
@@ -516,7 +518,7 @@ export default function InstallmentDetail() {
                           : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-white"
                       }`}
                     >
-                      Standard
+                      All Plans
                     </button>
                     {plan.variants.map((variant, vIdx) => (
                       <button
@@ -673,7 +675,7 @@ export default function InstallmentDetail() {
             {pricingView === "installments" && Array.isArray(plan.variants) && plan.variants.length > 0 && selectedVariantIndex !== null && currentPlans.length === 0 && (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 border border-gray-200">
                 <p className="text-sm text-gray-600">
-                  No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet. Select <strong>Standard</strong> to see all plans, or choose another specification.
+                  No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet. Select <strong>All Plans</strong> to see every option, or choose another specification.
                 </p>
               </section>
             )}
@@ -785,10 +787,12 @@ export default function InstallmentDetail() {
                         >
                           <div className="px-4 pb-4 pt-0 space-y-3">
                             <div className="grid grid-cols-2 gap-3 bg-gray-50 border border-gray-200 rounded-xl p-3">
+                              {downPayment > 0 && (
                               <div>
                                 <div className="text-[11px] text-gray-500 font-semibold">Down Payment</div>
                                 <div className="text-sm font-bold text-gray-900">PKR {downPayment.toLocaleString()}</div>
                               </div>
+                              )}
                               <div>
                                 <div className="text-[11px] text-gray-500 font-semibold">Financed Amount</div>
                                 <div className="text-sm font-bold text-gray-900">PKR {financedAmount.toLocaleString()}</div>
@@ -965,7 +969,7 @@ export default function InstallmentDetail() {
                                 : formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || "—"}
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                              PKR {downPayment.toLocaleString()}
+                              {downPayment > 0 ? `PKR ${downPayment.toLocaleString()}` : "—"}
                             </td>
                             <td className="px-4 py-3 text-center text-sm">
                               <div className="font-semibold text-gray-900">
@@ -1083,10 +1087,12 @@ export default function InstallmentDetail() {
                     <div className="text-xs sm:text-sm text-gray-500 mb-1"><span className="font-bold">Cash Price</span></div>
                     <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.price || 0).toLocaleString()}</div>
                   </div>
+                  {Number(plan.downpayment || 0) > 0 && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Down Payment</div>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900">PKR {Number(plan.downpayment || 0).toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">PKR {Number(plan.downpayment).toLocaleString()}</div>
                   </div>
+                  )}
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Monthly Installment</div>
                     <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.installment || 0).toLocaleString()}</div>
@@ -1474,12 +1480,14 @@ export default function InstallmentDetail() {
                             PKR {Number(product.price || 0).toLocaleString()}
                           </div>
                         </div>
+                        {Number(product.downpayment || 0) > 0 && (
                         <div className="text-right">
                           <div className="text-xs text-gray-500">Down Payment</div>
                           <div className="text-sm font-semibold text-gray-900">
-                            PKR {Number(product.downpayment || 0).toLocaleString()}
+                            PKR {Number(product.downpayment).toLocaleString()}
                           </div>
                         </div>
+                        )}
                       </div>
                     </div>
 

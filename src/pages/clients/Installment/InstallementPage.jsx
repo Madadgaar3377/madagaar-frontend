@@ -121,8 +121,11 @@ export default function InstallmentPlans() {
     }
   };
 
-  // UI state
-  const [search, setSearch] = useState("");
+  // UI state — searchDraft types in bar; appliedSearch triggers API (not every keystroke)
+  const [searchDraft, setSearchDraft] = useState("");
+  const [appliedSearch, setAppliedSearch] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [isSearchMode, setIsSearchMode] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedCity, setSelectedCity] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -134,45 +137,98 @@ export default function InstallmentPlans() {
   const [page, setPage] = useState(1);
 
 
-  useEffect(() => {
-    let mounted = true;
-    async function fetchPlans(fetchPage = 1) {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(`${apiUrl}/getAllInstallments?page=${fetchPage}&limit=${API_PAGE_LIMIT}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const payload = await res.json().catch(() => null);
-        if (!res.ok || (payload && payload.success === false)) {
-          setError(payload?.message || `Failed to load (${res.status})`);
-        } else {
-          const data = payload?.data ?? payload ?? [];
-          const extractedPlans = Array.isArray(data)
-            ? data
-            : (data?.plans || data?.installments || payload?.plans || payload?.installments || []);
-          const extractedPagination = payload?.pagination || data?.pagination || null;
-          if (mounted) {
-            setPlans(Array.isArray(extractedPlans) ? extractedPlans : []);
-            setApiPage(fetchPage);
-            setApiTotalPages(Number(extractedPagination?.totalPages || 1));
-            setApiTotalCount(Number(extractedPagination?.total || 0));
-          }
-        }
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError("Network error — could not fetch installment plans.");
-      } finally {
-        if (mounted) setLoading(false);
+  const fetchCatalogPlans = async (fetchPage = 1) => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${apiUrl}/getAllInstallments?page=${fetchPage}&limit=${API_PAGE_LIMIT}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || (payload && payload.success === false)) {
+        setError(payload?.message || `Failed to load (${res.status})`);
+      } else {
+        const data = payload?.data ?? payload ?? [];
+        const extractedPlans = Array.isArray(data)
+          ? data
+          : (data?.plans || data?.installments || payload?.plans || payload?.installments || []);
+        const extractedPagination = payload?.pagination || data?.pagination || null;
+        setPlans(Array.isArray(extractedPlans) ? extractedPlans : []);
+        setApiPage(fetchPage);
+        setApiTotalPages(Number(extractedPagination?.totalPages || 1));
+        setApiTotalCount(Number(extractedPagination?.total || 0));
       }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError("Network error — could not fetch installment plans.");
+    } finally {
+      setLoading(false);
     }
-    fetchPlans(1);
-    return () => (mounted = false);
+  };
+
+  const runInstallmentSearch = async () => {
+    const q = searchDraft.trim();
+    setAppliedSearch(q);
+    setPage(1);
+
+    if (!q) {
+      setIsSearchMode(false);
+      await fetchCatalogPlans(1);
+      return;
+    }
+
+    setSearchLoading(true);
+    setError("");
+    setIsSearchMode(true);
+    try {
+      const params = new URLSearchParams({
+        query: q,
+        page: "1",
+        limit: String(API_PAGE_LIMIT),
+      });
+      if (selectedCity) params.set("city", selectedCity);
+      if (selectedCategory) params.set("category", selectedCategory);
+      if (priceMin) params.set("minPrice", priceMin);
+      if (priceMax) params.set("maxPrice", priceMax);
+
+      const res = await fetch(`${apiUrl}/search/installments?${params.toString()}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok || payload?.success === false) {
+        setError(payload?.message || `Search failed (${res.status})`);
+        setPlans([]);
+      } else {
+        const data = payload?.data ?? [];
+        setPlans(Array.isArray(data) ? data : []);
+        setApiPage(1);
+        setApiTotalPages(Number(payload?.totalPages || 1));
+        setApiTotalCount(Number(payload?.total || data.length || 0));
+      }
+    } catch (err) {
+      console.error("Search error:", err);
+      setError("Network error — could not search installment plans.");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchDraft("");
+    setAppliedSearch("");
+    setIsSearchMode(false);
+    setPage(1);
+    fetchCatalogPlans(1);
+  };
+
+  useEffect(() => {
+    fetchCatalogPlans(1);
   }, [apiUrl]);
 
   const goToNextApiPage = async () => {
-    if (loadingMore || apiPage >= apiTotalPages) return;
+    if (isSearchMode || loadingMore || apiPage >= apiTotalPages) return;
     setLoadingMore(true);
     setError("");
     const nextPage = apiPage + 1;
@@ -293,7 +349,6 @@ export default function InstallmentPlans() {
 
   // filtered and sorted data
   const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
     let filteredPlans = plans.filter((p) => {
       // Category filter
       if (selectedCategory) {
@@ -323,15 +378,7 @@ export default function InstallmentPlans() {
       const monthly = Number(bestPlan.monthlyInstallment || 0);
       if (monthlyMin && monthly < Number(monthlyMin)) return false;
       if (monthlyMax && monthly > Number(monthlyMax)) return false;
-      // Search filter
-      if (!q) return true;
-      return (
-        (p.productName || "").toLowerCase().includes(q) ||
-        (p.description || "").toLowerCase().includes(q) ||
-        (p.city || "").toLowerCase().includes(q) ||
-        (p.companyName || p.companyNameOther || "").toLowerCase().includes(q) ||
-        (p.category || p.customCategory || "").toLowerCase().includes(q)
-      );
+      return true;
     });
 
     // Sort filtered plans
@@ -362,7 +409,7 @@ export default function InstallmentPlans() {
     });
 
     return filteredPlans;
-  }, [plans, search, selectedCategory, selectedCity, sortBy, priceMin, priceMax, monthlyMin, monthlyMax]);
+  }, [plans, selectedCategory, selectedCity, sortBy, priceMin, priceMax, monthlyMin, monthlyMax]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   useEffect(() => {
@@ -403,31 +450,50 @@ export default function InstallmentPlans() {
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-              {/* Main Search Bar */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <input
-                  value={search}
-                  onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                  placeholder="Search products..."
-                  className="block w-full pl-10 sm:pl-12 pr-10 sm:pr-12 py-3 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all shadow-sm hover:border-gray-300"
-                />
-                {search && (
-                  <button
-                    onClick={() => { setSearch(""); setPage(1); }}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 sm:pr-4 text-gray-400 hover:text-gray-600 transition"
-                    aria-label="Clear search"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              {/* Main Search Bar — API search on button / Enter only */}
+              <div className="flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
+                  </div>
+                  <input
+                    value={searchDraft}
+                    onChange={(e) => setSearchDraft(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        runInstallmentSearch();
+                      }
+                    }}
+                    placeholder="Search by name, brand, city, specs..."
+                    className="block w-full pl-10 sm:pl-12 pr-4 py-3 sm:py-3.5 text-sm sm:text-base border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all shadow-sm hover:border-gray-300"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={runInstallmentSearch}
+                  disabled={searchLoading}
+                  className="px-5 py-3 sm:py-3.5 bg-[rgb(183,36,42)] text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition disabled:opacity-60 min-h-[44px]"
+                >
+                  {searchLoading ? "Searching..." : "Search"}
+                </button>
+                {(searchDraft || appliedSearch) && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="px-5 py-3 sm:py-3.5 border-2 border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition min-h-[44px]"
+                  >
+                    Clear
                   </button>
                 )}
               </div>
+              {isSearchMode && appliedSearch && (
+                <p className="text-xs text-gray-500">
+                  Showing results for &quot;{appliedSearch}&quot; ({apiTotalCount} found). Filters below refine this list.
+                </p>
+              )}
 
               {/* Filters Row - All Visible */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3">
@@ -490,7 +556,9 @@ export default function InstallmentPlans() {
                 {/* Reset Button */}
                 <button 
                   onClick={() => { 
-                    setSearch(""); 
+                    setSearchDraft("");
+                    setAppliedSearch("");
+                    setIsSearchMode(false);
                     setSelectedCity(""); 
                     setSelectedCategory(""); 
                     setSortBy("newest");
@@ -498,7 +566,8 @@ export default function InstallmentPlans() {
                     setPriceMax("");
                     setMonthlyMin("");
                     setMonthlyMax("");
-                    setPage(1); 
+                    setPage(1);
+                    fetchCatalogPlans(1);
                   }} 
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-[rgb(183,36,42)] hover:bg-red-700 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 flex items-center justify-center gap-2 min-h-[44px]"
                   aria-label="Reset all filters"
@@ -692,7 +761,7 @@ export default function InstallmentPlans() {
         <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
         {/* content */}
-        {loading ? (
+        {loading || searchLoading ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 items-stretch">
             {[...Array(12)].map((_, idx) => (
               <div key={idx} className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse flex flex-col min-h-0">

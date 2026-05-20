@@ -353,10 +353,12 @@ const ApplyInstallment = () => {
                       <span className="text-gray-600">Price:</span>
                       <span className="font-semibold text-gray-900">PKR {(selectedPlan?.installmentPrice || selectedVariant?.price || plan.price || 0).toLocaleString()}</span>
                     </div>
+                    {Number(selectedPlan.downPayment || 0) > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Down Payment:</span>
-                      <span className="font-semibold text-red-600">PKR {selectedPlan.downPayment?.toLocaleString()}</span>
+                      <span className="font-semibold text-red-600">PKR {Number(selectedPlan.downPayment).toLocaleString()}</span>
                     </div>
+                    )}
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Monthly:</span>
                       <span className="font-semibold text-red-600">PKR {selectedPlan.monthlyInstallment?.toLocaleString()}</span>
