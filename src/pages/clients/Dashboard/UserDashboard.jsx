@@ -5,6 +5,10 @@ import { backendBaseUrl } from '../../../constants/apiUrl';
 import DashboardNavbar from '../../../components/DashboardNavbar';
 import SEO from '../../../components/SEO';
 import AnimatedSection from '../../../components/AnimatedSection';
+import {
+  resolveAppliedPlanDisplay,
+  resolvePartnerDisplay,
+} from '../../../utils/applicationPlanDetails';
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +19,7 @@ const UserDashboard = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [detailsLoading, setDetailsLoading] = useState(false);
+  const [catalogPlan, setCatalogPlan] = useState(null);
   const [dashboardData, setDashboardData] = useState({
     user: null,
     installments: [],
@@ -189,31 +194,37 @@ const UserDashboard = () => {
   };
 
   const handleViewDetails = async (application) => {
+    setShowDetailsModal(true);
+    setSelectedApplication(application);
+    setCatalogPlan(null);
+
     if (application?.installmentPlanId != null && application?.applicationId) {
       setDetailsLoading(true);
-      setShowDetailsModal(true);
-      setSelectedApplication(application);
       try {
         const token = getAuthToken();
-        const res = await fetch(`${backendBaseUrl}/getApplication/${application.applicationId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const json = await res.json();
-        if (json.success && json.data) setSelectedApplication(json.data);
+        const planId = encodeURIComponent(application.installmentPlanId);
+        const [appRes, planRes] = await Promise.all([
+          fetch(`${backendBaseUrl}/getApplication/${application.applicationId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${backendBaseUrl}/getInstallment/${planId}`),
+        ]);
+        const appJson = await appRes.json();
+        const planJson = await planRes.json();
+        if (appJson.success && appJson.data) setSelectedApplication(appJson.data);
+        if (planJson.success && planJson.data) setCatalogPlan(planJson.data);
       } catch (err) {
         console.error('Failed to load application details', err);
       } finally {
         setDetailsLoading(false);
       }
-    } else {
-      setSelectedApplication(application);
-      setShowDetailsModal(true);
     }
   };
 
   const closeDetailsModal = () => {
     setShowDetailsModal(false);
     setSelectedApplication(null);
+    setCatalogPlan(null);
   };
 
   if (loading) {
@@ -848,62 +859,131 @@ const UserDashboard = () => {
                 </div>
               </div>
 
-              {/* Plan Information */}
-              <div>
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  Plan Information
-                </h3>
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                  {selectedApplication.PlanInfo && selectedApplication.PlanInfo.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {selectedApplication.PlanInfo[0]?.planpic && (
-                        <div className="sm:col-span-2">
-                          <img
-                            src={selectedApplication.PlanInfo[0].planpic}
-                            alt="Plan"
-                            className="w-full h-48 object-cover rounded-lg"
-                            onError={(e) => e.target.style.display = 'none'}
-                          />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Plan Type</p>
-                        <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.PlanInfo[0]?.planType || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Plan Price</p>
-                        <p className="text-base font-bold text-blue-600 mt-1">{formatCurrency(selectedApplication.PlanInfo[0]?.planPrice)}</p>
-                      </div>
-                      {selectedApplication.PlanInfo[1] && (
-                        <>
+              {/* Plan Information — full applied plan */}
+              {(() => {
+                const plan = resolveAppliedPlanDisplay(selectedApplication, catalogPlan);
+                const showDown = plan.downPayment != null && Number(plan.downPayment) > 0;
+                return (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      Plan You Applied For
+                    </h3>
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                      {detailsLoading && !plan.monthlyInstallment ? (
+                        <p className="text-sm text-gray-600">Loading plan details...</p>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          {plan.planImage && (
+                            <div className="sm:col-span-2">
+                              <img
+                                src={plan.planImage}
+                                alt={plan.planName}
+                                className="w-full max-h-48 object-cover rounded-lg"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                              />
+                            </div>
+                          )}
+                          {plan.productName && (
+                            <div className="sm:col-span-2">
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Product</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">{plan.productName}</p>
+                              {(plan.productCategory || plan.productCity) && (
+                                <p className="text-sm text-gray-600 mt-0.5">
+                                  {[plan.productCategory, plan.productCity].filter(Boolean).join(' · ')}
+                                </p>
+                              )}
+                            </div>
+                          )}
+                          {(plan.variantInfo?.variantName || plan.matchedVariant?.variantName) && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Variant</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">
+                                {plan.variantInfo?.variantName || plan.matchedVariant?.variantName}
+                              </p>
+                            </div>
+                          )}
                           <div>
-                            <p className="text-xs font-semibold text-gray-600 uppercase">Down Payment</p>
-                            <p className="text-base font-bold text-green-600 mt-1">{formatCurrency(selectedApplication.PlanInfo[1].downPayment)}</p>
+                            <p className="text-xs font-semibold text-gray-600 uppercase">Plan Name</p>
+                            <p className="text-base font-bold text-gray-900 mt-1">{plan.planName}</p>
                           </div>
+                          {plan.companyName && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Offered By</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">{plan.companyName}</p>
+                            </div>
+                          )}
+                          <div>
+                            <p className="text-xs font-semibold text-gray-600 uppercase">Installment Price</p>
+                            <p className="text-base font-bold text-blue-600 mt-1">
+                              {formatCurrency(plan.installmentPrice)}
+                            </p>
+                          </div>
+                          {plan.cashPrice != null && Number(plan.cashPrice) > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Cash Price</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">{formatCurrency(plan.cashPrice)}</p>
+                            </div>
+                          )}
+                          {showDown && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Down Payment</p>
+                              <p className="text-base font-bold text-green-600 mt-1">{formatCurrency(plan.downPayment)}</p>
+                            </div>
+                          )}
                           <div>
                             <p className="text-xs font-semibold text-gray-600 uppercase">Monthly Installment</p>
-                            <p className="text-base font-bold text-red-600 mt-1">{formatCurrency(selectedApplication.PlanInfo[1].monthlyInstallment)}</p>
+                            <p className="text-base font-bold text-red-600 mt-1">
+                              {plan.monthlyInstallment != null ? formatCurrency(plan.monthlyInstallment) : 'N/A'}
+                            </p>
                           </div>
                           <div>
                             <p className="text-xs font-semibold text-gray-600 uppercase">Tenure</p>
-                            <p className="text-base font-bold text-gray-900 mt-1">{selectedApplication.PlanInfo[1].tenureMonths || 0} Months</p>
-                          </div>
-                          <div>
-                            <p className="text-xs font-semibold text-gray-600 uppercase">Interest Rate</p>
                             <p className="text-base font-bold text-gray-900 mt-1">
-                              {selectedApplication.PlanInfo[1].interestRatePercent || 0}% 
-                              <span className="text-xs font-normal text-gray-600 ml-1">({selectedApplication.PlanInfo[1].interestType || 'N/A'})</span>
+                              {plan.tenureMonths != null && plan.tenureMonths > 0
+                                ? `${plan.tenureMonths} months`
+                                : 'N/A'}
                             </p>
                           </div>
-                        </>
+                          {(plan.interestRatePercent != null && plan.interestRatePercent > 0) && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Markup / Interest Rate</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">
+                                {plan.interestRatePercent}%
+                                {plan.interestType && (
+                                  <span className="text-xs font-normal text-gray-600 ml-1">({plan.interestType})</span>
+                                )}
+                              </p>
+                            </div>
+                          )}
+                          {plan.markup != null && Number(plan.markup) > 0 && (
+                            <div>
+                              <p className="text-xs font-semibold text-gray-600 uppercase">Total Markup</p>
+                              <p className="text-base font-bold text-gray-900 mt-1">{formatCurrency(plan.markup)}</p>
+                            </div>
+                          )}
+                          {plan.installmentPlanId && (
+                            <div className="sm:col-span-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  closeDetailsModal();
+                                  navigate(`/installment/${encodeURIComponent(plan.installmentPlanId)}`);
+                                }}
+                                className="text-sm font-semibold text-blue-700 hover:text-blue-900 underline"
+                              >
+                                View product listing
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                );
+              })()}
 
               {/* Personal Information */}
               <div>
@@ -1088,62 +1168,30 @@ const UserDashboard = () => {
                 </div>
               )}
 
-              {/* Assigned Partner - full details */}
-              {selectedApplication.partnerDetails && !detailsLoading && (
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    Partner
-                  </h3>
-                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Company / Partner Name</p>
-                        <p className="text-base font-bold text-gray-900 mt-1">
-                          {selectedApplication.partnerDetails.companyDetails?.RegisteredCompanyName || selectedApplication.partnerDetails.name || 'N/A'}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Contact Name</p>
-                        <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.name || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Email</p>
-                        <a href={`mailto:${selectedApplication.partnerDetails.email}`} className="text-base text-blue-600 hover:underline mt-1 block">{selectedApplication.partnerDetails.email || 'N/A'}</a>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">Phone</p>
-                        <a href={`tel:${selectedApplication.partnerDetails.phoneNumber}`} className="text-base text-gray-900 mt-1 block">{selectedApplication.partnerDetails.phoneNumber || 'N/A'}</a>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-gray-600 uppercase">WhatsApp</p>
-                        <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.WhatsappNumber || 'N/A'}</p>
-                      </div>
-                      {selectedApplication.partnerDetails.companyDetails?.HeadOfficeAddress && (
-                        <div className="sm:col-span-2">
-                          <p className="text-xs font-semibold text-gray-600 uppercase">Head Office Address</p>
-                          <p className="text-base text-gray-900 mt-1">{selectedApplication.partnerDetails.companyDetails.HeadOfficeAddress}</p>
-                        </div>
-                      )}
-                      {selectedApplication.partnerDetails.companyDetails?.AuthorizedContactPerson?.length > 0 && (
-                        <div className="sm:col-span-2 mt-2 pt-2 border-t border-amber-200">
-                          <p className="text-xs font-semibold text-gray-600 uppercase mb-2">Authorized Contact</p>
-                          {selectedApplication.partnerDetails.companyDetails.AuthorizedContactPerson.slice(0, 2).map((person, idx) => (
-                            <div key={idx} className="text-sm text-gray-700 mb-1">
-                              <span className="font-medium">{person.fullName || 'N/A'}</span>
-                              {person.Designation && <span className="text-gray-500"> ({person.Designation})</span>}
-                              {person.phoneNumber && <span> · {person.phoneNumber}</span>}
-                              {person.email && <span> · {person.email}</span>}
-                            </div>
-                          ))}
-                        </div>
-                      )}
+              {/* Partner / company — company name only */}
+              {selectedApplication.installmentPlanId && (() => {
+                const partner = resolvePartnerDisplay(
+                  selectedApplication,
+                  catalogPlan,
+                  selectedApplication.partnerDetails
+                );
+                const companyName = partner?.companyName;
+                if (!companyName) return null;
+                return (
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      Partner / Company
+                    </h3>
+                    <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                      <p className="text-xs font-semibold text-gray-600 uppercase">Company Name</p>
+                      <p className="text-base font-bold text-gray-900 mt-1">{companyName}</p>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
 
               {/* Approval Information */}
               {selectedApplication.approval && selectedApplication.approval.length > 0 && (

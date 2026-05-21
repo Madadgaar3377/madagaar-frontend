@@ -510,7 +510,7 @@ export default function InstallmentDetail() {
                       : `Showing plans for ${plan.variants[selectedVariantIndex]?.variantName || "this option"}.`}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <button
+                    {/* <button
                       onClick={() => setSelectedVariantIndex(null)}
                       className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
                         selectedVariantIndex === null
@@ -519,7 +519,7 @@ export default function InstallmentDetail() {
                       }`}
                     >
                       All Plans
-                    </button>
+                    </button> */}
                     {plan.variants.map((variant, vIdx) => (
                       <button
                         key={vIdx}
