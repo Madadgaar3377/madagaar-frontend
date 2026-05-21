@@ -6,6 +6,7 @@ import DashboardNavbar from '../../../components/DashboardNavbar';
 import SEO from '../../../components/SEO';
 import AnimatedSection from '../../../components/AnimatedSection';
 import {
+  getStoredPlanInfo,
   resolveAppliedPlanDisplay,
   resolvePartnerDisplay,
 } from '../../../utils/applicationPlanDetails';
@@ -574,16 +575,18 @@ const UserDashboard = () => {
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
-                          {installments.map((item, index) => (
+                          {installments.map((item, index) => {
+                            const rowPlan = getStoredPlanInfo(item);
+                            return (
                             <tr key={index} className="hover:bg-gray-50">
                               <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
                                 #{item.applicationId || 'N/A'}
                               </td>
                               <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {item.PlanInfo?.[0]?.planType || item.productName || item.planName || 'Installment Plan'}
+                                {rowPlan?.planType || item.productName || item.planName || 'Installment Plan'}
                               </td>
                               <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {formatCurrency(item.PlanInfo?.[0]?.planPrice || item.amount || item.price)}
+                                {formatCurrency(rowPlan?.planPrice ?? item.amount ?? item.price)}
                               </td>
                               <td className="px-4 py-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
@@ -604,7 +607,8 @@ const UserDashboard = () => {
                                 </button>
                               </td>
                             </tr>
-                          ))}
+                          );
+                          })}
                         </tbody>
                       </table>
                     </div>
@@ -859,10 +863,12 @@ const UserDashboard = () => {
                 </div>
               </div>
 
-              {/* Plan Information — full applied plan */}
-              {(() => {
+              {/* Plan Information — full applied plan (no images; catalog merge frontend-only) */}
+              {(getStoredPlanInfo(selectedApplication) || catalogPlan || selectedApplication.installmentPlanId) && (() => {
                 const plan = resolveAppliedPlanDisplay(selectedApplication, catalogPlan);
                 const showDown = plan.downPayment != null && Number(plan.downPayment) > 0;
+                const variantLabel =
+                  plan.variantInfo?.variantName || plan.matchedVariant?.variantName;
                 return (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -872,20 +878,10 @@ const UserDashboard = () => {
                       Plan You Applied For
                     </h3>
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-                      {detailsLoading && !plan.monthlyInstallment ? (
+                      {detailsLoading && plan.monthlyInstallment == null && !plan.productName ? (
                         <p className="text-sm text-gray-600">Loading plan details...</p>
                       ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          {plan.planImage && (
-                            <div className="sm:col-span-2">
-                              <img
-                                src={plan.planImage}
-                                alt={plan.planName}
-                                className="w-full max-h-48 object-cover rounded-lg"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                              />
-                            </div>
-                          )}
                           {plan.productName && (
                             <div className="sm:col-span-2">
                               <p className="text-xs font-semibold text-gray-600 uppercase">Product</p>
@@ -897,12 +893,10 @@ const UserDashboard = () => {
                               )}
                             </div>
                           )}
-                          {(plan.variantInfo?.variantName || plan.matchedVariant?.variantName) && (
+                          {variantLabel && (
                             <div>
                               <p className="text-xs font-semibold text-gray-600 uppercase">Variant</p>
-                              <p className="text-base font-bold text-gray-900 mt-1">
-                                {plan.variantInfo?.variantName || plan.matchedVariant?.variantName}
-                              </p>
+                              <p className="text-base font-bold text-gray-900 mt-1">{variantLabel}</p>
                             </div>
                           )}
                           <div>

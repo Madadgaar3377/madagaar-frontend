@@ -76,7 +76,7 @@ export function resolveAppliedPlanDisplay(application, catalog) {
     productCity: catalog?.city || null,
     installmentPlanId: application?.installmentPlanId || catalog?.installmentPlanId,
     planName: stored?.planType || p.planName || 'N/A',
-    planImage: stored?.planpic || p.productImages?.[0] || catalog?.productImages?.[0],
+    variantName: variantInfo?.variantName || matched?.variant?.variantName || null,
     installmentPrice: num(stored?.planPrice) ?? num(p.installmentPrice) ?? num(stored?.installmentPrice),
     cashPrice: num(stored?.cashPrice) ?? num(p.cashPrice),
     downPayment: num(stored?.downPayment) ?? num(p.downPayment),
