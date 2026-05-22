@@ -104,6 +104,9 @@ export default function InstallmentDetail() {
   const [autoPlay, setAutoPlay] = useState(true);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
   const [pricingView, setPricingView] = useState("installments"); // "cash" | "installments"
+  const [showAllPlans, setShowAllPlans] = useState(false);
+
+  const PLANS_PREVIEW_LIMIT = 5;
 
   // fetch plan
   useEffect(() => {
@@ -200,6 +203,16 @@ export default function InstallmentDetail() {
     () => buildPlanEntries(plan, selectedVariantIndex),
     [plan, selectedVariantIndex]
   );
+
+  const hasMorePlans = planEntries.length > PLANS_PREVIEW_LIMIT;
+  const visiblePlanEntries = useMemo(() => {
+    if (showAllPlans || !hasMorePlans) return planEntries;
+    return planEntries.slice(0, PLANS_PREVIEW_LIMIT);
+  }, [planEntries, showAllPlans, hasMorePlans]);
+
+  useEffect(() => {
+    setShowAllPlans(false);
+  }, [id, selectedVariantIndex, pricingView]);
 
   const currentPlans = useMemo(() => planEntries.map((e) => e.plan), [planEntries]);
 
@@ -689,7 +702,8 @@ export default function InstallmentDetail() {
 
                 {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
                 <div className="lg:hidden space-y-3 mb-4">
-                  {planEntries.map((entry, idx) => {
+                  {visiblePlanEntries.map((entry) => {
+                    const idx = planEntries.indexOf(entry);
                     const p = entry.plan;
                     const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
                     const cashPrice = Number(currentPrice);
@@ -888,6 +902,20 @@ export default function InstallmentDetail() {
                   })}
                 </div>
 
+                {hasMorePlans && (
+                  <div className="flex justify-center mt-4 lg:hidden">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllPlans((v) => !v)}
+                      className="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-bold text-sm hover:bg-red-50 transition active:scale-[0.98]"
+                    >
+                      {showAllPlans
+                        ? "Show fewer plans"
+                        : `Show all ${planEntries.length} plans (${planEntries.length - PLANS_PREVIEW_LIMIT} more)`}
+                    </button>
+                  </div>
+                )}
+
                 {/* Desktop: Table view */}
                 <div className="hidden lg:block overflow-x-auto">
                   <table className="w-full border-collapse bg-white rounded-xl overflow-hidden border border-gray-200">
@@ -906,7 +934,8 @@ export default function InstallmentDetail() {
                       </tr>
                     </thead>
                     <tbody>
-                      {planEntries.map((entry, idx) => {
+                      {visiblePlanEntries.map((entry) => {
+                        const idx = planEntries.indexOf(entry);
                         const p = entry.plan;
                         const variantLabel =
                           selectedVariantIndex === null &&
@@ -1073,6 +1102,20 @@ export default function InstallmentDetail() {
                     </tbody>
                   </table>
                 </div>
+
+                {hasMorePlans && (
+                  <div className="hidden lg:flex justify-center mt-6">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllPlans((v) => !v)}
+                      className="px-8 py-3 rounded-xl border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-bold text-sm hover:bg-red-50 transition"
+                    >
+                      {showAllPlans
+                        ? "Show fewer plans"
+                        : `Show all ${planEntries.length} payment plans`}
+                    </button>
+                  </div>
+                )}
               </section>
             ) : pricingView === "installments" ? (
               /* Fallback for legacy plans without paymentPlans array */
