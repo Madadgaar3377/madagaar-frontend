@@ -87,6 +87,44 @@ export function getInstallmentCardPricing(plan, paymentPlan) {
   };
 }
 
+/** All payment plans on a product (root + every variant). */
+export function collectAllPaymentPlans(plan) {
+  if (!plan) return [];
+  const root = plan.paymentPlans || [];
+  const fromVariants = (plan.variants || []).flatMap((v) => v.paymentPlans || []);
+  return [...root, ...fromVariants];
+}
+
+/**
+ * Build plan list for UI: All Plans = root + variant plans; one variant = its plans,
+ * or root plans when that variant has none (common when partners attach plans at product level).
+ */
+export function buildPlanEntries(plan, selectedVariantIndex) {
+  if (!plan) return [];
+
+  if (selectedVariantIndex !== null && plan.variants?.[selectedVariantIndex]) {
+    const variantPlans = plan.variants[selectedVariantIndex].paymentPlans || [];
+    const plansToShow =
+      variantPlans.length > 0 ? variantPlans : plan.paymentPlans || [];
+    return plansToShow.map((p, planIndex) => ({
+      plan: p,
+      variantIndex: selectedVariantIndex,
+      planIndex,
+    }));
+  }
+
+  const entries = [];
+  (plan.paymentPlans || []).forEach((p, planIndex) => {
+    entries.push({ plan: p, variantIndex: null, planIndex });
+  });
+  (plan.variants || []).forEach((v, variantIndex) => {
+    (v.paymentPlans || []).forEach((p, planIndex) => {
+      entries.push({ plan: p, variantIndex, planIndex });
+    });
+  });
+  return entries;
+}
+
 export function buildInstallmentShareLines(plan, paymentPlan) {
   const p = getInstallmentCardPricing(plan, paymentPlan);
   const lines = [plan?.city || "Pakistan", p.primaryLabel];

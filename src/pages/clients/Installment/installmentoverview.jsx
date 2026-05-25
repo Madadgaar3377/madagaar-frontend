@@ -10,6 +10,8 @@ import {
   buildInstallmentShareLines,
   isCashOnlyInstallment,
   formatTenureDisplay,
+  buildPlanEntries,
+  collectAllPaymentPlans,
 } from "../../../utils/installmentPricing";
 
 const findBestPlanIndex = (paymentPlans, plan = {}) => {
@@ -26,28 +28,6 @@ const findBestPlanIndex = (paymentPlans, plan = {}) => {
     (p) => Number(p.cashPrice || plan.price || 0) === Number(best.cashPrice)
   );
   return idx >= 0 ? idx : 0;
-};
-
-/** Build plan list: All Plans = every plan; specific variant = that variant's plans only */
-const buildPlanEntries = (plan, selectedVariantIndex) => {
-  if (!plan) return [];
-  if (selectedVariantIndex !== null && plan.variants?.[selectedVariantIndex]) {
-    return (plan.variants[selectedVariantIndex].paymentPlans || []).map((p, planIndex) => ({
-      plan: p,
-      variantIndex: selectedVariantIndex,
-      planIndex,
-    }));
-  }
-  const entries = [];
-  (plan.paymentPlans || []).forEach((p, planIndex) => {
-    entries.push({ plan: p, variantIndex: null, planIndex });
-  });
-  (plan.variants || []).forEach((v, variantIndex) => {
-    (v.paymentPlans || []).forEach((p, planIndex) => {
-      entries.push({ plan: p, variantIndex, planIndex });
-    });
-  });
-  return entries;
 };
 
 const getApplyPlanQuery = (entry) => {
@@ -523,7 +503,8 @@ export default function InstallmentDetail() {
                       : `Showing plans for ${plan.variants[selectedVariantIndex]?.variantName || "this option"}.`}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    {/* <button
+                    <button
+                      type="button"
                       onClick={() => setSelectedVariantIndex(null)}
                       className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
                         selectedVariantIndex === null
@@ -532,7 +513,7 @@ export default function InstallmentDetail() {
                       }`}
                     >
                       All Plans
-                    </button> */}
+                    </button>
                     {plan.variants.map((variant, vIdx) => (
                       <button
                         key={vIdx}
@@ -1118,35 +1099,50 @@ export default function InstallmentDetail() {
                 )}
               </section>
             ) : pricingView === "installments" ? (
-              /* Fallback for legacy plans without paymentPlans array */
+              /* Summary when no plan rows to list (legacy or empty after filters) */
+              (() => {
+                const allPlans = collectAllPaymentPlans(plan);
+                const best = getBestPaymentPlan(allPlans, plan);
+                const tenureLabel =
+                  formatTenureDisplay(best.tenureMonths) ||
+                  (plan.tenure || plan.customTenure || "—");
+                const monthly = Number(best.monthlyInstallment || 0);
+                const downPayment = Number(best.downPayment ?? plan.downpayment ?? 0);
+                return (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
                   <span className="text-xl sm:text-2xl">💳</span>
-                  Payment Plan
+                  Payment Plan{best.planName ? ` — ${best.planName}` : ""}
                 </h3>
                 <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1"><span className="font-bold">Cash Price</span></div>
-                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.price || 0).toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(currentPrice || plan.price || 0).toLocaleString()}</div>
                   </div>
-                  {Number(plan.downpayment || 0) > 0 && (
+                  {downPayment > 0 && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Down Payment</div>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900">PKR {Number(plan.downpayment).toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">PKR {downPayment.toLocaleString()}</div>
                   </div>
                   )}
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Monthly Installment</div>
-                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(plan.installment || 0).toLocaleString()}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">
+                      {isCashOnlyInstallment(monthly)
+                        ? "—"
+                        : `PKR ${monthly.toLocaleString()}`}
+                    </div>
                   </div>
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Tenure</div>
-                    <div className="text-xl sm:text-2xl font-bold text-gray-900">{plan.tenure || plan.customTenure || "—"}</div>
+                    <div className="text-xl sm:text-2xl font-bold text-gray-900">{tenureLabel}</div>
                   </div>
                 </div>
                 </div>
               </section>
+                );
+              })()
             ) : null}
 
             {/* Finance Information - Only show main plan finance if NO individual plans have finance */}
