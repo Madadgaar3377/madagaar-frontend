@@ -179,9 +179,28 @@ export default function InstallmentDetail() {
   const descriptionHasHtml = /<[a-z][\s\S]*>/i.test(descriptionSource);
   const needsDescriptionToggle = descriptionDisplayPlain.length > 130;
 
+  const variantCount = plan?.variants?.length || 0;
+  const totalPaymentPlanCount = useMemo(
+    () => collectAllPaymentPlans(plan).length,
+    [plan]
+  );
+  /** Only show All Plans / variant chips when there are 2+ real choices */
+  const showVariantPicker = variantCount > 1;
+
+  const effectiveVariantIndex = useMemo(() => {
+    if (!showVariantPicker) return null;
+    return selectedVariantIndex;
+  }, [showVariantPicker, selectedVariantIndex]);
+
+  useEffect(() => {
+    if (variantCount <= 1) {
+      setSelectedVariantIndex(null);
+    }
+  }, [id, variantCount]);
+
   const planEntries = useMemo(
-    () => buildPlanEntries(plan, selectedVariantIndex),
-    [plan, selectedVariantIndex]
+    () => buildPlanEntries(plan, effectiveVariantIndex),
+    [plan, effectiveVariantIndex]
   );
 
   const hasMorePlans = planEntries.length > PLANS_PREVIEW_LIMIT;
@@ -200,14 +219,20 @@ export default function InstallmentDetail() {
 
   // Current displayed data based on variant selection
   const currentPrice = useMemo(() => {
-    if (selectedVariantIndex !== null && plan?.variants?.[selectedVariantIndex]) {
-      const v = plan.variants[selectedVariantIndex];
+    const vIdx =
+      effectiveVariantIndex !== null
+        ? effectiveVariantIndex
+        : variantCount === 1
+          ? 0
+          : null;
+    if (vIdx !== null && plan?.variants?.[vIdx]) {
+      const v = plan.variants[vIdx];
       const base = Number(v.price) || 0;
       const disc = Math.min(100, Math.max(0, Number(v.discountPercent) || 0));
       return Math.round(base * (1 - disc / 100)) || base;
     }
     return plan?.price || 0;
-  }, [plan, selectedVariantIndex]);
+  }, [plan, effectiveVariantIndex, variantCount]);
 
   const cashOffers = useMemo(() => {
     if (!plan) return [];
@@ -493,8 +518,8 @@ export default function InstallmentDetail() {
                 </div>
               </div>
 
-              {/* Variant Selection */}
-              {Array.isArray(plan.variants) && plan.variants.length > 0 && (
+              {/* Variant Selection — only when 2+ variants */}
+              {showVariantPicker && (
                 <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Select Specification</h3>
                   <p className="text-xs text-gray-500 mb-4">
@@ -535,7 +560,13 @@ export default function InstallmentDetail() {
               <div className="space-y-3">
                 <NavLink 
                   className="block w-full px-4 py-3 text-sm sm:text-base rounded-lg bg-[rgb(183,36,42)] text-white font-semibold hover:bg-red-700 transition-colors text-center" 
-                  to={`/installment/${encodeURIComponent(id)}/apply${selectedVariantIndex !== null ? `?variantIndex=${selectedVariantIndex}` : ""}`}
+                  to={`/installment/${encodeURIComponent(id)}/apply${
+                    variantCount === 1
+                      ? "?variantIndex=0"
+                      : selectedVariantIndex !== null
+                        ? `?variantIndex=${selectedVariantIndex}`
+                        : ""
+                  }`}
                 >
                   Apply Now
                 </NavLink>
@@ -666,7 +697,7 @@ export default function InstallmentDetail() {
             )}
 
             {/* payment plans */}
-            {pricingView === "installments" && Array.isArray(plan.variants) && plan.variants.length > 0 && selectedVariantIndex !== null && currentPlans.length === 0 && (
+            {pricingView === "installments" && showVariantPicker && selectedVariantIndex !== null && currentPlans.length === 0 && (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 border border-gray-200">
                 <p className="text-sm text-gray-600">
                   No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet. Select <strong>All Plans</strong> to see every option, or choose another specification.
@@ -678,7 +709,9 @@ export default function InstallmentDetail() {
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 lg:mb-6 flex items-center gap-2">
                   <span className="text-xl sm:text-2xl">💳</span>
-                  Available Payment Plans ({currentPlans.length})
+                  {totalPaymentPlanCount === 1
+                    ? "Payment Plan"
+                    : `Available Payment Plans (${currentPlans.length})`}
                 </h3>
 
                 {/* Mobile/Tablet: Dropdown (Best plan opened by default) */}
@@ -693,11 +726,13 @@ export default function InstallmentDetail() {
                     const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
                     const totalMarkup = Number(p.markup || 0);
                     const totalCost = cashPrice + totalMarkup;
-                    const isBestPlan = idx === bestPlanIndex;
-                    const isOpen = expandedPlanIndex === idx;
+                    const isBestPlan = idx === bestPlanIndex && totalPaymentPlanCount > 1;
+                    const isOpen =
+                      totalPaymentPlanCount === 1 ? true : expandedPlanIndex === idx;
                     const panelId = `plan-panel-${idx}`;
                     const variantLabel =
-                      selectedVariantIndex === null &&
+                      showVariantPicker &&
+                      effectiveVariantIndex === null &&
                       entry.variantIndex !== null &&
                       plan.variants?.[entry.variantIndex]?.variantName;
 
@@ -710,10 +745,14 @@ export default function InstallmentDetail() {
                       >
                         <button
                           type="button"
-                          onClick={() => togglePlan(idx)}
+                          onClick={() => {
+                            if (totalPaymentPlanCount > 1) togglePlan(idx);
+                          }}
                           aria-expanded={isOpen}
                           aria-controls={panelId}
-                          className="w-full p-4 flex items-start justify-between gap-3 text-left"
+                          className={`w-full p-4 flex items-start justify-between gap-3 text-left ${
+                            totalPaymentPlanCount === 1 ? "cursor-default" : ""
+                          }`}
                         >
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 mb-1">
@@ -762,6 +801,7 @@ export default function InstallmentDetail() {
                               <span className="font-bold">Cash Price:</span> PKR {cashPrice.toLocaleString()}
                             </div>
                           </div>
+                          {totalPaymentPlanCount > 1 && (
                           <svg
                             className={`w-5 h-5 text-gray-500 flex-shrink-0 mt-1 transition-transform ${
                               isOpen ? "rotate-180" : "rotate-0"
@@ -772,6 +812,7 @@ export default function InstallmentDetail() {
                           >
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                           </svg>
+                          )}
                         </button>
 
                         <div
@@ -919,7 +960,8 @@ export default function InstallmentDetail() {
                         const idx = planEntries.indexOf(entry);
                         const p = entry.plan;
                         const variantLabel =
-                          selectedVariantIndex === null &&
+                          showVariantPicker &&
+                          effectiveVariantIndex === null &&
                           entry.variantIndex !== null &&
                           plan.variants?.[entry.variantIndex]?.variantName;
                         const cashPrice = Number(currentPrice);
@@ -928,7 +970,7 @@ export default function InstallmentDetail() {
                         const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
                         const totalMarkup = Number(p.markup || 0);
                         const totalCost = cashPrice + totalMarkup;
-                        const isBestPlan = idx === bestPlanIndex;
+                        const isBestPlan = idx === bestPlanIndex && totalPaymentPlanCount > 1;
                         const hasFinance = p.finance && (p.finance.bankName || p.finance.financeInfo);
                         const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
 
