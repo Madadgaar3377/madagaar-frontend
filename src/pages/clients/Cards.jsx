@@ -113,7 +113,7 @@ export default function FeatureCards({ items = features }) {
               <div className="flex items-start gap-4">
                 {/* Icon circle */}
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-gray-50 border flex items-center justify-center shadow-sm">
+                  <div className="size-16 rounded-full bg-gray-50 border flex items-center justify-center shadow-sm">
                     <item.Icon />
                   </div>
                 </div>

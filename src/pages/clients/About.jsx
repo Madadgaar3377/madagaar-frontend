@@ -1,5 +1,6 @@
 import React from "react";
 import SEO from "../../components/SEO";
+import DownloadAppSection from "../../components/DownloadAppSection";
 import TeamMemberCard from "../../components/TeamMemberCard";
 import teamMembers from "../../constants/teamMembers";
 import AnimatedSection from "../../components/AnimatedSection";
@@ -51,24 +52,25 @@ export default function AboutPage() {
      <SEO
        title="How Madadgaar Works | Compare, Select & Apply"
        description="Learn how Madadgaar helps you compare options, choose wisely, and move forward confidently with property, loans, installments, and insurance."
-       keywords="how madadgaar works, madadgaar process, compare options pakistan, property comparison, loan comparison, installment comparison, insurance comparison, madadgaar guide"
+       keywords="how madadgaar works, madadgaar process, compare options pakistan, property comparison, loan comparison, installment comparison, insurance comparison, madadgaar guide, download madadgaar app, madadgaar mobile app"
        canonicalUrl="https://madadgaar.com.pk/about"
        structuredData={structuredData}
      />
    {/* About Company Section */}
    <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
-   <section className="w-full min-h-screen flex flex-col md:flex-row items-center justify-between bg-gray-50 container-safe section-padding">
-       <div className="md:w-1/2 mt-6 sm:mt-8 md:mt-0 flex justify-center w-full md:order-first">
+   <section className="w-full bg-gray-50 section-padding">
+   <div className="container-content page-hero">
+       <div className="page-hero-col flex justify-center lg:order-first">
           <img
             src="/Media/Aboutscreen/about-h4-1.png"
             alt="How Madadgaar Works - Compare Property, Loans, Installments and Insurance in Pakistan"
             loading="lazy"
-            className="rounded-xl sm:rounded-2xl shadow-lg w-full max-w-sm sm:max-w-md object-cover"
+            className="rounded-xl sm:rounded-2xl shadow-lg page-media"
           />
         </div>
 
-        <div className="md:w-1/2 space-y-3 sm:space-y-4 lg:space-y-6 w-full">
-          <button
+        <div className="page-hero-col space-y-3 sm:space-y-4 lg:space-y-6">
+          <button type="button"
             className="bg-white rounded-pill shadow-lg pt-2 pb-2 pr-3 pl-3 text-xs sm:text-sm rounded-xl"
              style={{ color: "rgb(183, 36, 42)" }}
           >
@@ -85,6 +87,7 @@ export default function AboutPage() {
             Get Started
           </a>
         </div>
+      </div>
       </section>
       </AnimatedSection>
 
@@ -103,7 +106,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 1
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Choose Your Service</h3>
@@ -113,7 +116,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 2
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Compare Options</h3>
@@ -123,7 +126,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 3
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Submit Your Request</h3>
@@ -133,7 +136,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg text-center hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 4
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Move Forward Confidently</h3>
@@ -175,7 +178,7 @@ export default function AboutPage() {
             {/* Mission */}
             <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 shadow-lg">
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+                <div className="size-12 rounded-full flex items-center justify-center text-white text-2xl" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                   🎯
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold ml-4 text-gray-900">Mission</h3>
@@ -188,7 +191,7 @@ export default function AboutPage() {
             {/* Vision */}
             <div className="bg-gray-50 rounded-2xl p-6 sm:p-8 shadow-lg">
               <div className="flex items-center mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-2xl" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+                <div className="size-12 rounded-full flex items-center justify-center text-white text-2xl" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                   👁️
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold ml-4 text-gray-900">Vision</h3>
@@ -203,8 +206,8 @@ export default function AboutPage() {
       </AnimatedSection>
 
       {/* Our Goals Section */}
-      <section className="w-full bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
+      <section className="w-full bg-gray-50 section-padding">
+        <div className="container-content">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Our Goals
@@ -216,7 +219,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 ⚡
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Simplify</h3>
@@ -226,7 +229,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 🤝
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Trust</h3>
@@ -236,7 +239,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-3xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 📈
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Grow</h3>
@@ -249,8 +252,8 @@ export default function AboutPage() {
       </section>
 
       {/* Market Size Section */}
-      <section className="w-full bg-white px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
+      <section className="w-full bg-white section-padding">
+        <div className="container-content">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Market Size
@@ -293,8 +296,8 @@ export default function AboutPage() {
       </section>
 
       {/* Team Members Section */}
-      <section id="team" className="w-full bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
+      <section id="team" className="w-full bg-gray-50 section-padding">
+        <div className="container-content">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Our Management Team
@@ -313,8 +316,8 @@ export default function AboutPage() {
       </section>
 
       {/* Strategy Section */}
-      <section className="w-full bg-white px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
+      <section className="w-full bg-white section-padding">
+        <div className="container-content">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Our Strategy to Achieve Our Goals
@@ -375,8 +378,8 @@ export default function AboutPage() {
       </section>
 
       {/* Support Services Section */}
-      <section className="w-full bg-gray-50 px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-7xl mx-auto">
+      <section className="w-full bg-gray-50 section-padding">
+        <div className="container-content">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Our Support Services
@@ -385,7 +388,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 ℹ️
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Information</h3>
@@ -395,7 +398,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 🆘
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Help</h3>
@@ -405,7 +408,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 🤲
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Assistance</h3>
@@ -415,7 +418,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 🧭
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Guidance</h3>
@@ -425,7 +428,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 💪
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Competence</h3>
@@ -435,7 +438,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 ✅
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Solution</h3>
@@ -445,7 +448,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 🎯
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Direction</h3>
@@ -455,7 +458,7 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-md text-center">
-              <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+              <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                 💡
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Advice</h3>
@@ -467,9 +470,12 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Download App Section */}
+      <DownloadAppSection delay={140} />
+
       {/* Contact Section */}
-      <section className="w-full bg-white px-3 sm:px-6 md:px-12 lg:px-16 py-12 md:py-20">
-        <div className="max-w-4xl mx-auto">
+      <section className="w-full bg-white section-padding">
+        <div className="container-content max-w-4xl">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
               Connect With Us
@@ -482,7 +488,7 @@ export default function AboutPage() {
           <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-2xl p-8 sm:p-12 shadow-lg">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div>
-                <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+                <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                   🌐
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Website</h3>
@@ -492,7 +498,7 @@ export default function AboutPage() {
               </div>
 
               <div>
-                <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+                <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                   ✉️
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Email</h3>
@@ -502,7 +508,7 @@ export default function AboutPage() {
               </div>
 
               <div>
-                <div className="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
+                <div className="size-16 rounded-full mx-auto flex items-center justify-center text-white text-2xl mb-4" style={{ backgroundColor: "rgb(183, 36, 42)" }}>
                   📞
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Call Us</h3>

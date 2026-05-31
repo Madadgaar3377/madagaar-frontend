@@ -278,7 +278,7 @@ export default function CompareProducts() {
       return (
         <div className="flex gap-2 flex-wrap">
           {imgs.slice(0, 3).map((s, i) => (
-            <button key={i} type="button" onClick={() => setImgPreview(s)} className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 hover:border-red-300 transition shrink-0">
+            <button key={i} type="button" onClick={() => setImgPreview(s)} className="size-14 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 hover:border-red-300 transition shrink-0">
               <img src={s} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
@@ -313,7 +313,7 @@ export default function CompareProducts() {
             <p className="text-sm text-gray-500 mt-1">Compare up to {MAX_COMPARE} products side by side by category</p>
           </div>
           <div className="flex gap-2 w-full sm:w-auto shrink-0">
-            <button onClick={clearAll} className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-semibold rounded-xl border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition">
+            <button type="button" onClick={clearAll} className="flex-1 sm:flex-none px-4 py-2.5 text-sm font-semibold rounded-xl border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition">
               Clear All
             </button>
           </div>
@@ -353,10 +353,10 @@ export default function CompareProducts() {
                       <p className="mt-1 text-sm text-gray-600 line-clamp-2">{(baseProduct.description || "").replace(/<[^>]+>/g, "").slice(0, 180)}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
-                      <button onClick={() => addToCompare(baseProduct)} className="px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shadow-sm">
+                      <button type="button" onClick={() => addToCompare(baseProduct)} className="px-4 py-2.5 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shadow-sm">
                         Add to compare
                       </button>
-                      <button onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-300 text-gray-700 hover:border-red-300 hover:text-red-600 transition">
+                      <button type="button" onClick={() => navigate(`/installment/${encodeURIComponent(baseProduct._id || baseProduct.installmentPlanId || "")}`)} className="px-4 py-2.5 text-sm font-semibold rounded-xl border border-gray-300 text-gray-700 hover:border-red-300 hover:text-red-600 transition">
                         View details
                       </button>
                     </div>
@@ -396,7 +396,7 @@ export default function CompareProducts() {
           <h3 className="text-base font-semibold text-gray-900 mb-3">Add more products to compare</h3>
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -406,7 +406,7 @@ export default function CompareProducts() {
                 className="w-full pl-10 pr-4 py-3 text-sm border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
             </div>
-            <button onClick={() => setDebouncedQuery(query)} className="px-5 py-3 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shrink-0">
+            <button type="button" onClick={() => setDebouncedQuery(query)} className="px-5 py-3 text-sm font-semibold rounded-xl bg-red-600 text-white hover:bg-red-700 transition shrink-0">
               Search
             </button>
           </div>
@@ -417,7 +417,7 @@ export default function CompareProducts() {
             <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {searchResults.map((s) => (
                 <div key={getId(s)} className="p-3 rounded-xl border border-gray-200 bg-gray-50/50 hover:border-red-200 hover:bg-red-50/30 transition flex gap-3">
-                  <div className="w-20 h-20 rounded-lg overflow-hidden bg-gray-200 shrink-0 flex items-center justify-center">
+                  <div className="size-20 rounded-lg overflow-hidden bg-gray-200 shrink-0 flex items-center justify-center">
                     {s.productImages?.[0] ? (
                       <img src={s.productImages[0]} alt="" className="w-full h-full object-cover" />
                     ) : (
@@ -428,7 +428,7 @@ export default function CompareProducts() {
                     <p className="font-medium text-sm text-gray-900 truncate">{s.productName}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</p>
                     <div className="mt-2 flex gap-2 flex-wrap">
-                      <button
+                      <button type="button"
                         onClick={() => {
                           const id = s._id || s.installmentPlanId || getId(s);
                           if (id) navigate(`/installment/product/CompareProduct/${encodeURIComponent(id)}`);
@@ -438,7 +438,7 @@ export default function CompareProducts() {
                       >
                         Set as base
                       </button>
-                      <button onClick={() => addToCompare(s)} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
+                      <button type="button" onClick={() => addToCompare(s)} className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100">
                         Add to compare
                       </button>
                     </div>
@@ -471,8 +471,8 @@ export default function CompareProducts() {
                       <p className="text-xs font-medium text-gray-900 line-clamp-2 min-h-[2rem]">{r.productName}</p>
                       <p className="text-xs text-gray-500 mt-0.5">Rs. {Number(r.price || 0).toLocaleString("en-PK")}</p>
                       <div className="mt-2 flex gap-1.5">
-                        <button onClick={() => addToCompare(r)} className="flex-1 text-xs py-1.5 rounded-lg bg-red-600 text-white font-medium">Add</button>
-                        <button onClick={() => navigate(`/installment/product/CompareProduct/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-300 font-medium">Open</button>
+                        <button type="button" onClick={() => addToCompare(r)} className="flex-1 text-xs py-1.5 rounded-lg bg-red-600 text-white font-medium">Add</button>
+                        <button type="button" onClick={() => navigate(`/installment/product/CompareProduct/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-300 font-medium">Open</button>
                       </div>
                     </div>
                   </div>
@@ -491,14 +491,14 @@ export default function CompareProducts() {
                 key={getId(p)}
                 className={`flex items-center gap-2 pl-2 pr-1 py-1.5 rounded-xl border bg-gray-50 ${idx === 0 ? "border-red-200 ring-1 ring-red-100" : "border-gray-200"}`}
               >
-                <div className="w-8 h-8 rounded-lg overflow-hidden bg-gray-200 shrink-0">
+                <div className="size-8 rounded-lg overflow-hidden bg-gray-200 shrink-0">
                   {p.productImages?.[0] ? (
                     <img src={p.productImages[0]} alt="" className="w-full h-full object-cover" />
                   ) : null}
                 </div>
                 <span className="text-sm font-medium text-gray-800 max-w-[120px] sm:max-w-[180px] truncate">{p.productName}</span>
                 {idx !== 0 ? (
-                  <button onClick={() => removeFromCompare(p)} className="p-1 rounded-lg text-gray-500 hover:bg-red-100 hover:text-red-600 transition" aria-label="Remove">×</button>
+                  <button type="button" onClick={() => removeFromCompare(p)} className="p-1 rounded-lg text-gray-500 hover:bg-red-100 hover:text-red-600 transition" aria-label="Remove">×</button>
                 ) : (
                   <span className="text-xs text-red-600 font-medium px-1.5">Base</span>
                 )}
@@ -525,7 +525,7 @@ export default function CompareProducts() {
                     {compareList.map((p) => (
                       <th key={getId(p)} className="p-3 sm:p-4 min-w-[200px] max-w-[260px] align-top border-r border-gray-100 last:border-r-0">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 shrink-0">
+                          <div className="size-12 rounded-lg overflow-hidden bg-gray-200 shrink-0">
                             {p.productImages?.[0] ? <img src={p.productImages[0]} alt="" className="w-full h-full object-cover" /> : null}
                           </div>
                           <div className="min-w-0">
@@ -580,7 +580,7 @@ export default function CompareProducts() {
           <div className="bg-white rounded-2xl shadow-xl max-w-3xl w-full overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-3 border-b border-gray-200">
               <span className="text-sm font-medium text-gray-600">Image preview</span>
-              <button onClick={() => setImgPreview(null)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600">✕</button>
+              <button type="button" onClick={() => setImgPreview(null)} className="p-2 rounded-lg hover:bg-gray-100 text-gray-600">✕</button>
             </div>
             <img src={imgPreview} alt="Preview" className="w-full max-h-[70vh] object-contain p-4" />
           </div>

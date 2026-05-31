@@ -18,7 +18,7 @@ export default function NotFound() {
       <AnimatedSection animation="fadeInUp" delay={0} className="w-full max-w-xl mx-auto">
       <div className="w-full bg-white rounded-3xl shadow-soft border border-gray-100 p-6 sm:p-8 text-center space-y-6 safe-margin">
         {/* Icon / Badge */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-50">
+        <div className="inline-flex items-center justify-center size-16 rounded-2xl bg-red-50">
           <span className="text-3xl" role="img" aria-label="broken link">
             🔍
           </span>
@@ -36,13 +36,13 @@ export default function NotFound() {
 
         {/* Quick links */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-4">
-          <button
+          <button type="button"
             onClick={() => navigate(-1)}
             className="w-full sm:w-auto px-5 py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
           >
             Go Back
           </button>
-          <button
+          <button type="button"
             onClick={() => navigate("/")}
             className="w-full sm:w-auto btn-primary px-5 py-2.5 rounded-full text-sm font-semibold min-h-touch"
           >

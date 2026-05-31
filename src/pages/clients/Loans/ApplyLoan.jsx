@@ -116,7 +116,7 @@ const ApplyLoan = () => {
     fetchPlanDetails();
   }, [fetchPlanDetails, navigate]);
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -318,7 +318,7 @@ const ApplyLoan = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full size-16 border-b-4 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Loading loan details...</p>
         </div>
       </div>
@@ -335,13 +335,13 @@ const ApplyLoan = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Loan Plan Not Found</h2>
             <p className="text-gray-600 mb-6">The loan plan you're looking for doesn't exist.</p>
           <div className="flex gap-3 justify-center">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
             >
               Go Back
             </button>
-            <button
+            <button type="button"
               onClick={() => navigate('/loans')}
               className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
             >
@@ -385,11 +385,11 @@ const ApplyLoan = () => {
         <div className="container-content">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back
@@ -457,7 +457,7 @@ const ApplyLoan = () => {
                         step.number === currentStep ? 'text-red-600 font-semibold' : 
                         step.number < currentStep ? 'text-green-600' : 'text-gray-400'
                       }`}>
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                        <div className={`size-6 rounded-full flex items-center justify-center text-xs ${
                           step.number === currentStep ? 'bg-red-600 text-white' : 
                           step.number < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200'
                         }`}>
@@ -482,7 +482,7 @@ const ApplyLoan = () => {
                   {steps.map((step, idx) => (
                     <React.Fragment key={step.number}>
                       <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition ${
+                        <div className={`size-10 rounded-full flex items-center justify-center font-semibold text-sm transition ${
                           step.number === currentStep 
                             ? 'bg-red-600 text-white ring-4 ring-red-100 scale-110' 
                             : step.number < currentStep 
@@ -512,41 +512,41 @@ const ApplyLoan = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-6">Applicant & Contact Information</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
                           Full Name *
                         </label>
-                        <input
+                        <input id="fullName"
                           type="text"
                           name="fullName"
                           value={formData.fullName}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="fatherOrHusbandName" className="block text-sm font-medium text-gray-700 mb-2">
                           Father/Husband Name
                         </label>
-                        <input
+                        <input id="fatherOrHusbandName"
                           type="text"
                           name="fatherOrHusbandName"
                           value={formData.fatherOrHusbandName}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="cnicNumber" className="block text-sm font-medium text-gray-700 mb-2">
                           CNIC Number *
                         </label>
-                        <input
+                        <input id="cnicNumber"
                           type="text"
                           name="cnicNumber"
                           value={formData.cnicNumber}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           placeholder="12345-1234567-1"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -554,39 +554,39 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="cnicExpiryDate" className="block text-sm font-medium text-gray-700 mb-2">
                           CNIC Expiry Date
                         </label>
-                        <input
+                        <input id="cnicExpiryDate"
                           type="date"
                           name="cnicExpiryDate"
                           value={formData.cnicExpiryDate}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
                           Date of Birth
                         </label>
-                        <input
+                        <input id="dateOfBirth"
                           type="date"
                           name="dateOfBirth"
                           value={formData.dateOfBirth}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="maritalStatus" className="block text-sm font-medium text-gray-700 mb-2">
                           Marital Status
                         </label>
-                        <select
+                        <select id="maritalStatus"
                           name="maritalStatus"
                           value={formData.maritalStatus}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         >
                           <option value="">Select Status</option>
@@ -596,14 +596,14 @@ const ApplyLoan = () => {
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="numberOfDependents" className="block text-sm font-medium text-gray-700 mb-2">
                           Number of Dependents
                         </label>
-                        <input
+                        <input id="numberOfDependents"
                           type="number"
                           name="numberOfDependents"
                           value={formData.numberOfDependents}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           min="0"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
@@ -615,14 +615,14 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
                           Mobile Number *
                         </label>
-                        <input
+                        <input id="mobileNumber"
                           type="tel"
                           name="mobileNumber"
                           value={formData.mobileNumber}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           placeholder="+92 300 1234567"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -630,67 +630,67 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="whatsappNumber" className="block text-sm font-medium text-gray-700 mb-2">
                           WhatsApp Number
                         </label>
-                        <input
+                        <input id="whatsappNumber"
                           type="tel"
                           name="whatsappNumber"
                           value={formData.whatsappNumber}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           placeholder="+92 300 1234567"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                           Email *
                         </label>
-                        <input
+                        <input id="email"
                           type="email"
                           name="email"
                           value={formData.email}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                           City
                         </label>
-                        <input
+                        <input id="city"
                           type="text"
                           name="city"
                           value={formData.city}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="currentAddress" className="block text-sm font-medium text-gray-700 mb-2">
                           Current Address
                         </label>
-                        <textarea
+                        <textarea id="currentAddress"
                           name="currentAddress"
                           value={formData.currentAddress}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           rows="2"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="residenceType" className="block text-sm font-medium text-gray-700 mb-2">
                           Residence Type
                         </label>
-                        <select
+                        <select id="residenceType"
                           name="residenceType"
                           value={formData.residenceType}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         >
                           <option value="">Select Type</option>
@@ -709,13 +709,13 @@ const ApplyLoan = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-6">Employment / Income Details</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="sm:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="incomeType" className="block text-sm font-medium text-gray-700 mb-2">
                           Income Type *
                         </label>
-                        <select
+                        <select id="incomeType"
                           name="incomeType"
                           value={formData.incomeType}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         >
@@ -729,39 +729,39 @@ const ApplyLoan = () => {
                       {formData.incomeType === 'Salaried' && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="employerName" className="block text-sm font-medium text-gray-700 mb-2">
                               Employer Name
                             </label>
-                            <input
+                            <input id="employerName"
                               type="text"
                               name="employerName"
                               value={formData.employerName}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="designation" className="block text-sm font-medium text-gray-700 mb-2">
                               Designation
                             </label>
-                            <input
+                            <input id="designation"
                               type="text"
                               name="designation"
                               value={formData.designation}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="jobStatus" className="block text-sm font-medium text-gray-700 mb-2">
                               Job Status
                             </label>
-                            <select
+                            <select id="jobStatus"
                               name="jobStatus"
                               value={formData.jobStatus}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             >
                               <option value="">Select Status</option>
@@ -771,14 +771,14 @@ const ApplyLoan = () => {
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="monthlyNetSalary" className="block text-sm font-medium text-gray-700 mb-2">
                               Monthly Net Salary (PKR)
                             </label>
-                            <input
+                            <input id="monthlyNetSalary"
                               type="number"
                               name="monthlyNetSalary"
                               value={formData.monthlyNetSalary}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               placeholder="50000"
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
@@ -789,54 +789,54 @@ const ApplyLoan = () => {
                       {(formData.incomeType === 'Business' || formData.incomeType === 'Self-Employed') && (
                         <>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="businessName" className="block text-sm font-medium text-gray-700 mb-2">
                               Business Name
                             </label>
-                            <input
+                            <input id="businessName"
                               type="text"
                               name="businessName"
                               value={formData.businessName}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="natureOfBusiness" className="block text-sm font-medium text-gray-700 mb-2">
                               Nature of Business
                             </label>
-                            <input
+                            <input id="natureOfBusiness"
                               type="text"
                               name="natureOfBusiness"
                               value={formData.natureOfBusiness}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="yearsInBusiness" className="block text-sm font-medium text-gray-700 mb-2">
                               Years in Business
                             </label>
-                            <input
+                            <input id="yearsInBusiness"
                               type="number"
                               name="yearsInBusiness"
                               value={formData.yearsInBusiness}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               min="0"
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="approxMonthlyIncome" className="block text-sm font-medium text-gray-700 mb-2">
                               Approx. Monthly Income (PKR)
                             </label>
-                            <input
+                            <input id="approxMonthlyIncome"
                               type="number"
                               name="approxMonthlyIncome"
                               value={formData.approxMonthlyIncome}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               placeholder="100000"
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
@@ -847,10 +847,10 @@ const ApplyLoan = () => {
                               type="checkbox"
                               name="ntnAvailable"
                               checked={formData.ntnAvailable}
-                              onChange={handleChange}
-                              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                              onChange={updateFormField}
+                              className="size-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                             />
-                            <label className="ml-2 block text-sm text-gray-700">
+                            <label htmlFor="loanType" className="ml-2 block text-sm text-gray-700">
                               NTN Available
                             </label>
                           </div>
@@ -869,10 +869,10 @@ const ApplyLoan = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Loan Type *
                         </label>
-                        <select
+                        <select id="loanType"
                           name="loanType"
                           value={formData.loanType}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-yellow-50"
                         >
@@ -886,14 +886,14 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="requiredAmount" className="block text-sm font-medium text-gray-700 mb-2">
                           Required Amount (PKR) *
                         </label>
-                        <input
+                        <input id="requiredAmount"
                           type="number"
                           name="requiredAmount"
                           value={formData.requiredAmount}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           placeholder="1000000"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-yellow-50"
@@ -902,14 +902,14 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="preferredTenure" className="block text-sm font-medium text-gray-700 mb-2">
                           Preferred Tenure (Months)
                         </label>
-                        <input
+                        <input id="preferredTenure"
                           type="number"
                           name="preferredTenure"
                           value={formData.preferredTenure}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           placeholder="12"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-yellow-50"
                         />
@@ -917,13 +917,13 @@ const ApplyLoan = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label htmlFor="financingPreference" className="block text-sm font-medium text-gray-700 mb-2">
                           Financing Preference
                         </label>
-                        <select
+                        <select id="financingPreference"
                           name="financingPreference"
                           value={formData.financingPreference}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-yellow-50"
                         >
                           <option value="">Select Preference</option>
@@ -940,13 +940,13 @@ const ApplyLoan = () => {
                         <h3 className="text-base font-semibold text-gray-900 mb-4">Islamic Financing Details</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="preferredMode" className="block text-sm font-medium text-gray-700 mb-2">
                               Preferred Mode
                             </label>
-                            <select
+                            <select id="preferredMode"
                               name="preferredMode"
                               value={formData.preferredMode}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             >
                               <option value="">Select Mode</option>
@@ -965,10 +965,10 @@ const ApplyLoan = () => {
                               type="checkbox"
                               name="shariahTermsAccepted"
                               checked={formData.shariahTermsAccepted}
-                              onChange={handleChange}
-                              className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                              onChange={updateFormField}
+                              className="size-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                             />
-                            <label className="ml-2 block text-sm text-gray-700">
+                            <label htmlFor="bankNames" className="ml-2 block text-sm text-gray-700">
                               I accept Shariah terms
                             </label>
                           </div>
@@ -990,24 +990,24 @@ const ApplyLoan = () => {
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Bank Names (comma-separated)
                           </label>
-                          <input
+                          <input id="bankNames"
                             type="text"
                             name="bankNames"
                             value={formData.bankNames}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             placeholder="Bank Alfalah, Meezan Bank"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="accountType" className="block text-sm font-medium text-gray-700 mb-2">
                             Account Type
                           </label>
-                          <select
+                          <select id="accountType"
                             name="accountType"
                             value={formData.accountType}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           >
                             <option value="">Select Type</option>
@@ -1022,41 +1022,41 @@ const ApplyLoan = () => {
                       <h3 className="text-base font-semibold text-gray-900 mb-4">Existing Loan (if any)</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm text-gray-600 mb-2">
+                          <label htmlFor="existingLoanType" className="block text-sm text-gray-600 mb-2">
                             Loan Type
                           </label>
-                          <input
+                          <input id="existingLoanType"
                             type="text"
                             name="existingLoanType"
                             value={formData.existingLoanType}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             placeholder="e.g., Personal Loan"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm text-gray-600 mb-2">
+                          <label htmlFor="existingLoanBank" className="block text-sm text-gray-600 mb-2">
                             Bank Name
                           </label>
-                          <input
+                          <input id="existingLoanBank"
                             type="text"
                             name="existingLoanBank"
                             value={formData.existingLoanBank}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm text-gray-600 mb-2">
+                          <label htmlFor="existingLoanInstallment" className="block text-sm text-gray-600 mb-2">
                             Monthly Installment (PKR)
                           </label>
-                          <input
+                          <input id="existingLoanInstallment"
                             type="number"
                             name="existingLoanInstallment"
                             value={formData.existingLoanInstallment}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
@@ -1067,13 +1067,13 @@ const ApplyLoan = () => {
                       <h3 className="text-base font-semibold text-gray-900 mb-4">Security / Asset</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label htmlFor="securityOffered" className="block text-sm font-medium text-gray-700 mb-2">
                             Security Offered
                           </label>
-                          <select
+                          <select id="securityOffered"
                             name="securityOffered"
                             value={formData.securityOffered}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           >
                             <option value="">Select Security</option>
@@ -1086,14 +1086,14 @@ const ApplyLoan = () => {
 
                         {formData.securityOffered && formData.securityOffered !== 'None' && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label htmlFor="estimatedValue" className="block text-sm font-medium text-gray-700 mb-2">
                               Estimated Value (PKR)
                             </label>
-                            <input
+                            <input id="estimatedValue"
                               type="number"
                               name="estimatedValue"
                               value={formData.estimatedValue}
-                              onChange={handleChange}
+                              onChange={updateFormField}
                               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                             />
                           </div>
@@ -1116,7 +1116,7 @@ const ApplyLoan = () => {
                         { key: 'bankStatement', label: 'Bank Statement', hint: 'Recent bank statement' },
                       ].map(({ key, label, hint }) => (
                         <div key={key}>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                          <label htmlFor="applicationNote" className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
                           <p className="text-xs text-gray-500 mb-2">{hint}</p>
                           <div className="flex items-center gap-2">
                             <input
@@ -1157,9 +1157,9 @@ const ApplyLoan = () => {
                           type="checkbox"
                           name="creditCheckConsent"
                           checked={formData.creditCheckConsent}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
-                          className="h-4 w-4 mt-1 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                          className="size-4 mt-1 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                         />
                         <label className="ml-3 block text-sm text-gray-700">
                           I consent to credit bureau checks and verification of the information provided *
@@ -1171,9 +1171,9 @@ const ApplyLoan = () => {
                           type="checkbox"
                           name="informationConfirmed"
                           checked={formData.informationConfirmed}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
-                          className="h-4 w-4 mt-1 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                          className="size-4 mt-1 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                         />
                         <label className="ml-3 block text-sm text-gray-700">
                           I confirm that all information provided is true and accurate *
@@ -1184,10 +1184,10 @@ const ApplyLoan = () => {
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                           Additional Notes (Optional)
                         </label>
-                        <textarea
+                        <textarea id="applicationNote"
                           name="applicationNote"
                           value={formData.applicationNote}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           rows="3"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           placeholder="Any additional information you'd like to share..."
@@ -1215,7 +1215,7 @@ const ApplyLoan = () => {
                           onClick={handlePrevious}
                           className="px-6 py-3 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50 transition font-medium flex items-center gap-2"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                           </svg>
                           Previous
@@ -1229,7 +1229,7 @@ const ApplyLoan = () => {
                           className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition font-medium flex items-center gap-2"
                         >
                           Next
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
@@ -1241,12 +1241,12 @@ const ApplyLoan = () => {
                         >
                           {loading ? (
                             <>
-                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                              <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
                               Submitting...
                             </>
                           ) : (
                             <>
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg>
                               Submit Application

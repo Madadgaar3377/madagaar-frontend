@@ -34,7 +34,7 @@ const DashboardProfile = () => {
     }
   }, [navigate]);
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -265,7 +265,7 @@ const DashboardProfile = () => {
           {/* Success/Error Messages */}
           {success && (
             <div className="mb-6 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="size-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               {success}
@@ -274,7 +274,7 @@ const DashboardProfile = () => {
 
           {error && (
             <div className="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg flex items-center gap-2">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="size-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
               </svg>
               {error}
@@ -294,16 +294,16 @@ const DashboardProfile = () => {
                       <img
                         src={imagePreview}
                         alt="Profile"
-                        className="w-32 h-32 rounded-full object-cover border-4 border-gray-200"
+                        className="size-32 rounded-full object-cover border-4 border-gray-200"
                       />
                     ) : (
-                      <div className="w-32 h-32 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white text-4xl font-bold border-4 border-gray-200">
+                      <div className="size-32 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white text-4xl font-bold border-4 border-gray-200">
                         {(currentUser?.name || 'U').charAt(0).toUpperCase()}
                       </div>
                     )}
                     {uploadingImage && (
                       <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                        <div className="animate-spin rounded-full size-8 border-b-2 border-white"></div>
                       </div>
                     )}
                   </div>
@@ -325,7 +325,7 @@ const DashboardProfile = () => {
                           disabled={uploadingImage}
                           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           {imagePreview ? 'Change Picture' : 'Upload Picture'}
@@ -338,7 +338,7 @@ const DashboardProfile = () => {
                             disabled={uploadingImage}
                             className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                             Remove
@@ -361,14 +361,14 @@ const DashboardProfile = () => {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                       Full Name *
                     </label>
-                    <input
+                    <input id="name"
                       type="text"
                       name="name"
                       value={formData.name}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="Enter your full name"
@@ -376,28 +376,28 @@ const DashboardProfile = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="userName" className="block text-sm font-medium text-gray-700 mb-2">
                       Username
                     </label>
-                    <input
+                    <input id="userName"
                       type="text"
                       name="userName"
                       value={formData.userName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="Enter username"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address
                     </label>
-                    <input
+                    <input id="email"
                       type="email"
                       name="email"
                       value={formData.email}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       disabled
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
                       placeholder="your@email.com"
@@ -406,14 +406,14 @@ const DashboardProfile = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="cnicNumber" className="block text-sm font-medium text-gray-700 mb-2">
                       CNIC Number
                     </label>
-                    <input
+                    <input id="cnicNumber"
                       type="text"
                       name="cnicNumber"
                       value={formData.cnicNumber}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="12345-1234567-1"
                     />
@@ -426,41 +426,41 @@ const DashboardProfile = () => {
                 <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
                       Phone Number
                     </label>
-                    <input
+                    <input id="phoneNumber"
                       type="tel"
                       name="phoneNumber"
                       value={formData.phoneNumber}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="+92 300 1234567"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="WhatsappNumber" className="block text-sm font-medium text-gray-700 mb-2">
                       WhatsApp Number
                     </label>
-                    <input
+                    <input id="WhatsappNumber"
                       type="tel"
                       name="WhatsappNumber"
                       value={formData.WhatsappNumber}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="+92 300 1234567"
                     />
                   </div>
 
                   <div className="sm:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="Address" className="block text-sm font-medium text-gray-700 mb-2">
                       Address
                     </label>
-                    <textarea
+                    <textarea id="Address"
                       name="Address"
                       value={formData.Address}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="Enter your complete address"
@@ -520,12 +520,12 @@ const DashboardProfile = () => {
                 >
                   {loading ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <div className="animate-spin rounded-full size-4 border-b-2 border-white"></div>
                       Updating...
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       Save Changes

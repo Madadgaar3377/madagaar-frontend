@@ -22,7 +22,7 @@ export default function LoadingPage({
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-4 sm:p-6 safe-area-top safe-area-bottom">
       <div className="w-full max-w-2xl text-center space-y-6">
         {/* Floating brand / hero */}
-        <div className="mx-auto w-36 h-36 sm:w-40 sm:h-40 rounded-3xl bg-white shadow-soft flex items-center justify-center relative overflow-hidden">
+        <div className="mx-auto size-36 sm:w-40 sm:h-40 rounded-3xl bg-white shadow-soft flex items-center justify-center relative overflow-hidden">
           {/* Animated concentric rings (SVG) */}
           <svg className="absolute inset-0 w-full h-full" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -46,9 +46,9 @@ export default function LoadingPage({
 
           {/* central dot + logo or letter */}
           <div className="relative z-10 flex flex-col items-center gap-2">
-            <div className="w-20 h-20 rounded-lg bg-[rgba(183,36,42,0.12)] flex items-center justify-center">
+            <div className="size-20 rounded-lg bg-[rgba(183,36,42,0.12)] flex items-center justify-center">
               {logoSrc ? (
-                <img src={logoSrc} alt="logo" className="w-14 h-14 object-contain" />
+                <img src={logoSrc} alt="logo" className="size-14 object-contain" />
               ) : (
                 <div className="text-[28px] font-extrabold" style={{ color: accent }}>
                   M
@@ -98,7 +98,7 @@ export default function LoadingPage({
 
         {/* small actions / brochure link */}
         <div className="flex items-center justify-center gap-3">
-          <button
+          <button type="button"
             onClick={() => window.location.reload()}
             className="px-4 py-2 rounded-full bg-white border shadow-sm text-sm font-medium hover:bg-gray-50"
           >

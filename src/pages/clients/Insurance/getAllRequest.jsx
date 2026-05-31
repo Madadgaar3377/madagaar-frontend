@@ -254,7 +254,7 @@ export default function InsuranceRequests() {
             <p className="text-sm text-gray-500">Manage incoming insurance requests — view, approve, reject, delete, or export selected.</p>
           </div>
           <div className="flex gap-2">
-            <button
+            <button type="button"
               onClick={() => {
                 setSearch("");
                 setStatusFilter("");
@@ -264,7 +264,7 @@ export default function InsuranceRequests() {
             >
               Reset Filters
             </button>
-            <button
+            <button type="button"
               onClick={() => setRefreshFlag((f) => f + 1)}
               className="px-3 py-2 rounded-md bg-[rgb(183,36,42)] text-white text-sm"
             >
@@ -300,7 +300,7 @@ export default function InsuranceRequests() {
           </div>
 
           <div className="flex gap-2">
-            <button onClick={() => setPage(1)} className="px-3 py-2 rounded-md border">Go</button>
+            <button type="button" onClick={() => setPage(1)} className="px-3 py-2 rounded-md border">Go</button>
             <div className="text-sm text-gray-500 self-end">Page {page} / {totalPages}</div>
           </div>
         </div>
@@ -313,7 +313,7 @@ export default function InsuranceRequests() {
                 <input type="checkbox" checked={selectAll} onChange={toggleSelectAll} className="form-checkbox" />
                 <span className="text-sm text-gray-600">Select All</span>
               </label>
-              <button onClick={exportSelectedToCSV} className="px-3 py-2 rounded bg-emerald-600 text-white text-sm">Export Selected CSV</button>
+              <button type="button" onClick={exportSelectedToCSV} className="px-3 py-2 rounded bg-emerald-600 text-white text-sm">Export Selected CSV</button>
             </div>
             <div className="text-sm text-gray-500">Selected: {selectedRows.size}</div>
           </div>
@@ -383,9 +383,9 @@ export default function InsuranceRequests() {
 
                     <td className="px-4 py-3 align-top">
                       <div className="flex gap-2 flex-wrap">
-                        <button onClick={() => handleView(it)} className="px-2 py-1 text-xs rounded border">View</button>
+                        <button type="button" onClick={() => handleView(it)} className="px-2 py-1 text-xs rounded border">View</button>
 
-                        <button
+                        <button type="button"
                           onClick={() => handleUpdateStatus(it._id, "approved")}
                           disabled={actionLoadingId === it._id}
                           className="px-2 py-1 text-xs rounded bg-emerald-600 text-white"
@@ -393,7 +393,7 @@ export default function InsuranceRequests() {
                           {actionLoadingId === it._id ? "..." : "Approve"}
                         </button>
 
-                        <button
+                        <button type="button"
                           onClick={() => handleUpdateStatus(it._id, "rejected")}
                           disabled={actionLoadingId === it._id}
                           className="px-2 py-1 text-xs rounded bg-red-600 text-white"
@@ -401,7 +401,7 @@ export default function InsuranceRequests() {
                           {actionLoadingId === it._id ? "..." : "Reject"}
                         </button>
 
-                        <button
+                        <button type="button"
                           onClick={() => handleDelete(it._id)}
                           disabled={actionLoadingId === it._id}
                           className="px-2 py-1 text-xs rounded border text-red-600"
@@ -421,8 +421,8 @@ export default function InsuranceRequests() {
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-600">Showing page {page} of {totalPages}</div>
           <div className="flex gap-2">
-            <button onClick={prevPage} disabled={page <= 1} className={`px-3 py-1 rounded ${page<=1 ? "opacity-50 cursor-not-allowed" : "border"}`}>Prev</button>
-            <button onClick={nextPage} disabled={page >= totalPages} className={`px-3 py-1 rounded ${page>=totalPages ? "opacity-50 cursor-not-allowed" : "border"}`}>Next</button>
+            <button type="button" onClick={prevPage} disabled={page <= 1} className={`px-3 py-1 rounded ${page<=1 ? "opacity-50 cursor-not-allowed" : "border"}`}>Prev</button>
+            <button type="button" onClick={nextPage} disabled={page >= totalPages} className={`px-3 py-1 rounded ${page>=totalPages ? "opacity-50 cursor-not-allowed" : "border"}`}>Next</button>
           </div>
         </div>
       </div>
@@ -437,7 +437,7 @@ export default function InsuranceRequests() {
                 <div className="text-sm text-gray-500">{selected.commonForm?.city} • {prettyDate(selected.createdAt)}</div>
               </div>
               <div>
-                <button onClick={closeView} className="px-3 py-1 rounded border">Close</button>
+                <button type="button" onClick={closeView} className="px-3 py-1 rounded border">Close</button>
               </div>
             </div>
 
@@ -477,9 +477,9 @@ export default function InsuranceRequests() {
             </div>
 
             <div className="mt-4 flex gap-2 justify-end">
-              <button onClick={() => handleUpdateStatus(selected._id, "approved")} className="px-4 py-2 rounded bg-emerald-600 text-white">Approve</button>
-              <button onClick={() => handleUpdateStatus(selected._id, "rejected")} className="px-4 py-2 rounded bg-red-600 text-white">Reject</button>
-              <button onClick={() => handleDelete(selected._id)} className="px-4 py-2 rounded border text-red-600">Delete</button>
+              <button type="button" onClick={() => handleUpdateStatus(selected._id, "approved")} className="px-4 py-2 rounded bg-emerald-600 text-white">Approve</button>
+              <button type="button" onClick={() => handleUpdateStatus(selected._id, "rejected")} className="px-4 py-2 rounded bg-red-600 text-white">Reject</button>
+              <button type="button" onClick={() => handleDelete(selected._id)} className="px-4 py-2 rounded border text-red-600">Delete</button>
             </div>
           </div>
         </div>

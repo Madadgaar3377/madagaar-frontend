@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const footerLinks = [
+  { to: "/download-app", label: "Download App" },
   { to: "/offers", label: "Offers" },
   { to: "/properties", label: "Properties" },
   { to: "/loans", label: "Loans" },
@@ -47,6 +48,15 @@ const Footer = () => {
             <p className="text-gray-300 text-sm sm:text-base leading-relaxed max-w-sm">
               Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's property solutions, insurance support, loans, or installment plans, we make your journey simple, reliable, and stress-free.
             </p>
+            <Link
+              to="/download-app"
+              className="inline-flex items-center gap-2 mt-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+            >
+              <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" />
+              </svg>
+              Download Madadgaar App
+            </Link>
           </motion.div>
 
           {/* Quick Links */}

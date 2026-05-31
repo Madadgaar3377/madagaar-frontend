@@ -98,7 +98,7 @@ export default function OffersPage() {
                             />
                           ) : (
                             <div className="flex flex-col items-center justify-center text-gray-400 p-4">
-                              <svg className="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="size-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14" />
                               </svg>
                               <span className="text-xs font-medium">{label}</span>
@@ -115,7 +115,7 @@ export default function OffersPage() {
                           )}
                           <span className="inline-flex items-center gap-1 text-sm font-medium text-red-600 mt-3">
                             View offer
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                           </span>

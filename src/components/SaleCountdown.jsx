@@ -77,7 +77,7 @@ export default function SaleCountdown() {
         >
           Sale Ending in
         </div>
-        <div className="flex items-center justify-center gap-1 sm:gap-2 px-4 py-4">
+        <div className="flex items-center justify-center gap-1 sm:gap-2 p-4">
           <div className="flex flex-col items-center bg-black/20 rounded-xl px-3 sm:px-4 py-2 min-w-[52px] sm:min-w-[60px]">
             <span className="text-2xl sm:text-3xl font-black text-white tabular-nums">{pad(days)}</span>
             <span className="text-xs font-semibold text-white/90 uppercase">Days</span>

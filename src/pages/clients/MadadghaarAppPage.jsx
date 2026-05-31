@@ -14,7 +14,7 @@ const MobileAppPage = () => {
 
             
 
-            <button  style={{ backgroundColor: "rgba(183, 36, 42, 0.6)" }} className="mt-6 p-2 text-white  font-medium hover:bg-blue-700 transition rounded-full">
+            <button type="button"  style={{ backgroundColor: "rgba(183, 36, 42, 0.6)" }} className="mt-6 p-2 text-white  font-medium hover:bg-blue-700 transition rounded-full">
              Already installed or Not supported
             </button>
           </div>

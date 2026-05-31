@@ -45,7 +45,7 @@ export default function WhatsAppButton({ message = "Hi, I need help from Madadga
 
       {/* Icon: responsive size, always centered in touch target */}
       <span
-        className="flex shrink-0 items-center justify-center w-6 h-6 sm:w-7 sm:h-7"
+        className="flex shrink-0 items-center justify-center size-6 sm:w-7 sm:h-7"
         aria-hidden
       >
         <svg className="w-full h-full" viewBox="0 0 24 24" fill="currentColor" aria-hidden>

@@ -30,7 +30,7 @@ function Toast({ toasts, onClose }) {
         >
           <div className="flex items-start justify-between gap-3">
             <div className="text-sm">{t.message}</div>
-            <button aria-label="close" onClick={() => onClose(t.id)} className="text-xs opacity-80">✕</button>
+            <button type="button" aria-label="close" onClick={() => onClose(t.id)} className="text-xs opacity-80">✕</button>
           </div>
         </div>
       ))}

@@ -19,9 +19,9 @@ export const TeamMemberSkeleton = () => {
         
         {/* Social Links */}
         <div className="flex justify-center gap-3 mt-4">
-          <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-          <div className="w-8 h-8 rounded-full bg-gray-200"></div>
-          <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+          <div className="size-8 rounded-full bg-gray-200"></div>
+          <div className="size-8 rounded-full bg-gray-200"></div>
+          <div className="size-8 rounded-full bg-gray-200"></div>
         </div>
       </div>
     </div>
@@ -79,7 +79,7 @@ export const LoanCardSkeleton = () => {
     <div className="bg-white rounded-xl overflow-hidden shadow-soft border border-gray-100 skeleton-pulse">
       <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg bg-gray-200"></div>
+          <div className="size-12 sm:w-14 sm:h-14 rounded-lg bg-gray-200"></div>
           <div className="flex-1 space-y-2">
             <div className="h-5 sm:h-6 bg-gray-200 rounded w-3/4"></div>
             <div className="h-3 sm:h-4 bg-gray-200 rounded w-1/2"></div>

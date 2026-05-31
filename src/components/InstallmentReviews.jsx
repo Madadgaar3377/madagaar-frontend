@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { isAuthenticated, getAuthToken, getUser } from "../utils/auth";
 import { useNavigate } from "react-router-dom";
@@ -57,17 +57,19 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
     reviewImages: []
   });
 
+  const resolvedPlanId = useMemo(() => getPlanId(), [installmentPlanId, planId]);
+  const missingPlanId = !resolvedPlanId;
+  const resolvedError = missingPlanId
+    ? "Installment plan ID is required to load reviews"
+    : error;
+  const resolvedLoading = missingPlanId ? false : loading;
+
   // Fetch reviews
   useEffect(() => {
-    const id = getPlanId();
-    if (!id) {
-      setLoading(false);
-      setError("Installment plan ID is required to load reviews");
-      return;
-    }
+    if (!resolvedPlanId) return;
     fetchReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [installmentPlanId, planId, page]);
+  }, [resolvedPlanId, page]);
 
   const fetchReviews = async () => {
     setLoading(true);
@@ -299,8 +301,8 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
       <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 mb-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+              <svg className="size-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
@@ -318,7 +320,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <svg
                         key={star}
-                        className={`w-4 h-4 ${star <= Math.round(statistics.averageRating) ? "text-amber-400" : "text-gray-200"}`}
+                        className={`size-4 ${star <= Math.round(statistics.averageRating) ? "text-amber-400" : "text-gray-200"}`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -340,7 +342,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
               onClick={() => setShowReviewForm(true)}
               className="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[rgb(183,36,42)] text-white text-sm font-semibold hover:bg-red-700 transition-colors w-full sm:w-auto"
             >
-              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
               </svg>
               Write a review
@@ -349,9 +351,9 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
         </div>
       </div>
 
-      {error && (
+      {resolvedError && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
-            {error}
+            {resolvedError}
           </div>
         )}
 
@@ -366,7 +368,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                   <div key={rating} className="flex items-center gap-2 sm:gap-3">
                     <div className="flex items-center gap-1 w-14 sm:w-16 shrink-0 text-xs text-gray-600">
                       <span className="font-medium tabular-nums">{rating}</span>
-                      <svg className="w-3 h-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
+                      <svg className="size-3 text-amber-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     </div>
@@ -392,14 +394,14 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
           <div className="mb-6 p-5 sm:p-6 lg:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl border-2 border-gray-200 shadow-lg">
             <div className="flex items-center justify-between mb-6">
               <h4 className="text-xl sm:text-2xl font-black text-gray-900 flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="size-10 bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 rounded-xl flex items-center justify-center">
+                  <svg className="size-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                 </div>
                 {editingReview ? "Edit Your Review" : "Write a Review"}
               </h4>
-              <button
+              <button type="button"
                 onClick={() => {
                   setShowReviewForm(false);
                   setEditingReview(null);
@@ -413,7 +415,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                 }}
                 className="text-gray-400 hover:text-gray-600 transition"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -427,13 +429,13 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                       key={star}
                       type="button"
                       onClick={() => setFormData({ ...formData, rating: star })}
-                      className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 ${
+                      className={`size-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 ${
                         star <= formData.rating 
                           ? 'bg-gradient-to-br from-yellow-400 to-yellow-500 text-white shadow-lg' 
                           : 'bg-gray-100 text-gray-300 hover:bg-gray-200'
                       }`}
                     >
-                      <svg fill="currentColor" viewBox="0 0 20 20" className="w-7 h-7 sm:w-8 sm:h-8">
+                      <svg fill="currentColor" viewBox="0 0 20 20" className="size-7 sm:w-8 sm:h-8">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     </button>
@@ -493,19 +495,19 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                 >
                   {submitting ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Submitting...
                     </>
                   ) : editingReview ? (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       Update Review
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                       </svg>
                       Submit Review
@@ -518,17 +520,17 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
         )}
 
         {/* Reviews List - Always Show */}
-        {loading ? (
+        {resolvedLoading ? (
           <div className="flex flex-col items-center justify-center gap-3 py-10">
-            <div className="relative h-10 w-10">
+            <div className="relative size-10">
               <div className="absolute inset-0 rounded-full border-2 border-gray-200" />
               <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-[rgb(183,36,42)] animate-spin" />
             </div>
             <p className="text-sm text-gray-600">Loading reviews…</p>
           </div>
-        ) : error && !reviews.length ? (
+        ) : resolvedError && !reviews.length ? (
           <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-6 text-center">
-            <p className="text-sm font-medium text-red-800">{error}</p>
+            <p className="text-sm font-medium text-red-800">{resolvedError}</p>
             <button
               type="button"
               onClick={fetchReviews}
@@ -562,19 +564,19 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                           <img 
                             src={review.userProfileImage} 
                             alt={review.userName || "User"} 
-                            className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-200 shadow-md"
+                            className="size-14 sm:w-16 sm:h-16 rounded-full object-cover border-2 border-gray-200 shadow-md"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
                         ) : null}
-                        <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg ${review.userProfileImage ? 'hidden' : ''}`}>
+                        <div className={`size-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-[rgb(183,36,42)] to-red-600 flex items-center justify-center font-black text-white text-lg sm:text-xl shadow-lg ${review.userProfileImage ? 'hidden' : ''}`}>
                           {review.userName?.charAt(0)?.toUpperCase() || "U"}
                         </div>
                         {isOwnReview && (
-                          <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="absolute -bottom-1 -right-1 size-6 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                            <svg className="size-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           </div>
@@ -590,7 +592,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                                 {[1, 2, 3, 4, 5].map((star) => (
                                   <svg
                                     key={star}
-                                    className={`w-4 h-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                    className={`size-4 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
                                     fill="currentColor"
                                     viewBox="0 0 20 20"
                                   >
@@ -606,21 +608,21 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                           
                           {isOwnReview && (
                             <div className="flex gap-2 flex-shrink-0">
-                              <button
+                              <button type="button"
                                 onClick={() => handleEditReview(review)}
                                 className="p-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
                                 title="Edit review"
                               >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                 </svg>
                               </button>
-                              <button
+                              <button type="button"
                                 onClick={() => handleDeleteReview(review.reviewId || review._id)}
                                 className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
                                 title="Delete review"
                               >
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
                               </button>
@@ -645,7 +647,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                               <img
                                 src={img}
                                 alt={`Review ${idx + 1}`}
-                                className="w-20 h-20 sm:w-24 sm:h-24 object-cover rounded-xl border-2 border-gray-200 hover:border-[rgb(183,36,42)] transition-all cursor-pointer hover:scale-105"
+                                className="size-20 sm:w-24 sm:h-24 object-cover rounded-xl border-2 border-gray-200 hover:border-[rgb(183,36,42)] transition-all cursor-pointer hover:scale-105"
                               />
                             </div>
                           ))}
@@ -655,7 +657,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                     
                     {/* Review Footer */}
                     <div className="flex items-center justify-between pt-4 mt-4 border-t border-gray-100">
-                      <button
+                      <button type="button"
                         onClick={() => handleMarkHelpful(review.reviewId || review._id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl font-semibold text-sm transition-all ${
                           isHelpful 
@@ -663,7 +665,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                             : 'text-gray-600 hover:text-[rgb(183,36,42)] hover:bg-gray-50 border-2 border-transparent hover:border-gray-200'
                         }`}
                       >
-                        <svg className={`w-5 h-5 ${isHelpful ? 'fill-current' : ''}`} fill={isHelpful ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`size-5 ${isHelpful ? 'fill-current' : ''}`} fill={isHelpful ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
                         </svg>
                         Helpful
@@ -672,7 +674,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                       
                       {review.isVerified && (
                         <div className="flex items-center gap-1 text-xs text-green-600 font-semibold">
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="size-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
                           Verified Purchase
@@ -691,12 +693,12 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                   Page <span className="text-[rgb(183,36,42)] font-black">{page}</span> of <span className="text-[rgb(183,36,42)] font-black">{totalPages}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button
+                  <button type="button"
                     onClick={() => setPage(p => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-5 py-2.5 text-sm font-bold border-2 border-gray-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition-all disabled:hover:border-gray-300 disabled:hover:text-gray-500 flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                     Previous
@@ -714,10 +716,10 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                         pageNum = page - 2 + i;
                       }
                       return (
-                        <button
+                        <button type="button"
                           key={pageNum}
                           onClick={() => setPage(pageNum)}
-                          className={`w-10 h-10 rounded-xl font-bold text-sm transition-all ${
+                          className={`size-10 rounded-xl font-bold text-sm transition-all ${
                             page === pageNum
                               ? 'bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white shadow-lg'
                               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -728,13 +730,13 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
                       );
                     })}
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
                     className="px-5 py-2.5 text-sm font-bold border-2 border-gray-300 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] transition-all disabled:hover:border-gray-300 disabled:hover:text-gray-500 flex items-center gap-2"
                   >
                     Next
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>

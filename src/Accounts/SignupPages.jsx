@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X, Phone } from "lucide-react";
@@ -36,21 +36,18 @@ export default function SignupPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [formData, setFormData] = useState(initialFormData);
-
-  // Prefill form when returning from OTP "Change email" (keep previous data, user can change email)
-  const hasPrefilled = useRef(false);
-  useEffect(() => {
+  const [formData, setFormData] = useState(() => {
     const prev = location.state?.previousFormData;
-    if (prev && typeof prev === "object" && !hasPrefilled.current) {
-      hasPrefilled.current = true;
-      setFormData({
+    if (prev && typeof prev === "object") {
+      return {
         ...initialFormData,
         ...prev,
         email: prev.email || "",
-      });
+      };
     }
-  }, [location.state]);
+    return initialFormData;
+  });
+
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -64,7 +61,7 @@ export default function SignupPage() {
     setDeclarationsChecked((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleChange = (e) =>
+  const updateFormField = (e) =>
     setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
 
   const handleImageUpload = async (e) => {
@@ -226,9 +223,9 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-red-50/30 flex items-center justify-center py-10 sm:py-14 px-4 relative overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-[rgb(183,36,42)]/5 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 -left-32 w-72 h-72 bg-red-100/40 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-1/4 w-48 h-48 bg-amber-100/30 rounded-full blur-2xl" />
+        <div className="absolute -top-40 -right-40 size-80 bg-[rgb(183,36,42)]/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 -left-32 size-72 bg-red-100/40 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-1/4 size-48 bg-amber-100/30 rounded-full blur-2xl" />
       </div>
 
       <div className="w-full max-w-lg relative z-10">
@@ -251,19 +248,19 @@ export default function SignupPage() {
                     <img
                       src={formData.profilePic}
                       alt="Profile"
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-gray-100 shadow-md"
+                      className="size-20 sm:w-24 sm:h-24 rounded-full object-cover ring-2 ring-gray-100 shadow-md"
                     />
                     <button
                       type="button"
                       onClick={handleRemoveImage}
-                      className="absolute -top-0.5 -right-0.5 w-7 h-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
+                      className="absolute -top-0.5 -right-0.5 size-7 bg-red-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-red-600 transition-colors"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </>
                 ) : (
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center">
-                    <UserCircle className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
+                  <div className="size-20 sm:w-24 sm:h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-200 flex items-center justify-center">
+                    <UserCircle className="size-10 sm:w-12 sm:h-12 text-gray-400" />
                   </div>
                 )}
               </div>
@@ -271,12 +268,12 @@ export default function SignupPage() {
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" disabled={uploadingImage} />
                 {uploadingImage ? (
                   <>
-                    <div className="w-4 h-4 border-2 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin" />
+                    <div className="size-4 border-2 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin" />
                     Uploading...
                   </>
                 ) : (
                   <>
-                    <Upload className="w-4 h-4" />
+                    <Upload className="size-4" />
                     {formData.profilePic ? "Change photo" : "Upload photo"}
                   </>
                 )}
@@ -288,13 +285,13 @@ export default function SignupPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Full name <span className="text-red-500">*</span></label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
                   <input
                     name="name"
                     type="text"
                     placeholder="Enter your full name"
                     value={formData.name}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className={inputBase}
                   />
@@ -305,13 +302,13 @@ export default function SignupPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Username <span className="text-gray-400 font-normal">(optional)</span></label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
                   <input
                     name="userName"
                     type="text"
                     placeholder="Choose a username"
                     value={formData.userName}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     className={inputBase}
                   />
                 </div>
@@ -321,13 +318,13 @@ export default function SignupPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone number</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
                   <input
                     name="phoneNumber"
                     type="tel"
                     placeholder="e.g. 03001234567"
                     value={formData.phoneNumber}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     className={inputBase}
                   />
                 </div>
@@ -337,13 +334,13 @@ export default function SignupPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address <span className="text-red-500">*</span></label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
                   <input
                     name="email"
                     type="email"
                     placeholder="you@example.com"
                     value={formData.email}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className={inputBase}
                   />
@@ -354,13 +351,13 @@ export default function SignupPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Password <span className="text-red-500">*</span></label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400 pointer-events-none" />
                   <input
                     name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="At least 8 characters"
                     value={formData.password}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     minLength={8}
                     className={`${inputBase} pr-12`}
@@ -370,7 +367,7 @@ export default function SignupPage() {
                     onClick={() => setShowPassword((s) => !s)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 rounded transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
                   </button>
                 </div>
                 <p className="mt-1 text-xs text-gray-400">Must be at least 8 characters</p>
@@ -394,7 +391,7 @@ export default function SignupPage() {
                         name="userType"
                         value={opt.value}
                         checked={formData.userType === opt.value}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="sr-only"
                       />
                       <span className={`font-semibold ${formData.userType === opt.value ? "text-[rgb(183,36,42)]" : "text-gray-800"}`}>
@@ -420,7 +417,7 @@ export default function SignupPage() {
                           id={key}
                           checked={declarationsChecked[key] || false}
                           onChange={(e) => setDeclaration(key, e.target.checked)}
-                          className="mt-0.5 w-4 h-4 rounded border-gray-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
+                          className="mt-0.5 size-4 rounded border-gray-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
                         />
                         <label htmlFor={key} className="text-sm text-gray-600 cursor-pointer leading-snug">
                           {isTerms && (
@@ -445,7 +442,7 @@ export default function SignupPage() {
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   Creating account...
                 </span>
               ) : (

@@ -39,11 +39,12 @@ const Services = () => {
   }, []);
 
   return (
-    <section className="w-full flex flex-col md:flex-row items-center justify-between container-safe section-padding">
+    <section className="w-full bg-white section-padding">
+      <div className="container-content page-hero">
       {/* Left Content */}
       <div
         ref={contentRef}
-        className={`md:w-1/2 space-y-3 sm:space-y-4 lg:space-y-6 w-full ${
+        className={`page-hero-col space-y-3 sm:space-y-4 lg:space-y-6 ${
           isVisible ? 'animate-fade-in-left' : 'animate-on-scroll'
         }`}
       >
@@ -61,7 +62,7 @@ const Services = () => {
           things simple and hassle-free for you.
         </p>
 
-        <button
+        <button type="button"
           style={{ backgroundColor: "rgb(183, 36, 42)" }}
           className="mt-4 sm:mt-6 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base text-white font-medium hover:bg-blue-700 transition rounded-full"
         >
@@ -72,7 +73,7 @@ const Services = () => {
       {/* Right Image */}
       <div
         ref={imageRef}
-        className={`md:w-1/2 mt-6 sm:mt-8 md:mt-0 flex justify-center w-full ${
+        className={`page-hero-col flex justify-center ${
           imageVisible ? 'animate-fade-in-right' : 'animate-on-scroll'
         }`}
         style={imageVisible ? { animationDelay: '200ms' } : {}}
@@ -80,9 +81,10 @@ const Services = () => {
         <img
             src="/Media/Support%20service.png"
             alt="Madadgaar Free Support Services - Property, Insurance, Loans and Installment Solutions in Pakistan"
-          className="rounded-xl sm:rounded-2xl w-full max-w-sm sm:max-w-md"
+          className="rounded-xl sm:rounded-2xl page-media"
           loading="lazy"
         />
+      </div>
       </div>
     </section>
   );

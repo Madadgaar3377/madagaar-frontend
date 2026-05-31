@@ -6,6 +6,7 @@ import Navbar from "./compontents/Navbar";
 import Footer from "./compontents/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import WhatsAppButton from "./components/WhatsAppButton";
+import AppDownloadBanner from "./components/AppDownloadBanner";
 import useAdSenseRouteRefresh from "./hooks/useAdSenseRouteRefresh";
 
 // Pages
@@ -46,6 +47,7 @@ import TermsAndConditions from "./pages/clients/TermsAndConditions.jsx";
 import PrivacyPolicy from "./pages/clients/PrivacyPolicy.jsx";
 import OffersPage from "./pages/clients/Offers.jsx";
 import DeleteAccountRequest from "./pages/clients/DeleteAccountRequest.jsx";
+import DownloadAppPage from "./pages/clients/DownloadAppPage.jsx";
 
 
 function LayoutWrapper({ children }) {
@@ -60,13 +62,14 @@ function LayoutWrapper({ children }) {
       {!hideLayout && <Navbar />}
 
       {/* Spacer for fixed navbar so content is not hidden under it */}
-      <main className={!hideLayout ? "min-h-screen pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden" : "overflow-x-hidden"}>
-        <div key={location.pathname} className="route-transition-enter">
+      <main className={!hideLayout ? "min-h-screen w-full max-w-[100vw] pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden" : "w-full max-w-[100vw] overflow-x-hidden"}>
+        <div key={location.pathname} className="route-transition-enter w-full max-w-full">
           {children}
         </div>
       </main>
 
       {!hideLayout && <Footer />}
+      {!hideLayout && <AppDownloadBanner />}
       {!hideLayout && <WhatsAppButton />}
 
       {/* Toaster last so it stacks above navbar (z-50), footer, and FAB; containerStyle overrides lib default z-index 9999 */}
@@ -104,6 +107,7 @@ function App() {
             {/* Public pages */}
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/download-app" element={<DownloadAppPage />} />
             <Route path="/offers" element={<OffersPage />} />
             <Route path="/delete-account" element={<DeleteAccountRequest />} />
             {/* Phase 1: Team detail route disabled - contact via email only */}

@@ -5,6 +5,95 @@ import { backendBaseUrl } from '../../../constants/apiUrl';
 import SEO from '../../../components/SEO';
 import { Toast, useToast } from '../../../components/Toast';
 
+function ClaimFileUploadButton({
+  fieldName,
+  label,
+  required = false,
+  accept = "image/*,application/pdf",
+  formData,
+  uploadingFile,
+  onFileSelect,
+  onRemoveDocument,
+}) {
+  const fileInputRef = useRef(null);
+  const inputId = `claim-file-${fieldName}`;
+  const isUploading = uploadingFile.type === fieldName && uploadingFile.status;
+  const hasFile = Array.isArray(formData[fieldName])
+    ? formData[fieldName].length > 0
+    : formData[fieldName];
+
+  return (
+    <div>
+      <label htmlFor={inputId} className="block text-sm font-medium text-gray-700 mb-2">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <input
+        id={inputId}
+        ref={fileInputRef}
+        type="file"
+        accept={accept}
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) {
+            onFileSelect(file, fieldName);
+          }
+        }}
+        className="hidden"
+      />
+      <button
+        type="button"
+        onClick={() => fileInputRef.current?.click()}
+        disabled={isUploading}
+        className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition flex items-center justify-center gap-2 ${
+          hasFile
+            ? 'border-green-300 bg-green-50'
+            : 'border-gray-300 hover:bg-gray-50'
+        }`}
+      >
+        {isUploading ? (
+          <>
+            <div className="animate-spin rounded-full size-5 border-b-2 border-gray-600"></div>
+            <span>Uploading...</span>
+          </>
+        ) : hasFile ? (
+          <>
+            <svg className="size-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{label} Uploaded</span>
+          </>
+        ) : (
+          <>
+            <svg className="size-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span>Upload {label}</span>
+          </>
+        )}
+      </button>
+      {Array.isArray(formData[fieldName]) && formData[fieldName].length > 0 && (
+        <div className="mt-2 space-y-2">
+          {formData[fieldName].map((doc, index) => (
+            <div key={`${fieldName}-${doc}-${index}`} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+              <span className="text-xs text-gray-700 truncate flex-1">{doc.split('/').pop()}</span>
+              <button
+                type="button"
+                onClick={() => onRemoveDocument(fieldName, index)}
+                className="ml-2 text-red-600 hover:text-red-700"
+                aria-label={`Remove ${label}`}
+              >
+                <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const SubmitClaim = () => {
   const navigate = useNavigate();
   const currentUser = getUser();
@@ -211,7 +300,7 @@ const SubmitClaim = () => {
     setCurrentStep(prev => Math.max(1, prev - 1));
   };
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -462,81 +551,11 @@ const SubmitClaim = () => {
     }
   };
 
-  const FileUploadButton = ({ fieldName, label, required = false, accept = "image/*,application/pdf" }) => {
-    const fileInputRef = useRef(null);
-    const isUploading = uploadingFile.type === fieldName && uploadingFile.status;
-    const hasFile = Array.isArray(formData[fieldName]) 
-      ? formData[fieldName].length > 0 
-      : formData[fieldName];
-
-    return (
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept={accept}
-          onChange={(e) => {
-            const file = e.target.files[0];
-            if (file) {
-              handleFileUpload(file, fieldName);
-            }
-          }}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-          className={`w-full px-4 py-3 border-2 border-dashed rounded-lg transition flex items-center justify-center gap-2 ${
-            hasFile 
-              ? 'border-green-300 bg-green-50' 
-              : 'border-gray-300 hover:bg-gray-50'
-          }`}
-        >
-          {isUploading ? (
-            <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
-              <span>Uploading...</span>
-            </>
-          ) : hasFile ? (
-            <>
-              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>{label} Uploaded</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-              <span>Upload {label}</span>
-            </>
-          )}
-        </button>
-        {Array.isArray(formData[fieldName]) && formData[fieldName].length > 0 && (
-          <div className="mt-2 space-y-2">
-            {formData[fieldName].map((doc, index) => (
-              <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                <span className="text-xs text-gray-700 truncate flex-1">{doc.split('/').pop()}</span>
-                <button
-                  type="button"
-                  onClick={() => removeDocument(fieldName, index)}
-                  className="ml-2 text-red-600 hover:text-red-700"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    );
+  const fileUploadSharedProps = {
+    formData,
+    uploadingFile,
+    onFileSelect: handleFileUpload,
+    onRemoveDocument: removeDocument,
   };
 
   return (
@@ -552,11 +571,11 @@ const SubmitClaim = () => {
         <div className="container-content">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back
@@ -569,7 +588,7 @@ const SubmitClaim = () => {
 
           {/* Service Type Toggle */}
           <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-3">Service Type</label>
+            <p className="block text-sm font-medium text-gray-700 mb-3">Service Type</p>
             <div className="flex gap-3">
               <button
                 type="button"
@@ -624,7 +643,7 @@ const SubmitClaim = () => {
                   
                   return (
                     <div key={step.number} className="flex flex-col items-center" style={{ flex: 1 }}>
-                      <div className={`relative z-10 w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
+                      <div className={`relative z-10 size-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-300 ${
                         isActive 
                           ? 'bg-red-600 text-white shadow-lg scale-110 border-2 border-red-700' 
                           : isCompleted 
@@ -632,7 +651,7 @@ const SubmitClaim = () => {
                           : 'bg-gray-200 text-gray-500 border-2 border-gray-300'
                       }`}>
                         {isCompleted ? (
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         ) : (
@@ -660,7 +679,7 @@ const SubmitClaim = () => {
             {/* Current Step Info */}
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-semibold">
+                <div className="size-10 rounded-full bg-red-600 text-white flex items-center justify-center text-sm font-semibold">
                   {currentStep}
                 </div>
                 <div>
@@ -744,88 +763,88 @@ const SubmitClaim = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Applicant Information</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
                           Full Name <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <input id="fullName"
                           type="text"
                           name="fullName"
                           value={formData.fullName}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="cnic" className="block text-sm font-medium text-gray-700 mb-1">
                           CNIC Number <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <input id="cnic"
                           type="text"
                           name="cnic"
                           value={formData.cnic}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
                           Mobile Number <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <input id="mobileNumber"
                           type="tel"
                           name="mobileNumber"
                           value={formData.mobileNumber}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                        <input
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input id="email"
                           type="email"
                           name="email"
                           value={formData.email}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="residentialAddress" className="block text-sm font-medium text-gray-700 mb-1">
                           Residential Address <span className="text-red-500">*</span>
                         </label>
-                        <textarea
+                        <textarea id="residentialAddress"
                           name="residentialAddress"
                           value={formData.residentialAddress}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           rows={3}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                           City <span className="text-red-500">*</span>
                         </label>
-                        <input
+                        <input id="city"
                           type="text"
                           name="city"
                           value={formData.city}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           required
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="preferredContactMethod" className="block text-sm font-medium text-gray-700 mb-1">
                           Preferred Contact Method
                         </label>
-                        <select
+                        <select id="preferredContactMethod"
                           name="preferredContactMethod"
                           value={formData.preferredContactMethod}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         >
                           <option value="Call">Call</option>
@@ -860,47 +879,47 @@ const SubmitClaim = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Policy Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="insuranceCompanyName" className="block text-sm font-medium text-gray-700 mb-1">
                     Insurance Company Name <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <input id="insuranceCompanyName"
                     type="text"
                     name="insuranceCompanyName"
                     value={formData.insuranceCompanyName}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="insuranceCompanyBranch" className="block text-sm font-medium text-gray-700 mb-1">
                     Insurance Company Branch
                   </label>
-                  <input
+                  <input id="insuranceCompanyBranch"
                     type="text"
                     name="insuranceCompanyBranch"
                     value={formData.insuranceCompanyBranch}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Policy Number <span className="text-red-500">*</span></label>
-                  <input
+                  <label htmlFor="policyNumber" className="block text-sm font-medium text-gray-700 mb-1">Policy Number <span className="text-red-500">*</span></label>
+                  <input id="policyNumber"
                     type="text"
                     name="policyNumber"
                     value={formData.policyNumber}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Policy Type <span className="text-red-500">*</span></label>
-                  <select
+                  <label htmlFor="policyType" className="block text-sm font-medium text-gray-700 mb-1">Policy Type <span className="text-red-500">*</span></label>
+                  <select id="policyType"
                     name="policyType"
                     value={formData.policyType}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   >
@@ -913,34 +932,34 @@ const SubmitClaim = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Policy Start Date <span className="text-red-500">*</span></label>
-                  <input
+                  <label htmlFor="policyStartDate" className="block text-sm font-medium text-gray-700 mb-1">Policy Start Date <span className="text-red-500">*</span></label>
+                  <input id="policyStartDate"
                     type="date"
                     name="policyStartDate"
                     value={formData.policyStartDate}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Policy Expiry Date</label>
-                  <input
+                  <label htmlFor="policyExpiryDate" className="block text-sm font-medium text-gray-700 mb-1">Policy Expiry Date</label>
+                  <input id="policyExpiryDate"
                     type="date"
                     name="policyExpiryDate"
                     value={formData.policyExpiryDate}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                   />
                 </div>
                 {serviceType === 'maturity' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Policy Maturity Date</label>
-                    <input
+                    <label htmlFor="policyMaturityDate" className="block text-sm font-medium text-gray-700 mb-1">Policy Maturity Date</label>
+                    <input id="policyMaturityDate"
                       type="date"
                       name="policyMaturityDate"
                       value={formData.policyMaturityDate}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
@@ -973,11 +992,11 @@ const SubmitClaim = () => {
                       <h2 className="text-xl font-bold text-gray-900 mb-4">Claim Details</h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Claim Type <span className="text-red-500">*</span></label>
-                      <select
+                      <label htmlFor="claimType" className="block text-sm font-medium text-gray-700 mb-1">Claim Type <span className="text-red-500">*</span></label>
+                      <select id="claimType"
                         name="claimType"
                         value={formData.claimType}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
@@ -986,11 +1005,11 @@ const SubmitClaim = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Claim Category <span className="text-red-500">*</span></label>
-                      <select
+                      <label htmlFor="claimCategory" className="block text-sm font-medium text-gray-700 mb-1">Claim Category <span className="text-red-500">*</span></label>
+                      <select id="claimCategory"
                         name="claimCategory"
                         value={formData.claimCategory}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
@@ -1004,44 +1023,44 @@ const SubmitClaim = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Date of Incident / Loss <span className="text-red-500">*</span></label>
-                      <input
+                      <label htmlFor="dateOfIncident" className="block text-sm font-medium text-gray-700 mb-1">Date of Incident / Loss <span className="text-red-500">*</span></label>
+                      <input id="dateOfIncident"
                         type="date"
                         name="dateOfIncident"
                         value={formData.dateOfIncident}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Place of Incident <span className="text-red-500">*</span></label>
-                      <input
+                      <label htmlFor="placeOfIncident" className="block text-sm font-medium text-gray-700 mb-1">Place of Incident <span className="text-red-500">*</span></label>
+                      <input id="placeOfIncident"
                         type="text"
                         name="placeOfIncident"
                         value={formData.placeOfIncident}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Brief Description of Incident <span className="text-red-500">*</span></label>
-                      <textarea
+                      <label htmlFor="briefDescription" className="block text-sm font-medium text-gray-700 mb-1">Brief Description of Incident <span className="text-red-500">*</span></label>
+                      <textarea id="briefDescription"
                         name="briefDescription"
                         value={formData.briefDescription}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         rows={4}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">FIR / Police Report Available?</label>
-                      <select
+                      <label htmlFor="firPoliceReportAvailable" className="block text-sm font-medium text-gray-700 mb-1">FIR / Police Report Available?</label>
+                      <select id="firPoliceReportAvailable"
                         name="firPoliceReportAvailable"
                         value={formData.firPoliceReportAvailable}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
                         <option value="">Select</option>
@@ -1077,11 +1096,11 @@ const SubmitClaim = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Maturity Details</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Maturity Type <span className="text-red-500">*</span></label>
-                    <select
+                    <label htmlFor="maturityType" className="block text-sm font-medium text-gray-700 mb-1">Maturity Type <span className="text-red-500">*</span></label>
+                    <select id="maturityType"
                       name="maturityType"
                       value={formData.maturityType}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     >
@@ -1092,32 +1111,32 @@ const SubmitClaim = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Maturity Date</label>
-                    <input
+                    <label htmlFor="maturityDate" className="block text-sm font-medium text-gray-700 mb-1">Maturity Date</label>
+                    <input id="maturityDate"
                       type="date"
                       name="maturityDate"
                       value={formData.maturityDate}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Expected Maturity Amount (if known)</label>
-                    <input
+                    <label htmlFor="expectedMaturityAmount" className="block text-sm font-medium text-gray-700 mb-1">Expected Maturity Amount (if known)</label>
+                    <input id="expectedMaturityAmount"
                       type="number"
                       name="expectedMaturityAmount"
                       value={formData.expectedMaturityAmount}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       min="0"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Bonus / Profit Expected?</label>
-                    <select
+                    <label htmlFor="bonusProfitExpected" className="block text-sm font-medium text-gray-700 mb-1">Bonus / Profit Expected?</label>
+                    <select id="bonusProfitExpected"
                       name="bonusProfitExpected"
                       value={formData.bonusProfitExpected}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     >
                       <option value="">Select</option>
@@ -1126,22 +1145,22 @@ const SubmitClaim = () => {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nominee / Beneficiary Name <span className="text-red-500">*</span></label>
-                    <input
+                    <label htmlFor="nomineeBeneficiaryName" className="block text-sm font-medium text-gray-700 mb-1">Nominee / Beneficiary Name <span className="text-red-500">*</span></label>
+                    <input id="nomineeBeneficiaryName"
                       type="text"
                       name="nomineeBeneficiaryName"
                       value={formData.nomineeBeneficiaryName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Relationship with Policyholder <span className="text-red-500">*</span></label>
-                    <select
+                    <label htmlFor="relationshipWithPolicyholder" className="block text-sm font-medium text-gray-700 mb-1">Relationship with Policyholder <span className="text-red-500">*</span></label>
+                    <select id="relationshipWithPolicyholder"
                       name="relationshipWithPolicyholder"
                       value={formData.relationshipWithPolicyholder}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     >
@@ -1181,34 +1200,34 @@ const SubmitClaim = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Claim Amount & Provider</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Estimated Claim Amount (PKR) <span className="text-red-500">*</span></label>
-                      <input
+                      <label htmlFor="estimatedClaimAmount" className="block text-sm font-medium text-gray-700 mb-1">Estimated Claim Amount (PKR) <span className="text-red-500">*</span></label>
+                      <input id="estimatedClaimAmount"
                         type="number"
                         name="estimatedClaimAmount"
                         value={formData.estimatedClaimAmount}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         min="0"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Hospital / Workshop / Vendor Name <span className="text-red-500">*</span></label>
-                      <input
+                      <label htmlFor="hospitalWorkshopVendorName" className="block text-sm font-medium text-gray-700 mb-1">Hospital / Workshop / Vendor Name <span className="text-red-500">*</span></label>
+                      <input id="hospitalWorkshopVendorName"
                         type="text"
                         name="hospitalWorkshopVendorName"
                         value={formData.hospitalWorkshopVendorName}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Panel Provider? <span className="text-red-500">*</span></label>
-                      <select
+                      <label htmlFor="panelProvider" className="block text-sm font-medium text-gray-700 mb-1">Panel Provider? <span className="text-red-500">*</span></label>
+                      <select id="panelProvider"
                         name="panelProvider"
                         value={formData.panelProvider}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
@@ -1218,13 +1237,13 @@ const SubmitClaim = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Service Date(s)</label>
+                      <label htmlFor="paymentStatus" className="block text-sm font-medium text-gray-700 mb-1">Service Date(s)</label>
                       <div className="grid grid-cols-2 gap-2">
                         <input
                           type="date"
                           name="serviceDate"
                           value={formData.serviceDate}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           placeholder="Start Date"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
@@ -1232,7 +1251,7 @@ const SubmitClaim = () => {
                           type="date"
                           name="serviceDateEnd"
                           value={formData.serviceDateEnd}
-                          onChange={handleChange}
+                          onChange={updateFormField}
                           placeholder="End Date"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         />
@@ -1240,10 +1259,10 @@ const SubmitClaim = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status <span className="text-red-500">*</span></label>
-                      <select
+                      <select id="paymentStatus"
                         name="paymentStatus"
                         value={formData.paymentStatus}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       >
@@ -1282,11 +1301,11 @@ const SubmitClaim = () => {
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Payment Mode</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Mode <span className="text-red-500">*</span></label>
-                          <select
+                          <label htmlFor="paymentMode" className="block text-sm font-medium text-gray-700 mb-1">Payment Mode <span className="text-red-500">*</span></label>
+                          <select id="paymentMode"
                             name="paymentMode"
                             value={formData.paymentMode}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           >
@@ -1302,62 +1321,62 @@ const SubmitClaim = () => {
                       <h3 className="text-lg font-semibold text-gray-900 mb-4">Bank Details <span className="text-red-500">*</span></h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label htmlFor="accountHolderName" className="block text-sm font-medium text-gray-700 mb-1">
                             Account Holder Name <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input id="accountHolderName"
                             type="text"
                             name="accountHolderName"
                             value={formData.accountHolderName}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 mb-1">
                             Bank Name <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input id="bankName"
                             type="text"
                             name="bankName"
                             value={formData.bankName}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 mb-1">
                             Account Number <span className="text-red-500">*</span>
                           </label>
-                          <input
+                          <input id="accountNumber"
                             type="text"
                             name="accountNumber"
                             value={formData.accountNumber}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             required
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
-                          <input
+                          <label htmlFor="iban" className="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                          <input id="iban"
                             type="text"
                             name="iban"
                             value={formData.iban}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             placeholder="PKXX XXXX XXXX XXXX XXXX XXXX"
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
-                          <input
+                          <label htmlFor="branchName" className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                          <input id="branchName"
                             type="text"
                             name="branchName"
                             value={formData.branchName}
-                            onChange={handleChange}
+                            onChange={updateFormField}
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                           />
                         </div>
@@ -1388,41 +1407,41 @@ const SubmitClaim = () => {
                   <div className="space-y-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Required Documents</h2>
               <div className="space-y-4">
-                <FileUploadButton fieldName="cnicCopy" label="CNIC Copy" required />
-                <FileUploadButton fieldName="policyCopy" label="Policy Copy" required />
+                <ClaimFileUploadButton fieldName="cnicCopy" label="CNIC Copy" required {...fileUploadSharedProps} />
+                <ClaimFileUploadButton fieldName="policyCopy" label="Policy Copy" required {...fileUploadSharedProps} />
                 
                 {serviceType === 'claim' && (
                   <>
-                    <FileUploadButton fieldName="claimForm" label="Claim Form" />
+                    <ClaimFileUploadButton fieldName="claimForm" label="Claim Form" {...fileUploadSharedProps} />
                     {formData.claimCategory === 'Medical' && (
-                      <FileUploadButton fieldName="medicalReports" label="Medical Reports" />
+                      <ClaimFileUploadButton fieldName="medicalReports" label="Medical Reports" {...fileUploadSharedProps} />
                     )}
                     {(formData.claimCategory === 'Accident' || formData.claimCategory === 'Theft') && (
-                      <FileUploadButton fieldName="firPoliceReport" label="FIR/Police Report" />
+                      <ClaimFileUploadButton fieldName="firPoliceReport" label="FIR/Police Report" {...fileUploadSharedProps} />
                     )}
                     {formData.claimCategory === 'Death' && (
-                      <FileUploadButton fieldName="deathCertificate" label="Death Certificate" />
+                      <ClaimFileUploadButton fieldName="deathCertificate" label="Death Certificate" {...fileUploadSharedProps} />
                     )}
                     {formData.policyType === 'Motor' && (
-                      <FileUploadButton fieldName="vehicleRegistration" label="Vehicle Registration" />
+                      <ClaimFileUploadButton fieldName="vehicleRegistration" label="Vehicle Registration" {...fileUploadSharedProps} />
                     )}
                     {formData.claimType === 'Reimbursement' && (
-                      <FileUploadButton fieldName="billsReceipts" label="Bills/Receipts" />
+                      <ClaimFileUploadButton fieldName="billsReceipts" label="Bills/Receipts" {...fileUploadSharedProps} />
                     )}
                   </>
                 )}
                 
                 {serviceType === 'maturity' && (
                   <>
-                    <FileUploadButton fieldName="maturityClaimForm" label="Maturity Claim Form" />
-                    <FileUploadButton fieldName="bankAccountProof" label="Bank Account Proof" />
+                    <ClaimFileUploadButton fieldName="maturityClaimForm" label="Maturity Claim Form" {...fileUploadSharedProps} />
+                    <ClaimFileUploadButton fieldName="bankAccountProof" label="Bank Account Proof" {...fileUploadSharedProps} />
                     {formData.nomineeBeneficiaryName && (
-                      <FileUploadButton fieldName="nomineeCNIC" label="Nominee CNIC" />
+                      <ClaimFileUploadButton fieldName="nomineeCNIC" label="Nominee CNIC" {...fileUploadSharedProps} />
                     )}
                   </>
                 )}
                 
-                <FileUploadButton fieldName="otherSupportingDocuments" label="Other Supporting Documents" />
+                <ClaimFileUploadButton fieldName="otherSupportingDocuments" label="Other Supporting Documents" {...fileUploadSharedProps} />
               </div>
               
               <div className="flex justify-between gap-3 pt-4">
@@ -1450,62 +1469,62 @@ const SubmitClaim = () => {
                     <h2 className="text-xl font-bold text-gray-900 mb-4">Bank Details <span className="text-red-500">*</span></h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="accountHolderName" className="block text-sm font-medium text-gray-700 mb-1">
                       Account Holder Name <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="accountHolderName"
                       type="text"
                       name="accountHolderName"
                       value={formData.accountHolderName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="bankName" className="block text-sm font-medium text-gray-700 mb-1">
                       Bank Name <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="bankName"
                       type="text"
                       name="bankName"
                       value={formData.bankName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700 mb-1">
                       Account Number <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="accountNumber"
                       type="text"
                       name="accountNumber"
                       value={formData.accountNumber}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
-                    <input
+                    <label htmlFor="iban" className="block text-sm font-medium text-gray-700 mb-1">IBAN</label>
+                    <input id="iban"
                       type="text"
                       name="iban"
                       value={formData.iban}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       placeholder="PKXX XXXX XXXX XXXX XXXX XXXX"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
-                    <input
+                    <label htmlFor="branchName" className="block text-sm font-medium text-gray-700 mb-1">Branch Name</label>
+                    <input id="branchName"
                       type="text"
                       name="branchName"
                       value={formData.branchName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
@@ -1542,8 +1561,8 @@ const SubmitClaim = () => {
                     type="checkbox"
                     name="authorizationToMadadgaar"
                     checked={formData.authorizationToMadadgaar}
-                    onChange={handleChange}
-                    className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                    onChange={updateFormField}
+                    className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                   />
                       <label className="text-sm text-gray-700">
                         I authorize Madadgaar to process my {serviceType} request <span className="text-red-500">*</span>
@@ -1554,8 +1573,8 @@ const SubmitClaim = () => {
                         type="checkbox"
                         name="dataSharingConsent"
                         checked={formData.dataSharingConsent}
-                        onChange={handleChange}
-                        className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                        onChange={updateFormField}
+                        className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                       />
                       <label className="text-sm text-gray-700">
                         I consent to data sharing with insurance company <span className="text-red-500">*</span>
@@ -1566,8 +1585,8 @@ const SubmitClaim = () => {
                         type="checkbox"
                         name="termsAcceptance"
                         checked={formData.termsAcceptance}
-                        onChange={handleChange}
-                        className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                        onChange={updateFormField}
+                        className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                       />
                       <label className="text-sm text-gray-700">
                         I accept the terms and conditions <span className="text-red-500">*</span>

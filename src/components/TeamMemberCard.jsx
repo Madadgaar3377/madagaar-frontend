@@ -25,7 +25,7 @@ const TeamMemberCard = ({ member }) => {
             }}
           />
         ) : null}
-        <div className={`${member.image && member.image !== '/Media/man 1.png' && member.image !== '/Media/man 2.png' && member.image !== '/Media/man 3.png' && member.image !== '/Media/Agent-1.png' ? 'hidden' : 'flex'} w-32 h-32 rounded-full bg-white items-center justify-center text-6xl shadow-lg`}>
+        <div className={`${member.image && member.image !== '/Media/man 1.png' && member.image !== '/Media/man 2.png' && member.image !== '/Media/man 3.png' && member.image !== '/Media/Agent-1.png' ? 'hidden' : 'flex'} size-32 rounded-full bg-white items-center justify-center text-6xl shadow-lg`}>
           {member.icon}
         </div>
       </div>
@@ -69,7 +69,7 @@ const TeamMemberCard = ({ member }) => {
                 href={member.socialLinks.linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 transition transform hover:scale-110"
+                className="size-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-blue-600 flex items-center justify-center text-white hover:bg-blue-700 transition transform hover:scale-110"
                 aria-label="LinkedIn"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" fill="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ const TeamMemberCard = ({ member }) => {
                 href={member.socialLinks.instagram}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-600 hover:to-pink-600 transition transform hover:scale-110"
+                className="size-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white hover:from-purple-600 hover:to-pink-600 transition transform hover:scale-110"
                 aria-label="Instagram"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" fill="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ const TeamMemberCard = ({ member }) => {
                 href={member.socialLinks.facebook}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-blue-900 transition transform hover:scale-110"
+                className="size-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-blue-800 flex items-center justify-center text-white hover:bg-blue-900 transition transform hover:scale-110"
                 aria-label="Facebook"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" fill="currentColor" viewBox="0 0 24 24">
@@ -108,7 +108,7 @@ const TeamMemberCard = ({ member }) => {
                 href={member.socialLinks.github}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-7 h-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-gray-900 transition transform hover:scale-110"
+                className="size-7 sm:w-8 sm:h-8 lg:w-9 lg:h-9 rounded-full bg-gray-800 flex items-center justify-center text-white hover:bg-gray-900 transition transform hover:scale-110"
                 aria-label="GitHub"
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-4.5 lg:h-4.5" fill="currentColor" viewBox="0 0 24 24">

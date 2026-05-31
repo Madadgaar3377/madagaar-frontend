@@ -141,15 +141,15 @@ export default function BlogsPage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-red-600 via-rose-500 to-orange-500 text-white">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute -top-40 -right-40 size-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 size-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
         </div>
 
         <div className="relative container-content max-w-7xl py-16 sm:py-20 lg:py-24">
           <div className="text-center max-w-4xl mx-auto">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full mb-6 border border-white/30">
-              <span className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></span>
+              <span className="size-2 bg-green-300 rounded-full animate-pulse"></span>
               <span className="text-sm font-semibold tracking-wide text-white">Latest Insights</span>
             </div>
 
@@ -205,7 +205,7 @@ export default function BlogsPage() {
               <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300"></div>
               <div className="relative flex items-center">
                 <div className="absolute left-4 text-gray-400 group-focus-within:text-red-500 transition-colors">
-                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
@@ -226,7 +226,7 @@ export default function BlogsPage() {
           {/* Category Pills */}
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm font-semibold text-gray-700 mr-2">Filter by:</span>
-            <button
+            <button type="button"
               onClick={() => {
                 setSelectedCategory("");
                 setPage(1);
@@ -240,7 +240,7 @@ export default function BlogsPage() {
               All Articles
             </button>
             {categories.map((c) => (
-              <button
+              <button type="button"
                 key={c}
                 onClick={() => {
                   setSelectedCategory(c);
@@ -256,7 +256,7 @@ export default function BlogsPage() {
               </button>
             ))}
             {(search || selectedCategory) && (
-              <button
+              <button type="button"
                 onClick={() => {
                   setSearch("");
                   setSelectedCategory("");
@@ -292,13 +292,13 @@ export default function BlogsPage() {
       <main className="container-content max-w-7xl py-8 sm:py-12">
         {error ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="inline-flex items-center justify-center size-16 bg-red-100 rounded-full mb-4">
+              <svg className="size-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <p className="text-red-600 font-semibold mb-3 text-lg">{error}</p>
-            <button
+            <button type="button"
               onClick={() => window.location.reload()}
               className="btn-primary px-6 py-3 rounded-xl font-semibold"
             >
@@ -307,14 +307,14 @@ export default function BlogsPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gray-100 rounded-full mb-6">
-              <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="inline-flex items-center justify-center size-20 bg-gray-100 rounded-full mb-6">
+              <svg className="size-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-2">No articles found</h3>
             <p className="text-gray-600 mb-6">Try adjusting your search or filters</p>
-            <button
+            <button type="button"
               onClick={() => {
                 setSearch("");
                 setSelectedCategory("");
@@ -345,7 +345,7 @@ export default function BlogsPage() {
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
-                          <svg className="w-16 h-16 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="size-16 text-red-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                           </svg>
                         </div>
@@ -388,7 +388,7 @@ export default function BlogsPage() {
                           className="inline-flex items-center gap-2 text-red-600 font-semibold text-sm hover:text-red-700"
                         >
                           <span>Read Article</span>
-                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                           </svg>
                         </Link>
@@ -407,7 +407,7 @@ export default function BlogsPage() {
                   Showing <span className="font-bold text-gray-900">{(page - 1) * PAGE_SIZE + 1}</span> - <span className="font-bold text-gray-900">{Math.min(page * PAGE_SIZE, filtered.length)}</span> of <span className="font-bold text-gray-900">{filtered.length}</span> articles
                 </div>
                 <div className="flex items-center gap-2">
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-5 py-2.5 rounded-xl font-semibold border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-red-500 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
@@ -417,7 +417,7 @@ export default function BlogsPage() {
                   <div className="px-6 py-2.5 rounded-xl font-bold bg-gradient-to-r from-red-600 to-orange-500 text-white shadow-lg">
                     {page} / {totalPages}
                   </div>
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
                     className="px-5 py-2.5 rounded-xl font-semibold border-2 border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-red-500 hover:text-red-600 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"

@@ -83,7 +83,7 @@ const ApplyInstallment = () => {
     fetchPlanDetails();
   }, [fetchPlanDetails, navigate]);
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -187,7 +187,7 @@ const ApplyInstallment = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full size-16 border-b-4 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Loading plan details...</p>
         </div>
       </div>
@@ -204,13 +204,13 @@ const ApplyInstallment = () => {
             The installment plan you're looking for doesn't exist.
           </p>
           <div className="flex gap-3 justify-center">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
             >
               Go Back
             </button>
-            <button
+            <button type="button"
               onClick={() => navigate('/installments')}
               className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
             >
@@ -234,13 +234,13 @@ const ApplyInstallment = () => {
             This installment plan is missing required information. Please contact support or try another plan.
           </p>
           <div className="flex gap-3 justify-center">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
             >
               Go Back
             </button>
-            <button
+            <button type="button"
               onClick={() => navigate('/installments')}
               className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
             >
@@ -270,11 +270,11 @@ const ApplyInstallment = () => {
         <div className="container-content max-w-5xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back
@@ -326,7 +326,7 @@ const ApplyInstallment = () => {
                 {/* Payment Plan Selector */}
                 {plan.paymentPlans && plan.paymentPlans.length > 0 && (
                   <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                       Select Payment Plan
                     </label>
                     <select
@@ -389,11 +389,11 @@ const ApplyInstallment = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Full Name *
                       </label>
-                      <input
+                      <input id="name"
                         type="text"
                         name="name"
                         value={formData.name}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         disabled
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
@@ -401,14 +401,14 @@ const ApplyInstallment = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email *
                       </label>
-                      <input
+                      <input id="email"
                         type="email"
                         name="email"
                         value={formData.email}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         disabled
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
@@ -416,14 +416,14 @@ const ApplyInstallment = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
                         Phone Number *
                       </label>
-                      <input
+                      <input id="phone"
                         type="tel"
                         name="phone"
                         value={formData.phone}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="+92 300 1234567"
@@ -431,14 +431,14 @@ const ApplyInstallment = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                         City *
                       </label>
-                      <input
+                      <input id="city"
                         type="text"
                         name="city"
                         value={formData.city}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="Enter your city"
@@ -446,13 +446,13 @@ const ApplyInstallment = () => {
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
                         Address *
                       </label>
-                      <textarea
+                      <textarea id="address"
                         name="address"
                         value={formData.address}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         rows="2"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -461,28 +461,28 @@ const ApplyInstallment = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-2">
                         State/Province
                       </label>
-                      <input
+                      <input id="state"
                         type="text"
                         name="state"
                         value={formData.state}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., Punjab, Sindh"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="zip" className="block text-sm font-medium text-gray-700 mb-2">
                         Postal Code
                       </label>
-                      <input
+                      <input id="zip"
                         type="text"
                         name="zip"
                         value={formData.zip}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., 54000"
                       />
@@ -495,69 +495,69 @@ const ApplyInstallment = () => {
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Employment Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 mb-2">
                         Occupation
                       </label>
-                      <input
+                      <input id="occupation"
                         type="text"
                         name="occupation"
                         value={formData.occupation}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., Software Engineer"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-2">
                         Job Title
                       </label>
-                      <input
+                      <input id="jobTitle"
                         type="text"
                         name="jobTitle"
                         value={formData.jobTitle}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., Senior Developer"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="employerName" className="block text-sm font-medium text-gray-700 mb-2">
                         Employer Name
                       </label>
-                      <input
+                      <input id="employerName"
                         type="text"
                         name="employerName"
                         value={formData.employerName}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="Company name"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="workContactNumber" className="block text-sm font-medium text-gray-700 mb-2">
                         Work Contact Number
                       </label>
-                      <input
+                      <input id="workContactNumber"
                         type="tel"
                         name="workContactNumber"
                         value={formData.workContactNumber}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="+92 300 1234567"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="employerAddress" className="block text-sm font-medium text-gray-700 mb-2">
                         Employer Address
                       </label>
-                      <textarea
+                      <textarea id="employerAddress"
                         name="employerAddress"
                         value={formData.employerAddress}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         rows="2"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="Company address"
@@ -571,28 +571,28 @@ const ApplyInstallment = () => {
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="monthlyIncome" className="block text-sm font-medium text-gray-700 mb-2">
                         Monthly Income
                       </label>
-                      <input
+                      <input id="monthlyIncome"
                         type="number"
                         name="monthlyIncome"
                         value={formData.monthlyIncome}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., 50000"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="otherIncomeSources" className="block text-sm font-medium text-gray-700 mb-2">
                         Other Income Sources
                       </label>
-                      <input
+                      <input id="otherIncomeSources"
                         type="text"
                         name="otherIncomeSources"
                         value={formData.otherIncomeSources}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                         placeholder="e.g., Freelancing, Business"
                       />
@@ -604,13 +604,13 @@ const ApplyInstallment = () => {
                 <div className="p-6 border-b border-gray-200">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="applicationNote" className="block text-sm font-medium text-gray-700 mb-2">
                       Application Notes (Optional)
                     </label>
-                    <textarea
+                    <textarea id="applicationNote"
                       name="applicationNote"
                       value={formData.applicationNote}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       placeholder="Any additional information you'd like to share..."
@@ -635,12 +635,12 @@ const ApplyInstallment = () => {
                     >
                       {loading ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
                           Submitting...
                         </>
                       ) : (
                         <>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           Submit Application

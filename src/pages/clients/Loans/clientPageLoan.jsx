@@ -217,7 +217,7 @@ export default function LoansPage() {
               <span className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-gray-400 text-xs sm:text-sm">⌕</span>
             </div>
 
-            <button
+            <button type="button"
               onClick={() => navigate("/loan/apply")}
               className="hidden sm:inline-flex items-center gap-2 rounded-full px-4 py-2 btn-primary"
             >
@@ -225,7 +225,7 @@ export default function LoansPage() {
             </button>
 
             {/* mobile quick action */}
-            <button
+            <button type="button"
               onClick={() => navigate("/loan/apply")}
               className="sm:hidden inline-flex items-center justify-center rounded-full p-2 btn-primary min-h-touch min-w-touch"
               aria-label="Apply for loan"
@@ -285,7 +285,7 @@ export default function LoansPage() {
             </div>
 
             <div className="flex items-end">
-              <button
+              <button type="button"
                 onClick={() => {
                   setSelectedCategory("");
                   setSelectedFinancingType("");
@@ -438,7 +438,7 @@ export default function LoansPage() {
             </div>
 
             <div className="flex items-center gap-1 sm:gap-2 flex-wrap justify-center">
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
                 className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
@@ -447,7 +447,7 @@ export default function LoansPage() {
                 First
               </button>
 
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className={`px-3 py-1 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
@@ -465,7 +465,7 @@ export default function LoansPage() {
                   if (start > maxStart) start = maxStart;
                   const page = start + i;
                   return (
-                    <button
+                    <button type="button"
                       key={page}
                       onClick={() => setCurrentPage(page)}
                       aria-current={page === currentPage ? "page" : undefined}
@@ -477,7 +477,7 @@ export default function LoansPage() {
                 })}
               </div>
 
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className={`px-3 py-1 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
@@ -486,7 +486,7 @@ export default function LoansPage() {
                 Next
               </button>
 
-              <button
+              <button type="button"
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
                 className={`px-3 py-1 rounded-md border disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200`}
@@ -506,8 +506,8 @@ export default function LoansPage() {
             <p className="text-sm text-gray-600">We’ll match you with the right plan and help with documentation.</p>
           </div>
           <div className="flex gap-3">
-            <button onClick={() => navigate("/contact")} className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200 min-h-touch">Contact Us</button>
-            <button onClick={() => navigate("/loan/apply")} className="btn-primary px-4 py-2 rounded-lg">Start Application</button>
+            <button type="button" onClick={() => navigate("/contact")} className="px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-red-200 min-h-touch">Contact Us</button>
+            <button type="button" onClick={() => navigate("/loan/apply")} className="btn-primary px-4 py-2 rounded-lg">Start Application</button>
           </div>
         </div>
         </AnimatedSection>

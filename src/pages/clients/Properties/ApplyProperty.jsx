@@ -104,7 +104,7 @@ const ApplyProperty = () => {
     fetchPropertyDetails();
   }, [fetchPropertyDetails, navigate]);
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -200,7 +200,7 @@ const ApplyProperty = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full size-16 border-b-4 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Loading property details...</p>
         </div>
       </div>
@@ -217,13 +217,13 @@ const ApplyProperty = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Property Not Found</h2>
             <p className="text-gray-600 mb-6">The property you're looking for doesn't exist.</p>
             <div className="flex gap-3 justify-center">
-              <button
+              <button type="button"
                 onClick={() => navigate(-1)}
                 className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
               >
                 Go Back
               </button>
-              <button
+              <button type="button"
                 onClick={() => navigate('/properties')}
                 className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
               >
@@ -255,11 +255,11 @@ const ApplyProperty = () => {
         <div className="container-content max-w-5xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back
@@ -330,42 +330,42 @@ const ApplyProperty = () => {
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
                         Full Name *
                       </label>
-                      <input
+                      <input id="name"
                         type="text"
                         name="name"
                         value={formData.name}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                         Email *
                       </label>
-                      <input
+                      <input id="email"
                         type="email"
                         name="email"
                         value={formData.email}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="number" className="block text-sm font-medium text-gray-700 mb-2">
                         Phone Number *
                       </label>
-                      <input
+                      <input id="number"
                         type="tel"
                         name="number"
                         value={formData.number}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         placeholder="+92 300 1234567"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -373,28 +373,28 @@ const ApplyProperty = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="whatsApp" className="block text-sm font-medium text-gray-700 mb-2">
                         WhatsApp Number
                       </label>
-                      <input
+                      <input id="whatsApp"
                         type="tel"
                         name="whatsApp"
                         value={formData.whatsApp}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         placeholder="+92 300 1234567"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="cnic" className="block text-sm font-medium text-gray-700 mb-2">
                         CNIC Number *
                       </label>
-                      <input
+                      <input id="cnic"
                         type="text"
                         name="cnic"
                         value={formData.cnic}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         placeholder="12345-1234567-1"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -402,42 +402,42 @@ const ApplyProperty = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
                         City *
                       </label>
-                      <input
+                      <input id="city"
                         type="text"
                         name="city"
                         value={formData.city}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         required
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="area" className="block text-sm font-medium text-gray-700 mb-2">
                         Area
                       </label>
-                      <input
+                      <input id="area"
                         type="text"
                         name="area"
                         value={formData.area}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         placeholder="Area/Locality"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label htmlFor="reference" className="block text-sm font-medium text-gray-700 mb-2">
                         Reference
                       </label>
-                      <input
+                      <input id="reference"
                         type="text"
                         name="reference"
                         value={formData.reference}
-                        onChange={handleChange}
+                        onChange={updateFormField}
                         placeholder="How did you hear about us?"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
@@ -451,7 +451,7 @@ const ApplyProperty = () => {
                   <textarea
                     name="applicationNote"
                     value={formData.applicationNote}
-                    onChange={handleChange}
+                    onChange={updateFormField}
                     rows="4"
                     placeholder="Any additional information you'd like to share about your property interest..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -475,12 +475,12 @@ const ApplyProperty = () => {
                     >
                       {loading ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                          <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
                           Submitting...
                         </>
                       ) : (
                         <>
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           Submit Application

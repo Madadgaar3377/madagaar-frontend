@@ -454,7 +454,7 @@ export default function InstallmentPlans() {
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 sm:w-6 sm:h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
@@ -538,7 +538,7 @@ export default function InstallmentPlans() {
                 </select>
 
                 {/* Filter Button */}
-                <button 
+                <button type="button" 
                   onClick={() => setShowFilters(!showFilters)}
                   className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 min-h-[44px] ${
                     showFilters 
@@ -547,14 +547,14 @@ export default function InstallmentPlans() {
                   }`}
                   aria-label={showFilters ? "Hide filters" : "Show more filters"}
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                   </svg>
                   <span>{showFilters ? "Hide" : "More"} Filters</span>
                 </button>
 
                 {/* Reset Button */}
-                <button 
+                <button type="button" 
                   onClick={() => { 
                     setSearchDraft("");
                     setAppliedSearch("");
@@ -572,7 +572,7 @@ export default function InstallmentPlans() {
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-[rgb(183,36,42)] hover:bg-red-700 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 flex items-center justify-center gap-2 min-h-[44px]"
                   aria-label="Reset all filters"
                 >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   </svg>
                   <span>Reset All</span>
@@ -655,7 +655,7 @@ export default function InstallmentPlans() {
                               className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-gray-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition min-h-[44px]"
                             />
                             {(priceMin || priceMax) && (
-                              <button
+                              <button type="button"
                                 onClick={() => { setPriceMin(""); setPriceMax(""); setPage(1); }}
                                 className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition min-h-[44px]"
                               >
@@ -739,7 +739,7 @@ export default function InstallmentPlans() {
                               className="flex-1 px-3 sm:px-4 py-2 sm:py-2.5 border-2 border-gray-200 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition min-h-[44px]"
                             />
                             {(monthlyMin || monthlyMax) && (
-                              <button
+                              <button type="button"
                                 onClick={() => { setMonthlyMin(""); setMonthlyMax(""); setPage(1); }}
                                 className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition min-h-[44px]"
                               >
@@ -823,7 +823,7 @@ export default function InstallmentPlans() {
 
                     <div className="flex items-center justify-between gap-2 text-xs sm:text-sm min-w-0">
                       <div className="flex items-center gap-1 sm:gap-2 text-gray-600 min-w-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="size-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         <span className="font-medium truncate">{plan.city || "N/A"}</span>
                       </div>
                     </div>
@@ -869,7 +869,7 @@ export default function InstallmentPlans() {
                       )}
                       {hasFinance && (
                         <div className="text-[9px] sm:text-[10px] text-blue-600 mt-1 pt-1 border-t border-blue-200 flex items-center gap-1">
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                           </svg>
                           <span className="font-semibold">Bank Finance Available</span>
@@ -908,7 +908,7 @@ export default function InstallmentPlans() {
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
-                <button 
+                <button type="button" 
                   onClick={goToPreviousApiPage} 
                   disabled={loadingMore || apiPage === 1} 
                   className="px-4 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-300 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] hover:bg-red-50 transition-all font-semibold active:scale-95"
@@ -918,7 +918,7 @@ export default function InstallmentPlans() {
                 <div className="px-4 sm:px-6 py-2 sm:py-2.5 text-sm sm:text-base bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white rounded-xl font-bold shadow-sm">
                   {apiPage} / {apiTotalPages}
                 </div>
-                <button 
+                <button type="button" 
                   onClick={goToNextApiPage} 
                   disabled={loadingMore || apiPage === apiTotalPages} 
                   className="px-4 sm:px-5 py-2 sm:py-2.5 text-sm sm:text-base border-2 border-gray-300 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:border-[rgb(183,36,42)] hover:text-[rgb(183,36,42)] hover:bg-red-50 transition-all font-semibold active:scale-95"

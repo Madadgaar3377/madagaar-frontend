@@ -168,7 +168,7 @@ export default function AdminInstallment() {
               ))}
             </select>
 
-            <button onClick={() => { setSearch(""); setSelectedCity(""); setSelectedCategory(""); setPage(1); }} className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">Reset</button>
+            <button type="button" onClick={() => { setSearch(""); setSelectedCity(""); setSelectedCategory(""); setPage(1); }} className="px-3 py-2 text-sm text-gray-600 hover:text-gray-900">Reset</button>
           </div>
           </div>
         </header>
@@ -207,7 +207,7 @@ export default function AdminInstallment() {
 
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <div className="flex items-center gap-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v4a1 1 0 001 1h16M3 7a2 2 0 012-2h14a2 2 0 012 2M7 11V7m10 4V7M8 21h8" /></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v4a1 1 0 001 1h16M3 7a2 2 0 012-2h14a2 2 0 012 2M7 11V7m10 4V7M8 21h8" /></svg>
                         <span>{plan.city || "N/A"}</span>
                       </div>
 
@@ -250,9 +250,9 @@ export default function AdminInstallment() {
               </div>
 
               <div className="flex items-center gap-2">
-                <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
+                <button type="button" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1 border rounded disabled:opacity-50">Prev</button>
                 <div className="px-3 py-1 border rounded bg-white">Page {page} / {totalPages}</div>
-                <button onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
+                <button type="button" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page === totalPages} className="px-3 py-1 border rounded disabled:opacity-50">Next</button>
               </div>
             </div>
           </>
@@ -283,10 +283,10 @@ export default function AdminInstallment() {
                   {/* carousel controls */}
                   {openPlan.productImages && openPlan.productImages.length > 1 && (
                     <>
-                      <button onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow">
+                      <button type="button" onClick={prevImage} className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow">
                         ‹
                       </button>
-                      <button onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow">
+                      <button type="button" onClick={nextImage} className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 p-2 rounded-full shadow">
                         ›
                       </button>
                     </>
@@ -300,7 +300,7 @@ export default function AdminInstallment() {
                       <div className="text-sm text-gray-500 mt-1">{openPlan.companyName || openPlan.companyNameOther || ""} • {openPlan.category}</div>
                     </div>
                     <div>
-                      <button onClick={closeDetails} className="text-gray-500 px-2 py-1 hover:text-gray-700">Close ✕</button>
+                      <button type="button" onClick={closeDetails} className="text-gray-500 px-2 py-1 hover:text-gray-700">Close ✕</button>
                     </div>
                   </div>
 
@@ -329,7 +329,7 @@ export default function AdminInstallment() {
                     <div className="mt-4 border-t pt-3">
                       <h4 className="text-sm font-semibold mb-2">Seller</h4>
                       <div className="flex items-center gap-3">
-                        <div className="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium">
+                        <div className="size-12 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium">
                           {openPlan.user?.fullName?.charAt(0)?.toUpperCase() || "A"}
                         </div>
                         <div>

@@ -125,7 +125,7 @@ export default function InfoBoxes() {
                     loading="lazy"
                   />
                   {/* Icon Badge */}
-                  <div className="absolute -top-3 -right-3 bg-red-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl shadow-lg">
+                  <div className="absolute -top-3 -right-3 bg-red-600 text-white size-12 rounded-full flex items-center justify-center text-2xl shadow-lg">
                     {box.icon}
                   </div>
                 </div>

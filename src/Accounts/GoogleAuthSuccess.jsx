@@ -8,6 +8,7 @@ export default function GoogleAuthSuccess() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let redirectTimer;
     const token = searchParams.get("token");
     const userId = searchParams.get("userId");
     const name = searchParams.get("name");
@@ -34,7 +35,7 @@ export default function GoogleAuthSuccess() {
         toast.success("Google Login Successful!");
         
         // Redirect to dashboard or home
-        setTimeout(() => {
+        redirectTimer = setTimeout(() => {
           window.location.href = "/";
         }, 1000);
       } catch (error) {
@@ -46,11 +47,14 @@ export default function GoogleAuthSuccess() {
       toast.error("Authentication failed or was cancelled.");
       navigate("/account?error=no_token");
     }
+    return () => {
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
   }, [searchParams, navigate]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
-      <div className="w-12 h-12 border-4 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
+      <div className="size-12 border-4 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin mb-4 mx-auto"></div>
       <h2 className="text-xl font-semibold text-gray-800">Finalizing Google Sign-in...</h2>
       <p className="text-gray-500 mt-2">Please wait while we secure your session.</p>
     </div>

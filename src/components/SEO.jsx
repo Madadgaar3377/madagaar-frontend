@@ -61,6 +61,7 @@ const SEO = ({
     },
     sameAs: [
       'https://madadgaar.com.pk',
+      'https://play.google.com/store/apps/details?id=com.madadgaarexpert.app',
     ],
     founder: [
       {

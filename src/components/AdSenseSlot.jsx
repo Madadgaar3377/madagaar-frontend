@@ -20,8 +20,8 @@ export default function AdSenseSlot({
 }) {
   const adRef = useRef(null);
   const observerRef = useRef(null);
+  const hasPushedRef = useRef(false);
   const [isVisible, setIsVisible] = useState(!lazy);
-  const [hasPushed, setHasPushed] = useState(false);
 
   const mergedStyle = useMemo(
     () => ({ display: "block", textAlign, ...(style || {}) }),
@@ -60,27 +60,27 @@ export default function AdSenseSlot({
   }, [lazy]);
 
   useEffect(() => {
-    if (!isVisible || hasPushed || !adRef.current || !isBrowser) return;
+    if (!isVisible || hasPushedRef.current || !adRef.current || !isBrowser) return;
 
     const adElement = adRef.current;
     if (adElement.getAttribute("data-adsbygoogle-status") === "done") {
-      setHasPushed(true);
+      hasPushedRef.current = true;
       return;
     }
 
     if (adElement.dataset.adsRendered === "1") {
-      setHasPushed(true);
+      hasPushedRef.current = true;
       return;
     }
 
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       adElement.dataset.adsRendered = "1";
-      setHasPushed(true);
+      hasPushedRef.current = true;
     } catch (error) {
       // AdSense can throw when blocked; fail silently.
     }
-  }, [isVisible, hasPushed]);
+  }, [isVisible]);
 
   return (
     <div className={`${minHeightClass} ${className}`.trim()}>

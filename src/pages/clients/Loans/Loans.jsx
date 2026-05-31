@@ -78,6 +78,7 @@ export default function LoansPage() {
   // fetch data from server — uses backend `query` param if debouncedQuery present
   useEffect(() => {
     let mounted = true;
+    let logoutTimer;
     async function fetchLoans() {
       setLoading(true);
       setError("");
@@ -113,7 +114,7 @@ export default function LoansPage() {
           // optional: force logout if 401
           if (res.status === 401) {
             // token probably expired — clear and redirect to login
-            setTimeout(() => logout("/account"), 1200);
+            logoutTimer = setTimeout(() => logout("/account"), 1200);
           }
           setLoans([]);
           setLoading(false);
@@ -142,6 +143,7 @@ export default function LoansPage() {
     fetchLoans();
     return () => {
       mounted = false;
+      if (logoutTimer) clearTimeout(logoutTimer);
     };
   }, [apiUrl, debouncedQuery, searchType, isAdmin]);
 
@@ -209,7 +211,7 @@ export default function LoansPage() {
                 className="px-4 py-2 border rounded-md w-64"
               />
               {searchValue && (
-                <button
+                <button type="button"
                   onClick={() => setSearchValue("")}
                   className="absolute right-1 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-600"
                 >
@@ -218,7 +220,7 @@ export default function LoansPage() {
               )}
             </div>
 
-            <button
+            <button type="button"
               onClick={() => {
                 setSearchValue("");
                 setDebouncedQuery("");
@@ -229,7 +231,7 @@ export default function LoansPage() {
               Reset
             </button>
 
-            <button
+            <button type="button"
               onClick={handleExportVisible}
               className="px-3 py-2 rounded-md bg-[rgb(183,36,42)] text-white text-sm"
             >
@@ -244,7 +246,7 @@ export default function LoansPage() {
             <div className="py-12 text-center">
               <p className="text-red-600 font-semibold mb-3">Unauthorized</p>
               <p className="text-sm text-gray-600 mb-4">You must be an admin to view loan submissions.</p>
-              <button onClick={() => window.location.href = "/"} className="px-4 py-2 rounded bg-white border">Go home</button>
+              <button type="button" onClick={() => window.location.href = "/"} className="px-4 py-2 rounded bg-white border">Go home</button>
             </div>
           ) : loading ? (
             <div className="py-12 text-center text-gray-500">Loading loan forms…</div>
@@ -285,7 +287,7 @@ export default function LoansPage() {
                         <td className="px-4 py-3 text-gray-700">{formatDate(row.createdAt)}</td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <button
+                            <button type="button"
                               onClick={() => setOpenLoan(row)}
                               className="px-3 py-1.5 text-xs rounded-md bg-white border"
                             >
@@ -318,7 +320,7 @@ export default function LoansPage() {
                     ))}
                   </select>
 
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                     disabled={page === 1}
                     className="px-3 py-1 rounded border disabled:opacity-50"
@@ -328,7 +330,7 @@ export default function LoansPage() {
 
                   <div className="px-3 py-1 text-sm border rounded bg-gray-50">Page {page} / {totalPages}</div>
 
-                  <button
+                  <button type="button"
                     onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                     disabled={page === totalPages}
                     className="px-3 py-1 rounded border disabled:opacity-50"
@@ -354,7 +356,7 @@ export default function LoansPage() {
                   <h2 className="text-xl font-bold">{openLoan.name ?? openLoan.fullName ?? "Loan Application"}</h2>
                   <div className="text-sm text-gray-500">ID: {openLoan._id ?? openLoan._idStr}</div>
                 </div>
-                <button onClick={() => setOpenLoan(null)} className="text-gray-500">Close ✕</button>
+                <button type="button" onClick={() => setOpenLoan(null)} className="text-gray-500">Close ✕</button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -394,7 +396,7 @@ export default function LoansPage() {
               <div className="mt-6 flex items-center gap-2">
                 <a href={`mailto:${openLoan.email || ""}`} className="px-3 py-2 rounded bg-[rgb(183,36,42)] text-white text-sm">Email</a>
                 <a href={`tel:${openLoan.phone || openLoan.number || ""}`} className="px-3 py-2 rounded border text-sm">Call</a>
-                <button onClick={() => {
+                <button type="button" onClick={() => {
                   navigator.clipboard?.writeText(openLoan._id ?? openLoan._idStr ?? "");
                   alert("ID copied");
                 }} className="px-3 py-2 rounded border text-sm">Copy ID</button>

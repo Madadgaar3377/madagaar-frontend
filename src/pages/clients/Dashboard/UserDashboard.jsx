@@ -232,7 +232,7 @@ const UserDashboard = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full size-16 border-b-4 border-red-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Loading your dashboard...</p>
         </div>
       </div>
@@ -246,7 +246,7 @@ const UserDashboard = () => {
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Error Loading Dashboard</h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <button
+          <button type="button"
             onClick={fetchDashboardData}
             className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
           >
@@ -285,14 +285,14 @@ const UserDashboard = () => {
                   Manage your applications and track your progress
                 </p>
               </div>
-              <button
+              <button type="button"
                 onClick={handleRefresh}
                 disabled={refreshing}
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition disabled:opacity-50"
                 title="Refresh data"
               >
                 <svg 
-                  className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+                  className={`size-4 ${refreshing ? 'animate-spin' : ''}`}
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -315,7 +315,7 @@ const UserDashboard = () => {
                   <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{totalApplications}</p>
                 </div>
                 <div className="bg-red-100 rounded-full p-3">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-6 sm:w-8 sm:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
@@ -329,7 +329,7 @@ const UserDashboard = () => {
                   <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{installments.length}</p>
                 </div>
                 <div className="bg-blue-100 rounded-full p-3">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-6 sm:w-8 sm:h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
@@ -343,7 +343,7 @@ const UserDashboard = () => {
                   <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{properties.length}</p>
                 </div>
                 <div className="bg-green-100 rounded-full p-3">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                   </svg>
                 </div>
@@ -357,7 +357,7 @@ const UserDashboard = () => {
                   <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{loans.length}</p>
                 </div>
                 <div className="bg-purple-100 rounded-full p-3">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-6 sm:w-8 sm:h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
@@ -371,7 +371,7 @@ const UserDashboard = () => {
                   <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">{insurance.length}</p>
                 </div>
                 <div className="bg-amber-100 rounded-full p-3">
-                  <svg className="w-6 h-6 sm:w-8 sm:h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-6 sm:w-8 sm:h-8 text-amber-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
                 </div>
@@ -384,7 +384,7 @@ const UserDashboard = () => {
           <div className="bg-white rounded-lg shadow-md mb-6">
             <div className="border-b border-gray-200 overflow-x-auto">
               <nav className="flex -mb-px">
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('overview')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'overview'
@@ -394,7 +394,7 @@ const UserDashboard = () => {
                 >
                   Overview
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('installments')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'installments'
@@ -404,7 +404,7 @@ const UserDashboard = () => {
                 >
                   Installments ({installments.length})
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('properties')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'properties'
@@ -414,7 +414,7 @@ const UserDashboard = () => {
                 >
                   Properties ({properties.length})
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('loans')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'loans'
@@ -424,7 +424,7 @@ const UserDashboard = () => {
                 >
                   Loans ({loans.length})
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('insurance')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'insurance'
@@ -434,7 +434,7 @@ const UserDashboard = () => {
                 >
                   Insurance ({insurance.length})
                 </button>
-                <button
+                <button type="button"
                   onClick={() => setActiveTab('profile')}
                   className={`px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium whitespace-nowrap border-b-2 transition-colors ${
                     activeTab === 'profile'
@@ -455,25 +455,25 @@ const UserDashboard = () => {
                   
                   {totalApplications === 0 ? (
                     <div className="text-center py-12">
-                      <svg className="w-16 h-16 sm:w-24 sm:h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-16 sm:w-24 sm:h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
                       <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">No Applications Yet</h3>
                       <p className="text-gray-500 mb-6">Start by applying for properties, loans, or installment plans</p>
                       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <button
+                        <button type="button"
                           onClick={() => navigate('/properties')}
                           className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
                         >
                           Browse Properties
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => navigate('/loans')}
                           className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
                         >
                           Apply for Loan
                         </button>
-                        <button
+                        <button type="button"
                           onClick={() => navigate('/installments')}
                           className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
                         >
@@ -554,7 +554,7 @@ const UserDashboard = () => {
                   {installments.length === 0 ? (
                     <div className="text-center py-12">
                       <p className="text-gray-500 mb-4">No installment applications found</p>
-                      <button
+                      <button type="button"
                         onClick={() => navigate('/installments')}
                         className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
                       >
@@ -579,27 +579,27 @@ const UserDashboard = () => {
                             const rowPlan = getStoredPlanInfo(item);
                             return (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                              <td className="p-4 whitespace-nowrap text-sm font-medium text-blue-600">
                                 #{item.applicationId || 'N/A'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {rowPlan?.planType || item.productName || item.planName || 'Installment Plan'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-900">
                                 {formatCurrency(rowPlan?.planPrice ?? item.amount ?? item.price)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                              <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(item.createdAt)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
-                                <button
+                              <td className="p-4 whitespace-nowrap text-sm">
+                                <button type="button"
                                   onClick={() => handleViewDetails(item)}
                                   className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition"
                                 >
-                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                   </svg>
@@ -623,7 +623,7 @@ const UserDashboard = () => {
                   {properties.length === 0 ? (
                     <div className="text-center py-12">
                       <p className="text-gray-500 mb-4">No property applications found</p>
-                      <button
+                      <button type="button"
                         onClick={() => navigate('/properties')}
                         className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
                       >
@@ -644,16 +644,16 @@ const UserDashboard = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                           {properties.map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {item.propertyName || item.title || 'Property'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-900">
                                 {formatCurrency(item.budget || item.price)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                              <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(item.createdAt)}
                               </td>
                             </tr>
@@ -672,7 +672,7 @@ const UserDashboard = () => {
                   {loans.length === 0 ? (
                     <div className="text-center py-12">
                       <p className="text-gray-500 mb-4">No loan applications found</p>
-                      <button
+                      <button type="button"
                         onClick={() => navigate('/loans')}
                         className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
                       >
@@ -693,16 +693,16 @@ const UserDashboard = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                           {loans.map((item, index) => (
                             <tr key={index} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 {item.loanType || 'Loan Application'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-900">
                                 {formatCurrency(item.loanAmount || item.amount)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                              <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(item.createdAt)}
                               </td>
                             </tr>
@@ -744,22 +744,22 @@ const UserDashboard = () => {
                         <tbody className="bg-white divide-y divide-gray-200">
                           {insurance.map((item, index) => (
                             <tr key={item._id || index} className="hover:bg-gray-50">
-                              <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-amber-700">
+                              <td className="p-4 whitespace-nowrap text-sm font-medium text-amber-700">
                                 #{item.applicationId || item._id || 'N/A'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-900">
                                 {item.planName || 'Insurance plan'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-700">
                                 {item.policyType || '—'}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                              <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-500">
                                 {formatDate(item.createdAt)}
                               </td>
-                              <td className="px-4 py-4 whitespace-nowrap text-sm">
+                              <td className="p-4 whitespace-nowrap text-sm">
                                 {item.planId ? (
                                   <button
                                     type="button"
@@ -830,11 +830,11 @@ const UserDashboard = () => {
                 <h2 className="text-xl sm:text-2xl font-bold">Application Details</h2>
                 <p className="text-sm text-red-100 mt-1">Application ID: #{selectedApplication.applicationId || 'N/A'}</p>
               </div>
-              <button
+              <button type="button"
                 onClick={closeDetailsModal}
                 className="text-white hover:bg-red-800 rounded-full p-2 transition"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="size-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -872,7 +872,7 @@ const UserDashboard = () => {
                 return (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                       </svg>
                       Plan You Applied For
@@ -982,7 +982,7 @@ const UserDashboard = () => {
               {/* Personal Information */}
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   Personal Information
@@ -1035,7 +1035,7 @@ const UserDashboard = () => {
               ) && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     Employment Information
@@ -1076,7 +1076,7 @@ const UserDashboard = () => {
               ) && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Financial Information
@@ -1100,7 +1100,7 @@ const UserDashboard = () => {
               {selectedApplication.applicationNote && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                     </svg>
                     Application Notes
@@ -1115,7 +1115,7 @@ const UserDashboard = () => {
               {(selectedApplication.agentDetails || selectedApplication.assigenAgent) && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
                     Assigned Agent
@@ -1174,7 +1174,7 @@ const UserDashboard = () => {
                 return (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                       </svg>
                       Partner / Company
@@ -1191,7 +1191,7 @@ const UserDashboard = () => {
               {selectedApplication.approval && selectedApplication.approval.length > 0 && (
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Approval Information
@@ -1216,7 +1216,7 @@ const UserDashboard = () => {
 
             {/* Modal Footer */}
             <div className="sticky bottom-0 bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
-              <button
+              <button type="button"
                 onClick={closeDetailsModal}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium"
               >

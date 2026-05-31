@@ -184,7 +184,7 @@ const ApplyInsurance = () => {
     };
   }, [id, fetchPlanDetails, navigate, submitted]); // Removed showError from dependencies
 
-  const handleChange = (e) => {
+  const updateFormField = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -436,7 +436,7 @@ const ApplyInsurance = () => {
         <Toast toasts={toasts} onClose={removeToast} />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-red-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full size-16 border-b-4 border-red-600 mx-auto mb-4"></div>
             <p className="text-gray-600 text-lg">Loading insurance plan details...</p>
             <p className="text-gray-500 text-sm mt-2">Please wait...</p>
           </div>
@@ -455,13 +455,13 @@ const ApplyInsurance = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Insurance Plan Not Found</h2>
             <p className="text-gray-600 mb-6">The insurance plan you're looking for doesn't exist or could not be loaded.</p>
             <div className="flex gap-3 justify-center">
-              <button
+              <button type="button"
                 onClick={() => navigate(-1)}
                 className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
               >
                 Go Back
               </button>
-              <button
+              <button type="button"
                 onClick={() => navigate('/insurance')}
                 className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
               >
@@ -494,11 +494,11 @@ const ApplyInsurance = () => {
         <div className="container-content">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
-            <button
+            <button type="button"
               onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               Back
@@ -586,7 +586,7 @@ const ApplyInsurance = () => {
                         step.number === currentStep ? 'text-red-600 font-semibold' : 
                         step.number < currentStep ? 'text-green-600' : 'text-gray-400'
                       }`}>
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${
+                        <div className={`size-6 rounded-full flex items-center justify-center text-xs ${
                           step.number === currentStep ? 'bg-red-600 text-white' : 
                           step.number < currentStep ? 'bg-green-500 text-white' : 'bg-gray-200'
                         }`}>
@@ -613,28 +613,28 @@ const ApplyInsurance = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
                       Full Name <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="fullName"
                       type="text"
                       name="fullName"
                       value={formData.fullName}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="cnic" className="block text-sm font-medium text-gray-700 mb-1">
                       CNIC Number <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="cnic"
                       type="text"
                       name="cnic"
                       value={formData.cnic}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       placeholder="XXXXX-XXXXXXX-X"
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -642,40 +642,40 @@ const ApplyInsurance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
                       Mobile Number
                     </label>
-                    <input
+                    <input id="mobileNumber"
                       type="tel"
                       name="mobileNumber"
                       value={formData.mobileNumber}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       placeholder="03XX-XXXXXXX"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                       Email
                     </label>
-                    <input
+                    <input id="email"
                       type="email"
                       name="email"
                       value={formData.email}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="residentialAddress" className="block text-sm font-medium text-gray-700 mb-1">
                       Residential Address <span className="text-red-500">*</span>
                     </label>
-                    <textarea
+                    <textarea id="residentialAddress"
                       name="residentialAddress"
                       value={formData.residentialAddress}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       rows={3}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
@@ -683,27 +683,27 @@ const ApplyInsurance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                       City <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <input id="city"
                       type="text"
                       name="city"
                       value={formData.city}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       required
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="preferredContactMethod" className="block text-sm font-medium text-gray-700 mb-1">
                       Preferred Contact Method
                     </label>
-                    <select
+                    <select id="preferredContactMethod"
                       name="preferredContactMethod"
                       value={formData.preferredContactMethod}
-                      onChange={handleChange}
+                      onChange={updateFormField}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     >
                       <option value="Call">Call</option>
@@ -739,10 +739,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Life Insurance Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Nominee Name
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.lifeInsurance?.nomineeName || ''}
                           onChange={(e) => handlePolicyDetailChange('lifeInsurance', 'nomineeName', e.target.value)}
@@ -750,10 +750,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Relationship with Nominee
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.lifeInsurance?.relationshipWithNominee || ''}
                           onChange={(e) => handlePolicyDetailChange('lifeInsurance', 'relationshipWithNominee', e.target.value)}
@@ -762,10 +762,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Sum Assured (PKR)
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.lifeInsurance?.sumAssured || ''}
                           onChange={(e) => handlePolicyDetailChange('lifeInsurance', 'sumAssured', parseFloat(e.target.value) || '')}
@@ -773,10 +773,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Beneficiary CNIC
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.lifeInsurance?.beneficiaryCNIC || ''}
                           onChange={(e) => handlePolicyDetailChange('lifeInsurance', 'beneficiaryCNIC', e.target.value)}
@@ -794,10 +794,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Health Insurance Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Insured Person Name
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.healthInsurance?.insuredPersonName || ''}
                           onChange={(e) => handlePolicyDetailChange('healthInsurance', 'insuredPersonName', e.target.value)}
@@ -805,10 +805,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Relationship
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.healthInsurance?.relationship || ''}
                           onChange={(e) => handlePolicyDetailChange('healthInsurance', 'relationship', e.target.value)}
@@ -817,10 +817,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Age
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.healthInsurance?.age || ''}
                           onChange={(e) => handlePolicyDetailChange('healthInsurance', 'age', parseInt(e.target.value) || '')}
@@ -828,10 +828,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Pre-existing Conditions
                         </label>
-                        <textarea
+                        <textarea id="authorizationToMadadgaar"
                           value={formData.policySpecificDetails.healthInsurance?.preExistingConditions || ''}
                           onChange={(e) => handlePolicyDetailChange('healthInsurance', 'preExistingConditions', e.target.value)}
                           rows={3}
@@ -849,10 +849,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Motor Insurance Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Vehicle Type
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.motorInsurance?.vehicleType || ''}
                           onChange={(e) => handlePolicyDetailChange('motorInsurance', 'vehicleType', e.target.value)}
@@ -861,10 +861,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Vehicle Model
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.motorInsurance?.vehicleModel || ''}
                           onChange={(e) => handlePolicyDetailChange('motorInsurance', 'vehicleModel', e.target.value)}
@@ -873,10 +873,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Registration Number
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.motorInsurance?.vehicleRegistrationNumber || ''}
                           onChange={(e) => handlePolicyDetailChange('motorInsurance', 'vehicleRegistrationNumber', e.target.value)}
@@ -884,10 +884,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Year of Manufacture
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.motorInsurance?.yearOfManufacture || ''}
                           onChange={(e) => handlePolicyDetailChange('motorInsurance', 'yearOfManufacture', parseInt(e.target.value) || '')}
@@ -897,10 +897,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Driving License Number
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.motorInsurance?.drivingLicenseNumber || ''}
                           onChange={(e) => handlePolicyDetailChange('motorInsurance', 'drivingLicenseNumber', e.target.value)}
@@ -917,10 +917,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Travel Insurance Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Travel Start Date
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="date"
                           value={formData.policySpecificDetails.travelInsurance?.travelStartDate || ''}
                           onChange={(e) => handlePolicyDetailChange('travelInsurance', 'travelStartDate', e.target.value)}
@@ -928,10 +928,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Travel End Date
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="date"
                           value={formData.policySpecificDetails.travelInsurance?.travelEndDate || ''}
                           onChange={(e) => handlePolicyDetailChange('travelInsurance', 'travelEndDate', e.target.value)}
@@ -939,10 +939,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Destination Country
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.travelInsurance?.destinationCountry || ''}
                           onChange={(e) => handlePolicyDetailChange('travelInsurance', 'destinationCountry', e.target.value)}
@@ -950,10 +950,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Destination City
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.travelInsurance?.destinationCity || ''}
                           onChange={(e) => handlePolicyDetailChange('travelInsurance', 'destinationCity', e.target.value)}
@@ -961,10 +961,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Traveler Age
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.travelInsurance?.travelerAge || ''}
                           onChange={(e) => handlePolicyDetailChange('travelInsurance', 'travelerAge', parseInt(e.target.value) || '')}
@@ -981,10 +981,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Property Insurance Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Property Type
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.propertyInsurance?.propertyType || ''}
                           onChange={(e) => handlePolicyDetailChange('propertyInsurance', 'propertyType', e.target.value)}
@@ -993,10 +993,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Estimated Property Value (PKR)
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.propertyInsurance?.estimatedPropertyValue || ''}
                           onChange={(e) => handlePolicyDetailChange('propertyInsurance', 'estimatedPropertyValue', parseFloat(e.target.value) || '')}
@@ -1004,10 +1004,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Property Address
                         </label>
-                        <textarea
+                        <textarea id="authorizationToMadadgaar"
                           value={formData.policySpecificDetails.propertyInsurance?.propertyAddress || ''}
                           onChange={(e) => handlePolicyDetailChange('propertyInsurance', 'propertyAddress', e.target.value)}
                           rows={3}
@@ -1024,10 +1024,10 @@ const ApplyInsurance = () => {
                     <h3 className="font-semibold text-gray-900 mb-3">Takaful Details</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Participant Name
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.takaful?.participantName || ''}
                           onChange={(e) => handlePolicyDetailChange('takaful', 'participantName', e.target.value)}
@@ -1035,10 +1035,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Contribution Amount (PKR)
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="number"
                           value={formData.policySpecificDetails.takaful?.contributionAmount || ''}
                           onChange={(e) => handlePolicyDetailChange('takaful', 'contributionAmount', parseFloat(e.target.value) || '')}
@@ -1046,10 +1046,10 @@ const ApplyInsurance = () => {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-1">
                           Beneficiary Nominee
                         </label>
-                        <input
+                        <input id="authorizationToMadadgaar"
                           type="text"
                           value={formData.policySpecificDetails.takaful?.beneficiaryNominee || ''}
                           onChange={(e) => handlePolicyDetailChange('takaful', 'beneficiaryNominee', e.target.value)}
@@ -1062,9 +1062,9 @@ const ApplyInsurance = () => {
                             type="checkbox"
                             checked={formData.policySpecificDetails.takaful?.shariahComplianceAgreement || false}
                             onChange={(e) => handlePolicyDetailChange('takaful', 'shariahComplianceAgreement', e.target.checked)}
-                            className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                            className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                           />
-                          <label className="text-sm text-gray-700">
+                          <label htmlFor="authorizationToMadadgaar" className="text-sm text-gray-700">
                             I agree to Shariah compliance terms and conditions
                           </label>
                         </div>
@@ -1098,10 +1098,10 @@ const ApplyInsurance = () => {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Required Documents</h2>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="authorizationToMadadgaar" className="block text-sm font-medium text-gray-700 mb-2">
                     CNIC Copy <span className="text-red-500">*</span>
                   </label>
-                  <input
+                  <input id="authorizationToMadadgaar"
                     ref={cnicFileInputRef}
                     type="file"
                     accept="image/*,application/pdf"
@@ -1116,19 +1116,19 @@ const ApplyInsurance = () => {
                   >
                     {uploadingCNIC ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-red-600"></div>
+                        <div className="animate-spin rounded-full size-5 border-b-2 border-red-600"></div>
                         <span>Uploading...</span>
                       </>
                     ) : formData.cnicCopy ? (
                       <>
-                        <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="size-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>CNIC Copy Uploaded</span>
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="size-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         <span>Upload CNIC Copy</span>
@@ -1144,7 +1144,7 @@ const ApplyInsurance = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Additional Documents (Optional)
                   </label>
-                  <input
+                  <input id="authorizationToMadadgaar"
                     ref={documentFileInputRef}
                     type="file"
                     accept="image/*,application/pdf"
@@ -1159,12 +1159,12 @@ const ApplyInsurance = () => {
                   >
                     {uploadingDocuments ? (
                       <>
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-600"></div>
+                        <div className="animate-spin rounded-full size-5 border-b-2 border-gray-600"></div>
                         <span>Uploading...</span>
                       </>
                     ) : (
                       <>
-                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="size-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                         </svg>
                         <span>Upload Additional Documents</span>
@@ -1182,7 +1182,7 @@ const ApplyInsurance = () => {
                             onClick={() => removeDocument(index)}
                             className="ml-2 text-red-600 hover:text-red-700"
                           >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                             </svg>
                           </button>
@@ -1222,8 +1222,8 @@ const ApplyInsurance = () => {
                       type="checkbox"
                       name="authorizationToMadadgaar"
                       checked={formData.authorizationToMadadgaar}
-                      onChange={handleChange}
-                      className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                      onChange={updateFormField}
+                      className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                     />
                     <label className="text-sm text-gray-700">
                       I authorize Madadgaar to process my insurance application <span className="text-red-500">*</span>
@@ -1235,8 +1235,8 @@ const ApplyInsurance = () => {
                       type="checkbox"
                       name="dataSharingConsent"
                       checked={formData.dataSharingConsent}
-                      onChange={handleChange}
-                      className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                      onChange={updateFormField}
+                      className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                     />
                     <label className="text-sm text-gray-700">
                       I consent to data sharing with insurance company <span className="text-red-500">*</span>
@@ -1248,8 +1248,8 @@ const ApplyInsurance = () => {
                       type="checkbox"
                       name="termsAcceptance"
                       checked={formData.termsAcceptance}
-                      onChange={handleChange}
-                      className="mt-1 w-5 h-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                      onChange={updateFormField}
+                      className="mt-1 size-5 text-red-600 border-gray-300 rounded focus:ring-red-500"
                     />
                     <label className="text-sm text-gray-700">
                       I accept the terms and conditions <span className="text-red-500">*</span>

@@ -73,7 +73,7 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
         className={btnClass}
         aria-label="Share"
       >
-        <svg className={compact ? "w-4 h-4" : "w-5 h-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className={compact ? "size-4" : "size-5"} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
         </svg>
         Share
@@ -95,7 +95,7 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
                 className="p-2 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
                 aria-label="Close"
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -115,10 +115,10 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
                   className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition text-left"
                 >
                   <span
-                    className="flex items-center justify-center w-10 h-10 rounded-full text-white shrink-0"
+                    className="flex items-center justify-center size-10 rounded-full text-white shrink-0"
                     style={{ backgroundColor: opt.color }}
                   >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="size-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d={opt.icon} />
                     </svg>
                   </span>
@@ -130,8 +130,8 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
                 onClick={handleNativeShare}
                 className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition text-left"
               >
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-600 text-white shrink-0">
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span className="flex items-center justify-center size-10 rounded-full bg-gray-600 text-white shrink-0">
+                  <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
                 </span>
@@ -142,13 +142,13 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
                 onClick={handleCopyLink}
                 className={`w-full flex items-center gap-4 p-3 rounded-xl transition text-left ${copySuccess ? "bg-green-50" : "hover:bg-gray-50"}`}
               >
-                <span className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${copySuccess ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}>
+                <span className={`flex items-center justify-center size-10 rounded-full shrink-0 ${copySuccess ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}>
                   {copySuccess ? (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                   )}

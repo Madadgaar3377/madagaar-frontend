@@ -256,7 +256,7 @@ const FAQPage = () => {
                 const isExpanded = expandedItems[key];
                 return (
                   <div key={index} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <button
+                    <button type="button"
                       onClick={() => toggleFAQ('general', index)}
                       className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-expanded={isExpanded}
@@ -265,7 +265,7 @@ const FAQPage = () => {
                         {faq.question}
                       </h3>
                       <svg
-                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                        className={`size-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
                           isExpanded ? 'rotate-180' : 'rotate-0'
                         }`}
                         fill="none"
@@ -299,7 +299,7 @@ const FAQPage = () => {
                 const isExpanded = expandedItems[key];
                 return (
                   <div key={index} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <button
+                    <button type="button"
                       onClick={() => toggleFAQ('property', index)}
                       className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-expanded={isExpanded}
@@ -308,7 +308,7 @@ const FAQPage = () => {
                         {faq.question}
                       </h3>
                       <svg
-                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                        className={`size-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
                           isExpanded ? 'rotate-180' : 'rotate-0'
                         }`}
                         fill="none"
@@ -342,7 +342,7 @@ const FAQPage = () => {
                 const isExpanded = expandedItems[key];
                 return (
                   <div key={index} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <button
+                    <button type="button"
                       onClick={() => toggleFAQ('loan', index)}
                       className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-expanded={isExpanded}
@@ -351,7 +351,7 @@ const FAQPage = () => {
                         {faq.question}
                       </h3>
                       <svg
-                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                        className={`size-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
                           isExpanded ? 'rotate-180' : 'rotate-0'
                         }`}
                         fill="none"
@@ -385,7 +385,7 @@ const FAQPage = () => {
                 const isExpanded = expandedItems[key];
                 return (
                   <div key={index} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <button
+                    <button type="button"
                       onClick={() => toggleFAQ('installment', index)}
                       className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-expanded={isExpanded}
@@ -394,7 +394,7 @@ const FAQPage = () => {
                         {faq.question}
                       </h3>
                       <svg
-                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                        className={`size-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
                           isExpanded ? 'rotate-180' : 'rotate-0'
                         }`}
                         fill="none"
@@ -428,7 +428,7 @@ const FAQPage = () => {
                 const isExpanded = expandedItems[key];
                 return (
                   <div key={index} className="bg-white rounded-lg sm:rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                    <button
+                    <button type="button"
                       onClick={() => toggleFAQ('insurance', index)}
                       className="w-full flex items-center justify-between gap-3 sm:gap-4 p-4 sm:p-6 text-left focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                       aria-expanded={isExpanded}
@@ -437,7 +437,7 @@ const FAQPage = () => {
                         {faq.question}
                       </h3>
                       <svg
-                        className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
+                        className={`size-5 sm:w-6 sm:h-6 flex-shrink-0 transition-transform duration-300 text-gray-500 ${
                           isExpanded ? 'rotate-180' : 'rotate-0'
                         }`}
                         fill="none"

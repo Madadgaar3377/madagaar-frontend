@@ -173,7 +173,7 @@ export default function LoginPage() {
 
           <div className="flex items-center justify-between mb-4">
             <label className="flex items-center gap-2 text-sm">
-              <input type="checkbox" className="h-4 w-4 rounded border-gray-300" />
+              <input type="checkbox" className="size-4 rounded border-gray-300" />
               <span className="text-gray-600">Remember me</span>
             </label>
 
@@ -198,7 +198,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <button
+        <button type="button"
           onClick={() => window.location.href = `${apiUrl.replace(/\/api$/, "")}/auth/google`}
           className="w-full flex items-center justify-center gap-3 py-2.5 px-4 border border-gray-200 rounded-lg bg-white text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm"
         >
