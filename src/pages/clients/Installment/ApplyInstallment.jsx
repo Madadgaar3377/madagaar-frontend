@@ -10,6 +10,8 @@ import {
   resolveEntryCashPrice,
   formatApplyEntryLabel,
   findApplyEntryIndex,
+  cashOfferKey,
+  findCashOfferByKey,
   isPartnerOwnedVariant,
   isCashOnlyInstallment,
 } from '../../../utils/installmentPricing';
@@ -25,6 +27,8 @@ const ApplyInstallment = () => {
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
   const [selectedEntryIdx, setSelectedEntryIdx] = useState(0);
+  /** Which partner cash offer (when no installment plan on variant) */
+  const [selectedCashOfferKey, setSelectedCashOfferKey] = useState('');
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -99,6 +103,23 @@ const ApplyInstallment = () => {
     [plan, selectedVariantIndex]
   );
 
+  const variantCashOffers = useMemo(() => {
+    if (selectedVariantIndex === null || selectedVariantIndex === undefined || !plan) {
+      return [];
+    }
+    return buildPartnerCashOffers(plan, { variantIndex: selectedVariantIndex });
+  }, [plan, selectedVariantIndex]);
+
+  const needsCashPartnerPick =
+    selectedVariantIndex !== null &&
+    planEntries.length === 0 &&
+    variantCashOffers.length > 0;
+
+  const selectedCashOffer = useMemo(
+    () => findCashOfferByKey(variantCashOffers, selectedCashOfferKey),
+    [variantCashOffers, selectedCashOfferKey]
+  );
+
   useEffect(() => {
     if (!plan) return;
     if (variantCount === 1 && selectedVariantIndex === null) {
@@ -121,25 +142,37 @@ const ApplyInstallment = () => {
     }
   }, [planEntries, selectedVariantIndex, selectedPlanIndex]);
 
+  useEffect(() => {
+    if (!needsCashPartnerPick) {
+      setSelectedCashOfferKey('');
+      return;
+    }
+    const stillValid = variantCashOffers.some(
+      (o) => cashOfferKey(o) === selectedCashOfferKey
+    );
+    if (!stillValid && variantCashOffers.length > 0) {
+      setSelectedCashOfferKey(cashOfferKey(variantCashOffers[0]));
+    }
+  }, [needsCashPartnerPick, variantCashOffers, selectedCashOfferKey]);
+
   const selectedEntry = planEntries[selectedEntryIdx] || null;
   const selectedPlan = selectedEntry?.plan || null;
   const selectedVariant =
     selectedVariantIndex !== null ? plan?.variants?.[selectedVariantIndex] : null;
-  const summaryCashPrice = selectedEntry
+  const summaryCashPrice = selectedPlan
     ? resolveEntryCashPrice(plan, selectedEntry)
-    : 0;
-  const resolvedPartnerName = (() => {
-    if (selectedPlan?.companyName) return selectedPlan.companyName;
-    const pid = selectedPlan?.partnerId || selectedVariant?.partnerId;
-    if (pid && plan) {
-      const offer = buildPartnerCashOffers(plan, {
-        variantIndex: selectedVariantIndex,
-      }).find((o) => String(o.partnerId) === String(pid));
-      if (offer?.companyName && offer.companyName !== 'Partner') return offer.companyName;
-    }
-    return plan?.companyName || plan?.companyNameOther || 'Partner';
-  })();
-  const partnerLogo = selectedPlan?.companyLogo || '';
+    : Number(selectedCashOffer?.price) || 0;
+  const resolvedPartnerName = selectedPlan?.companyName
+    || selectedCashOffer?.companyName
+    || plan?.companyName
+    || plan?.companyNameOther
+    || 'Partner';
+  const resolvedPartnerId =
+    selectedPlan?.partnerId ||
+    selectedCashOffer?.partnerId ||
+    selectedVariant?.partnerId ||
+    '';
+  const partnerLogo = selectedPlan?.companyLogo || selectedCashOffer?.companyLogo || '';
   const cashOnlyPlan = selectedPlan && isCashOnlyInstallment(selectedPlan.monthlyInstallment);
 
   const handleVariantChange = (vIdx) => {
@@ -147,6 +180,7 @@ const ApplyInstallment = () => {
     setSelectedVariantIndex(next);
     setSelectedPlanIndex(0);
     setSelectedEntryIdx(0);
+    setSelectedCashOfferKey('');
   };
 
   const handleEntryChange = (idx) => {
@@ -189,6 +223,11 @@ const ApplyInstallment = () => {
       return false;
     }
 
+    if (needsCashPartnerPick && !selectedCashOffer) {
+      showError('Please select which partner cash price you want to apply for.');
+      return false;
+    }
+
     return true;
   };
 
@@ -213,8 +252,12 @@ const ApplyInstallment = () => {
 
       const applicationData = {
         installmentPlanId: planId,
-        selectedPlanIndex: selectedPlanIndex,
-        selectedVariantIndex: selectedVariantIndex, // Pass the variant index
+        selectedPlanIndex: selectedPlan ? selectedPlanIndex : undefined,
+        selectedVariantIndex: selectedVariantIndex,
+        applyForCashOnly: Boolean(!selectedPlan && selectedCashOffer),
+        selectedPartnerId: selectedCashOffer?.partnerId || selectedPlan?.partnerId || undefined,
+        selectedCashPrice: selectedCashOffer?.price || undefined,
+        selectedPartnerCompanyName: selectedCashOffer?.companyName || selectedPlan?.companyName || undefined,
         applicationNote: formData.applicationNote,
         userInfo: {
           address: formData.address,
@@ -428,13 +471,59 @@ const ApplyInstallment = () => {
                   </p>
                 )}
 
-                {showVariantPicker && selectedVariantIndex !== null && planEntries.length === 0 && (
+                {needsCashPartnerPick && (
+                  <div className="mb-4">
+                    <label htmlFor="apply-cash-partner" className="block text-sm font-medium text-gray-700 mb-2">
+                      Select partner cash price *
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Multiple partners offer this variant at different cash prices. Choose the offer you want to apply for.
+                    </p>
+                    <select
+                      id="apply-cash-partner"
+                      value={selectedCashOfferKey}
+                      onChange={(e) => setSelectedCashOfferKey(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    >
+                      {variantCashOffers.map((o) => (
+                        <option key={cashOfferKey(o)} value={cashOfferKey(o)}>
+                          {o.companyName} — PKR {Number(o.price).toLocaleString()}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="mt-3 space-y-2">
+                      {variantCashOffers.map((o) => {
+                        const key = cashOfferKey(o);
+                        const active = key === selectedCashOfferKey;
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            onClick={() => setSelectedCashOfferKey(key)}
+                            className={`w-full text-left px-3 py-2.5 rounded-lg border-2 transition-all text-sm ${
+                              active
+                                ? 'border-[rgb(183,36,42)] bg-red-50'
+                                : 'border-gray-200 bg-white hover:border-gray-300'
+                            }`}
+                          >
+                            <span className="font-semibold text-gray-900">{o.companyName}</span>
+                            <span className="block text-[rgb(183,36,42)] font-bold mt-0.5">
+                              PKR {Number(o.price).toLocaleString()}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {showVariantPicker && selectedVariantIndex !== null && planEntries.length === 0 && !needsCashPartnerPick && (
                   <p className="text-sm text-blue-800 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-4">
-                    No installment plan for this variant yet. You can still apply for cash pricing — our team will contact you.
+                    No cash or installment pricing for this variant yet. Try another specification.
                   </p>
                 )}
 
-                {(selectedPlan || (selectedVariantIndex !== null && selectedVariant)) && (
+                {(selectedPlan || selectedCashOffer || (selectedVariantIndex !== null && selectedVariant)) && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
                     {selectedVariant && (
                       <div className="flex justify-between text-sm gap-2">
@@ -456,6 +545,12 @@ const ApplyInstallment = () => {
                         {resolvedPartnerName}
                       </span>
                     </div>
+                    {selectedCashOffer && !selectedPlan && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Application type:</span>
+                        <span className="font-semibold text-gray-900">Cash price request</span>
+                      </div>
+                    )}
                     {selectedPlan && (
                       <>
                         <div className="flex justify-between text-sm">
@@ -510,28 +605,20 @@ const ApplyInstallment = () => {
                         )}
                       </>
                     )}
-                    {!selectedPlan && selectedVariant && summaryCashPrice > 0 && (
+                    {(selectedCashOffer || (!selectedPlan && selectedVariant)) && summaryCashPrice > 0 && (
                       <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Cash price:</span>
-                        <span className="font-semibold text-gray-900">
+                        <span className="text-gray-600">Your selected cash price:</span>
+                        <span className="font-semibold text-[rgb(183,36,42)]">
                           PKR {summaryCashPrice.toLocaleString()}
                         </span>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {selectedVariantIndex !== null && (
-                  <div className="mt-4">
-                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Other partners (cash)</p>
-                    <ul className="space-y-1 max-h-32 overflow-y-auto text-xs text-gray-700">
-                      {buildPartnerCashOffers(plan, { variantIndex: selectedVariantIndex }).map((o, i) => (
-                        <li key={i} className="flex justify-between gap-2">
-                          <span className="truncate">{o.companyName}</span>
-                          <span className="font-semibold shrink-0">PKR {o.price.toLocaleString()}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    {resolvedPartnerId && (
+                      <p className="text-xs text-gray-500 pt-1 border-t border-red-100">
+                        Request will be sent to <strong>{resolvedPartnerName}</strong>
+                        {selectedCashOffer && !selectedPlan ? ' for this cash offer' : ''}.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>

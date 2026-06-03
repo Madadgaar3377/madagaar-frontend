@@ -929,3 +929,15 @@ export function entryToApplyQuery(entry) {
   return `?${params.toString()}`;
 }
 
+/** Stable key for a partner cash offer row in apply UI */
+export function cashOfferKey(offer) {
+  if (!offer) return "";
+  const pid = offer.partnerId != null ? String(offer.partnerId) : "listing";
+  return `${pid}:${offer.price}:${offer.source || ""}`;
+}
+
+export function findCashOfferByKey(offers, key) {
+  if (!key || !offers?.length) return null;
+  return offers.find((o) => cashOfferKey(o) === key) || null;
+}
+
