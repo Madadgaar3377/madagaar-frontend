@@ -12,6 +12,10 @@ import {
   formatTenureDisplay,
   buildPlanEntries,
   collectAllPaymentPlans,
+  buildPartnerCashOffers,
+  resolveEntryCashPrice,
+  getLowestPublicCashPrice,
+  isPartnerOwnedVariant,
 } from "../../../utils/installmentPricing";
 
 const findBestPlanIndex = (paymentPlans, plan = {}) => {
@@ -217,106 +221,25 @@ export default function InstallmentDetail() {
 
   const bestPlanIndex = useMemo(() => findBestPlanIndex(currentPlans, plan), [currentPlans, plan]);
 
-  // Current displayed data based on variant selection
-  const currentPrice = useMemo(() => {
-    const vIdx =
-      effectiveVariantIndex !== null
-        ? effectiveVariantIndex
-        : variantCount === 1
-          ? 0
-          : null;
-    if (vIdx !== null && plan?.variants?.[vIdx]) {
-      const v = plan.variants[vIdx];
-      const base = Number(v.price) || 0;
-      const disc = Math.min(100, Math.max(0, Number(v.discountPercent) || 0));
-      return Math.round(base * (1 - disc / 100)) || base;
-    }
-    return plan?.price || 0;
-  }, [plan, effectiveVariantIndex, variantCount]);
+  const priceVariantIndex = useMemo(() => {
+    if (effectiveVariantIndex !== null) return effectiveVariantIndex;
+    if (variantCount === 1) return 0;
+    return null;
+  }, [effectiveVariantIndex, variantCount]);
 
-  const cashOffers = useMemo(() => {
-    if (!plan) return [];
+  const currentPrice = useMemo(
+    () => getLowestPublicCashPrice(plan, priceVariantIndex),
+    [plan, priceVariantIndex]
+  );
 
-    const safeStr = (v) => (v == null ? "" : String(v));
-    const byKey = new Map();
-
-    const upsert = ({ partnerId, companyName, companyLogo, price, source }) => {
-      const pid = safeStr(partnerId);
-      const key = pid || `__global__:${safeStr(companyName)}`;
-      const next = {
-        partnerId: pid,
-        companyName: companyName || "Partner",
-        companyLogo: companyLogo || "",
-        price: Number(price) || 0,
-        source,
-      };
-      const prev = byKey.get(key);
-      if (!prev) {
-        byKey.set(key, next);
-        return;
-      }
-      // Prefer non-zero price
-      if ((Number(prev.price) || 0) === 0 && next.price > 0) byKey.set(key, next);
-      // Prefer richer metadata
-      if (!prev.companyName && next.companyName) prev.companyName = next.companyName;
-      if (!prev.companyLogo && next.companyLogo) prev.companyLogo = next.companyLogo;
-      byKey.set(key, prev);
-    };
-
-    // Partner-specific base price override entries (new backend feature)
-    if (Array.isArray(plan.partnerPricing)) {
-      for (const pp of plan.partnerPricing) {
-        upsert({
-          partnerId: pp?.partnerId,
-          companyName: null,
-          companyLogo: null,
-          price: pp?.basePrice,
-          source: "partnerBasePrice",
-        });
-      }
-    }
-
-    // Pull any explicit cashPrice overrides from plans
-    const plansToScan = Array.isArray(currentPlans) ? currentPlans : [];
-    for (const p of plansToScan) {
-      const cash = Number(p?.cashPrice) || 0;
-      if (cash > 0) {
-        upsert({
-          partnerId: p?.partnerId,
-          companyName: p?.companyName,
-          companyLogo: p?.companyLogo,
-          price: cash,
-          source: "planCashPrice",
-        });
-      }
-    }
-
-    // Always include the global/base price
-    upsert({
-      partnerId: "",
-      companyName: plan.companyName || plan.companyNameOther || plan.category || "Standard",
-      companyLogo: "",
-      price: Number(currentPrice) || 0,
-      source: "global",
-    });
-
-    // Backfill names/logos using plans (when only partnerPricing exists)
-    for (const p of plansToScan) {
-      const pid = safeStr(p?.partnerId);
-      if (!pid) continue;
-      for (const [key, v] of byKey.entries()) {
-        if (v.partnerId === pid) {
-          if (!v.companyName && p?.companyName) v.companyName = p.companyName;
-          if (!v.companyLogo && p?.companyLogo) v.companyLogo = p.companyLogo;
-          byKey.set(key, v);
-        }
-      }
-    }
-
-    return Array.from(byKey.values())
-      .filter((x) => Number(x.price) > 0)
-      .sort((a, b) => Number(a.price) - Number(b.price));
-  }, [plan, currentPlans, currentPrice]);
+  const cashOffers = useMemo(
+    () =>
+      buildPartnerCashOffers(plan, {
+        variantIndex: priceVariantIndex,
+        currentPlans,
+      }),
+    [plan, currentPlans, priceVariantIndex]
+  );
 
 
 
@@ -502,10 +425,17 @@ export default function InstallmentDetail() {
                 
                 <div className="space-y-3 pt-4 border-t border-gray-200">
                   <div>
-                    <div className="text-xs text-gray-500 mb-1 font-medium">Cash Price</div>
+                    <div className="text-xs text-gray-500 mb-1 font-medium">
+                      {cashOffers.length > 1 ? "From (lowest cash)" : "Cash Price"}
+                    </div>
                     <div className="text-2xl sm:text-3xl font-bold text-[rgb(183,36,42)]">
                       PKR {Number(currentPrice).toLocaleString()}
                     </div>
+                    {cashOffers.length > 1 && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {cashOffers.length} partner{cashOffers.length === 1 ? "" : "s"} — see Cash tab below
+                      </p>
+                    )}
                   </div>
                   {Number(plan.downpayment || 0) > 0 && (
                   <div>
@@ -552,6 +482,11 @@ export default function InstallmentDetail() {
                         }`}
                       >
                         {variant.variantName}
+                        {isPartnerOwnedVariant(variant) && (
+                          <span className="block text-[9px] font-semibold normal-case tracking-normal opacity-80 mt-0.5">
+                            Partner offer
+                          </span>
+                        )}
                       </button>
                     ))}
                   </div>
@@ -685,11 +620,24 @@ export default function InstallmentDetail() {
                           {offer.source === "partnerBasePrice" && (
                             <span className="ml-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">BASE</span>
                           )}
+                          {offer.source === "variantOverride" && (
+                            <span className="ml-auto text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">VARIANT</span>
+                          )}
+                          {offer.source === "partnerVariant" && (
+                            <span className="ml-auto text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full">YOUR SKU</span>
+                          )}
+                          {offer.source === "catalogVariant" && (
+                            <span className="ml-auto text-[10px] font-bold text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">LISTING</span>
+                          )}
                           {offer.source === "planCashPrice" && (
-                            <span className="ml-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">CASH</span>
+                            <span className="ml-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">PLAN</span>
                           )}
                         </div>
-                        <div className="text-xs text-gray-500 mb-1">Cash Price</div>
+                        {offer.variantName ? (
+                          <div className="text-xs text-gray-500 mb-1">{offer.variantName}</div>
+                        ) : (
+                          <div className="text-xs text-gray-500 mb-1">Cash Price</div>
+                        )}
                         <div className="text-xl font-black text-gray-900">PKR {Number(offer.price || 0).toLocaleString()}</div>
                       </div>
                     ))}
@@ -730,7 +678,7 @@ export default function InstallmentDetail() {
                     const idx = planEntries.indexOf(entry);
                     const p = entry.plan;
                     const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
-                    const cashPrice = Number(currentPrice);
+                    const cashPrice = resolveEntryCashPrice(plan, entry);
                     const downPayment = Number(p.downPayment || 0);
                     const financedAmount = Math.max(0, cashPrice - downPayment);
                     const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
@@ -974,7 +922,7 @@ export default function InstallmentDetail() {
                           effectiveVariantIndex === null &&
                           entry.variantIndex !== null &&
                           plan.variants?.[entry.variantIndex]?.variantName;
-                        const cashPrice = Number(currentPrice);
+                        const cashPrice = resolveEntryCashPrice(plan, entry);
                         const downPayment = Number(p.downPayment || 0);
                         const financedAmount = Math.max(0, cashPrice - downPayment);
                         const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);

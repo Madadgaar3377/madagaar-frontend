@@ -13,6 +13,7 @@ import {
   getBestPaymentPlan,
   getInstallmentCardPricing,
   buildInstallmentShareLines,
+  collectAllPaymentPlans,
 } from "../../../utils/installmentPricing";
 
 // Category options - comprehensive list
@@ -320,7 +321,7 @@ export default function InstallmentPlans() {
     return Array.from(setCity).filter(Boolean).sort();
   }, [plans]);
 
-  const getBestPlan = (plan) => getBestPaymentPlan(plan.paymentPlans, plan);
+  const getBestPlan = (plan) => getBestPaymentPlan(collectAllPaymentPlans(plan), plan);
 
   // Get price range from plans for filter limits
   const priceRange = useMemo(() => {
