@@ -26,6 +26,9 @@ export function getStoredPlanInfo(application) {
     cashPrice: a.cashPrice ?? b.cashPrice,
     markup: a.markup ?? b.markup,
     installmentPrice: a.installmentPrice ?? b.installmentPrice,
+    companyName: a.companyName ?? b.companyName,
+    partnerId: a.partnerId ?? b.partnerId,
+    companyLogo: a.companyLogo ?? b.companyLogo,
   };
 }
 
@@ -87,10 +90,22 @@ export function resolveAppliedPlanDisplay(application, catalog) {
     markup: num(stored?.markup) ?? num(p.markup),
     companyName:
       p.companyName ||
+      stored?.companyName ||
+      variantInfo?.companyName ||
       catalog?.companyName ||
       catalog?.companyNameOther ||
       null,
-    partnerId: p.partnerId || catalog?.userId || application?.createdBy || null,
+    partnerId:
+      p.partnerId ||
+      stored?.partnerId ||
+      variantInfo?.partnerId ||
+      application?.createdBy ||
+      catalog?.userId ||
+      null,
+    variantIndex:
+      variantInfo?.variantIndex !== undefined && variantInfo?.variantIndex !== null
+        ? Number(variantInfo.variantIndex)
+        : null,
   };
 }
 

@@ -582,11 +582,30 @@ const UserDashboard = () => {
                               <td className="p-4 whitespace-nowrap text-sm font-medium text-blue-600">
                                 #{item.applicationId || 'N/A'}
                               </td>
-                              <td className="p-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {rowPlan?.planType || item.productName || item.planName || 'Installment Plan'}
+                              <td className="p-4 whitespace-nowrap text-sm text-gray-900">
+                                <span className="font-medium text-gray-900 block">
+                                  {item.variantInfo?.variantName
+                                    ? `${rowPlan?.planType?.split(' — ')[0] || item.productName || 'Product'}`
+                                    : rowPlan?.planType || item.productName || item.planName || 'Installment Plan'}
+                                </span>
+                                {item.variantInfo?.variantName && (
+                                  <span className="text-xs text-[rgb(183,36,42)] block mt-0.5">
+                                    {item.variantInfo.variantName}
+                                  </span>
+                                )}
+                                {(rowPlan?.companyName || item.variantInfo?.companyName) && (
+                                  <span className="text-xs text-gray-500 block mt-0.5">
+                                    {rowPlan?.companyName || item.variantInfo?.companyName}
+                                  </span>
+                                )}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm text-gray-900">
-                                {formatCurrency(rowPlan?.planPrice ?? item.amount ?? item.price)}
+                                {formatCurrency(
+                                  rowPlan?.planPrice ??
+                                    rowPlan?.cashPrice ??
+                                    item.amount ??
+                                    item.price
+                                )}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
@@ -868,7 +887,9 @@ const UserDashboard = () => {
                 const plan = resolveAppliedPlanDisplay(selectedApplication, catalogPlan);
                 const showDown = plan.downPayment != null && Number(plan.downPayment) > 0;
                 const variantLabel =
-                  plan.variantInfo?.variantName || plan.matchedVariant?.variantName;
+                  plan.variantName ||
+                  plan.variantInfo?.variantName ||
+                  plan.matchedVariant?.variantName;
                 return (
                   <div>
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">

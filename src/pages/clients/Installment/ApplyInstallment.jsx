@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getAuthToken, getUser, isAuthenticated } from '../../../utils/auth';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import SEO from '../../../components/SEO';
 import { Toast, useToast } from '../../../components/Toast';
+import {
+  buildPlanEntries,
+  buildPartnerCashOffers,
+  resolveEntryCashPrice,
+  formatApplyEntryLabel,
+  findApplyEntryIndex,
+  isPartnerOwnedVariant,
+  isCashOnlyInstallment,
+} from '../../../utils/installmentPricing';
 
 const ApplyInstallment = () => {
   const { id } = useParams(); // installment plan ID
@@ -15,6 +24,7 @@ const ApplyInstallment = () => {
   const [plan, setPlan] = useState(null);
   const [selectedPlanIndex, setSelectedPlanIndex] = useState(0);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(null);
+  const [selectedEntryIdx, setSelectedEntryIdx] = useState(0);
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -54,7 +64,6 @@ const ApplyInstallment = () => {
         throw new Error('Plan data not found');
       }
 
-      console.log('Fetched plan:', planData); // Debug log
       setPlan(planData);
     } catch (err) {
       console.error('Plan fetch error:', err);
@@ -76,12 +85,79 @@ const ApplyInstallment = () => {
     const params = new URLSearchParams(window.location.search);
     const pIdx = params.get('planIndex');
     const vIdx = params.get('variantIndex');
-    if (pIdx !== null) setSelectedPlanIndex(parseInt(pIdx));
-    if (vIdx !== null) setSelectedVariantIndex(parseInt(vIdx));
+    if (pIdx !== null && !Number.isNaN(Number(pIdx))) setSelectedPlanIndex(parseInt(pIdx, 10));
+    if (vIdx !== null && !Number.isNaN(Number(vIdx))) setSelectedVariantIndex(parseInt(vIdx, 10));
 
-    // Fetch installment plan details
     fetchPlanDetails();
   }, [fetchPlanDetails, navigate]);
+
+  const variantCount = plan?.variants?.length || 0;
+  const showVariantPicker = variantCount > 0;
+
+  const planEntries = useMemo(
+    () => buildPlanEntries(plan, selectedVariantIndex),
+    [plan, selectedVariantIndex]
+  );
+
+  useEffect(() => {
+    if (!plan) return;
+    if (variantCount === 1 && selectedVariantIndex === null) {
+      setSelectedVariantIndex(0);
+    }
+  }, [plan, variantCount, selectedVariantIndex]);
+
+  useEffect(() => {
+    if (!planEntries.length) return;
+    const idx = findApplyEntryIndex(planEntries, selectedVariantIndex, selectedPlanIndex);
+    if (idx >= 0) {
+      setSelectedEntryIdx(idx);
+    } else {
+      setSelectedEntryIdx(0);
+      const first = planEntries[0];
+      setSelectedPlanIndex(first.planIndex);
+      if (first.variantIndex !== null && first.variantIndex !== undefined) {
+        setSelectedVariantIndex(first.variantIndex);
+      }
+    }
+  }, [planEntries, selectedVariantIndex, selectedPlanIndex]);
+
+  const selectedEntry = planEntries[selectedEntryIdx] || null;
+  const selectedPlan = selectedEntry?.plan || null;
+  const selectedVariant =
+    selectedVariantIndex !== null ? plan?.variants?.[selectedVariantIndex] : null;
+  const summaryCashPrice = selectedEntry
+    ? resolveEntryCashPrice(plan, selectedEntry)
+    : 0;
+  const resolvedPartnerName = (() => {
+    if (selectedPlan?.companyName) return selectedPlan.companyName;
+    const pid = selectedPlan?.partnerId || selectedVariant?.partnerId;
+    if (pid && plan) {
+      const offer = buildPartnerCashOffers(plan, {
+        variantIndex: selectedVariantIndex,
+      }).find((o) => String(o.partnerId) === String(pid));
+      if (offer?.companyName && offer.companyName !== 'Partner') return offer.companyName;
+    }
+    return plan?.companyName || plan?.companyNameOther || 'Partner';
+  })();
+  const partnerLogo = selectedPlan?.companyLogo || '';
+  const cashOnlyPlan = selectedPlan && isCashOnlyInstallment(selectedPlan.monthlyInstallment);
+
+  const handleVariantChange = (vIdx) => {
+    const next = vIdx === '' || vIdx === 'all' ? null : Number(vIdx);
+    setSelectedVariantIndex(next);
+    setSelectedPlanIndex(0);
+    setSelectedEntryIdx(0);
+  };
+
+  const handleEntryChange = (idx) => {
+    const entry = planEntries[Number(idx)];
+    if (!entry) return;
+    setSelectedEntryIdx(Number(idx));
+    setSelectedPlanIndex(entry.planIndex);
+    if (entry.variantIndex !== null && entry.variantIndex !== undefined) {
+      setSelectedVariantIndex(entry.variantIndex);
+    }
+  };
 
   const updateFormField = (e) => {
     const { name, value } = e.target;
@@ -99,6 +175,17 @@ const ApplyInstallment = () => {
 
     if (!formData.address || !formData.city) {
       showError('Please provide your address and city');
+      return false;
+    }
+
+    const variantCount = plan?.variants?.length || 0;
+    if (variantCount > 0 && (selectedVariantIndex === null || selectedVariantIndex === undefined)) {
+      showError('Please select a product variant (specification) before submitting.');
+      return false;
+    }
+
+    if (planEntries.length > 0 && !selectedPlan) {
+      showError('Please select a payment plan before submitting.');
       return false;
     }
 
@@ -124,8 +211,6 @@ const ApplyInstallment = () => {
         throw new Error('Plan ID is missing. Please try again.');
       }
 
-      console.log('Submitting application with planId:', planId); // Debug log
-
       const applicationData = {
         installmentPlanId: planId,
         selectedPlanIndex: selectedPlanIndex,
@@ -147,8 +232,6 @@ const ApplyInstallment = () => {
         }
       };
 
-      console.log('Application data:', applicationData); // Debug log
-
       const response = await fetch(`${backendBaseUrl}/applyInstallment`, {
         method: 'POST',
         headers: {
@@ -159,8 +242,6 @@ const ApplyInstallment = () => {
       });
 
       const data = await response.json();
-
-      console.log('Backend response:', data); // Debug log
 
       if (!response.ok || !data.success) {
         // Show detailed error message from backend
@@ -252,11 +333,6 @@ const ApplyInstallment = () => {
     );
   }
 
-  const selectedVariant = selectedVariantIndex !== null ? plan.variants?.[selectedVariantIndex] : null;
-  const selectedPlan = (selectedVariant && selectedVariant.paymentPlans?.length > 0)
-    ? selectedVariant.paymentPlans[selectedPlanIndex]
-    : (plan.paymentPlans?.[selectedPlanIndex] || null);
-
   return (
     <>
       <Toast toasts={toasts} onClose={removeToast} />
@@ -285,24 +361,6 @@ const ApplyInstallment = () => {
             <p className="text-gray-600 mt-2 text-responsive-sm">Complete the form below to apply for this installment plan</p>
           </div>
 
-          {/* Debug Info - Remove in production */}
-          {process.env.NODE_ENV === 'development' && plan && (
-            <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
-              <details>
-                <summary className="cursor-pointer font-semibold">Debug: Plan Object Fields</summary>
-                <pre className="mt-2 text-xs overflow-auto">
-                  {JSON.stringify({
-                    installmentPlanId: plan.installmentPlanId,
-                    _id: plan._id,
-                    productName: plan.productName,
-                    hasPaymentPlans: !!plan.paymentPlans?.length
-                  }, null, 2)}
-                </pre>
-              </details>
-            </div>
-          )}
-
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Plan Summary Sidebar */}
             <div className="lg:col-span-1">
@@ -317,62 +375,163 @@ const ApplyInstallment = () => {
                   />
                 </div>
 
-                <h3 className="font-semibold text-gray-900 mb-2">
-                  {plan.productName} 
-                  {selectedVariant && <span className="text-[rgb(183,36,42)]"> - {selectedVariant.variantName}</span>}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{plan.description}</p>
+                <h3 className="font-semibold text-gray-900 mb-2">{plan.productName}</h3>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  {plan.description || plan.city || 'Installment product'}
+                </p>
 
-                {/* Payment Plan Selector */}
-                {plan.paymentPlans && plan.paymentPlans.length > 0 && (
+                {showVariantPicker && (
                   <div className="mb-4">
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      Select Payment Plan
+                    <label htmlFor="apply-variant" className="block text-sm font-medium text-gray-700 mb-2">
+                      Select variant / specification *
                     </label>
                     <select
-                      value={selectedPlanIndex}
-                      onChange={(e) => setSelectedPlanIndex(parseInt(e.target.value))}
+                      id="apply-variant"
+                      value={selectedVariantIndex === null ? '' : String(selectedVariantIndex)}
+                      onChange={(e) => handleVariantChange(e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
                     >
-                      {(selectedVariant && selectedVariant.paymentPlans?.length > 0 ? selectedVariant.paymentPlans : plan.paymentPlans).map((paymentPlan, index) => (
-                        <option key={index} value={index}>
-                          {paymentPlan.planName} - {paymentPlan.tenureMonths} months
+                      {variantCount > 1 && <option value="">Choose specification…</option>}
+                      {plan.variants.map((v, vIdx) => (
+                        <option key={vIdx} value={vIdx}>
+                          {v.variantName}
+                          {isPartnerOwnedVariant(v) ? ' (Partner offer)' : ''}
                         </option>
                       ))}
                     </select>
                   </div>
                 )}
 
-                {selectedPlan && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Plan:</span>
-                      <span className="font-semibold text-gray-900">{selectedPlan.planName}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Price:</span>
-                      <span className="font-semibold text-gray-900">PKR {(selectedPlan?.installmentPrice || selectedVariant?.price || plan.price || 0).toLocaleString()}</span>
-                    </div>
-                    {Number(selectedPlan.downPayment || 0) > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Down Payment:</span>
-                      <span className="font-semibold text-red-600">PKR {Number(selectedPlan.downPayment).toLocaleString()}</span>
-                    </div>
-                    )}
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Monthly:</span>
-                      <span className="font-semibold text-red-600">PKR {selectedPlan.monthlyInstallment?.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Tenure:</span>
-                      <span className="font-semibold text-gray-900">{selectedPlan.tenureMonths} months</span>
-                    </div>
-                    {selectedPlan.interestRatePercent > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Interest:</span>
-                        <span className="font-semibold text-gray-900">{selectedPlan.interestRatePercent}% {selectedPlan.interestType}</span>
+                {planEntries.length > 0 && (
+                  <div className="mb-4">
+                    <label htmlFor="apply-plan-entry" className="block text-sm font-medium text-gray-700 mb-2">
+                      Select payment plan *
+                    </label>
+                    <select
+                      id="apply-plan-entry"
+                      value={selectedEntryIdx}
+                      onChange={(e) => handleEntryChange(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm"
+                    >
+                      {planEntries.map((entry, idx) => (
+                        <option key={`${entry.variantIndex ?? 'r'}-${entry.planIndex}-${idx}`} value={idx}>
+                          {formatApplyEntryLabel(plan, entry)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {showVariantPicker && selectedVariantIndex === null && (
+                  <p className="text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-4">
+                    Choose a variant to see payment plans and partner pricing for that option.
+                  </p>
+                )}
+
+                {showVariantPicker && selectedVariantIndex !== null && planEntries.length === 0 && (
+                  <p className="text-sm text-blue-800 bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 mb-4">
+                    No installment plan for this variant yet. You can still apply for cash pricing — our team will contact you.
+                  </p>
+                )}
+
+                {(selectedPlan || (selectedVariantIndex !== null && selectedVariant)) && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-3">
+                    {selectedVariant && (
+                      <div className="flex justify-between text-sm gap-2">
+                        <span className="text-gray-600 shrink-0">Variant:</span>
+                        <span className="font-semibold text-gray-900 text-right">
+                          {selectedVariant.variantName}
+                          {isPartnerOwnedVariant(selectedVariant) && (
+                            <span className="block text-xs font-normal text-violet-700">Partner offer</span>
+                          )}
+                        </span>
                       </div>
                     )}
+                    <div className="flex items-center justify-between gap-2 text-sm border-t border-red-100 pt-2">
+                      <span className="text-gray-600">Offered by:</span>
+                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                        {partnerLogo ? (
+                          <img src={partnerLogo} alt="" className="h-5 w-auto object-contain" />
+                        ) : null}
+                        {resolvedPartnerName}
+                      </span>
+                    </div>
+                    {selectedPlan && (
+                      <>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Plan:</span>
+                          <span className="font-semibold text-gray-900">{selectedPlan.planName}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Cash price:</span>
+                          <span className="font-semibold text-gray-900">
+                            PKR {summaryCashPrice.toLocaleString()}
+                          </span>
+                        </div>
+                        {!cashOnlyPlan && Number(selectedPlan.installmentPrice) > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Total payable:</span>
+                            <span className="font-semibold text-gray-900">
+                              PKR {Number(selectedPlan.installmentPrice).toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                        {Number(selectedPlan.downPayment || 0) > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Down payment:</span>
+                            <span className="font-semibold text-red-600">
+                              PKR {Number(selectedPlan.downPayment).toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                        {!cashOnlyPlan && Number(selectedPlan.monthlyInstallment) > 0 && (
+                          <>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Monthly:</span>
+                              <span className="font-semibold text-red-600">
+                                PKR {Number(selectedPlan.monthlyInstallment).toLocaleString()}
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Tenure:</span>
+                              <span className="font-semibold text-gray-900">
+                                {selectedPlan.tenureMonths} months
+                              </span>
+                            </div>
+                          </>
+                        )}
+                        {Number(selectedPlan.interestRatePercent) > 0 && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-gray-600">Rate:</span>
+                            <span className="font-semibold text-gray-900">
+                              {selectedPlan.interestRatePercent}% {selectedPlan.interestType}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                    {!selectedPlan && selectedVariant && summaryCashPrice > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Cash price:</span>
+                        <span className="font-semibold text-gray-900">
+                          PKR {summaryCashPrice.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {selectedVariantIndex !== null && (
+                  <div className="mt-4">
+                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Other partners (cash)</p>
+                    <ul className="space-y-1 max-h-32 overflow-y-auto text-xs text-gray-700">
+                      {buildPartnerCashOffers(plan, { variantIndex: selectedVariantIndex }).map((o, i) => (
+                        <li key={i} className="flex justify-between gap-2">
+                          <span className="truncate">{o.companyName}</span>
+                          <span className="font-semibold shrink-0">PKR {o.price.toLocaleString()}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
