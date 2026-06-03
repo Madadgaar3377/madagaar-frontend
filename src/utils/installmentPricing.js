@@ -96,7 +96,7 @@ export function collectAllPaymentPlans(plan) {
 }
 
 /**
- * Build plan list for UI: All Plans = root + variant plans; one variant = its plans,
+ * Build plan list for UI: null = all root + variant plans; one variant = its plans,
  * or root plans when that variant has none (common when partners attach plans at product level).
  */
 export function buildPlanEntries(plan, selectedVariantIndex) {

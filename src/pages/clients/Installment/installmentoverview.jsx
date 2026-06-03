@@ -184,7 +184,7 @@ export default function InstallmentDetail() {
     () => collectAllPaymentPlans(plan).length,
     [plan]
   );
-  /** Only show All Plans / variant chips when there are 2+ real choices */
+  /** Only show variant filter chips when there are 2+ variants (all plans shown by default). */
   const showVariantPicker = variantCount > 1;
 
   const effectiveVariantIndex = useMemo(() => {
@@ -524,23 +524,25 @@ export default function InstallmentDetail() {
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Select Specification</h3>
                   <p className="text-xs text-gray-500 mb-4">
                     {selectedVariantIndex === null
-                      ? "All Plans shows every payment option. Pick a specification to see plans for that option only."
+                      ? "All payment options are shown below. Pick a specification to filter plans for that option only."
                       : `Showing plans for ${plan.variants[selectedVariantIndex]?.variantName || "this option"}.`}
+                    {selectedVariantIndex !== null && (
+                      <>
+                        {" "}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedVariantIndex(null)}
+                          className="text-[rgb(183,36,42)] font-semibold hover:underline"
+                        >
+                          Show all plans
+                        </button>
+                      </>
+                    )}
                   </p>
                   <div className="flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedVariantIndex(null)}
-                      className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
-                        selectedVariantIndex === null
-                          ? "bg-[rgb(183,36,42)] border-[rgb(183,36,42)] text-white shadow-lg shadow-red-100"
-                          : "bg-gray-50 border-gray-100 text-gray-400 hover:border-gray-200 hover:bg-white"
-                      }`}
-                    >
-                      All Plans
-                    </button>
                     {plan.variants.map((variant, vIdx) => (
-                      <button type="button"
+                      <button
+                        type="button"
                         key={vIdx}
                         onClick={() => setSelectedVariantIndex(vIdx)}
                         className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${
@@ -700,7 +702,15 @@ export default function InstallmentDetail() {
             {pricingView === "installments" && showVariantPicker && selectedVariantIndex !== null && currentPlans.length === 0 && (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 border border-gray-200">
                 <p className="text-sm text-gray-600">
-                  No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet. Select <strong>All Plans</strong> to see every option, or choose another specification.
+                  No installment plans for <strong>{plan.variants[selectedVariantIndex]?.variantName}</strong> yet.{" "}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedVariantIndex(null)}
+                    className="text-[rgb(183,36,42)] font-semibold hover:underline"
+                  >
+                    Show all payment plans
+                  </button>{" "}
+                  or choose another specification.
                 </p>
               </section>
             )}
