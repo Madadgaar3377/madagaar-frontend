@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { getUser } from "../utils/auth";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
 import AnimatedSection from "../components/AnimatedSection";
+import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const location = useLocation();
-  const navigate = useNavigate();
-  const verifiedMessage = location.state?.message || (location.state?.verified ? "Account verified. Please sign in." : null);
+  const router = useRouter();
+  const [navState] = useState(() => consumeNavigationState() || {});
+  const verifiedMessage = navState?.message || (navState?.verified ? "Account verified. Please sign in." : null);
 
   useEffect(() => {
     // Check if user is already logged in
@@ -67,7 +69,7 @@ export default function LoginPage() {
         if (data?.code === "EMAIL_NOT_VERIFIED" && data?.email) {
           const message = data?.message || "Please verify your email before logging in. We've sent you a verification code.";
           toast(message, { icon: "📧", duration: 5000 });
-          navigate("/account/verify-otp", { state: { email: data.email, fromUnverified: true, message } });
+          pushWithState(router, "/account/verify-otp", { email: data.email, fromUnverified: true, message });
           setLoading(false);
           return;
         }
@@ -177,7 +179,7 @@ export default function LoginPage() {
               <span className="text-gray-600">Remember me</span>
             </label>
 
-            <NavLink to="/account/forgot" className="text-sm text-[rgb(183,36,42)] hover:underline">Forgot?</NavLink>
+            <Link href="/account/forgot" className="text-sm text-[rgb(183,36,42)] hover:underline">Forgot?</Link>
           </div>
 
           <button

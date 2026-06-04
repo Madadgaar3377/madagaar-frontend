@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
+import { pushWithState } from "../utils/navigationState";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   function validateEmail(e) {
     return /\S+@\S+\.\S+/.test(e);
@@ -41,7 +42,7 @@ export default function ForgotPassword() {
       } else {
         toast.success(body?.message || "OTP sent to your email. Check your inbox.");
         setTimeout(() => {
-          navigate("/account/reset", { state: { email: email.trim() } });
+          pushWithState(router, "/account/reset", { email: email.trim() });
         }, 1200);
       }
     } catch (err) {
@@ -82,7 +83,7 @@ export default function ForgotPassword() {
 
             <button
               type="button"
-              onClick={() => navigate("/account")}
+              onClick={() => router.push("/account")}
               className="px-4 py-2 rounded-lg border text-sm text-gray-700"
             >
               Back

@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
+import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 
 const OTP_LENGTH = 6;
 
 export default function OtpVerifyPage() {
   const apiUrl = backendBaseUrl.replace(/\/$/, "");
-  const navigate = useNavigate();
-  const location = useLocation();
-  const prefilledEmail = location.state?.email || "";
-  const previousFormData = location.state?.previousFormData || null;
-  const fromUnverified = location.state?.fromUnverified === true;
-  const verifyMessage = location.state?.message || "Please verify your email before logging in. We've sent you a verification code.";
+  const router = useRouter();
+  const [navState] = useState(() => consumeNavigationState() || {});
+  const prefilledEmail = navState?.email || "";
+  const previousFormData = navState?.previousFormData || null;
+  const fromUnverified = navState?.fromUnverified === true;
+  const verifyMessage =
+    navState?.message ||
+    "Please verify your email before logging in. We've sent you a verification code.";
 
   const [email, setEmail] = useState(prefilledEmail);
   const [emailForResend, setEmailForResend] = useState(""); // when no email in state, user types here first
@@ -175,7 +179,10 @@ export default function OtpVerifyPage() {
       toast.success("Account verified successfully! Redirecting to sign in...");
 
       setTimeout(() => {
-        navigate("/account", { state: { verified: true, message: "Account verified. Please sign in." } });
+        pushWithState(router, "/account", {
+          verified: true,
+          message: "Account verified. Please sign in.",
+        });
       }, 1500);
     } catch (err) {
       console.error("OTP verify error:", err);
@@ -217,7 +224,7 @@ export default function OtpVerifyPage() {
           </form>
           <p className="mt-4 text-center text-sm text-gray-500">
             Already have an account?{" "}
-            <Link to="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">Sign In</Link>
+            <Link href="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">Sign In</Link>
           </p>
         </div>
       </div>
@@ -228,7 +235,7 @@ export default function OtpVerifyPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
       <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
         <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
-        {(fromUnverified || location.state?.message) && (
+        {(fromUnverified || navState?.message) && (
           <p className="text-center text-amber-700 text-sm mb-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
             {verifyMessage}
           </p>
@@ -243,7 +250,7 @@ export default function OtpVerifyPage() {
                 {effectiveEmail}
               </div>
               <Link
-                to="/account/register"
+                href="/account/register"
                 state={{
                   previousFormData: previousFormData || { email: effectiveEmail },
                   currentUnverifiedEmail: effectiveEmail,

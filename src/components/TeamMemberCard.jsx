@@ -11,14 +11,14 @@ const TeamMemberCard = ({ member }) => {
   const mailtoLink = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group">
+    <div className="bg-white rounded-xl overflow-hidden shadow-lg interactive-card card-hover-lift group">
       {/* Image Section */}
       <div className={`h-48 bg-gradient-to-br ${member.color} flex items-center justify-center relative overflow-hidden`}>
         {member.image && member.image !== '/Media/man 1.png' && member.image !== '/Media/man 2.png' && member.image !== '/Media/man 3.png' && member.image !== '/Media/Agent-1.png' ? (
           <img 
             src={member.image} 
             alt={member.name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             onError={(e) => {
               e.target.style.display = 'none';
               e.target.nextSibling.style.display = 'flex';
@@ -43,7 +43,7 @@ const TeamMemberCard = ({ member }) => {
         {/* Contact Button */}
         <a
           href={mailtoLink}
-          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs sm:text-sm lg:text-base font-semibold py-2 px-4 sm:py-2.5 sm:px-5 lg:py-3 lg:px-6 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-xs sm:text-sm lg:text-base font-semibold py-2 px-4 sm:py-2.5 sm:px-5 lg:py-3 lg:px-6 rounded-lg btn-smooth shadow-md"
         >
           <svg 
             className="w-3.5 h-3.5 sm:w-4 sm:h-4 lg:w-5 lg:h-5" 

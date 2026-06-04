@@ -1,9 +1,11 @@
 import React, { useState, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X, Phone } from "lucide-react";
 import { SIGNUP_DECLARATIONS } from "../constants/signupDeclarations";
 import toast from "react-hot-toast";
+import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 
 const getInitialDeclarations = () => {
   const obj = {};
@@ -33,11 +35,11 @@ const initialFormData = {
 
 export default function SignupPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const [initialNavState] = useState(() => consumeNavigationState() || {});
 
   const [formData, setFormData] = useState(() => {
-    const prev = location.state?.previousFormData;
+    const prev = initialNavState?.previousFormData;
     if (prev && typeof prev === "object") {
       return {
         ...initialFormData,
@@ -123,7 +125,7 @@ export default function SignupPage() {
       return;
     }
 
-    const currentUnverifiedEmail = location.state?.currentUnverifiedEmail;
+    const currentUnverifiedEmail = initialNavState?.currentUnverifiedEmail;
 
     try {
       // "Change email" flow: update existing unverified account (same data, only email can change). No new account.
@@ -155,8 +157,9 @@ export default function SignupPage() {
         toast.success(data?.message || "Account updated. Check your email for OTP.");
         const emailToVerify = data?.email || formData.email;
         setTimeout(() => {
-          navigate("/account/verify-otp", {
-            state: { email: emailToVerify, previousFormData: { ...formData, email: emailToVerify } },
+          pushWithState(router, "/account/verify-otp", {
+            email: emailToVerify,
+            previousFormData: { ...formData, email: emailToVerify },
           });
         }, 1500);
         setLoading(false);
@@ -187,13 +190,11 @@ export default function SignupPage() {
           (data?.message && String(data.message).toLowerCase().includes("not verified"));
         if (isUnverified) {
           toast.error(data?.message || "Account not verified. Please verify with OTP.");
-          navigate("/account/verify-otp", {
-            state: {
-              email: formData.email,
-              fromUnverified: true,
-              previousFormData: { ...formData },
-              currentUnverifiedEmail: formData.email,
-            },
+          pushWithState(router, "/account/verify-otp", {
+            email: formData.email,
+            fromUnverified: true,
+            previousFormData: { ...formData },
+            currentUnverifiedEmail: formData.email,
           });
           setLoading(false);
           return;
@@ -206,7 +207,7 @@ export default function SignupPage() {
 
       toast.success(data?.message || "Signup successful! Check your email for OTP.");
       setTimeout(() => {
-        navigate("/account/verify-otp", { state: { email: formData.email } });
+        pushWithState(router, "/account/verify-otp", { email: formData.email });
       }, 1500);
     } catch (err) {
       console.error("Signup error:", err);
@@ -421,10 +422,10 @@ export default function SignupPage() {
                         />
                         <label htmlFor={key} className="text-sm text-gray-600 cursor-pointer leading-snug">
                           {isTerms && (
-                            <>I agree to the <Link to="/terms-and-conditions" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link></>
+                            <>I agree to the <Link href="/terms-and-conditions" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Terms & Conditions</Link></>
                           )}
                           {isPrivacy && (
-                            <>I agree to the <Link to="/privacy-policy" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link></>
+                            <>I agree to the <Link href="/privacy-policy" className="text-[rgb(183,36,42)] font-medium hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</Link></>
                           )}
                         </label>
                       </div>
@@ -494,7 +495,7 @@ export default function SignupPage() {
           <div className="px-6 sm:px-8 pb-6 pt-2 text-center border-t border-gray-100">
             <p className="text-gray-500 text-sm">
               Already have an account?{" "}
-              <Link to="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">
+              <Link href="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">
                 Sign in
               </Link>
             </p>

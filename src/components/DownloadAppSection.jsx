@@ -1,25 +1,26 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import AnimatedSection from "./AnimatedSection";
+import StaggerReveal from "./StaggerReveal";
 
 const ACCENT = "rgb(183, 36, 42)";
 
 export default function DownloadAppSection({ delay = 140, className = "w-full" }) {
   return (
     <AnimatedSection animation="fadeInUp" delay={delay} className={className}>
-      <section className="w-full bg-gradient-to-br from-red-50 via-white to-gray-50 section-padding">
+      <section className="w-full bg-gradient-to-br from-red-50 via-white to-gray-50 section-padding overflow-hidden">
         <div className="container-content page-hero">
-          <div className="page-hero-col flex justify-center order-2 lg:order-1">
+          <StaggerReveal animation="fadeInLeft" index={0} staggerMs={0} className="page-hero-col flex justify-center order-2 lg:order-1">
             <img
               src="/Media/mobileAppMockup.png"
               alt="Download Madadgaar mobile app for property, loans, installments and insurance in Pakistan"
               loading="lazy"
-              className="rounded-2xl shadow-lg page-media"
+              className="rounded-2xl shadow-lg page-media interactive-image float-gentle"
             />
-          </div>
-          <div className="page-hero-col space-y-4 sm:space-y-5 order-1 lg:order-2">
+          </StaggerReveal>
+          <StaggerReveal animation="fadeInRight" index={1} staggerMs={0} className="page-hero-col space-y-4 sm:space-y-5 order-1 lg:order-2">
             <span
-              className="inline-block rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold bg-white shadow-sm border border-red-100"
+              className="inline-block rounded-full px-4 py-1.5 text-xs sm:text-sm font-semibold bg-white shadow-sm border border-red-100 transition-shadow duration-300 hover:shadow-md"
               style={{ color: ACCENT }}
             >
               Mobile App
@@ -33,19 +34,19 @@ export default function DownloadAppSection({ delay = 140, className = "w-full" }
               for users in Pakistan.
             </p>
             <ul className="space-y-2 text-sm sm:text-base text-gray-600">
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-2 transition-transform duration-300 hover:translate-x-1">
                 <span style={{ color: ACCENT }} aria-hidden>
                   ✓
                 </span>
                 Property listings &amp; rentals on your phone
               </li>
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-2 transition-transform duration-300 hover:translate-x-1">
                 <span style={{ color: ACCENT }} aria-hidden>
                   ✓
                 </span>
                 Installment plans, loans &amp; insurance in one app
               </li>
-              <li className="flex items-start gap-2">
+              <li className="flex items-start gap-2 transition-transform duration-300 hover:translate-x-1">
                 <span style={{ color: ACCENT }} aria-hidden>
                   ✓
                 </span>
@@ -53,15 +54,15 @@ export default function DownloadAppSection({ delay = 140, className = "w-full" }
               </li>
             </ul>
             <Link
-              to="/download-app"
-              className="btn-primary mt-2 inline-flex items-center gap-2 px-5 py-3 text-sm sm:text-base rounded-full font-semibold"
+              href="/download-app"
+              className="btn-primary btn-smooth mt-2 inline-flex items-center gap-2 px-5 py-3 text-sm sm:text-base rounded-full font-semibold"
             >
               <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M17 1.01 7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z" />
               </svg>
               Download App
             </Link>
-          </div>
+          </StaggerReveal>
         </div>
       </section>
     </AnimatedSection>
