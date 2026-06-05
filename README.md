@@ -11,6 +11,7 @@
   [![React Router](https://img.shields.io/badge/React_Router-7.9.6-CA4245.svg)](https://reactrouter.com/)
   [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.18-38B2AC.svg)](https://tailwindcss.com/)
   [![API](https://img.shields.io/badge/API-api.madadgaar.com.pk-orange.svg)](https://api.madadgaar.com.pk/api)
+  [![Built by Code-XA](https://img.shields.io/badge/Built_by-Code--XA-6C63FF.svg)](https://github.com/code-xa)
   [![License](https://img.shields.io/badge/License-Private-red.svg)]()
 </div>
 
@@ -26,6 +27,7 @@
 | **Production branch** | `main` (Create React App) |
 | **Migration branch** | `nextjs` (Next.js 15 App Router — in progress) |
 | **Repository** | [github.com/Madadgaar3377/madagaar-frontend](https://github.com/Madadgaar3377/madagaar-frontend) |
+| **Designed & developed by** | [Code-XA](https://github.com/code-xa) — [code-xa.web.app](https://code-xa.web.app) |
 | **Last major update** | June 2026 — Installment cash/discount pricing display, dashboard caching, SEO improvements |
 
 ---
@@ -46,6 +48,7 @@
 - [Branches](#branches)
 - [Documentation](#documentation)
 - [Related Panels](#related-panels)
+- [Built By — Code-XA](#built-by--code-xa)
 - [Team & Contact](#team--contact)
 - [License](#license)
 
@@ -438,6 +441,21 @@ This frontend is one part of the Madadgaar platform:
 
 ---
 
+## Built By — Code-XA
+
+This platform is **designed, developed, and maintained** by **[Code-XA](https://github.com/code-xa)** — a technology company focused on building innovative digital products that drive growth and enhance user experience.
+
+| | |
+|--|--|
+| **GitHub** | [github.com/code-xa](https://github.com/code-xa) |
+| **Website** | [code-xa.web.app](https://code-xa.web.app) |
+| **Email** | thecodexaoffical@gmail.com |
+| **Lead engineer** | [Abubakkar Sajid](https://github.com/Innocent-Developer) (@Innocent-Developer) |
+
+**Code-XA** delivered the full Madadgaar ecosystem including this public frontend, admin panel, partner panel, agent panel, and backend API — with ongoing feature work such as installment pricing, multi-vendor plans, dashboard caching, SEO, and the Next.js migration.
+
+---
+
 ## Team & Contact
 
 ### Leadership
@@ -449,11 +467,11 @@ This frontend is one part of the Madadgaar platform:
 
 - **Ayesha** — Head of Marketing & Operations — ayesha@madadgaar.com.pk
 
-### Technology
+### Technology (Code-XA)
 
-- **Abubakkar Sajid** — Head of IT & Innovation | Lead Software Engineer
+- **Abubakkar Sajid** — Head of IT & Innovation | Lead Software Engineer @ [Code-XA](https://github.com/code-xa)
   - abubakkarsajid4@gmail.com | +92 324 185 147 6
-  - [GitHub](https://github.com/Innocent-Developer) · [LinkedIn](https://www.linkedin.com/in/mughal-abubakkar/)
+  - [GitHub](https://github.com/Innocent-Developer) · [LinkedIn](https://www.linkedin.com/in/mughal-abubakkar/) · [Code-XA](https://github.com/code-xa)
 
 ### Company
 
@@ -471,7 +489,9 @@ This frontend is one part of the Madadgaar platform:
 
 Proprietary and confidential. All rights reserved by **Madadgaar Expert Partner**.
 
-© 2024–2026 Madadgaar Expert Partner. Designed & Developed by Code-XA.
+© 2024–2026 Madadgaar Expert Partner.
+
+**Designed & developed by [Code-XA](https://github.com/code-xa)** · [code-xa.web.app](https://code-xa.web.app)
 
 ---
 
@@ -479,4 +499,6 @@ Proprietary and confidential. All rights reserved by **Madadgaar Expert Partner*
   <strong>Built with care in Pakistan</strong>
   <br/><br/>
   <em>v0.1.03 — Live at <a href="https://madadgaar.com.pk">madadgaar.com.pk</a></em>
+  <br/>
+  <em>Developed by <a href="https://github.com/code-xa">Code-XA</a></em>
 </div>
