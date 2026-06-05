@@ -15,77 +15,10 @@ import {
   buildInstallmentShareLines,
   collectAllPaymentPlans,
 } from "../../../utils/installmentPricing";
+import CATEGORY_OPTIONS from "../../../constants/category";
+import SORT_OPTIONS from "../../../constants/sortOption";
 
-// Category options - comprehensive list
-const CATEGORY_OPTIONS = [
-  { value: "", label: "All Categories" },
-  { value: "Laptops", label: "Laptops" },
-  { value: "Desktop Computers", label: "Desktop Computers" },
-  { value: "phones", label: "Phones / Mobile" }, // Legacy support
-  { value: "Tablets", label: "Tablets" },
-  { value: "Projectors", label: "Projectors" },
-  { value: "Printers", label: "Printers" },
-  { value: "Scanners", label: "Scanners" },
-  { value: "CCTV Camera Systems", label: "CCTV Camera Systems" },
-  { value: "Biometric Attendance Machines", label: "Biometric Attendance Machines" },
-  { value: "Access Control Systems", label: "Access Control Systems" },
-  { value: "Gaming Consoles", label: "Gaming Consoles" },
-  { value: "LED / Smart TVs", label: "LED / Smart TVs" },
-  { value: "Home Theatre Systems", label: "Home Theatre Systems" },
-  { value: "Sound Systems / Speakers", label: "Sound Systems / Speakers" },
-  { value: "Smart Watches", label: "Smart Watches" },
-  { value: "Air Conditioners", label: "Air Conditioners" },
-  { value: "air_conditioner", label: "Air Conditioner" }, // Legacy support
-  { value: "Refrigerators", label: "Refrigerators" },
-  { value: "Deep Freezers", label: "Deep Freezers" },
-  { value: "Washing Machines", label: "Washing Machines" },
-  { value: "Dryers", label: "Dryers" },
-  { value: "Microwave/Electric Ovens", label: "Microwave/Electric Ovens" },
-  { value: "Water Dispensers", label: "Water Dispensers" },
-  { value: "Vacuum Cleaners", label: "Vacuum Cleaners" },
-  { value: "Fans", label: "Fans" },
-  { value: "Heaters", label: "Heaters" },
-  { value: "Air Coolers", label: "Air Coolers" },
-  { value: "Solar Panels / Solar Systems", label: "Solar Panels / Solar Systems" },
-  { value: "Inverters", label: "Inverters" },
-  { value: "Batteries", label: "Batteries" },
-  { value: "UPS (Uninterruptible Power Supply)", label: "UPS (Uninterruptible Power Supply)" },
-  { value: "Cars", label: "Cars" },
-  { value: "Motorcycles (Bikes / Scooters) - Mechanical", label: "Motorcycles (Bikes / Scooters) - Mechanical" },
-  { value: "bikes_mechanical", label: "Bikes — Mechanical" }, // Legacy support
-  { value: "Motorcycles (Bikes / Scooters) - Electrical", label: "Motorcycles (Bikes / Scooters) - Electrical" },
-  { value: "bikes_electric", label: "Bikes — Electric" }, // Legacy support
-  { value: "Tyres", label: "Tyres" },
-  { value: "Office Furniture", label: "Office Furniture" },
-  { value: "Home Furniture", label: "Home Furniture" },
-  { value: "Mattresses", label: "Mattresses" },
-  { value: "appliances", label: "Home Appliances / Other" }, // Legacy support
-  { value: "other", label: "Other (Custom)" },
-];
 
-// Sort options
-const SORT_OPTIONS = [
-  { value: "newest", label: "Newest First" },
-  { value: "price_low", label: "Price: Low to High" },
-  { value: "price_high", label: "Price: High to Low" },
-  { value: "monthly_low", label: "Monthly Payment: Low to High" },
-  { value: "monthly_high", label: "Monthly Payment: High to Low" },
-  { value: "name_asc", label: "Name: A to Z" },
-  { value: "name_desc", label: "Name: Z to A" },
-];
-
-/**
- * InstallmentPlans.jsx
- *
- * Fetches: GET `${backendBaseUrl}/installmentplan/get/public`
- * - Displays plans in a responsive grid
- * - Search, filter (category, city), pagination
- * - Card detail modal with image carousel and video playback
- *
- * No external libraries required.
- */
-
-const PAGE_SIZE = 36; // Show 36 items per page (6x6 grid on large screens)
 const API_PAGE_LIMIT = 100;
 
 export default function InstallmentPlans() {
@@ -135,7 +68,6 @@ export default function InstallmentPlans() {
   const [monthlyMin, setMonthlyMin] = useState("");
   const [monthlyMax, setMonthlyMax] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [page, setPage] = useState(1);
 
 
   const fetchCatalogPlans = async (fetchPage = 1) => {
@@ -171,7 +103,6 @@ export default function InstallmentPlans() {
   const runInstallmentSearch = async () => {
     const q = searchDraft.trim();
     setAppliedSearch(q);
-    setPage(1);
 
     if (!q) {
       setIsSearchMode(false);
@@ -220,7 +151,6 @@ export default function InstallmentPlans() {
     setSearchDraft("");
     setAppliedSearch("");
     setIsSearchMode(false);
-    setPage(1);
     fetchCatalogPlans(1);
   };
 
@@ -254,7 +184,6 @@ export default function InstallmentPlans() {
       setApiPage(nextPage);
       setApiTotalPages(Number(extractedPagination?.totalPages || apiTotalPages || nextPage));
       setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
-      setPage(1);
     } catch (err) {
       console.error("Next page fetch error:", err);
       setError("Network error — could not load next page.");
@@ -289,7 +218,6 @@ export default function InstallmentPlans() {
       setApiPage(prevPage);
       setApiTotalPages(Number(extractedPagination?.totalPages || apiTotalPages || prevPage));
       setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
-      setPage(1);
     } catch (err) {
       console.error("Previous page fetch error:", err);
       setError("Network error — could not load previous page.");
@@ -358,8 +286,10 @@ export default function InstallmentPlans() {
         // Support legacy category values
         const categoryMap = {
           "phones": ["phones", "smartphones / mobile", "smartphones", "mobile"],
+          "smartphones": ["phones", "smartphones / mobile", "smartphones", "mobile"],
+          "e_bikes": ["e_bikes", "e-bikes", "e bikes", "bikes_electric", "motorcycles (bikes / scooters) - electrical", "bikes — electric"],
           "bikes_mechanical": ["bikes_mechanical", "motorcycles (bikes / scooters) - mechanical", "bikes — mechanical"],
-          "bikes_electric": ["bikes_electric", "motorcycles (bikes / scooters) - electrical", "bikes — electric"],
+          "bikes_electric": ["bikes_electric", "e_bikes", "e-bikes", "motorcycles (bikes / scooters) - electrical", "bikes — electric"],
           "air_conditioner": ["air_conditioner", "air conditioners", "air conditioner"],
           "appliances": ["appliances", "home appliances / other"]
         };
@@ -412,12 +342,7 @@ export default function InstallmentPlans() {
     return filteredPlans;
   }, [plans, selectedCategory, selectedCity, sortBy, priceMin, priceMax, monthlyMin, monthlyMax]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  useEffect(() => {
-    if (page > totalPages) setPage(1);
-  }, [totalPages, page]); // reset if filters change
-
-  const pageData = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pageData = filtered;
 
   // helpers
   const currency = (v) =>
@@ -501,7 +426,7 @@ export default function InstallmentPlans() {
                 {/* Category Dropdown */}
                 <select 
                   value={selectedCategory} 
-                  onChange={(e) => { setSelectedCategory(e.target.value); setPage(1); }} 
+                  onChange={(e) => { setSelectedCategory(e.target.value); }} 
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl bg-white text-xs sm:text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all shadow-sm hover:border-gray-300 cursor-pointer min-h-[44px]"
                 >
                   {CATEGORY_OPTIONS.map((opt) => (
@@ -518,7 +443,7 @@ export default function InstallmentPlans() {
                 {/* City Dropdown */}
                 <select 
                   value={selectedCity} 
-                  onChange={(e) => { setSelectedCity(e.target.value); setPage(1); }} 
+                  onChange={(e) => { setSelectedCity(e.target.value); }} 
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl bg-white text-xs sm:text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all shadow-sm hover:border-gray-300 cursor-pointer min-h-[44px]"
                 >
                   <option value="">All Cities</option>
@@ -530,7 +455,7 @@ export default function InstallmentPlans() {
                 {/* Sort Dropdown */}
                 <select 
                   value={sortBy} 
-                  onChange={(e) => { setSortBy(e.target.value); setPage(1); }} 
+                  onChange={(e) => { setSortBy(e.target.value); }} 
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-gray-200 rounded-xl bg-white text-xs sm:text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[rgb(183,36,42)] focus:border-[rgb(183,36,42)] transition-all shadow-sm hover:border-gray-300 cursor-pointer min-h-[44px]"
                 >
                   {SORT_OPTIONS.map((opt) => (
@@ -567,7 +492,6 @@ export default function InstallmentPlans() {
                     setPriceMax("");
                     setMonthlyMin("");
                     setMonthlyMax("");
-                    setPage(1);
                     fetchCatalogPlans(1);
                   }} 
                   className="w-full px-3 sm:px-4 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white bg-[rgb(183,36,42)] hover:bg-red-700 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 flex items-center justify-center gap-2 min-h-[44px]"
@@ -607,7 +531,6 @@ export default function InstallmentPlans() {
                                 const val = Number(e.target.value);
                                 setPriceMin(val.toString());
                                 if (priceMax && val > Number(priceMax)) setPriceMax(val.toString());
-                                setPage(1); 
                               }}
                               className="w-full h-2.5 sm:h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[rgb(183,36,42)]"
                               style={{
@@ -624,7 +547,6 @@ export default function InstallmentPlans() {
                                 const val = Number(e.target.value);
                                 setPriceMax(val.toString());
                                 if (priceMin && val < Number(priceMin)) setPriceMin(val.toString());
-                                setPage(1); 
                               }}
                               className="absolute top-2 left-0 w-full h-2.5 sm:h-3 bg-transparent rounded-lg appearance-none cursor-pointer accent-[rgb(183,36,42)] pointer-events-none"
                               style={{
@@ -640,7 +562,7 @@ export default function InstallmentPlans() {
                             <input
                               type="number"
                               value={priceMin}
-                              onChange={(e) => { setPriceMin(e.target.value); setPage(1); }}
+                              onChange={(e) => { setPriceMin(e.target.value); }}
                               placeholder="Min"
                               min={priceRange.min}
                               max={priceRange.max}
@@ -649,7 +571,7 @@ export default function InstallmentPlans() {
                             <input
                               type="number"
                               value={priceMax}
-                              onChange={(e) => { setPriceMax(e.target.value); setPage(1); }}
+                              onChange={(e) => { setPriceMax(e.target.value); }}
                               placeholder="Max"
                               min={priceRange.min}
                               max={priceRange.max}
@@ -657,7 +579,7 @@ export default function InstallmentPlans() {
                             />
                             {(priceMin || priceMax) && (
                               <button type="button"
-                                onClick={() => { setPriceMin(""); setPriceMax(""); setPage(1); }}
+                                onClick={() => { setPriceMin(""); setPriceMax(""); }}
                                 className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition min-h-[44px]"
                               >
                                 Clear
@@ -691,7 +613,6 @@ export default function InstallmentPlans() {
                                 const val = Number(e.target.value);
                                 setMonthlyMin(val.toString());
                                 if (monthlyMax && val > Number(monthlyMax)) setMonthlyMax(val.toString());
-                                setPage(1); 
                               }}
                               className="w-full h-2.5 sm:h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[rgb(183,36,42)]"
                               style={{
@@ -708,7 +629,6 @@ export default function InstallmentPlans() {
                                 const val = Number(e.target.value);
                                 setMonthlyMax(val.toString());
                                 if (monthlyMin && val < Number(monthlyMin)) setMonthlyMin(val.toString());
-                                setPage(1); 
                               }}
                               className="absolute top-2 left-0 w-full h-2.5 sm:h-3 bg-transparent rounded-lg appearance-none cursor-pointer accent-[rgb(183,36,42)] pointer-events-none"
                               style={{
@@ -724,7 +644,7 @@ export default function InstallmentPlans() {
                             <input
                               type="number"
                               value={monthlyMin}
-                              onChange={(e) => { setMonthlyMin(e.target.value); setPage(1); }}
+                              onChange={(e) => { setMonthlyMin(e.target.value); }}
                               placeholder="Min"
                               min={monthlyRange.min}
                               max={monthlyRange.max}
@@ -733,7 +653,7 @@ export default function InstallmentPlans() {
                             <input
                               type="number"
                               value={monthlyMax}
-                              onChange={(e) => { setMonthlyMax(e.target.value); setPage(1); }}
+                              onChange={(e) => { setMonthlyMax(e.target.value); }}
                               placeholder="Max"
                               min={monthlyRange.min}
                               max={monthlyRange.max}
@@ -741,7 +661,7 @@ export default function InstallmentPlans() {
                             />
                             {(monthlyMin || monthlyMax) && (
                               <button type="button"
-                                onClick={() => { setMonthlyMin(""); setMonthlyMax(""); setPage(1); }}
+                                onClick={() => { setMonthlyMin(""); setMonthlyMax(""); }}
                                 className="w-full sm:w-auto px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition min-h-[44px]"
                               >
                                 Clear
@@ -905,7 +825,7 @@ export default function InstallmentPlans() {
             <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
             <div className="mt-4 sm:mt-6 lg:mt-8 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
               <div className="text-xs sm:text-sm lg:text-base text-gray-600 font-medium text-center sm:text-left">
-                Showing <span className="text-[rgb(183,36,42)] font-bold">{plans.length ? ((apiPage - 1) * API_PAGE_LIMIT) + 1 : 0}</span> to <span className="text-[rgb(183,36,42)] font-bold">{plans.length ? ((apiPage - 1) * API_PAGE_LIMIT) + plans.length : 0}</span> of <span className="text-[rgb(183,36,42)] font-bold">{apiTotalCount || filtered.length}</span> {(apiTotalCount || filtered.length) === 1 ? 'plan' : 'plans'}
+                Showing <span className="text-[rgb(183,36,42)] font-bold">{pageData.length ? ((apiPage - 1) * API_PAGE_LIMIT) + 1 : 0}</span> to <span className="text-[rgb(183,36,42)] font-bold">{pageData.length ? ((apiPage - 1) * API_PAGE_LIMIT) + pageData.length : 0}</span> of <span className="text-[rgb(183,36,42)] font-bold">{isSearchMode ? (apiTotalCount || pageData.length) : (apiTotalCount || filtered.length)}</span> {(isSearchMode ? (apiTotalCount || pageData.length) : (apiTotalCount || filtered.length)) === 1 ? 'plan' : 'plans'}
               </div>
 
               <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
