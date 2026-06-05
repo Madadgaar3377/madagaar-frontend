@@ -4,10 +4,14 @@ import { getAuthToken, getUser, isAuthenticated } from '../../../utils/auth';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import SEO from '../../../components/SEO';
 import { Toast, useToast } from '../../../components/Toast';
+import CashPriceDisplay from '../../../components/CashPriceDisplay';
 import {
   buildPlanEntries,
   buildPartnerCashOffers,
   resolveEntryCashPrice,
+  resolveEntryPriceDisplay,
+  getOfferPriceDisplay,
+  getProductPriceDisplay,
   formatApplyEntryLabel,
   findApplyEntryIndex,
   cashOfferKey,
@@ -162,6 +166,13 @@ const ApplyInstallment = () => {
   const summaryCashPrice = selectedPlan
     ? resolveEntryCashPrice(plan, selectedEntry)
     : Number(selectedCashOffer?.price) || 0;
+  const summaryCashDisplay = selectedPlan
+    ? resolveEntryPriceDisplay(plan, selectedEntry)
+    : selectedCashOffer
+    ? getOfferPriceDisplay(plan, selectedCashOffer)
+    : selectedVariantIndex !== null
+    ? getProductPriceDisplay(plan, selectedVariantIndex)
+    : getProductPriceDisplay(plan);
   const resolvedPartnerName = selectedPlan?.companyName
     || selectedCashOffer?.companyName
     || plan?.companyName
@@ -507,8 +518,8 @@ const ApplyInstallment = () => {
                             }`}
                           >
                             <span className="font-semibold text-gray-900">{o.companyName}</span>
-                            <span className="block text-[rgb(183,36,42)] font-bold mt-0.5">
-                              PKR {Number(o.price).toLocaleString()}
+                            <span className="block mt-0.5">
+                              <CashPriceDisplay display={getOfferPriceDisplay(plan, o)} size="sm" inline />
                             </span>
                           </button>
                         );
@@ -557,11 +568,9 @@ const ApplyInstallment = () => {
                           <span className="text-gray-600">Plan:</span>
                           <span className="font-semibold text-gray-900">{selectedPlan.planName}</span>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Cash price:</span>
-                          <span className="font-semibold text-gray-900">
-                            PKR {summaryCashPrice.toLocaleString()}
-                          </span>
+                        <div className="flex justify-between items-start gap-2 text-sm">
+                          <span className="text-gray-600 shrink-0">Cash price:</span>
+                          <CashPriceDisplay display={summaryCashDisplay} size="sm" inline className="text-right" />
                         </div>
                         {!cashOnlyPlan && Number(selectedPlan.installmentPrice) > 0 && (
                           <div className="flex justify-between text-sm">
@@ -606,11 +615,9 @@ const ApplyInstallment = () => {
                       </>
                     )}
                     {(selectedCashOffer || (!selectedPlan && selectedVariant)) && summaryCashPrice > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Your selected cash price:</span>
-                        <span className="font-semibold text-[rgb(183,36,42)]">
-                          PKR {summaryCashPrice.toLocaleString()}
-                        </span>
+                      <div className="flex justify-between items-start gap-2 text-sm">
+                        <span className="text-gray-600 shrink-0">Your selected cash price:</span>
+                        <CashPriceDisplay display={summaryCashDisplay} size="sm" inline className="text-right" />
                       </div>
                     )}
                     {resolvedPartnerId && (

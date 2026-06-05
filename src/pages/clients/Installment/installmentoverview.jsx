@@ -5,6 +5,7 @@ import LoadingPage from "../../../compontents/Loader";
 import InstallmentReviews from "../../../components/InstallmentReviews";
 import ShareButtons from "../../../components/ShareButtons";
 import SEO from "../../../components/SEO";
+import CashPriceDisplay from "../../../components/CashPriceDisplay";
 import {
   getBestPaymentPlan,
   buildInstallmentShareLines,
@@ -14,6 +15,9 @@ import {
   collectAllPaymentPlans,
   buildPartnerCashOffers,
   resolveEntryCashPrice,
+  resolveEntryPriceDisplay,
+  getProductPriceDisplay,
+  getOfferPriceDisplay,
   getLowestPublicCashPrice,
   isPartnerOwnedVariant,
 } from "../../../utils/installmentPricing";
@@ -232,6 +236,11 @@ export default function InstallmentDetail() {
     [plan, priceVariantIndex]
   );
 
+  const productPriceDisplay = useMemo(
+    () => getProductPriceDisplay(plan, priceVariantIndex),
+    [plan, priceVariantIndex]
+  );
+
   const cashOffers = useMemo(
     () =>
       buildPartnerCashOffers(plan, {
@@ -293,7 +302,9 @@ export default function InstallmentDetail() {
   const firstImage = Array.isArray(plan.productImages) && plan.productImages.length ? plan.productImages[0] : null;
   const plainDesc = plan.description && typeof plan.description === "string" ? plan.description.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
   const detailDesc = [plan.productName, plan.category, plan.city, plan.companyName || plan.companyNameOther].filter(Boolean).join(" · ");
-  const priceInfo = plan.price ? `From PKR ${Number(plan.price).toLocaleString()}` : (plan.paymentPlans?.[0]?.monthlyInstallment ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo` : "");
+  const priceInfo = productPriceDisplay.displayPrice > 0
+    ? `From PKR ${productPriceDisplay.displayPrice.toLocaleString()}${productPriceDisplay.hasDiscount ? ` (was PKR ${productPriceDisplay.cashPrice.toLocaleString()}, ${productPriceDisplay.discountPercent}% off)` : ""}`
+    : (plan.paymentPlans?.[0]?.monthlyInstallment ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo` : "");
   const seoDescription = plainDesc || [detailDesc, priceInfo, "Compare & apply on Madadgaar."].filter(Boolean).join(" ");
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
@@ -425,12 +436,11 @@ export default function InstallmentDetail() {
                 
                 <div className="space-y-3 pt-4 border-t border-gray-200">
                   <div>
-                    <div className="text-xs text-gray-500 mb-1 font-medium">
-                      {cashOffers.length > 1 ? "From (lowest cash)" : "Cash Price"}
-                    </div>
-                    <div className="text-2xl sm:text-3xl font-bold text-[rgb(183,36,42)]">
-                      PKR {Number(currentPrice).toLocaleString()}
-                    </div>
+                    <CashPriceDisplay
+                      display={productPriceDisplay}
+                      size="lg"
+                      label={cashOffers.length > 1 ? "From (lowest cash)" : "Cash Price"}
+                    />
                     {cashOffers.length > 1 && (
                       <p className="text-xs text-gray-500 mt-1">
                         {cashOffers.length} partner{cashOffers.length === 1 ? "" : "s"} — see Cash tab below
@@ -638,7 +648,11 @@ export default function InstallmentDetail() {
                         ) : (
                           <div className="text-xs text-gray-500 mb-1">Cash Price</div>
                         )}
-                        <div className="text-xl font-black text-gray-900">PKR {Number(offer.price || 0).toLocaleString()}</div>
+                        <CashPriceDisplay
+                          display={getOfferPriceDisplay(plan, offer)}
+                          size="xl"
+                          className="text-gray-900"
+                        />
                       </div>
                     ))}
                   </div>
@@ -679,6 +693,7 @@ export default function InstallmentDetail() {
                     const p = entry.plan;
                     const vendorName = p.companyName || plan.companyName || plan.companyNameOther || "Standard";
                     const cashPrice = resolveEntryCashPrice(plan, entry);
+                    const cashPriceDisplay = resolveEntryPriceDisplay(plan, entry);
                     const downPayment = Number(p.downPayment || 0);
                     const financedAmount = Math.max(0, cashPrice - downPayment);
                     const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
@@ -738,9 +753,7 @@ export default function InstallmentDetail() {
                             <div className="mt-1 flex items-baseline gap-2 flex-wrap">
                               {isCashOnlyInstallment(p.monthlyInstallment) ? (
                                 <>
-                                  <span className="text-lg font-black text-[rgb(183,36,42)]">
-                                    PKR {cashPrice.toLocaleString()}
-                                  </span>
+                                  <CashPriceDisplay display={cashPriceDisplay} size="sm" inline />
                                   <span className="text-xs text-gray-500">Cash Price</span>
                                 </>
                               ) : (
@@ -755,9 +768,12 @@ export default function InstallmentDetail() {
                                 </>
                               )}
                             </div>
-                            <div className="mt-1 text-xs text-gray-600">
-                              <span className="font-bold">Cash Price:</span> PKR {cashPrice.toLocaleString()}
+                            {!isCashOnlyInstallment(p.monthlyInstallment) && (
+                            <div className="mt-1 text-xs text-gray-600 flex flex-wrap items-center gap-x-1">
+                              <span className="font-bold">Cash Price:</span>
+                              <CashPriceDisplay display={cashPriceDisplay} size="sm" inline />
                             </div>
+                            )}
                           </div>
                           {totalPaymentPlanCount > 1 && (
                           <svg
@@ -923,6 +939,7 @@ export default function InstallmentDetail() {
                           entry.variantIndex !== null &&
                           plan.variants?.[entry.variantIndex]?.variantName;
                         const cashPrice = resolveEntryCashPrice(plan, entry);
+                        const cashPriceDisplay = resolveEntryPriceDisplay(plan, entry);
                         const downPayment = Number(p.downPayment || 0);
                         const financedAmount = Math.max(0, cashPrice - downPayment);
                         const totalPayable = Number(p.installmentPrice || p.monthlyInstallment * (p.tenureMonths || 1) || 0);
@@ -964,14 +981,20 @@ export default function InstallmentDetail() {
                               </div>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <div className="font-black text-[rgb(183,36,42)] text-lg">
-                                {isCashOnlyInstallment(p.monthlyInstallment)
-                                  ? `PKR ${cashPrice.toLocaleString()}`
-                                  : `PKR ${Number(p.monthlyInstallment || 0).toLocaleString()}`}
-                              </div>
-                              <div className="text-xs text-gray-500">
-                                {isCashOnlyInstallment(p.monthlyInstallment) ? "Cash Price" : "/month"}
-                              </div>
+                              {isCashOnlyInstallment(p.monthlyInstallment) ? (
+                                <CashPriceDisplay display={cashPriceDisplay} size="sm" />
+                              ) : (
+                                <>
+                                  <div className="font-black text-[rgb(183,36,42)] text-lg">
+                                    PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
+                                  </div>
+                                  <div className="text-xs text-gray-500">/month</div>
+                                  <div className="text-xs text-gray-600 mt-1 flex flex-wrap items-center justify-center gap-x-1">
+                                    <span className="font-semibold">Cash:</span>
+                                    <CashPriceDisplay display={cashPriceDisplay} size="sm" inline />
+                                  </div>
+                                </>
+                              )}
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
                               {isCashOnlyInstallment(p.monthlyInstallment)
@@ -1117,8 +1140,7 @@ export default function InstallmentDetail() {
                 <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-                    <div className="text-xs sm:text-sm text-gray-500 mb-1"><span className="font-bold">Cash Price</span></div>
-                    <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">PKR {Number(currentPrice || plan.price || 0).toLocaleString()}</div>
+                    <CashPriceDisplay display={productPriceDisplay} size="md" label="Cash Price" />
                   </div>
                   {downPayment > 0 && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
@@ -1513,12 +1535,11 @@ export default function InstallmentDetail() {
 
                     <div className="border-t pt-2 mt-2">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-xs text-gray-500"><span className="font-bold">Cash Price</span></div>
-                          <div className="text-lg sm:text-xl font-bold text-[rgb(183,36,42)]">
-                            PKR {Number(product.price || 0).toLocaleString()}
-                          </div>
-                        </div>
+                        <CashPriceDisplay
+                          display={getProductPriceDisplay(product)}
+                          size="md"
+                          label="Cash Price"
+                        />
                         {Number(product.downpayment || 0) > 0 && (
                         <div className="text-right">
                           <div className="text-xs text-gray-500">Down Payment</div>

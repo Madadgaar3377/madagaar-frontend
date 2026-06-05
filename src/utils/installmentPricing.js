@@ -16,15 +16,175 @@ export function resolveMonthlyInstallment(paymentPlan, plan) {
 
 
 
+export function calcDiscountPercentFromPrices(cashPrice, discountedPrice) {
+
+  const cash = Number(cashPrice) || 0;
+
+  const discounted = Number(discountedPrice);
+
+  if (cash <= 0 || !Number.isFinite(discounted) || discounted < 0) return 0;
+
+  const pct = ((cash - discounted) / cash) * 100;
+
+  return Math.round(Math.min(100, Math.max(0, pct)) * 100) / 100;
+
+}
+
+
+
+export function calcDiscountedPriceFromPercent(cashPrice, discountPercent) {
+
+  const cash = Number(cashPrice) || 0;
+
+  const disc = Math.min(100, Math.max(0, Number(discountPercent) || 0));
+
+  return Math.round(cash * (1 - disc / 100));
+
+}
+
+
+
+function isExplicitPriceSet(value) {
+
+  return (
+
+    value !== undefined &&
+
+    value !== null &&
+
+    value !== "" &&
+
+    Number.isFinite(Number(value)) &&
+
+    Number(value) > 0
+
+  );
+
+}
+
+
+
+/**
+
+ * Public cash price display rules:
+
+ * - Only cash OR only discounted → show the one that is set as cash price
+
+ * - Both cash and discounted → show discounted + original cash (discount %)
+
+ */
+
+export function resolvePriceDisplay({ price, cashPrice, discountedPrice, discountPercent } = {}) {
+
+  const cash = Number(price ?? cashPrice) || 0;
+
+  const hasCash = cash > 0;
+
+  const hasExplicitDiscounted = isExplicitPriceSet(discountedPrice);
+
+  const explicitDiscounted = hasExplicitDiscounted ? Math.round(Number(discountedPrice)) : 0;
+
+  const pct = Math.min(100, Math.max(0, Number(discountPercent) || 0));
+
+  const derivedDiscounted = hasCash && pct > 0 ? calcDiscountedPriceFromPercent(cash, pct) : 0;
+
+
+
+  if (hasCash && (hasExplicitDiscounted || pct > 0)) {
+
+    const discounted = hasExplicitDiscounted ? explicitDiscounted : derivedDiscounted;
+
+    if (discounted > 0 && discounted < cash) {
+
+      return {
+
+        displayPrice: discounted,
+
+        cashPrice: cash,
+
+        discountPercent: hasExplicitDiscounted
+
+          ? calcDiscountPercentFromPrices(cash, discounted)
+
+          : pct,
+
+        hasDiscount: true,
+
+      };
+
+    }
+
+  }
+
+
+
+  if (hasExplicitDiscounted && !hasCash) {
+
+    return {
+
+      displayPrice: explicitDiscounted,
+
+      cashPrice: 0,
+
+      discountPercent: 0,
+
+      hasDiscount: false,
+
+    };
+
+  }
+
+
+
+  if (hasCash) {
+
+    return {
+
+      displayPrice: cash,
+
+      cashPrice: cash,
+
+      discountPercent: 0,
+
+      hasDiscount: false,
+
+    };
+
+  }
+
+
+
+  return {
+
+    displayPrice: 0,
+
+    cashPrice: 0,
+
+    discountPercent: 0,
+
+    hasDiscount: false,
+
+  };
+
+}
+
+
+
 export function getVariantEffectivePrice(variant) {
 
   if (!variant) return 0;
 
-  const base = Number(variant.price) || 0;
+  const display = resolvePriceDisplay({
 
-  const disc = Math.min(100, Math.max(0, Number(variant.discountPercent) || 0));
+    price: variant.price,
 
-  return Math.round(base * (1 - disc / 100)) || base;
+    discountedPrice: variant.discountedPrice,
+
+    discountPercent: variant.discountPercent,
+
+  });
+
+  return display.displayPrice;
 
 }
 
@@ -34,11 +194,231 @@ export function getPartnerOverrideEffective(override) {
 
   if (!override) return 0;
 
-  const base = Number(override.cashPrice) || 0;
+  const display = resolvePriceDisplay({
 
-  const disc = Math.min(100, Math.max(0, Number(override.discountPercent) || 0));
+    cashPrice: override.cashPrice,
 
-  return Math.round(base * (1 - disc / 100)) || base;
+    discountPercent: override.discountPercent,
+
+  });
+
+  return display.displayPrice;
+
+}
+
+
+
+export function getProductPriceDisplay(plan, variantIndex = null) {
+
+  if (!plan) return resolvePriceDisplay({});
+
+
+
+  if (variantIndex !== null && variantIndex !== undefined && plan.variants?.[variantIndex]) {
+
+    const v = plan.variants[variantIndex];
+
+    return resolvePriceDisplay({
+
+      price: v.price,
+
+      discountedPrice: v.discountedPrice,
+
+      discountPercent: v.discountPercent,
+
+    });
+
+  }
+
+
+
+  const catalogDisplays = (plan.variants || [])
+
+    .filter((v) => !isPartnerOwnedVariant(v))
+
+    .map((v) =>
+
+      resolvePriceDisplay({
+
+        price: v.price,
+
+        discountedPrice: v.discountedPrice,
+
+        discountPercent: v.discountPercent,
+
+      })
+
+    )
+
+    .filter((d) => d.displayPrice > 0);
+
+
+
+  if (catalogDisplays.length) {
+
+    return catalogDisplays.reduce((a, b) => (a.displayPrice < b.displayPrice ? a : b));
+
+  }
+
+
+
+  return resolvePriceDisplay({
+
+    price: plan.price,
+
+    discountedPrice: plan.discountedPrice,
+
+    discountPercent: plan.discountPercent,
+
+  });
+
+}
+
+
+
+export function getOfferPriceDisplay(plan, offer) {
+
+  if (!plan || !offer) return resolvePriceDisplay({});
+
+
+
+  const vIdx = offer.variantIndex;
+
+  const pid = offer.partnerId;
+
+
+
+  if (offer.source === "catalogVariant" || offer.source === "partnerVariant") {
+
+    const v = plan.variants?.[vIdx];
+
+    return resolvePriceDisplay({
+
+      price: v?.price,
+
+      discountedPrice: v?.discountedPrice,
+
+      discountPercent: v?.discountPercent,
+
+    });
+
+  }
+
+
+
+  if (offer.source === "variantOverride") {
+
+    const ov = (plan.partnerPricing || [])
+
+      .find((p) => p?.partnerId && String(p.partnerId) === String(pid))
+
+      ?.variantOverrides?.find((o) => Number(o.variantIndex) === Number(vIdx));
+
+    return resolvePriceDisplay({
+
+      cashPrice: ov?.cashPrice,
+
+      discountPercent: ov?.discountPercent,
+
+    });
+
+  }
+
+
+
+  if (offer.source === "partnerBasePrice") {
+
+    const pp = (plan.partnerPricing || []).find(
+
+      (p) => p?.partnerId && String(p.partnerId) === String(pid)
+
+    );
+
+    return resolvePriceDisplay({ price: pp?.basePrice });
+
+  }
+
+
+
+  return resolvePriceDisplay({ price: offer.price });
+
+}
+
+
+
+export function resolveEntryPriceDisplay(plan, entry) {
+
+  if (!plan || !entry) return getProductPriceDisplay(plan);
+
+
+
+  const p = entry.plan || {};
+
+  const vIdx = entry.variantIndex;
+
+  const partnerId = p?.partnerId;
+
+
+
+  if (partnerId) {
+
+    if (vIdx !== null && vIdx !== undefined) {
+
+      const ov = (plan.partnerPricing || [])
+
+        .find((pp) => pp?.partnerId && String(pp.partnerId) === String(partnerId))
+
+        ?.variantOverrides?.find((o) => Number(o.variantIndex) === Number(vIdx));
+
+      if (ov && Number(ov.cashPrice) > 0) {
+
+        return resolvePriceDisplay({
+
+          cashPrice: ov.cashPrice,
+
+          discountPercent: ov.discountPercent,
+
+        });
+
+      }
+
+    }
+
+    const pp = (plan.partnerPricing || []).find(
+
+      (row) => row?.partnerId && String(row.partnerId) === String(partnerId)
+
+    );
+
+    if (Number(pp?.basePrice) > 0) {
+
+      return resolvePriceDisplay({ price: pp.basePrice });
+
+    }
+
+  }
+
+
+
+  if (vIdx !== null && vIdx !== undefined && plan.variants?.[vIdx]) {
+
+    const v = plan.variants[vIdx];
+
+    return resolvePriceDisplay({
+
+      price: v.price,
+
+      discountedPrice: v.discountedPrice,
+
+      discountPercent: v.discountPercent,
+
+    });
+
+  }
+
+
+
+  return resolvePriceDisplay({ price: plan.price });
 
 }
 
@@ -780,6 +1160,10 @@ export function getInstallmentCardPricing(plan, paymentPlan) {
 
 
 
+  const cashDisplay = getProductPriceDisplay(plan);
+
+
+
   return {
 
     monthly,
@@ -788,17 +1172,19 @@ export function getInstallmentCardPricing(plan, paymentPlan) {
 
     cashPrice,
 
+    cashDisplay,
+
     downPayment,
 
     tenureLabel,
 
     primaryLabel: cashOnly ? "Cash Price" : "Monthly Payment",
 
-    primaryAmount: cashOnly ? cashPrice : monthly,
+    primaryAmount: cashOnly ? cashDisplay.displayPrice || cashPrice : monthly,
 
     showPerMonth: !cashOnly,
 
-    showCashLine: !cashOnly && cashPrice > 0,
+    showCashLine: !cashOnly && (cashDisplay.displayPrice > 0 || cashPrice > 0),
 
   };
 
