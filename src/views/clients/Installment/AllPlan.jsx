@@ -3,6 +3,8 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import Link from 'next/link';
 import LoadingPage from "../../../compontents/Loader";
 import NavbarDashboard from "../../../components/DashboardNavbar";
+import CashPriceDisplay from "../../../components/CashPriceDisplay";
+import { getProductPriceDisplay } from "../../../utils/installmentPricing";
 
 /**
  * InstallmentPlans.jsx
@@ -224,8 +226,7 @@ export default function AdminInstallment() {
                       </div>
 
                       <div className="text-right">
-                        <div className="text-xs text-gray-500">Price</div>
-                        <div className="font-semibold">{currency(plan.price)}</div>
+                        <CashPriceDisplay display={getProductPriceDisplay(plan)} size="sm" label="Price" />
                       </div>
                     </div>
 

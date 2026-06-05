@@ -9,6 +9,7 @@ import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
+import CashPriceDisplay from "../../../components/CashPriceDisplay";
 import {
   getBestPaymentPlan,
   getInstallmentCardPricing,
@@ -761,9 +762,13 @@ export default function InstallmentPlans() {
                         )}
                       </div>
                       <div className="flex items-baseline gap-1 sm:gap-2 flex-wrap">
-                        <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums break-all">
-                          {currency(pricing.primaryAmount)}
-                        </span>
+                        {pricing.cashOnly ? (
+                          <CashPriceDisplay display={pricing.cashDisplay} size="md" inline />
+                        ) : (
+                          <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums break-all">
+                            {currency(pricing.primaryAmount)}
+                          </span>
+                        )}
                         {pricing.showPerMonth && (
                         <span className="text-[11px] sm:text-sm text-gray-500">/month</span>
                         )}
@@ -771,9 +776,9 @@ export default function InstallmentPlans() {
                       {(pricing.showCashLine || pricing.tenureLabel) && (
                       <div className="flex flex-row flex-wrap items-center justify-between gap-x-1 gap-y-0.5 mt-1.5 pt-1 border-t border-red-100/60">
                         {pricing.showCashLine && (
-                        <div className="text-[11px] sm:text-xs text-gray-700 min-w-0">
-                          <span className="font-extrabold text-gray-900">Cash:</span>{" "}
-                          <span className="tabular-nums">{currency(pricing.cashPrice)}</span>
+                        <div className="text-[11px] sm:text-xs text-gray-700 min-w-0 flex flex-wrap items-center gap-x-1">
+                          <span className="font-extrabold text-gray-900">Cash:</span>
+                          <CashPriceDisplay display={pricing.cashDisplay} size="sm" inline />
                         </div>
                         )}
                         {pricing.tenureLabel && (

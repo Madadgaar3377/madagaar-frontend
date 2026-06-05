@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import CashPriceDisplay from "../../../components/CashPriceDisplay";
+import { getProductPriceDisplay } from "../../../utils/installmentPricing";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 const MAX_COMPARE = 4;
@@ -286,7 +288,12 @@ export default function CompareProducts() {
         </div>
       );
     }
-    if (["price", "downpayment", "installment"].includes(key)) {
+    if (key === "price") {
+      const display = getProductPriceDisplay(product);
+      if (!display.displayPrice) return <span className="text-xs text-gray-400">—</span>;
+      return <CashPriceDisplay display={display} size="sm" prefix="Rs." inline className="font-semibold" />;
+    }
+    if (["downpayment", "installment"].includes(key)) {
       if (v == null || v === "") return <span className="text-xs text-gray-400">—</span>;
       return <span className="font-semibold">Rs. {Number(v).toLocaleString("en-PK")}</span>;
     }
@@ -350,7 +357,9 @@ export default function CompareProducts() {
                         <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700 border border-red-100">Base product</span>
                       </div>
                       <p className="text-sm text-gray-500 mt-1">{[baseProduct.companyName, baseProduct.category, baseProduct.city].filter(Boolean).join(" • ") || "—"}</p>
-                      <p className="mt-2 text-lg font-bold text-red-600">Rs. {Number(baseProduct.price || 0).toLocaleString("en-PK")}</p>
+                      <div className="mt-2">
+                        <CashPriceDisplay display={getProductPriceDisplay(baseProduct)} size="md" prefix="Rs." />
+                      </div>
                       <p className="mt-1 text-sm text-gray-600 line-clamp-2">{(baseProduct.description || "").replace(/<[^>]+>/g, "").slice(0, 180)}</p>
                     </div>
                     <div className="flex gap-2 shrink-0">
@@ -427,7 +436,10 @@ export default function CompareProducts() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm text-gray-900 truncate">{s.productName}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{s.companyName} • Rs. {Number(s.price || 0).toLocaleString("en-PK")}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-x-1">
+                      <span>{s.companyName} •</span>
+                      <CashPriceDisplay display={getProductPriceDisplay(s)} size="sm" prefix="Rs." inline />
+                    </p>
                     <div className="mt-2 flex gap-2 flex-wrap">
                       <button type="button"
                         onClick={() => {
@@ -470,7 +482,7 @@ export default function CompareProducts() {
                     </div>
                     <div className="p-2.5">
                       <p className="text-xs font-medium text-gray-900 line-clamp-2 min-h-[2rem]">{r.productName}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">Rs. {Number(r.price || 0).toLocaleString("en-PK")}</p>
+                      <CashPriceDisplay display={getProductPriceDisplay(r)} size="sm" prefix="Rs." className="mt-0.5" />
                       <div className="mt-2 flex gap-1.5">
                         <button type="button" onClick={() => addToCompare(r)} className="flex-1 text-xs py-1.5 rounded-lg bg-red-600 text-white font-medium">Add</button>
                         <button type="button" onClick={() => router.push(`/installment/product/CompareProduct/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-300 font-medium">Open</button>
