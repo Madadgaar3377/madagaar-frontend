@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from "framer-motion";
 import { APP_BANNER_SESSION_KEY } from "../constants/mobileApp";
 
@@ -9,11 +10,11 @@ const ACCENT = "#b7242a";
 const BANNER_HIDDEN_PATHS = ["/about", "/download-app"];
 
 export default function AppDownloadBanner() {
-  const location = useLocation();
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
 
   const hideOnPage = BANNER_HIDDEN_PATHS.some(
-    (path) => location.pathname === path || location.pathname.startsWith(`${path}/`)
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
 
   useEffect(() => {
@@ -82,7 +83,7 @@ export default function AppDownloadBanner() {
               </div>
 
               <Link
-                to="/download-app"
+                href="/download-app"
                 className="shrink-0 inline-flex items-center justify-center rounded-full bg-white px-3.5 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md hover:bg-gray-100 active:scale-[0.98] transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#b7242a]"
                 style={{ color: ACCENT }}
               >

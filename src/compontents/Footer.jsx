@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from 'next/link';
 import { motion } from "framer-motion";
 
 const footerLinks = [
@@ -38,7 +38,7 @@ const Footer = () => {
             transition={{ duration: 0.4 }}
             className="min-w-0"
           >
-            <Link to="/" className="inline-block focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">
+            <Link href="/" className="inline-block focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">
               <img
                 src="/Media/Group%2033.png"
                 alt="Madadgaar Logo"
@@ -49,7 +49,7 @@ const Footer = () => {
               Madadgaar Expert Partner is a trusted marketplace where finding the right solution becomes simple. Whether it's property solutions, insurance support, loans, or installment plans, we make your journey simple, reliable, and stress-free.
             </p>
             <Link
-              to="/download-app"
+              href="/download-app"
               className="inline-flex items-center gap-2 mt-4 rounded-xl bg-white/10 hover:bg-white/15 border border-white/15 px-4 py-2.5 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
             >
               <svg className="size-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -72,7 +72,7 @@ const Footer = () => {
               {footerLinks.map((link, i) => (
                 <motion.li key={link.to} variants={item}>
                   <Link
-                    to={link.to}
+                    href={link.to}
                     className="inline-block py-1.5 text-sm sm:text-base hover:text-primary transition-colors duration-200 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
                   >
                     {link.label}
@@ -139,11 +139,11 @@ const Footer = () => {
             © 2024 Madadgaar Expert Partner. Designed & Developed By <span className="text-primary">Code-XA</span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-1 sm:order-2">
-            <Link to="/" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Sitemap</Link>
+            <Link href="/" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Sitemap</Link>
             <span className="text-gray-600" aria-hidden>|</span>
-            <Link to="/privacy-policy" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Privacy Policy</Link>
+            <Link href="/privacy-policy" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Privacy Policy</Link>
             <span className="text-gray-600" aria-hidden>|</span>
-            <Link to="/terms-and-conditions" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Terms of Use</Link>
+            <Link href="/terms-and-conditions" className="py-2 px-1 hover:text-primary transition-colors focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900">Terms of Use</Link>
           </div>
         </div>
       </div>

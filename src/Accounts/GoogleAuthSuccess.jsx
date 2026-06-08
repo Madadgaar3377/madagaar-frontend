@@ -1,20 +1,22 @@
+"use client";
+
 import React, { useEffect } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { setAuthData } from "../utils/auth";
 import toast from "react-hot-toast";
 
 export default function GoogleAuthSuccess() {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     let redirectTimer;
-    const token = searchParams.get("token");
-    const userId = searchParams.get("userId");
-    const name = searchParams.get("name");
-    const email = searchParams.get("email");
-    const userType = searchParams.get("userType");
-    const profilePic = searchParams.get("profilePic");
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+    const userId = params.get("userId");
+    const name = params.get("name");
+    const email = params.get("email");
+    const userType = params.get("userType");
+    const profilePic = params.get("profilePic");
 
     if (token) {
       try {
@@ -26,31 +28,29 @@ export default function GoogleAuthSuccess() {
           profilePic,
           emailVerify: true,
           isActive: true,
-          isVerified: true
+          isVerified: true,
         };
-        
-        // Save to localStorage using the existing auth utility
+
         setAuthData(token, userData);
-        
+
         toast.success("Google Login Successful!");
-        
-        // Redirect to dashboard or home
+
         redirectTimer = setTimeout(() => {
           window.location.href = "/";
         }, 1000);
       } catch (error) {
         console.error("Error saving auth data:", error);
         toast.error("Authentication failed. Please try again.");
-        navigate("/account?error=auth_persistence_failed");
+        router.push("/account?error=auth_persistence_failed");
       }
     } else {
       toast.error("Authentication failed or was cancelled.");
-      navigate("/account?error=no_token");
+      router.push("/account?error=no_token");
     }
     return () => {
       if (redirectTimer) clearTimeout(redirectTimer);
     };
-  }, [searchParams, navigate]);
+  }, [router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">

@@ -5,6 +5,7 @@
  * @returns {boolean}
  */
 export function isAuthenticated() {
+  if (typeof window === "undefined") return false;
   return !!(localStorage.getItem("authToken") || localStorage.getItem("access_token"));
 }
 
@@ -13,6 +14,7 @@ export function isAuthenticated() {
  * @returns {string|null}
  */
 export function getAuthToken() {
+  if (typeof window === "undefined") return null;
   return localStorage.getItem("authToken") || localStorage.getItem("access_token");
 }
 
@@ -21,6 +23,7 @@ export function getAuthToken() {
  * @returns {Object|null}
  */
 export function getUser() {
+  if (typeof window === "undefined") return null;
   try {
     const userData = localStorage.getItem("user");
     return userData ? JSON.parse(userData) : null;
@@ -62,18 +65,17 @@ export function isRegularUser() {
  * @param {string} redirectPath - Path to redirect after logout
  */
 export function logout(redirectPath = "/account") {
-  // Clear all authentication-related data
+  if (typeof window === "undefined") return;
+
   localStorage.removeItem("authToken");
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
   localStorage.removeItem("user");
   localStorage.removeItem("authData");
-  
-  // Clear dashboard cache
+
   localStorage.removeItem("dashboardData");
   localStorage.removeItem("dashboardDataTime");
-  
-  // Redirect to login
+
   window.location.href = redirectPath;
 }
 
@@ -81,30 +83,32 @@ export function logout(redirectPath = "/account") {
  * Clear dashboard cache (call when data changes)
  */
 export function clearDashboardCache() {
+  if (typeof window === "undefined") return;
   localStorage.removeItem("dashboardData");
   localStorage.removeItem("dashboardDataTime");
 }
 
 /**
  * Set authentication data
- * @param {string} token 
- * @param {Object} user 
+ * @param {string} token
+ * @param {Object} user
  */
 export function setAuthData(token, user) {
+  if (typeof window === "undefined") return;
+
   if (token) {
     localStorage.setItem("authToken", token);
     localStorage.setItem("access_token", token);
   }
-  
+
   if (user) {
-    // Sanitize user data before storing
     const safeUser = { ...user };
     delete safeUser.password;
     delete safeUser.verificationOtp;
     delete safeUser.passwordResetOtp;
     delete safeUser.verificationOtpExpiryTime;
     delete safeUser.passwordResetOtpExpiryTime;
-    
+
     localStorage.setItem("user", JSON.stringify(safeUser));
   }
 }

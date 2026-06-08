@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { isAuthenticated, getAuthToken, getUser } from "../utils/auth";
-import { useNavigate } from "react-router-dom";
-
+import { useRouter } from 'next/navigation';
 const InstallmentReviews = ({ installmentPlanId, planId }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const [reviews, setReviews] = useState([]);
   const [statistics, setStatistics] = useState({
@@ -143,7 +142,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
     e.preventDefault();
     
     if (!isAuthenticated()) {
-      navigate("/account");
+      router.push("/account");
       return;
     }
 
@@ -233,7 +232,7 @@ const InstallmentReviews = ({ installmentPlanId, planId }) => {
 
   const handleMarkHelpful = async (reviewId) => {
     if (!isAuthenticated()) {
-      navigate("/account");
+      router.push("/account");
       return;
     }
 

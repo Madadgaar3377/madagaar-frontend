@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import toast from "react-hot-toast";
+import { consumeNavigationState } from "../utils/navigationState";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
 export default function ResetPassword() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const prefillEmail = location.state?.email || "";
+  const router = useRouter();
+  const [navState] = useState(() => consumeNavigationState() || {});
+  const prefillEmail = navState?.email || "";
 
   const [email, setEmail] = useState(prefillEmail);
   const [otp, setOtp] = useState("");
@@ -62,7 +63,7 @@ export default function ResetPassword() {
         toast.error(body?.message || "Reset failed. Please check OTP and try again.");
       } else {
         toast.success(body?.message || "Password reset successfully! Redirecting to login...");
-        setTimeout(() => navigate("/account"), 1500);
+        setTimeout(() => router.push("/account"), 1500);
       }
     } catch (err) {
       console.error(err);
@@ -140,7 +141,7 @@ export default function ResetPassword() {
 
             <button
               type="button"
-              onClick={() => navigate("/account")}
+              onClick={() => router.push("/account")}
               className="px-4 py-2 rounded-lg border text-sm text-gray-700"
             >
               Cancel
