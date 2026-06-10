@@ -41,38 +41,55 @@ const SEO = ({
   const resolvedDescription = truncateDescription(description, 160);
   const defaultStructuredData = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Madadgaar Expert Partner",
-    description:
-      "Trusted marketplace for property, insurance, loans, and installment solutions in Pakistan",
-    url: "https://madadgaar.com.pk",
-    logo: "https://madadgaar.com.pk/Media/Group%2033.png",
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: "+92-307-111-333-0",
-      contactType: "Customer Service",
-      email: "help.madadgaar@gmail.com",
-      areaServed: "PK",
-      availableLanguage: ["English", "Urdu"],
-    },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Lahore",
-      addressRegion: "Punjab",
-      addressCountry: "Pakistan",
-      streetAddress: "Gulberg III",
-    },
-    sameAs: [
-      "https://madadgaar.com.pk",
-      "https://play.google.com/store/apps/details?id=com.madadgaarexpert.app",
-    ],
-    founder: [
+    "@graph": [
       {
-        "@type": "Person",
-        name: "Raja Afzal",
-        jobTitle: "Founder & CEO",
+        "@type": "Organization",
+        "@id": "https://madadgaar.com.pk/#organization",
+        "name": "Madadgaar Expert Partner",
+        "description": "Trusted marketplace for property, insurance, loans, and installment solutions in Pakistan",
+        "url": "https://madadgaar.com.pk",
+        "logo": "https://madadgaar.com.pk/Media/Group%2033.png",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "telephone": "+92-307-111-333-0",
+          "contactType": "Customer Service",
+          "email": "help.madadgaar@gmail.com",
+          "areaServed": "PK",
+          "availableLanguage": ["English", "Urdu"]
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Lahore",
+          "addressRegion": "Punjab",
+          "addressCountry": "Pakistan",
+          "streetAddress": "Gulberg III"
+        },
+        "sameAs": [
+          "https://play.google.com/store/apps/details?id=com.madadgaarexpert.app"
+        ],
+        "founder": [
+          {
+            "@type": "Person",
+            "name": "Raja Afzal",
+            "jobTitle": "Founder & CEO"
+          }
+        ]
       },
-    ],
+      {
+        "@type": "WebSite",
+        "@id": "https://madadgaar.com.pk/#website",
+        "url": "https://madadgaar.com.pk",
+        "name": "Madadgaar Expert Partner",
+        "publisher": {
+          "@id": "https://madadgaar.com.pk/#organization"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://madadgaar.com.pk/properties?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    ]
   };
 
   return (

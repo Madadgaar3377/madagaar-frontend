@@ -153,21 +153,42 @@ const PropertyDetails = () => {
 
     if (!property) return null;
 
+    const plainDesc = property.description ? String(property.description).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
+    const metaDesc = plainDesc || (() => {
+        const parts = [property.title, property.type, property.transactionType, property.city, property.location];
+        const price = property.transaction?.price || property.transaction?.monthlyRent;
+        if (price) parts.push(`PKR ${Number(price).toLocaleString()}`);
+        parts.push("View details on Madadgaar.");
+        return parts.filter(Boolean).join(" · ");
+    })();
+
+    const structuredData = {
+        "@context": "https://schema.org",
+        "@type": property.type === "Project" ? "RealEstateListing" : "Product",
+        "name": property.title,
+        "description": metaDesc,
+        "image": property.images?.[0] || "https://madadgaar.com.pk/Media/Group%2033.png",
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "PKR",
+            "price": property.transaction?.price || property.transaction?.monthlyRent || 0,
+            "availability": "https://schema.org/InStock",
+            "url": `https://madadgaar.com.pk/property/${property._id}`,
+            "seller": {
+                "@type": "Organization",
+                "name": "Madadgaar Expert Partner"
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <SEO
                 title={`${property.title} | Madadgaar Properties`}
-                description={(function () {
-                    const plain = property.description ? String(property.description).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
-                    if (plain) return plain;
-                    const parts = [property.title, property.type, property.transactionType, property.city, property.location];
-                    const price = property.transaction?.price || property.transaction?.monthlyRent;
-                    if (price) parts.push(`PKR ${Number(price).toLocaleString()}`);
-                    parts.push("View details on Madadgaar.");
-                    return parts.filter(Boolean).join(" · ");
-                })()}
+                description={metaDesc}
                 canonicalUrl={`https://madadgaar.com.pk/property/${property._id}`}
                 ogImage={property.images?.[0]}
+                structuredData={structuredData}
             />
             {/* Breadcrumb */}
             <div className="bg-white border-b">

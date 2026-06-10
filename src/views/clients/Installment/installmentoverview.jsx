@@ -307,6 +307,26 @@ export default function InstallmentDetail() {
     ? `From PKR ${productPriceDisplay.displayPrice.toLocaleString()}${productPriceDisplay.hasDiscount ? ` (was PKR ${productPriceDisplay.cashPrice.toLocaleString()}, ${productPriceDisplay.discountPercent}% off)` : ""}`
     : (plan.paymentPlans?.[0]?.monthlyInstallment ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo` : "");
   const seoDescription = plainDesc || [detailDesc, priceInfo, "Compare & apply on Madadgaar."].filter(Boolean).join(" ");
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": plan.productName || "Installment Plan",
+    "description": seoDescription,
+    "image": firstImage || "https://madadgaar.com.pk/Media/Group%2033.png",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "PKR",
+      "price": productPriceDisplay.displayPrice > 0 ? productPriceDisplay.displayPrice : (plan.paymentPlans?.[0]?.monthlyInstallment || 0),
+      "availability": "https://schema.org/InStock",
+      "url": `https://madadgaar.com.pk/installment/${encodeURIComponent(id)}`,
+      "seller": {
+        "@type": "Organization",
+        "name": plan.companyName || plan.companyNameOther || "Madadgaar Partner"
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <SEO
@@ -314,6 +334,7 @@ export default function InstallmentDetail() {
         description={seoDescription}
         canonicalUrl={`https://madadgaar.com.pk/installment/${encodeURIComponent(id)}`}
         ogImage={firstImage}
+        structuredData={structuredData}
       />
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">

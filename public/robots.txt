@@ -20,5 +20,17 @@ Crawl-delay: 1
 # Sitemap location
 Sitemap: https://madadgaar.com.pk/sitemap.xml
 
+# AI and LLM Bots (Generative Engine Optimization)
+User-agent: GPTBot
+Allow: /
+User-agent: CCBot
+Allow: /
+User-agent: Google-Extended
+Allow: /
+User-agent: PerplexityBot
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+
 # Host
 Host: https://madadgaar.com.pk
