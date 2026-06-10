@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { getAuthToken, getUser, isAuthenticated } from '../../../utils/auth';
 import { backendBaseUrl } from '../../../constants/apiUrl';
 import SEO from '../../../components/SEO';
@@ -23,6 +23,7 @@ import {
 const ApplyInstallment = () => {
   const { id } = useParams(); // installment plan ID
   const router = useRouter();
+  const searchParams = useSearchParams();
   const currentUser = getUser();
   
   const [loading, setLoading] = useState(false);
@@ -89,15 +90,14 @@ const ApplyInstallment = () => {
       return;
     }
 
-    // Extract indices from URL
-    const params = new URLSearchParams(window.searchParams.toString());
-    const pIdx = params.get('planIndex');
-    const vIdx = params.get('variantIndex');
+    // Extract plan/variant indices from URL query (?planIndex=0&variantIndex=1)
+    const pIdx = searchParams.get('planIndex');
+    const vIdx = searchParams.get('variantIndex');
     if (pIdx !== null && !Number.isNaN(Number(pIdx))) setSelectedPlanIndex(parseInt(pIdx, 10));
     if (vIdx !== null && !Number.isNaN(Number(vIdx))) setSelectedVariantIndex(parseInt(vIdx, 10));
 
-    fetchPlanDetails();
-  }, [fetchPlanDetails, router]);
+    if (id) fetchPlanDetails();
+  }, [fetchPlanDetails, router, searchParams, id]);
 
   const variantCount = plan?.variants?.length || 0;
   const showVariantPicker = variantCount > 0;
