@@ -893,10 +893,89 @@ flowchart TB
 
 **Rules for API integrators:**
 
-| Role | Create product | Edit product name/images | Add plan | Edit own plan | Delete product |
-|------|------------------|--------------------------|----------|---------------|----------------|
-| Owner | ✅ | ✅ | ✅ | ✅ | ✅ (full delete) |
-| Contributor | ❌ (add plan to existing) | ❌ | ✅ | ✅ | ❌ (only remove own plans) |
+| Role | Create new listing | Join existing product | Edit name/images/specs | Add payment plan | Edit own plan / pricing | Delete whole product | Remove own plan |
+|------|-------------------|----------------------|------------------------|------------------|-------------------------|----------------------|-----------------|
+| **Owner** | ✅ `POST /createInstallmentPlan` | — | ✅ `PUT /updateInstallment/:id` | ✅ | ✅ | ✅ `DELETE /deleteInstallment/:id` | ✅ |
+| **Contributor** | ❌ | ✅ select product + `POST /installment/:id/add-plan` | ❌ (UI locked) | ✅ | ✅ `PUT` merge + `partnerPricing` | ❌ **403** | ✅ `DELETE /installment/:id/payment-plan/:planId` |
+
+> **Contributor** = partner who added their own `paymentPlans`, `partnerPricing`, or partner-owned variants on **another company’s** catalog product (`partnerRole: "contributor"` / `isProductOwner: false`).
+
+### 10.1 Is the Contributor row actually possible? (backend check)
+
+**Yes — mostly implemented today.** Verified against `backend-Nodejs-Express` and `partner-panel`.
+
+| Capability | Possible? | How it works today | API / file |
+|------------|-----------|-------------------|------------|
+| Create **new** catalog listing as contributor | ❌ No | Contributor does not call `createInstallmentPlan` for someone else’s product | — |
+| **Join** existing product (add plans) | ✅ Yes | Pick product in create flow → `POST /installment/:id/add-plan` | `addPaymentPlanToInstallment.js` |
+| Edit product name, images, description | ❌ Intended no | Partner panel locks fields when `isAttachedProduct` (contributor on shared product) | `EditInstallmentPlan.jsx` → `fieldsLocked` |
+| Add own payment plan | ✅ Yes | Plan stamped with `partnerId`; no owner check on add-plan | `POST /installment/:id/add-plan` |
+| Edit **own** payment plans only | ✅ Yes | `paymentPlanMerge.js` merges only editor’s plans; others preserved | `PUT /updateInstallment/:id` |
+| Set own **cash pricing** on shared product | ✅ Yes | `partnerPricing`, `partnerBasePrice`, `partnerVariantPricing` | `enrichUpdateWithPartnerPricing` |
+| Add **partner-owned variants** (own SKUs) | ✅ Yes | `partnerOwnedVariants` on update | `mergePartnerOwnedVariants` |
+| Delete **entire** product | ❌ No | Non-owner gets **403** | `deleteInstallmentPlan.js` L48–60 |
+| Remove **only own** payment plan | ✅ Yes | Must match `plan.partnerId` | `removePartnerPaymentPlan.js` |
+| See other partners’ plans in portal | ❌ No | Stripped in API response | `filterInstallmentPlansForPartner` |
+| List shared products in dashboard | ✅ Yes | Query: owner OR has plans on product | `fetchPartnerInstallments` |
+
+```mermaid
+flowchart TD
+    subgraph ContributorCan["Contributor CAN"]
+        A1[POST /installment/:id/add-plan]
+        A2[PUT /updateInstallment/:id<br/>own plans + partnerPricing only]
+        A3[DELETE /installment/:id/payment-plan/:planId<br/>own plan only]
+        A4[GET /getPartnerInstallment/:id<br/>sees only own plans]
+        A5[GET /getAllCreateInstallnment<br/>lists shared + owned products]
+    end
+
+    subgraph ContributorCannot["Contributor CANNOT"]
+        B1[POST /createInstallmentPlan<br/>as owner of others product]
+        B2[DELETE /deleteInstallment/:id<br/>whole listing — 403]
+        B3[Edit productName / productImages<br/>in partner panel UI]
+    end
+```
+
+#### Contributor flow in partner panel (today)
+
+```mermaid
+sequenceDiagram
+    participant P as Contributor Partner
+    participant PP as Partner Panel
+    participant API as Backend API
+
+    P->>PP: Create → select existing product
+    PP->>API: POST /installment/:id/add-plan
+    API-->>PP: plan added with partnerId=B
+
+    P->>PP: Installments list → badge "Shared — your plans"
+    P->>PP: Edit → fieldsLocked (name/images read-only)
+    PP->>API: PUT /updateInstallment/:id (plans + partnerPricing only)
+    API->>API: paymentPlanMerge — keep other partners plans
+
+    P->>PP: Delete one plan
+    PP->>API: DELETE /installment/:id/payment-plan/:planId
+    API-->>PP: OK
+
+    P->>PP: Try delete whole listing
+    PP->>API: DELETE /deleteInstallment/:id
+    API-->>PP: 403 — only owner can delete listing
+```
+
+#### ⚠️ Gaps before Partner API keys (must fix)
+
+| Gap | Risk | Fix for API v1 |
+|-----|------|----------------|
+| `PUT /updateInstallment/:id` has **no server-side block** on `productName` / `productImages` for contributors | Contributor could change catalog via raw API | Reject catalog fields when `!isProductOwner` |
+| `POST /installment/:id/add-plan` has **no check** partner is “joined” to product | Any partner could add plan to any product ID | Optional: require prior `partnerPricing` or explicit link |
+| `createInstallmentPlan` accepts `userId` from body | Spoof another partner | Force `userId = req.user.userId` |
+
+#### Extra contributor features (not in old table)
+
+| Feature | Supported? | Endpoint / field |
+|---------|------------|------------------|
+| Cash-only on shared product (no installment plan) | ✅ | `submitPartnerCatalogPricing` → `partnerPricing` |
+| Partner-owned variant SKUs | ✅ | `partnerOwnedVariants` on PUT |
+| Applications for contributor plans | ✅ | `ApplyInstallements.createdBy` = plan’s `partnerId` |
 
 ---
 
