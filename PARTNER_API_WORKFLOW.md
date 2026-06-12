@@ -1,13 +1,38 @@
-# Partner API Key  Complete Workflow & Architecture
+# Partner API Key — Complete Workflow & Architecture
 
 > **Purpose:** Let verified Madadgaar partners connect their **own website / panel / ERP** to Madadgaar using an **API key**, so they can manage installments, applications, and dashboard data without logging into `partner.madadgaar.com.pk` for every action.
 
 **Base API (production):** `https://api.madadgaar.com.pk/api`  
+**Partner integration base:** `https://api.madadgaar.com.pk/api/v1/partner`  
 **Partner panel (human UI):** `https://partner.madadgaar.com.pk`  
-**Partner API docs (panel):** `https://partner.madadgaar.com.pk/settings/api-keys/docs`  
-**This document (repo):** `docs/PARTNER_API_WORKFLOW.md`  
-**Backend repo:** `backend-Nodejs-Express/`  
+**Public API docs:** `https://docs.madadgaar.com.pk`  
+**Panel quick test:** `https://partner.madadgaar.com.pk/settings/api-keys/docs`  
+**This document (repo):** `madagaar-frontend/PARTNER_API_WORKFLOW.md`  
+**Backend module:** `backend-Nodejs-Express/thirdPartyApis/` (+ `thirdPartyApis/README.md`)  
+**Docs site repo:** `docs-madadgaar/`  
 **Partner panel repo:** `partner-panel/`
+
+---
+
+## Implementation status (current)
+
+| Area | Status | Notes |
+|------|--------|-------|
+| `PartnerApiKey` model + bcrypt | ✅ Done | `models/PartnerApiKey.js` |
+| `verifyPartnerApiKey` middleware | ✅ Done | Bearer or `X-API-Key` |
+| Key CRUD + emails | ✅ Done | `/api/v1/partner/keys` (JWT) |
+| `GET /me`, dashboard | ✅ Done | Any valid key / `dashboard:read` |
+| Installments v1 CRUD | ✅ Done | Wraps existing controllers |
+| Partner panel API Keys UI | ✅ Done | `/settings/api-keys` |
+| Public docs site | ✅ Done | `docs.madadgaar.com.pk` |
+| Applications v1 router | ✅ Done | `/applications` list, get, patch status, delete |
+| OpenAPI / Postman | ✅ Done | `openapi.json` + Postman collection in repo |
+| Rate limits per key | ✅ Done | 100/min + 20 writes/min |
+| API audit logs | ✅ Done | `PartnerApiAuditLog` + admin routes |
+| Admin usage dashboard API | ✅ Done | `GET /api/admin/partner-api/usage` |
+| Admin usage UI (frontend) | ⏳ Planned | API ready; admin panel charts TBD |
+
+See live checklist: **https://docs.madadgaar.com.pk/status**
 
 ---
 
@@ -75,8 +100,9 @@ flowchart LR
 |------|-----|
 | API Keys list | `https://partner.madadgaar.com.pk/settings/api-keys` |
 | Generate key modal | Same page → **Generate Key** button |
-| API documentation | `https://partner.madadgaar.com.pk/settings/api-keys/docs` |
-| Link in navbar | **Settings → API Keys** |
+| In-panel quick test | `https://partner.madadgaar.com.pk/settings/api-keys/docs` |
+| **Full public documentation** | **`https://docs.madadgaar.com.pk`** |
+| Link in navbar | **Settings → API Documentation** + top **API Docs** button |
 
 #### Backend  key management endpoints (JWT only)
 
@@ -285,58 +311,47 @@ flowchart TB
 
 | Document | Location | Audience |
 |----------|----------|----------|
-| **This workflow** | `docs/PARTNER_API_WORKFLOW.md` (repo) | Dev team + partners (export to PDF) |
-| **Partner panel in-app docs** | `partner.madadgaar.com.pk/settings/api-keys/docs` | Partners (copy-paste curl examples) |
-| **OpenAPI / Swagger** | `GET /api/v1/partner/openapi.json` | Postman import, code generators |
-| **Postman collection** | `docs/postman/Madadgaar-Partner-API.postman_collection.json` (to add) | Partners |
-| **Section 0 (this)** | Quick path reference | Start here |
+| **Public docs site** | **https://docs.madadgaar.com.pk** | Partners + developers (primary) |
+| **API status / roadmap** | https://docs.madadgaar.com.pk/status | What is live vs planned |
+| **This workflow** | `madagaar-frontend/PARTNER_API_WORKFLOW.md` | Dev team architecture |
+| **Backend module README** | `backend-Nodejs-Express/thirdPartyApis/README.md` | Backend developers |
+| **Partner panel quick test** | `partner.madadgaar.com.pk/settings/api-keys/docs` | In-panel curl + live test |
+| **Postman collection** | `docs/postman/` (to add) | Partners |
 
-**Partner panel docs page should show:**
+**Public docs site includes:**
 
-1. Link to create key → `/settings/api-keys`
+1. Getting started + key creation flow
 2. Base URL → `https://api.madadgaar.com.pk/api/v1/partner`
-3. Header format → `Authorization: Bearer mg_live_...`
-4. Table of all endpoints from [§0.2](#02-where-partners-use-the-api-key-integration-endpoints)
-5. Scopes table from [§12](#12-scopes--permissions-matrix)
-6. Download OpenAPI button
+3. Installments complete payload (variants, finance, field tables)
+4. Code examples with **Test now** → https://www.apitestlab.org/tester
+5. Scopes matrix + security guide
 
 ---
 
-### 0.6 Backend route registration (implementation)
+### 0.6 Backend route registration (implemented)
 
-Add to `backend-Nodejs-Express/routes/routes.js`:
+In `backend-Nodejs-Express/routes/routes.js`:
 
 ```js
-// ─── Partner API v1 ───────────────────────────────────────────────
-const partnerApiV1 = require("./partnerApiV1");
+const partnerApiV1 = require("../thirdPartyApis");
 
-// A) Key management  JWT only (partner logged into panel)
 router.use("/v1/partner/keys", verifyUser, requirePartner, partnerApiV1.keysRouter);
-
-// B) Integration  API key
 router.use("/v1/partner", verifyPartnerApiKey, partnerApiV1.integrationRouter);
-
-// C) OpenAPI spec (public read)
-router.get("/v1/partner/openapi.json", partnerApiV1.openApiSpec);
 ```
 
-File layout:
+File layout (actual):
 
 ```
-backend-Nodejs-Express/
-  routes/
-    partnerApiV1/
-      index.js              # mounts keys + integration routers
-      keysRouter.js         # POST/GET/DELETE /v1/partner/keys
-      integrationRouter.js  # installments, applications, dashboard, me
-      openapi.json          # or generated spec
-  partner/apiKeys/
-    createPartnerApiKey.js
-    listPartnerApiKeys.js
-    revokePartnerApiKey.js
-  Middelware/
-    verifyPartnerApiKey.js
-    requirePartner.js       # UserType === partner && isVerified
+backend-Nodejs-Express/thirdPartyApis/
+  index.js
+  README.md
+  apiKeys/          # keysRouter + CRUD + emails
+  integration/      # /me, dashboardRouter, mounts installments
+  installments/     # installmentsRouter + listPartnerInstallments
+  middleware/       # attachPartnerUser, forcePartnerBody
+models/PartnerApiKey.js
+Middelware/verifyPartnerApiKey.js
+Middelware/requirePartner.js
 ```
 
 ---
@@ -1115,16 +1130,14 @@ flowchart LR
 
 ## 14. Gaps to fix before launch
 
-These exist in the **current** backend and must be fixed **before** exposing API keys:
-
-| # | Issue | Risk | Fix |
-|---|-------|------|-----|
-| 1 | `GET /getApplication/:id`  no `createdBy` check | Any verified user can read any application | Add `assertApplicationOwner(partnerId)` |
-| 2 | `PUT /updateApplicationStatus`  no ownership check | Partner could change another partner's leads | Require `createdBy === req.partner.userId` |
-| 3 | `createInstallmentPlan` accepts `userId` in body | Spoof another partner | Force `userId = req.user.userId` or `req.partner.userId` |
-| 4 | No API key model | Cannot launch feature | Add `PartnerApiKey` schema |
-| 5 | `LoginWithToken` calls `/api/auth/partnerSession` | Broken deep link | Use `/api/partnerSession` |
-| 6 | `userToken` fields on User unused | Confusion | Deprecate in favor of `PartnerApiKey` |
+| # | Issue | Risk | Fix | Status |
+|---|-------|------|-----|--------|
+| 1 | `GET /getApplication/:id` — no `createdBy` check | Cross-partner read | Add ownership assert | ⏳ Before applications v1 |
+| 2 | `PUT /updateApplicationStatus` — no ownership check | Cross-partner write | Require `createdBy === partnerId` | ⏳ Before applications v1 |
+| 3 | `createInstallmentPlan` accepts `userId` in body | Spoof partner | `forcePartnerBody` on v1 routes | ✅ Done |
+| 4 | No API key model | Cannot launch | `PartnerApiKey` schema | ✅ Done |
+| 5 | `deleteInstallmentPlan` wrong R2 import path | Delete fails | Fixed `../../ImagesUploadR2/...` | ✅ Done |
+| 6 | Applications not on v1 router | CRM cannot use API key | Add `applicationsRouter.js` | ⏳ Planned |
 
 ---
 
@@ -1152,28 +1165,29 @@ gantt
     Sandbox mg_test keys                   :p5b, after p5a, 7d
 ```
 
-### Phase 1  Foundation (week 1–2)
-- [ ] `models/PartnerApiKey.js`
-- [ ] `Middelware/verifyPartnerApiKey.js`
-- [ ] Fix application ownership checks
-- [ ] Force `partnerId` from auth context on create/update
+### Phase 1 — Foundation ✅
+- [x] `models/PartnerApiKey.js`
+- [x] `Middelware/verifyPartnerApiKey.js`
+- [x] `Middelware/requirePartner.js`
+- [x] Force `partnerId` from auth context on create/update (`forcePartnerBody.js`)
 
-### Phase 2  Core API (week 3–4)
-- [ ] Router `routes/partnerApiV1.js`
-- [ ] Wrap existing controllers (thin adapters)
-- [ ] OpenAPI / Postman collection
+### Phase 2 — Core API ✅
+- [x] `thirdPartyApis/` routers
+- [x] Wrap existing installment + dashboard controllers
+- [x] Applications router on v1
+- [x] OpenAPI spec + Postman collection
 
-### Phase 3  Partner panel UI (week 5)
-- [ ] `partner-panel/src/pages/settings/ApiKeys.jsx` → route `/settings/api-keys`
-- [ ] `partner-panel/src/pages/settings/ApiKeysDocs.jsx` → route `/settings/api-keys/docs`
-- [ ] Generate / revoke / scope picker (calls `POST /api/v1/partner/keys`)
-- [ ] Link from Navbar → Settings → API Keys
-- [ ] Docs page: full endpoint table from §0.2 + copy curl buttons
+### Phase 3 — Partner panel UI ✅
+- [x] `partner-panel/src/pages/settings/ApiKeys.jsx`
+- [x] `partner-panel/src/pages/settings/ApiKeysDocs.jsx`
+- [x] Navbar links to API Keys + docs.madadgaar.com.pk
+- [x] Public docs site `docs-madadgaar/` → docs.madadgaar.com.pk
 
-### Phase 4  Production hardening (week 6–7)
-- [ ] Per-key rate limiting
-- [ ] `PartnerApiAuditLog` + usage UI
-- [ ] Admin revoke all keys for blocked partner
+### Phase 4 — Production hardening ✅ (API layer)
+- [x] Per-key rate limiting (100/min + 20 writes/min)
+- [x] `PartnerApiAuditLog` + admin usage API
+- [ ] Admin panel UI charts for API usage
+- [ ] Application ownership fixes on legacy JWT routes (partial — partner checks added)
 
 ---
 
@@ -1300,4 +1314,4 @@ sequenceDiagram
 
 ---
 
-*Document version: 1.0  aligned with backend audit of `backend-Nodejs-Express` and `partner-panel` as of project review.*
+*Document version: 2.0 — aligned with `thirdPartyApis/`, `docs-madadgaar/`, and partner panel as of implementation review.*

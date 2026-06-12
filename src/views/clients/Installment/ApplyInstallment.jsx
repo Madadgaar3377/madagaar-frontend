@@ -19,6 +19,23 @@ import {
   isPartnerOwnedVariant,
   isCashOnlyInstallment,
 } from '../../../utils/installmentPricing';
+import InstallmentCheckoutStep from './InstallmentCheckoutStep';
+import cities from '../../../constants/cities';
+import { getAreasForCity } from '../../../constants/cityAreas';
+import { FormSection, inputClass, labelClass } from './InstallmentApplyShared';
+
+const buildApplicationNote = (formData) => {
+  const meta = [
+    formData.cnic && `CNIC: ${formData.cnic.trim()}`,
+    formData.alternativePhone && `Alternative phone: ${formData.alternativePhone.trim()}`,
+    formData.area && `Area: ${formData.area.trim()}`,
+  ].filter(Boolean);
+
+  const notes = (formData.applicationNote || '').trim();
+  if (meta.length && notes) return `${meta.join('\n')}\n---\n${notes}`;
+  if (meta.length) return meta.join('\n');
+  return notes;
+};
 
 const ApplyInstallment = () => {
   const { id } = useParams(); // installment plan ID
@@ -34,15 +51,19 @@ const ApplyInstallment = () => {
   const [selectedEntryIdx, setSelectedEntryIdx] = useState(0);
   /** Which partner cash offer (when no installment plan on variant) */
   const [selectedCashOfferKey, setSelectedCashOfferKey] = useState('');
+  const [currentStep, setCurrentStep] = useState('details');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const { toasts, success: showSuccess, error: showError, removeToast } = useToast();
   
   const [formData, setFormData] = useState({
-    // User Info
     name: currentUser?.name || '',
     email: currentUser?.email || '',
     phone: currentUser?.phoneNumber || '',
+    alternativePhone: '',
+    cnic: currentUser?.cnicNumber || '',
     address: currentUser?.Address || '',
     city: '',
+    area: '',
     state: '',
     zip: '',
     country: 'Pakistan',
@@ -212,18 +233,11 @@ const ApplyInstallment = () => {
     }));
   };
 
-  const validateForm = () => {
-    if (!formData.name || !formData.email || !formData.phone) {
-      showError('Please fill in all required fields (Name, Email, Phone)');
-      return false;
-    }
+  const setFormField = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    if (!formData.address || !formData.city) {
-      showError('Please provide your address and city');
-      return false;
-    }
-
-    const variantCount = plan?.variants?.length || 0;
+  const validatePlanSelection = () => {
     if (variantCount > 0 && (selectedVariantIndex === null || selectedVariantIndex === undefined)) {
       showError('Please select a product variant (specification) before submitting.');
       return false;
@@ -242,11 +256,65 @@ const ApplyInstallment = () => {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const validateDetailsStep = () => {
+    if (!validatePlanSelection()) return false;
+
+    if (!formData.name?.trim() || !formData.email?.trim() || !formData.phone?.trim()) {
+      showError('Please fill in all required fields (Name, Email, Phone)');
+      return false;
+    }
+
+    if (!formData.cnic?.trim()) {
+      showError('Please enter your CNIC number');
+      return false;
+    }
+
+    if (!formData.city?.trim()) {
+      showError('Please select your city');
+      return false;
+    }
+
+    if (!formData.area?.trim()) {
+      showError('Please select or enter your area');
+      return false;
+    }
+
+    if (!formData.address?.trim()) {
+      showError('Please provide your address');
+      return false;
+    }
+
+    return true;
+  };
+
+  const validateCheckout = () => {
+    if (!validateDetailsStep()) {
+      return false;
+    }
+
+    if (!termsAccepted) {
+      showError('Please accept the terms and conditions to place your order');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleContinueToCheckout = (e) => {
     e.preventDefault();
+    if (!validateDetailsStep()) return;
+    setCurrentStep('checkout');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const areaOptions = getAreasForCity(formData.city);
+  const showAreaSelect = areaOptions.length > 0;
+
+  const handleSubmit = async (e) => {
+    if (e?.preventDefault) e.preventDefault();
     setLoading(true);
 
-    if (!validateForm()) {
+    if (!validateCheckout()) {
       setLoading(false);
       return;
     }
@@ -254,7 +322,6 @@ const ApplyInstallment = () => {
     try {
       const token = getAuthToken();
 
-      // Ensure we have the installmentPlanId
       const planId = plan?.installmentPlanId || plan?._id;
       
       if (!planId) {
@@ -269,11 +336,11 @@ const ApplyInstallment = () => {
         selectedPartnerId: selectedCashOffer?.partnerId || selectedPlan?.partnerId || undefined,
         selectedCashPrice: selectedCashOffer?.price || undefined,
         selectedPartnerCompanyName: selectedCashOffer?.companyName || selectedPlan?.companyName || undefined,
-        applicationNote: formData.applicationNote,
+        applicationNote: buildApplicationNote(formData),
         userInfo: {
           address: formData.address,
           city: formData.city,
-          state: formData.state,
+          state: formData.area || formData.state,
           zip: formData.zip,
           country: formData.country,
           occupation: formData.occupation,
@@ -282,7 +349,7 @@ const ApplyInstallment = () => {
           jobTitle: formData.jobTitle,
           monthlyIncome: formData.monthlyIncome,
           otherIncomeSources: formData.otherIncomeSources,
-          workContactNumber: formData.workContactNumber,
+          workContactNumber: formData.alternativePhone || formData.workContactNumber,
         }
       };
 
@@ -303,7 +370,7 @@ const ApplyInstallment = () => {
         throw new Error(errorMessage);
       }
 
-      showSuccess('Application submitted successfully! Our agent will contact you soon.');
+      showSuccess('Your order has been placed successfully! Our agent will contact you soon.');
       
       // Redirect to dashboard after 2 seconds
       setTimeout(() => {
@@ -397,7 +464,7 @@ const ApplyInstallment = () => {
       />
 
       <div className="min-h-screen bg-gray-50 section-padding">
-        <div className="container-content max-w-5xl">
+        <div className="container-content max-w-6xl">
           {/* Header */}
           <div className="mb-6 sm:mb-8">
             <button type="button"
@@ -410,16 +477,45 @@ const ApplyInstallment = () => {
               Back
             </button>
             <h1 className="text-responsive-xl font-bold text-gray-900">
-              Apply for Installment Plan
+              {currentStep === 'checkout' ? 'Checkout' : 'Apply for Installment Plan'}
             </h1>
-            <p className="text-gray-600 mt-2 text-responsive-sm">Complete the form below to apply for this installment plan</p>
+            <p className="text-gray-600 mt-2 text-responsive-sm">
+              {currentStep === 'checkout'
+                ? 'Review your details and confirm your application'
+                : 'Complete the form below to apply for this installment plan'}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            {currentStep === 'checkout' ? (
+              <div className="p-4 sm:p-6 lg:p-8">
+                <InstallmentCheckoutStep
+                  plan={plan}
+                  formData={formData}
+                  selectedVariant={selectedVariant}
+                  selectedPlan={selectedPlan}
+                  selectedCashOffer={selectedCashOffer}
+                  cashOnlyPlan={cashOnlyPlan}
+                  summaryCashDisplay={summaryCashDisplay}
+                  summaryCashPrice={summaryCashPrice}
+                  resolvedPartnerName={resolvedPartnerName}
+                  partnerLogo={partnerLogo}
+                  termsAccepted={termsAccepted}
+                  setTermsAccepted={setTermsAccepted}
+                  loading={loading}
+                  onBack={() => {
+                    setCurrentStep('details');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  onSubmit={handleSubmit}
+                />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 xl:grid-cols-12 gap-0 xl:divide-x divide-gray-100">
             {/* Plan Summary Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Plan Summary</h2>
+            <div className="xl:col-span-4 bg-gray-50/60 p-4 sm:p-6 lg:p-8">
+              <div className="xl:sticky xl:top-6 space-y-5">
+                <h2 className="text-lg font-semibold text-gray-900">Plan Summary</h2>
                 
                 <div className="aspect-square w-full mb-4 rounded-lg overflow-hidden bg-gray-100">
                   <img
@@ -628,285 +724,162 @@ const ApplyInstallment = () => {
                     )}
                   </div>
                 )}
+
               </div>
             </div>
 
             {/* Application Form */}
-            <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md">
-                {/* Personal Information */}
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h2>
+            <div className="xl:col-span-8">
+              <form onSubmit={handleContinueToCheckout} className="divide-y divide-gray-100">
+                <FormSection title="Personal Information" description="Your contact and delivery details">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name *
-                      </label>
-                      <input id="name"
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={updateFormField}
-                        required
-                        disabled
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-                      />
+                      <label htmlFor="name" className={labelClass}>Full Name *</label>
+                      <input id="name" type="text" name="name" value={formData.name} disabled
+                        className={`${inputClass} bg-gray-50 cursor-not-allowed`} />
                     </div>
-
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                        Email *
-                      </label>
-                      <input id="email"
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={updateFormField}
-                        required
-                        disabled
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 cursor-not-allowed"
-                      />
+                      <label htmlFor="email" className={labelClass}>Email *</label>
+                      <input id="email" type="email" name="email" value={formData.email} disabled
+                        className={`${inputClass} bg-gray-50 cursor-not-allowed`} />
                     </div>
-
                     <div>
-                      <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input id="phone"
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={updateFormField}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="+92 300 1234567"
-                      />
+                      <label htmlFor="phone" className={labelClass}>Phone Number *</label>
+                      <input id="phone" type="tel" name="phone" value={formData.phone} onChange={updateFormField}
+                        required className={inputClass} placeholder="+92 300 1234567" />
                     </div>
-
                     <div>
-                      <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
-                        City *
+                      <label htmlFor="alternativePhone" className={labelClass}>
+                        Alternative Number <span className="text-gray-400 font-normal">(optional)</span>
                       </label>
-                      <input id="city"
-                        type="text"
-                        name="city"
-                        value={formData.city}
-                        onChange={updateFormField}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Enter your city"
-                      />
+                      <input id="alternativePhone" type="tel" name="alternativePhone" value={formData.alternativePhone}
+                        onChange={updateFormField} className={inputClass} placeholder="+92 321 0000000" />
                     </div>
-
+                    <div>
+                      <label htmlFor="cnic" className={labelClass}>CNIC Number *</label>
+                      <input id="cnic" type="text" name="cnic" value={formData.cnic} onChange={updateFormField}
+                        required maxLength={15} className={inputClass} placeholder="35202-1234567-1" />
+                    </div>
+                    <div>
+                      <label htmlFor="city" className={labelClass}>Select City *</label>
+                      <select id="city" name="city" value={formData.city} required
+                        onChange={(e) => { updateFormField(e); setFormField('area', ''); }}
+                        className={`${inputClass} bg-white`}>
+                        <option value="">Select a city</option>
+                        {cities.map((c) => (
+                          <option key={c.value} value={c.value}>{c.title}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="area" className={labelClass}>Select Area *</label>
+                      {showAreaSelect ? (
+                        <select id="area" name="area" value={formData.area} onChange={updateFormField} required
+                          className={`${inputClass} bg-white`}>
+                          <option value="">Select area</option>
+                          {areaOptions.map((a) => (
+                            <option key={a} value={a}>{a}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input id="area" type="text" name="area" value={formData.area} onChange={updateFormField}
+                          required disabled={!formData.city} className={`${inputClass} disabled:bg-gray-50`}
+                          placeholder={formData.city ? 'Enter your area' : 'Select a city first'} />
+                      )}
+                    </div>
                     <div className="sm:col-span-2">
-                      <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-2">
-                        Address *
-                      </label>
-                      <textarea id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={updateFormField}
-                        required
-                        rows="2"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Enter your complete address"
-                      />
+                      <label htmlFor="address" className={labelClass}>Address *</label>
+                      <textarea id="address" name="address" value={formData.address} onChange={updateFormField}
+                        required rows={2} className={inputClass} placeholder="Enter your complete address" />
                     </div>
-
                     <div>
-                      <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-2">
-                        State/Province
-                      </label>
-                      <input id="state"
-                        type="text"
-                        name="state"
-                        value={formData.state}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., Punjab, Sindh"
-                      />
+                      <label htmlFor="state" className={labelClass}>State / Province</label>
+                      <input id="state" type="text" name="state" value={formData.state} onChange={updateFormField}
+                        className={inputClass} placeholder="e.g., Punjab, Sindh" />
                     </div>
-
                     <div>
-                      <label htmlFor="zip" className="block text-sm font-medium text-gray-700 mb-2">
-                        Postal Code
-                      </label>
-                      <input id="zip"
-                        type="text"
-                        name="zip"
-                        value={formData.zip}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., 54000"
-                      />
+                      <label htmlFor="zip" className={labelClass}>Postal Code</label>
+                      <input id="zip" type="text" name="zip" value={formData.zip} onChange={updateFormField}
+                        className={inputClass} placeholder="e.g., 54000" />
                     </div>
                   </div>
-                </div>
+                </FormSection>
 
-                {/* Employment Information */}
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Employment Information</h2>
+                <FormSection title="Employment Information">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="occupation" className="block text-sm font-medium text-gray-700 mb-2">
-                        Occupation
-                      </label>
-                      <input id="occupation"
-                        type="text"
-                        name="occupation"
-                        value={formData.occupation}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., Software Engineer"
-                      />
+                      <label htmlFor="occupation" className={labelClass}>Occupation</label>
+                      <input id="occupation" type="text" name="occupation" value={formData.occupation}
+                        onChange={updateFormField} className={inputClass} placeholder="e.g., Software Engineer" />
                     </div>
-
                     <div>
-                      <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700 mb-2">
-                        Job Title
-                      </label>
-                      <input id="jobTitle"
-                        type="text"
-                        name="jobTitle"
-                        value={formData.jobTitle}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., Senior Developer"
-                      />
+                      <label htmlFor="jobTitle" className={labelClass}>Job Title</label>
+                      <input id="jobTitle" type="text" name="jobTitle" value={formData.jobTitle}
+                        onChange={updateFormField} className={inputClass} placeholder="e.g., Senior Developer" />
                     </div>
-
                     <div>
-                      <label htmlFor="employerName" className="block text-sm font-medium text-gray-700 mb-2">
-                        Employer Name
-                      </label>
-                      <input id="employerName"
-                        type="text"
-                        name="employerName"
-                        value={formData.employerName}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Company name"
-                      />
+                      <label htmlFor="employerName" className={labelClass}>Employer Name</label>
+                      <input id="employerName" type="text" name="employerName" value={formData.employerName}
+                        onChange={updateFormField} className={inputClass} placeholder="Company name" />
                     </div>
-
                     <div>
-                      <label htmlFor="workContactNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                        Work Contact Number
-                      </label>
-                      <input id="workContactNumber"
-                        type="tel"
-                        name="workContactNumber"
-                        value={formData.workContactNumber}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="+92 300 1234567"
-                      />
+                      <label htmlFor="workContactNumber" className={labelClass}>Work Contact Number</label>
+                      <input id="workContactNumber" type="tel" name="workContactNumber" value={formData.workContactNumber}
+                        onChange={updateFormField} className={inputClass} placeholder="+92 300 1234567" />
                     </div>
-
                     <div className="sm:col-span-2">
-                      <label htmlFor="employerAddress" className="block text-sm font-medium text-gray-700 mb-2">
-                        Employer Address
-                      </label>
-                      <textarea id="employerAddress"
-                        name="employerAddress"
-                        value={formData.employerAddress}
-                        onChange={updateFormField}
-                        rows="2"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Company address"
-                      />
+                      <label htmlFor="employerAddress" className={labelClass}>Employer Address</label>
+                      <textarea id="employerAddress" name="employerAddress" value={formData.employerAddress}
+                        onChange={updateFormField} rows={2} className={inputClass} placeholder="Company address" />
                     </div>
                   </div>
-                </div>
+                </FormSection>
 
-                {/* Financial Information */}
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Information</h2>
+                <FormSection title="Financial Information">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="monthlyIncome" className="block text-sm font-medium text-gray-700 mb-2">
-                        Monthly Income
-                      </label>
-                      <input id="monthlyIncome"
-                        type="number"
-                        name="monthlyIncome"
-                        value={formData.monthlyIncome}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., 50000"
-                      />
+                      <label htmlFor="monthlyIncome" className={labelClass}>Monthly Income</label>
+                      <input id="monthlyIncome" type="number" name="monthlyIncome" value={formData.monthlyIncome}
+                        onChange={updateFormField} className={inputClass} placeholder="e.g., 50000" />
                     </div>
-
                     <div>
-                      <label htmlFor="otherIncomeSources" className="block text-sm font-medium text-gray-700 mb-2">
-                        Other Income Sources
-                      </label>
-                      <input id="otherIncomeSources"
-                        type="text"
-                        name="otherIncomeSources"
-                        value={formData.otherIncomeSources}
-                        onChange={updateFormField}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="e.g., Freelancing, Business"
-                      />
+                      <label htmlFor="otherIncomeSources" className={labelClass}>Other Income Sources</label>
+                      <input id="otherIncomeSources" type="text" name="otherIncomeSources" value={formData.otherIncomeSources}
+                        onChange={updateFormField} className={inputClass} placeholder="e.g., Freelancing, Business" />
                     </div>
                   </div>
-                </div>
+                </FormSection>
 
-                {/* Additional Notes */}
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
+                <FormSection title="Additional Information">
                   <div>
-                    <label htmlFor="applicationNote" className="block text-sm font-medium text-gray-700 mb-2">
-                      Application Notes (Optional)
+                    <label htmlFor="applicationNote" className={labelClass}>
+                      Application Notes <span className="text-gray-400 font-normal">(optional)</span>
                     </label>
-                    <textarea id="applicationNote"
-                      name="applicationNote"
-                      value={formData.applicationNote}
-                      onChange={updateFormField}
-                      rows="3"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      placeholder="Any additional information you'd like to share..."
-                    />
+                    <textarea id="applicationNote" name="applicationNote" value={formData.applicationNote}
+                      onChange={updateFormField} rows={3} className={inputClass}
+                      placeholder="Any additional information you'd like to share..." />
                   </div>
-                </div>
+                </FormSection>
 
-                {/* Submit Button */}
-                <div className="p-6 bg-gray-50">
-                  <div className="flex flex-col sm:flex-row gap-3 justify-end">
-                    <button
-                      type="button"
-                      onClick={() => router.back()}
-                      className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition font-medium"
-                    >
+                <div className="p-5 sm:p-6 bg-gray-50">
+                  <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+                    <button type="button" onClick={() => router.back()}
+                      className="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-100 transition font-medium">
                       Cancel
                     </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                    >
-                      {loading ? (
-                        <>
-                          <div className="animate-spin rounded-full size-5 border-b-2 border-white"></div>
-                          Submitting...
-                        </>
-                      ) : (
-                        <>
-                          <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Submit Application
-                        </>
-                      )}
+                    <button type="submit"
+                      className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 transition font-medium flex items-center justify-center gap-2">
+                      Continue to checkout
+                      <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3 text-center">
-                    By submitting this application, you agree to our terms and conditions. Our agent will contact you within 24-48 hours.
-                  </p>
                 </div>
               </form>
             </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
