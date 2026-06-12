@@ -55,7 +55,7 @@ export default function BlogDetail() {
         }
       } catch (err) {
         console.error("Fetch blog error:", err);
-        setError("Network error — could not fetch blog.");
+        setError("Network error  could not fetch blog.");
       } finally {
         if (mounted) setLoading(false);
       }

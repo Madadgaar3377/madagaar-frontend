@@ -19,7 +19,7 @@ const boxData = [
     img: "/Media/Agent-3.png",
     title: "Customer-First Approach",
     description:
-      "Your satisfaction is our top priority. We take time to understand your individual needs, ensuring every solution—whether it's finding the right property, securing insurance, getting a loan, or choosing an installment plan—is tailored to your goals and delivered with care.",
+      "Your satisfaction is our top priority. We take time to understand your individual needs, ensuring every solutionwhether it's finding the right property, securing insurance, getting a loan, or choosing an installment planis tailored to your goals and delivered with care.",
     icon: "❤️",
   },
 ];

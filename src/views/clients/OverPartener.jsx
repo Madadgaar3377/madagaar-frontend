@@ -42,7 +42,7 @@ export default function OurPartners() {
           </h1>
           <p className="mt-2 text-gray-500 max-w-2xl mx-auto text-responsive-sm">
             We proudly collaborate with trusted brands. Scroll to explore their
-            logos — hover to pause.
+            logos  hover to pause.
           </p>
         </header>
 

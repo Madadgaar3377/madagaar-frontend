@@ -75,7 +75,7 @@ export default function LoansPage() {
     setIsAdmin(u?.userType === "Admin" || u?.userType === "admin");
   }, []);
 
-  // fetch data from server — uses backend `query` param if debouncedQuery present
+  // fetch data from server  uses backend `query` param if debouncedQuery present
   useEffect(() => {
     let mounted = true;
     let logoutTimer;
@@ -83,7 +83,7 @@ export default function LoansPage() {
       setLoading(true);
       setError("");
 
-      // if user isn't admin, don't fetch — show unauthorized
+      // if user isn't admin, don't fetch  show unauthorized
       if (!isAdmin) {
         setLoans([]);
         setLoading(false);
@@ -113,7 +113,7 @@ export default function LoansPage() {
           setError("You are not authorized to view this page.");
           // optional: force logout if 401
           if (res.status === 401) {
-            // token probably expired — clear and redirect to login
+            // token probably expired  clear and redirect to login
             logoutTimer = setTimeout(() => logout("/account"), 1200);
           }
           setLoans([]);
@@ -134,7 +134,7 @@ export default function LoansPage() {
         }
       } catch (err) {
         console.error("fetch loans error:", err);
-        setError("Network error — could not fetch loan forms");
+        setError("Network error  could not fetch loan forms");
         if (mounted) setLoans([]);
       } finally {
         if (mounted) setLoading(false);
@@ -304,7 +304,7 @@ export default function LoansPage() {
               {/* pagination & pageSize */}
               <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3">
                 <div className="text-sm text-gray-600">
-                  Showing <strong>{(page - 1) * pageSize + 1}</strong> — <strong>{Math.min(page * pageSize, total)}</strong> of <strong>{total}</strong>
+                  Showing <strong>{(page - 1) * pageSize + 1}</strong>  <strong>{Math.min(page * pageSize, total)}</strong> of <strong>{total}</strong>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -389,7 +389,7 @@ export default function LoansPage() {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500">Status</div>
-                  <div className="font-medium">{openLoan.status ?? "—"}</div>
+                  <div className="font-medium">{openLoan.status ?? ""}</div>
                 </div>
               </div>
 

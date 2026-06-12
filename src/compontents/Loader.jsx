@@ -4,16 +4,16 @@ import React from "react";
 /**
  * LoadingPage
  * Props:
- *  - percent?: number (0..100) — shows progress bar and percent
- *  - message?: string — optional message under spinner
- *  - logoSrc?: string — optional logo image URL (if you want)
+ *  - percent?: number (0..100)  shows progress bar and percent
+ *  - message?: string  optional message under spinner
+ *  - logoSrc?: string  optional logo image URL (if you want)
  *
  * Example usage:
  * <LoadingPage percent={45} message="Preparing your dashboard..." />
  */
 export default function LoadingPage({
   percent = null,
-  message = "Hang tight — preparing things for you...",
+  message = "Hang tight  preparing things for you...",
   logoSrc = null, // if you have a small logo URL set it here
 }) {
   const accent = "var(--color-primary, rgb(183,36,42))";

@@ -211,7 +211,7 @@ export default function SignupPage() {
       }, 1500);
     } catch (err) {
       console.error("Signup error:", err);
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setLoading(false);
     }
@@ -235,7 +235,7 @@ export default function SignupPage() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight mb-1">
             Create Account
           </h1>
-          <p className="text-gray-500 text-sm sm:text-base">Join Madadgaar — one account for users, agents & partners</p>
+          <p className="text-gray-500 text-sm sm:text-base">Join Madadgaar  one account for users, agents & partners</p>
         </div>
 
         {/* Form Card */}
@@ -374,7 +374,7 @@ export default function SignupPage() {
                 <p className="mt-1 text-xs text-gray-400">Must be at least 8 characters</p>
               </div>
 
-              {/* Account type — moved to end before terms */}
+              {/* Account type  moved to end before terms */}
               <div className="pt-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">I am signing up as <span className="text-red-500">*</span></label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">

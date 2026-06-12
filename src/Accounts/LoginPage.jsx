@@ -118,7 +118,7 @@ export default function LoginPage() {
       window.location.href = "/";
     } catch (err) {
       console.error("Login error:", err);
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setLoading(false);
     }

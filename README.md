@@ -1,4 +1,4 @@
-# Madadgaar Expert Partner — Public Frontend
+# Madadgaar Expert Partner  Public Frontend
 
 <div align="center">
   <img src="public/Media/Group%2033.png" alt="Madadgaar Logo" width="200"/>
@@ -25,10 +25,10 @@
 | **API base URL** | [https://api.madadgaar.com.pk/api](https://api.madadgaar.com.pk/api) |
 | **Current version** | `v0.1.03` |
 | **Production branch** | `main` (Create React App) |
-| **Migration branch** | `nextjs` (Next.js 15 App Router — in progress) |
+| **Migration branch** | `nextjs` (Next.js 15 App Router  in progress) |
 | **Repository** | [github.com/Madadgaar3377/madagaar-frontend](https://github.com/Madadgaar3377/madagaar-frontend) |
-| **Designed & developed by** | [Code-XA](https://github.com/code-xa) — [code-xa.web.app](https://code-xa.web.app) |
-| **Last major update** | June 2026 — Installment cash/discount pricing display, dashboard caching, SEO improvements |
+| **Designed & developed by** | [Code-XA](https://github.com/code-xa)  [code-xa.web.app](https://code-xa.web.app) |
+| **Last major update** | June 2026  Installment cash/discount pricing display, dashboard caching, SEO improvements |
 
 ---
 
@@ -48,7 +48,7 @@
 - [Branches](#branches)
 - [Documentation](#documentation)
 - [Related Panels](#related-panels)
-- [Built By — Code-XA](#built-by--code-xa)
+- [Built By  Code-XA](#built-by--code-xa)
 - [Team & Contact](#team--contact)
 - [License](#license)
 
@@ -58,11 +58,11 @@
 
 Madadgaar Expert Partner is the **public-facing website** for the Madadgaar ecosystem. It connects users across Pakistan with verified partners for:
 
-- **Properties** — buy, sell, rent, and apply online
-- **Installment plans** — multi-vendor products, variants, cash & EMI options
-- **Loans** — browse plans and submit applications
-- **Insurance** — plans, applications, and claim submission
-- **User dashboard** — track applications, profile, and security settings
+- **Properties**  buy, sell, rent, and apply online
+- **Installment plans**  multi-vendor products, variants, cash & EMI options
+- **Loans**  browse plans and submit applications
+- **Insurance**  plans, applications, and claim submission
+- **User dashboard**  track applications, profile, and security settings
 
 The frontend talks to the shared Node.js backend (`backend-Nodejs-Express`) and works alongside the **Admin**, **Partner**, and **Agent** panels in the Madadgaar monorepo.
 
@@ -92,9 +92,9 @@ Become Pakistan's largest and most trusted marketplace for service and financial
 - **Listing page** with best-plan highlights, finance badges, and filters
 - **Product detail** with Cash / Installments / Both views
 - **Variant picker** (RAM, storage, color, etc.) with per-variant plans
-- **Multi-partner cash offers** — base price, variant overrides, partner SKUs
-- **Payment plan breakdown** — monthly, down payment, markup, total cost, schedule
-- **Apply flow** — select variant, plan, or partner cash offer
+- **Multi-partner cash offers**  base price, variant overrides, partner SKUs
+- **Payment plan breakdown**  monthly, down payment, markup, total cost, schedule
+- **Apply flow**  select variant, plan, or partner cash offer
 - **Installment reviews** on product pages
 - **Smart public pricing display** (see [Installment Pricing](#installment-pricing-public-display-rules))
 
@@ -216,7 +216,7 @@ madagaar-frontend/
 └── README.md
 ```
 
-> **Next.js branch (`nextjs`):** views live under `src/views/` and routes under `src/app/` — same features, migrating to Next.js.
+> **Next.js branch (`nextjs`):** views live under `src/views/` and routes under `src/app/`  same features, migrating to Next.js.
 
 ---
 
@@ -308,7 +308,7 @@ Open [http://localhost:3000](http://localhost:3000)
 npm run build
 ```
 
-Output: `build/` folder (CRA) — ready for Vercel, Netlify, or static hosting.
+Output: `build/` folder (CRA)  ready for Vercel, Netlify, or static hosting.
 
 ### Tests
 
@@ -323,7 +323,7 @@ npm test
 Create `.env` in the project root:
 
 ```env
-# API (optional — default is production API in src/constants/apiUrl.js)
+# API (optional  default is production API in src/constants/apiUrl.js)
 REACT_APP_API_URL=https://api.madadgaar.com.pk/api
 
 # Analytics
@@ -351,13 +351,13 @@ For local backend development, change to `http://localhost:3001/api`.
 
 Central engine for installment catalog pricing:
 
-- `resolvePriceDisplay()` — public cash/discount display rules
-- `getProductPriceDisplay()` — product/variant hero pricing
-- `getInstallmentCardPricing()` — listing card primary + cash line
-- `buildPartnerCashOffers()` — multi-partner cash price aggregation
-- `getBestPaymentPlan()` — lowest monthly / best cash plan
-- `resolveEntryCashPrice()` — plan row calculation price
-- `buildPlanEntries()` — variant + plan matrix for detail/apply pages
+- `resolvePriceDisplay()`  public cash/discount display rules
+- `getProductPriceDisplay()`  product/variant hero pricing
+- `getInstallmentCardPricing()`  listing card primary + cash line
+- `buildPartnerCashOffers()`  multi-partner cash price aggregation
+- `getBestPaymentPlan()`  lowest monthly / best cash plan
+- `resolveEntryCashPrice()`  plan row calculation price
+- `buildPlanEntries()`  variant + plan matrix for detail/apply pages
 
 ### `CashPriceDisplay.jsx`
 
@@ -434,16 +434,16 @@ This frontend is one part of the Madadgaar platform:
 | Panel | Role |
 |-------|------|
 | **madagaar-frontend** (this repo) | Public website for users |
-| **admin** | Admin portal — manage listings, users, approvals |
-| **partner-panel** | Partner portal — create/edit installment plans, pricing |
-| **agentPanel** | Agent portal — field operations |
+| **admin** | Admin portal  manage listings, users, approvals |
+| **partner-panel** | Partner portal  create/edit installment plans, pricing |
+| **agentPanel** | Agent portal  field operations |
 | **backend-Nodejs-Express** | Shared REST API |
 
 ---
 
-## Built By — Code-XA
+## Built By  Code-XA
 
-This platform is **designed, developed, and maintained** by **[Code-XA](https://github.com/code-xa)** — a technology company focused on building innovative digital products that drive growth and enhance user experience.
+This platform is **designed, developed, and maintained** by **[Code-XA](https://github.com/code-xa)**  a technology company focused on building innovative digital products that drive growth and enhance user experience.
 
 | | |
 |--|--|
@@ -452,7 +452,7 @@ This platform is **designed, developed, and maintained** by **[Code-XA](https://
 | **Email** | thecodexaoffical@gmail.com |
 | **Lead engineer** | [Abubakkar Sajid](https://github.com/Innocent-Developer) (@Innocent-Developer) |
 
-**Code-XA** delivered the full Madadgaar ecosystem including this public frontend, admin panel, partner panel, agent panel, and backend API — with ongoing feature work such as installment pricing, multi-vendor plans, dashboard caching, SEO, and the Next.js migration.
+**Code-XA** delivered the full Madadgaar ecosystem including this public frontend, admin panel, partner panel, agent panel, and backend API  with ongoing feature work such as installment pricing, multi-vendor plans, dashboard caching, SEO, and the Next.js migration.
 
 ---
 
@@ -460,16 +460,16 @@ This platform is **designed, developed, and maintained** by **[Code-XA](https://
 
 ### Leadership
 
-- **Raja Afzal** — Founder & CEO — ceo@madadgaar.com.pk — +92 310 4179363
-- **Saud Ch** — Director & CEO — saud.ch@madadgaar.com.pk — +92 307 111 333 0
+- **Raja Afzal**  Founder & CEO  ceo@madadgaar.com.pk  +92 310 4179363
+- **Saud Ch**  Director & CEO  saud.ch@madadgaar.com.pk  +92 307 111 333 0
 
 ### Operations
 
-- **Ayesha** — Head of Marketing & Operations — ayesha@madadgaar.com.pk
+- **Ayesha**  Head of Marketing & Operations  ayesha@madadgaar.com.pk
 
 ### Technology (Code-XA)
 
-- **Abubakkar Sajid** — Head of IT & Innovation | Lead Software Engineer @ [Code-XA](https://github.com/code-xa)
+- **Abubakkar Sajid**  Head of IT & Innovation | Lead Software Engineer @ [Code-XA](https://github.com/code-xa)
   - abubakkarsajid4@gmail.com | +92 324 185 147 6
   - [GitHub](https://github.com/Innocent-Developer) · [LinkedIn](https://www.linkedin.com/in/mughal-abubakkar/) · [Code-XA](https://github.com/code-xa)
 
@@ -498,7 +498,7 @@ Proprietary and confidential. All rights reserved by **Madadgaar Expert Partner*
 <div align="center">
   <strong>Built with care in Pakistan</strong>
   <br/><br/>
-  <em>v0.1.03 — Live at <a href="https://madadgaar.com.pk">madadgaar.com.pk</a></em>
+  <em>v0.1.03  Live at <a href="https://madadgaar.com.pk">madadgaar.com.pk</a></em>
   <br/>
   <em>Developed by <a href="https://github.com/code-xa">Code-XA</a></em>
 </div>

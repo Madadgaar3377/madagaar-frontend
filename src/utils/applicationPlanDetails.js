@@ -1,6 +1,6 @@
 /**
  * Resolve installment application plan + partner display from stored application
- * and optional live catalog (getInstallment) — frontend only.
+ * and optional live catalog (getInstallment)  frontend only.
  */
 
 const num = (v) => {

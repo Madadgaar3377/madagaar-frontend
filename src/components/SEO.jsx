@@ -26,7 +26,7 @@ function truncateDescription(text, maxLen = 160) {
 
 const SEO = ({
   title = "Madadgaar Expert Partner | Property, Financing, Installments & Insurance Services",
-  description = "Let's make things easier — and make them happen together. Whether you are looking for property, loans, installment plans, or insurance support, Madadgaar helps you compare multiple options across Pakistan to find what truly fits your needs.",
+  description = "Let's make things easier  and make them happen together. Whether you are looking for property, loans, installment plans, or insurance support, Madadgaar helps you compare multiple options across Pakistan to find what truly fits your needs.",
   keywords = "madadgaar, property solutions pakistan, insurance pakistan, loans pakistan, installment plans, real estate pakistan, car insurance, life insurance, home loans, business loans, verified agents, property pakistan, financing pakistan, EMI plans pakistan",
   author = "Madadgaar Expert Partner",
   canonicalUrl = "https://madadgaar.com.pk",

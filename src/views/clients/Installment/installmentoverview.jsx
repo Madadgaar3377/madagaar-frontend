@@ -119,7 +119,7 @@ export default function InstallmentDetail() {
         }
       } catch (err) {
         console.error(err);
-        setError("Network error — could not fetch plan.");
+        setError("Network error  could not fetch plan.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -465,7 +465,7 @@ export default function InstallmentDetail() {
                     />
                     {cashOffers.length > 1 && (
                       <p className="text-xs text-gray-500 mt-1">
-                        {cashOffers.length} partner{cashOffers.length === 1 ? "" : "s"} — see Cash tab below
+                        {cashOffers.length} partner{cashOffers.length === 1 ? "" : "s"}  see Cash tab below
                       </p>
                     )}
                   </div>
@@ -480,7 +480,7 @@ export default function InstallmentDetail() {
                 </div>
               </div>
 
-              {/* Variant Selection — only when 2+ variants */}
+              {/* Variant Selection  only when 2+ variants */}
               {showVariantPicker && (
                 <div className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                   <h3 className="text-xs font-black text-gray-400 uppercase tracking-[0.2em] mb-1">Select Specification</h3>
@@ -785,7 +785,7 @@ export default function InstallmentDetail() {
                                   </span>
                                   <span className="text-xs text-gray-500">/month</span>
                                   <span className="ml-auto text-xs font-semibold text-gray-700 whitespace-nowrap">
-                                    {formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || "—"}
+                                    {formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || ""}
                                   </span>
                                 </>
                               )}
@@ -832,12 +832,12 @@ export default function InstallmentDetail() {
                               <div>
                                 <div className="text-[11px] text-gray-500 font-semibold">Interest Rate</div>
                                 <div className="text-sm font-bold text-gray-900">
-                                  {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}
+                                  {p.interestRatePercent ? `${p.interestRatePercent}%` : ""}
                                 </div>
                               </div>
                               <div>
                                 <div className="text-[11px] text-gray-500 font-semibold">Interest Type</div>
-                                <div className="text-sm font-bold text-gray-900 truncate">{p.interestType || "—"}</div>
+                                <div className="text-sm font-bold text-gray-900 truncate">{p.interestType || ""}</div>
                               </div>
                               <div>
                                 <div className="text-[11px] text-gray-500 font-semibold">Total Payable</div>
@@ -865,7 +865,7 @@ export default function InstallmentDetail() {
                                       className="grid grid-cols-2 gap-2 py-2 border-b border-gray-200 last:border-0 text-[11px]"
                                     >
                                       <span className="font-semibold">#{i + 1}</span>
-                                      <span className="text-right">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : "—"}</span>
+                                      <span className="text-right">{it.dueDate ? new Date(it.dueDate).toLocaleDateString() : ""}</span>
                                       <span className="font-bold">PKR {Number(it.amount || 0).toLocaleString()}</span>
                                       <span
                                         className={`px-2 py-0.5 rounded text-center ${
@@ -1020,15 +1020,15 @@ export default function InstallmentDetail() {
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
                               {isCashOnlyInstallment(p.monthlyInstallment)
-                                ? "—"
-                                : formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || "—"}
+                                ? ""
+                                : formatTenureDisplay(p.tenureMonths || p.customTenureLabel) || ""}
                             </td>
                             <td className="px-4 py-3 text-center text-sm font-semibold text-gray-900">
-                              {downPayment > 0 ? `PKR ${downPayment.toLocaleString()}` : "—"}
+                              {downPayment > 0 ? `PKR ${downPayment.toLocaleString()}` : ""}
                             </td>
                             <td className="px-4 py-3 text-center text-sm">
                               <div className="font-semibold text-gray-900">
-                                {p.interestRatePercent ? `${p.interestRatePercent}%` : "—"}
+                                {p.interestRatePercent ? `${p.interestRatePercent}%` : ""}
                               </div>
                               {p.interestType && (
                                 <div className="text-xs text-gray-500">{p.interestType}</div>
@@ -1111,7 +1111,7 @@ export default function InstallmentDetail() {
                                   </div>
                                 </div>
                               ) : (
-                                <span className="text-gray-400 text-sm">—</span>
+                                <span className="text-gray-400 text-sm"></span>
                               )}
                             </td>
                             <td className="px-4 py-3 text-center">
@@ -1150,14 +1150,14 @@ export default function InstallmentDetail() {
                 const best = getBestPaymentPlan(allPlans, plan);
                 const tenureLabel =
                   formatTenureDisplay(best.tenureMonths) ||
-                  (plan.tenure || plan.customTenure || "—");
+                  (plan.tenure || plan.customTenure || "");
                 const monthly = Number(best.monthlyInstallment || 0);
                 const downPayment = Number(best.downPayment ?? plan.downpayment ?? 0);
                 return (
               <section className="bg-white rounded-lg sm:rounded-xl p-4 sm:p-5 lg:p-6 border border-gray-200">
                 <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4 sm:mb-5 flex items-center gap-2">
                   <span className="text-xl sm:text-2xl">💳</span>
-                  Payment Plan{best.planName ? ` — ${best.planName}` : ""}
+                  Payment Plan{best.planName ? `  ${best.planName}` : ""}
                 </h3>
                 <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -1174,7 +1174,7 @@ export default function InstallmentDetail() {
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Monthly Installment</div>
                     <div className="text-xl sm:text-2xl font-bold text-[rgb(183,36,42)]">
                       {isCashOnlyInstallment(monthly)
-                        ? "—"
+                        ? ""
                         : `PKR ${monthly.toLocaleString()}`}
                     </div>
                   </div>
@@ -1281,10 +1281,10 @@ export default function InstallmentDetail() {
                         >
                           <div className="flex flex-col gap-2">
                             <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                              {spec.label || spec.field || "—"}
+                              {spec.label || spec.field || ""}
                             </div>
                             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 group-hover:text-[rgb(183,36,42)] transition-colors">
-                              {spec.value ?? "—"}
+                              {spec.value ?? ""}
                             </div>
                           </div>
                         </div>
@@ -1491,7 +1491,7 @@ export default function InstallmentDetail() {
               </section>
             ) : null}
 
-            {/* Reviews — layout owned by InstallmentReviews (single visual stack) */}
+            {/* Reviews  layout owned by InstallmentReviews (single visual stack) */}
             <section className="mt-2">
               {plan ? (
                 <InstallmentReviews 

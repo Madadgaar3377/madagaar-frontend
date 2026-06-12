@@ -251,7 +251,7 @@ export default function InsuranceRequests() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">Insurance Requests</h1>
-            <p className="text-sm text-gray-500">Manage incoming insurance requests — view, approve, reject, delete, or export selected.</p>
+            <p className="text-sm text-gray-500">Manage incoming insurance requests  view, approve, reject, delete, or export selected.</p>
           </div>
           <div className="flex gap-2">
             <button type="button"
@@ -464,7 +464,7 @@ export default function InsuranceRequests() {
                 <div className="mt-3 text-xs text-gray-400">Items</div>
                 <ul className="list-disc pl-4 text-sm">
                   {(selected.typeOfInsurance || []).length
-                    ? selected.typeOfInsurance.map((t, i) => <li key={i}>{t.complaint} — {t.comment}</li>)
+                    ? selected.typeOfInsurance.map((t, i) => <li key={i}>{t.complaint}  {t.comment}</li>)
                     : <li className="text-xs text-gray-400">No items</li>
                   }
                 </ul>

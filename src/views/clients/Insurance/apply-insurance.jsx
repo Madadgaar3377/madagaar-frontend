@@ -207,8 +207,8 @@ export default function InsuranceApply() {
         console.error("getAuthToken threw:", err);
       }
       if (!token) {
-        setError("Missing  — please log in.");
-        addToast("Missing  — please log in.", "error");
+        setError("Missing   please log in.");
+        addToast("Missing   please log in.", "error");
         // Navigate("/account");
         return;
       }
@@ -271,7 +271,7 @@ export default function InsuranceApply() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">Apply for Insurance</h2>
-                <p className="text-sm text-gray-500">A simple multi-step form — complete in small parts.</p>
+                <p className="text-sm text-gray-500">A simple multi-step form  complete in small parts.</p>
               </div>
               <div className="text-xs text-gray-500">{progress}%</div>
             </div>
@@ -284,7 +284,7 @@ export default function InsuranceApply() {
             {successMsg && <div className="mb-4 text-sm text-green-600">{successMsg}</div>}
 
             <form onSubmit={handleSubmit}>
-              {/* Step 1 — Contact / Basic */}
+              {/* Step 1  Contact / Basic */}
               {step === 1 && (
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-700">Your Details</h3>
@@ -320,7 +320,7 @@ export default function InsuranceApply() {
                 </div>
               )}
 
-              {/* Step 2 — Company / Agent */}
+              {/* Step 2  Company / Agent */}
               {step === 2 && (
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-700">Company / Agent Details</h3>
@@ -382,7 +382,7 @@ export default function InsuranceApply() {
                 </div>
               )}
 
-              {/* Step 3 — Payment / Premium */}
+              {/* Step 3  Payment / Premium */}
               {step === 3 && (
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-700">Premium & Policy Details</h3>
@@ -428,7 +428,7 @@ export default function InsuranceApply() {
                 </div>
               )}
 
-              {/* Step 4 — Extra Inquiries & Reference */}
+              {/* Step 4  Extra Inquiries & Reference */}
               {step === 4 && (
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-700">Extra Info & Reference</h3>
@@ -473,19 +473,19 @@ export default function InsuranceApply() {
                 </div>
               )}
 
-              {/* Step 5 — Review & Submit */}
+              {/* Step 5  Review & Submit */}
               {step === 5 && (
                 <div className="space-y-4">
                   <h3 className="font-medium text-gray-700">Review & Submit</h3>
 
                   <div className="bg-gray-50 p-4 rounded space-y-3 text-sm">
                     <div><strong>Applicant:</strong> {form.commonForm.name} • {form.commonForm.number} • {form.commonForm.email}</div>
-                    <div><strong>Company / Agent:</strong> {form.nameOfCompany || form.nameOfAgent || "—"}</div>
+                    <div><strong>Company / Agent:</strong> {form.nameOfCompany || form.nameOfAgent || ""}</div>
                     <div><strong>Policy Dates:</strong> {form.yearOfInsured || "-"} → {form.yearOfCompletion || "-"}</div>
                     <div><strong>Premiums:</strong> Monthly {form.amountMonthly || "-"}, Quarterly {form.amountQuaterly || "-"}, Yearly {form.amountYearly || "-"}</div>
                     <div><strong>Type of Insurance Items:</strong>
                       <ul className="pl-4 list-disc">
-                        {(form.typeOfInsurance || []).map((t, i) => <li key={i} className="text-xs">{t.complaint} — {t.comment}</li>)}
+                        {(form.typeOfInsurance || []).map((t, i) => <li key={i} className="text-xs">{t.complaint}  {t.comment}</li>)}
                         {(form.typeOfInsurance || []).length === 0 && <li className="text-xs text-gray-400">None</li>}
                       </ul>
                     </div>

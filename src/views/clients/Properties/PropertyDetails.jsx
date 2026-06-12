@@ -315,7 +315,7 @@ const PropertyDetails = () => {
                                     property.propertyType ? `${property.propertyType}` : null,
                                     property.transaction?.price > 0 ? `Price: PKR ${property.transaction.price.toLocaleString()}` : property.transaction?.monthlyRent ? `Rent: PKR ${property.transaction.monthlyRent.toLocaleString()}/month` : property.transaction?.priceRange ? `Price: ${property.transaction.priceRange}` : null,
                                     property.areaSize ? `Area: ${property.areaSize} ${property.areaUnit || "sq. ft"}` : null,
-                                    (property.bedrooms || property.bathrooms) ? `🛏️ ${property.bedrooms || "—"} Bed • 🚿 ${property.bathrooms || "—"} Bath` : null,
+                                    (property.bedrooms || property.bathrooms) ? `🛏️ ${property.bedrooms || ""} Bed • 🚿 ${property.bathrooms || ""} Bath` : null,
                                 ].filter(Boolean).join("\n")}
                                 label="Share this property"
                             />

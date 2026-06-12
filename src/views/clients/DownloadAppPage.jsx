@@ -102,7 +102,7 @@ export default function DownloadAppPage() {
     <>
       <SEO
         title="Download Madadgaar App | Android App for Property, Loans, Installments & Insurance"
-        description="Download the official Madadgaar mobile app on Google Play. Browse property listings, installment plans, loans, and insurance in Pakistan. Free Android app — compare options and apply from your phone."
+        description="Download the official Madadgaar mobile app on Google Play. Browse property listings, installment plans, loans, and insurance in Pakistan. Free Android app  compare options and apply from your phone."
         keywords="download madadgaar app, madadgaar app download, madadgaar android app, download app pakistan, property app pakistan, installment app pakistan, loan app pakistan, insurance app pakistan, madadgaar google play, madadgaar mobile app, get madadgaar app"
         canonicalUrl="https://madadgaar.com.pk/download-app"
         structuredData={structuredData}
@@ -121,11 +121,11 @@ export default function DownloadAppPage() {
                 Official Android App
               </span>
               <h1 className="text-responsive-lg font-bold text-gray-900 leading-tight">
-                Download Madadgaar App — Property, Installments, Loans &amp; Insurance in One Place
+                Download Madadgaar App  Property, Installments, Loans &amp; Insurance in One Place
               </h1>
               <p className="text-gray-700 text-responsive-sm leading-relaxed">
                 Get the Madadgaar mobile app on Google Play and access Pakistan&apos;s trusted marketplace from
-                anywhere. Browse listings, compare plans, submit applications, and track updates — all from your
+                anywhere. Browse listings, compare plans, submit applications, and track updates  all from your
                 Android phone.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-2">
@@ -156,7 +156,7 @@ export default function DownloadAppPage() {
             <div className="page-hero-col flex justify-center">
               <img
                 src="/Media/mobileAppMockup.png"
-                alt="Madadgaar mobile app — property, installments, loans and insurance on Android"
+                alt="Madadgaar mobile app  property, installments, loans and insurance on Android"
                 className="rounded-2xl shadow-xl page-media"
                 loading="eager"
               />
@@ -172,7 +172,7 @@ export default function DownloadAppPage() {
             <div className="text-center mb-10 sm:mb-12">
               <h2 className="text-responsive-2xl font-bold text-gray-900 mb-3">Why Download the Madadgaar App?</h2>
               <p className="text-gray-600 max-w-3xl mx-auto text-responsive-sm">
-                Everything you need for property, financing, and insurance — optimized for mobile browsing and
+                Everything you need for property, financing, and insurance  optimized for mobile browsing and
                 applications in Pakistan.
               </p>
             </div>
@@ -270,7 +270,7 @@ export default function DownloadAppPage() {
             className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 font-bold shadow-lg hover:bg-gray-100 transition-colors"
             style={{ color: ACCENT }}
           >
-            Download Now — Google Play
+            Download Now  Google Play
           </a>
         </div>
       </section>

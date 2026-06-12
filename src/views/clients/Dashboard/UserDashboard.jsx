@@ -585,7 +585,7 @@ const UserDashboard = () => {
                               <td className="p-4 whitespace-nowrap text-sm text-gray-900">
                                 <span className="font-medium text-gray-900 block">
                                   {item.variantInfo?.variantName
-                                    ? `${rowPlan?.planType?.split(' — ')[0] || item.productName || 'Product'}`
+                                    ? `${rowPlan?.planType?.split('  ')[0] || item.productName || 'Product'}`
                                     : rowPlan?.planType || item.productName || item.planName || 'Installment Plan'}
                                 </span>
                                 {item.variantInfo?.variantName && (
@@ -770,7 +770,7 @@ const UserDashboard = () => {
                                 {item.planName || 'Insurance plan'}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm text-gray-700">
-                                {item.policyType || '—'}
+                                {item.policyType || ''}
                               </td>
                               <td className="p-4 whitespace-nowrap text-sm">
                                 {getStatusBadge(item.status)}
@@ -788,7 +788,7 @@ const UserDashboard = () => {
                                     View plan
                                   </button>
                                 ) : (
-                                  '—'
+                                  ''
                                 )}
                               </td>
                             </tr>
@@ -882,7 +882,7 @@ const UserDashboard = () => {
                 </div>
               </div>
 
-              {/* Plan Information — full applied plan (no images; catalog merge frontend-only) */}
+              {/* Plan Information  full applied plan (no images; catalog merge frontend-only) */}
               {(getStoredPlanInfo(selectedApplication) || catalogPlan || selectedApplication.installmentPlanId) && (() => {
                 const plan = resolveAppliedPlanDisplay(selectedApplication, catalogPlan);
                 const showDown = plan.downPayment != null && Number(plan.downPayment) > 0;
@@ -1183,7 +1183,7 @@ const UserDashboard = () => {
                 </div>
               )}
 
-              {/* Partner / company — company name only */}
+              {/* Partner / company  company name only */}
               {selectedApplication.installmentPlanId && (() => {
                 const partner = resolvePartnerDisplay(
                   selectedApplication,

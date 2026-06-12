@@ -55,7 +55,7 @@ export default function AdminInstallment() {
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        setError("Network error — could not fetch installment plans.");
+        setError("Network error  could not fetch installment plans.");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -195,7 +195,7 @@ export default function AdminInstallment() {
                       onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                     />
                     <div className="absolute top-3 left-3 bg-white/70 text-xs px-2 py-1 rounded-full font-medium">
-                      {plan.tenure || plan.customTenure || "—"}
+                      {plan.tenure || plan.customTenure || ""}
                     </div>
                     <div className="absolute top-3 right-3">
                       <span className={`px-3 py-1 rounded-full text-xs font-semibold ${plan.status === "approved" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"}`}>
@@ -247,7 +247,7 @@ export default function AdminInstallment() {
             {/* pagination */}
             <div className="mt-6 flex items-center justify-between gap-3">
               <div className="text-sm text-gray-600">
-                Showing <strong>{(page - 1) * PAGE_SIZE + 1}</strong> — <strong>{Math.min(page * PAGE_SIZE, filtered.length)}</strong> of <strong>{filtered.length}</strong>
+                Showing <strong>{(page - 1) * PAGE_SIZE + 1}</strong>  <strong>{Math.min(page * PAGE_SIZE, filtered.length)}</strong> of <strong>{filtered.length}</strong>
               </div>
 
               <div className="flex items-center gap-2">
@@ -319,7 +319,7 @@ export default function AdminInstallment() {
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">Tenure</div>
-                        <div className="font-semibold">{openPlan.tenure || openPlan.customTenure || "—"}</div>
+                        <div className="font-semibold">{openPlan.tenure || openPlan.customTenure || ""}</div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">Location</div>

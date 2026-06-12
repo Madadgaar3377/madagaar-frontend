@@ -220,7 +220,7 @@
     @apply py-6 sm:py-8 md:py-10 lg:py-12 xl:py-14;
   }
 
-  /* Two-column hero / promo rows — stay balanced on large & ultra-wide screens */
+  /* Two-column hero / promo rows  stay balanced on large & ultra-wide screens */
   .page-hero {
     @apply w-full flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10 xl:gap-14 2xl:gap-16;
   }
@@ -568,7 +568,7 @@ body, html {
   }
 }
 
-/* Home page — smooth interactive utilities */
+/* Home page  smooth interactive utilities */
 .interactive-card {
   transition:
     transform 0.35s var(--ease-out-expo),

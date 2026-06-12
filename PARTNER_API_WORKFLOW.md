@@ -1,4 +1,4 @@
-# Partner API Key — Complete Workflow & Architecture
+# Partner API Key  Complete Workflow & Architecture
 
 > **Purpose:** Let verified Madadgaar partners connect their **own website / panel / ERP** to Madadgaar using an **API key**, so they can manage installments, applications, and dashboard data without logging into `partner.madadgaar.com.pk` for every action.
 
@@ -39,19 +39,19 @@ Madadgaar uses **two separate URL groups**. Do not mix them.
 
 | Group | Base path | Auth | Who calls it |
 |-------|-----------|------|--------------|
-| **A — Key management** | `/api/v1/partner/keys` | Partner **JWT** (login) | Partner panel UI only |
-| **B — Partner integration** | `/api/v1/partner` | **API key** | Partner website / ERP / custom panel |
-| **C — Public catalog** | `/api` (legacy paths) | None / user JWT | Partner site embed, Madadgaar app |
+| **A  Key management** | `/api/v1/partner/keys` | Partner **JWT** (login) | Partner panel UI only |
+| **B  Partner integration** | `/api/v1/partner` | **API key** | Partner website / ERP / custom panel |
+| **C  Public catalog** | `/api` (legacy paths) | None / user JWT | Partner site embed, Madadgaar app |
 
 ```mermaid
 flowchart LR
-    subgraph A["A — Create & manage keys<br/>JWT only"]
+    subgraph A["A  Create & manage keys<br/>JWT only"]
         A1["POST /api/v1/partner/keys"]
         A2["GET /api/v1/partner/keys"]
         A3["DELETE /api/v1/partner/keys/:keyId"]
     end
 
-    subgraph B["B — Use key on your systems<br/>API key only"]
+    subgraph B["B  Use key on your systems<br/>API key only"]
         B1["GET /api/v1/partner/installments"]
         B2["POST /api/v1/partner/installments"]
         B3["GET /api/v1/partner/applications"]
@@ -78,7 +78,7 @@ flowchart LR
 | API documentation | `https://partner.madadgaar.com.pk/settings/api-keys/docs` |
 | Link in navbar | **Settings → API Keys** |
 
-#### Backend — key management endpoints (JWT only)
+#### Backend  key management endpoints (JWT only)
 
 > **Never** call these with an API key. Use the JWT from `POST /api/login`.
 
@@ -92,7 +92,7 @@ flowchart LR
 | OpenAPI spec | `GET` | `https://api.madadgaar.com.pk/api/v1/partner/openapi.json` |
 | Health / key test | `GET` | `https://api.madadgaar.com.pk/api/v1/partner/me` |
 
-**Create key — request example:**
+**Create key  request example:**
 
 ```http
 POST https://api.madadgaar.com.pk/api/v1/partner/keys
@@ -112,12 +112,12 @@ Content-Type: application/json
 }
 ```
 
-**Create key — response (secret shown once):**
+**Create key  response (secret shown once):**
 
 ```json
 {
   "success": true,
-  "message": "API key created. Copy the secret now — it will not be shown again.",
+  "message": "API key created. Copy the secret now  it will not be shown again.",
   "data": {
     "keyId": "key_8f3a2b1c",
     "name": "Production Website",
@@ -160,7 +160,7 @@ or
 X-API-Key: mg_live_a8f2k9XmP4nQ7vR2wL5yH8jT1cB6dF0
 ```
 
-#### Installments — full paths
+#### Installments  full paths
 
 | Action | Method | Full URL |
 |--------|--------|----------|
@@ -173,7 +173,7 @@ X-API-Key: mg_live_a8f2k9XmP4nQ7vR2wL5yH8jT1cB6dF0
 | Add payment plan | `POST` | `https://api.madadgaar.com.pk/api/v1/partner/installments/:installmentPlanId/plans` |
 | Remove payment plan | `DELETE` | `https://api.madadgaar.com.pk/api/v1/partner/installments/:installmentPlanId/plans/:planId` |
 
-#### Applications (requests) — full paths
+#### Applications (requests)  full paths
 
 | Action | Method | Full URL |
 |--------|--------|----------|
@@ -183,7 +183,7 @@ X-API-Key: mg_live_a8f2k9XmP4nQ7vR2wL5yH8jT1cB6dF0
 | Approve / reject / update | `PATCH` | `https://api.madadgaar.com.pk/api/v1/partner/applications/:applicationId/status` |
 | Delete request | `DELETE` | `https://api.madadgaar.com.pk/api/v1/partner/applications/:applicationId` |
 
-#### Dashboard & profile — full paths
+#### Dashboard & profile  full paths
 
 | Action | Method | Full URL |
 |--------|--------|----------|
@@ -191,21 +191,21 @@ X-API-Key: mg_live_a8f2k9XmP4nQ7vR2wL5yH8jT1cB6dF0
 | Partner profile | `GET` | `https://api.madadgaar.com.pk/api/v1/partner/me` |
 | Test key is valid | `GET` | `https://api.madadgaar.com.pk/api/v1/partner/me` |
 
-**Test key — curl example:**
+**Test key  curl example:**
 
 ```bash
 curl -s https://api.madadgaar.com.pk/api/v1/partner/me \
   -H "Authorization: Bearer $MADADGAAR_API_KEY"
 ```
 
-**List installments — curl example:**
+**List installments  curl example:**
 
 ```bash
 curl -s "https://api.madadgaar.com.pk/api/v1/partner/installments?page=1&limit=10" \
   -H "X-API-Key: $MADADGAAR_API_KEY"
 ```
 
-**Update application status — curl example:**
+**Update application status  curl example:**
 
 ```bash
 curl -s -X PATCH \
@@ -217,7 +217,7 @@ curl -s -X PATCH \
 
 ---
 
-### 0.3 Public paths (partner website — no API key)
+### 0.3 Public paths (partner website  no API key)
 
 Use these on the **customer-facing** partner website to show catalog. No API key required.
 
@@ -232,7 +232,7 @@ Use these on the **customer-facing** partner website to show catalog. No API key
 
 ---
 
-### 0.4 Path map — one diagram
+### 0.4 Path map  one diagram
 
 ```mermaid
 flowchart TB
@@ -242,13 +242,13 @@ flowchart TB
         UI3["/installments"]
     end
 
-    subgraph KeysAPI["Key management — JWT"]
+    subgraph KeysAPI["Key management  JWT"]
         K1["POST /api/v1/partner/keys"]
         K2["GET /api/v1/partner/keys"]
         K3["DELETE /api/v1/partner/keys/:keyId"]
     end
 
-    subgraph PartnerAPI["Partner integration — API key"]
+    subgraph PartnerAPI["Partner integration  API key"]
         P1["GET /api/v1/partner/installments"]
         P2["POST /api/v1/partner/installments"]
         P3["PUT /api/v1/partner/installments/:id"]
@@ -259,7 +259,7 @@ flowchart TB
         P8["GET /api/v1/partner/me"]
     end
 
-    subgraph PublicAPI["Public catalog — no key"]
+    subgraph PublicAPI["Public catalog  no key"]
         Pu1["GET /api/getInstallment/:id"]
         Pu2["GET /api/getAllInstallments"]
     end
@@ -310,10 +310,10 @@ Add to `backend-Nodejs-Express/routes/routes.js`:
 // ─── Partner API v1 ───────────────────────────────────────────────
 const partnerApiV1 = require("./partnerApiV1");
 
-// A) Key management — JWT only (partner logged into panel)
+// A) Key management  JWT only (partner logged into panel)
 router.use("/v1/partner/keys", verifyUser, requirePartner, partnerApiV1.keysRouter);
 
-// B) Integration — API key
+// B) Integration  API key
 router.use("/v1/partner", verifyPartnerApiKey, partnerApiV1.integrationRouter);
 
 // C) OpenAPI spec (public read)
@@ -350,7 +350,7 @@ backend-Nodejs-Express/
 | **End customer** | Applies on madadgaar.com / mobile app | Can also apply via partner's own site (if partner embeds apply flow) |
 | **Admin** | Verifies partner, manages listings | Can revoke partner keys, view API usage |
 
-**Core idea:** API key resolves to `partnerId` (`User.userId` where `UserType = partner`). All operations are scoped to that partner — same business rules as the partner panel, but machine-to-machine.
+**Core idea:** API key resolves to `partnerId` (`User.userId` where `UserType = partner`). All operations are scoped to that partner  same business rules as the partner panel, but machine-to-machine.
 
 ---
 
@@ -382,7 +382,7 @@ Partners are **not** a separate collection. They are `User` documents:
 | `userId` | Primary partner identifier (used everywhere) |
 | `UserType` | `"partner"` |
 | `userAccess[]` | UI feature flags: `Installments`, `Property`, `Loan`, `Insurance`, `Commission` |
-| `isVerified` | Admin approval — required for most APIs via `verifyUser` |
+| `isVerified` | Admin approval  required for most APIs via `verifyUser` |
 | `companyDetails` | SECP, NTN, company name, etc. |
 | `emailVerify` | Email verified |
 
@@ -616,8 +616,8 @@ mg_test_<32_char_random>     # sandbox (optional phase 2)
 ```
 
 Store in DB:
-- `keyPrefix` — first 12 chars (for lookup)
-- `keyHash` — bcrypt(full secret)
+- `keyPrefix`  first 12 chars (for lookup)
+- `keyHash`  bcrypt(full secret)
 - Never store plaintext after creation response
 
 ---
@@ -639,8 +639,8 @@ Store in DB:
 | Admin approve listing | `PATCH` | `/updateInstallmentStatus/:id` | `verifyAdmin` |
 
 **Partner access logic:** `partner/installmentPartnerAccess.js`
-- **Product owner** — created the listing; can edit product fields
-- **Contributor** — added their own `paymentPlans` / `partnerPricing` on shared product; can only edit/remove their own plans
+- **Product owner**  created the listing; can edit product fields
+- **Contributor**  added their own `paymentPlans` / `partnerPricing` on shared product; can only edit/remove their own plans
 
 ### 7.2 Create installment flow
 
@@ -822,12 +822,12 @@ sequenceDiagram
 
 | Action | Method | Route | Gap for API key |
 |--------|--------|-------|-----------------|
-| Apply (customer) | `POST` | `/applyInstallment` | N/A — end user JWT |
+| Apply (customer) | `POST` | `/applyInstallment` | N/A  end user JWT |
 | Partner list | `GET` | `/getAllRequestInstallments` | ✅ scoped by `createdBy` |
-| Get one | `GET` | `/getApplication/:applicationId` | ⚠️ **no ownership check** — must fix |
-| Update status | `PUT` | `/updateApplicationStatus` | ⚠️ **no ownership check** — must fix |
+| Get one | `GET` | `/getApplication/:applicationId` | ⚠️ **no ownership check**  must fix |
+| Update status | `PUT` | `/updateApplicationStatus` | ⚠️ **no ownership check**  must fix |
 | Delete | `DELETE` | `/deleteInstallmentApplication/:id` | Has owner/admin check |
-| List all (admin) | `GET` | `/getAllApplications` | Returns all — never expose via API key |
+| List all (admin) | `GET` | `/getAllApplications` | Returns all  never expose via API key |
 
 ---
 
@@ -895,18 +895,18 @@ flowchart TB
 
 | Role | Create new listing | Join existing product | Edit name/images/specs | Add payment plan | Edit own plan / pricing | Delete whole product | Remove own plan |
 |------|-------------------|----------------------|------------------------|------------------|-------------------------|----------------------|-----------------|
-| **Owner** | ✅ `POST /createInstallmentPlan` | — | ✅ `PUT /updateInstallment/:id` | ✅ | ✅ | ✅ `DELETE /deleteInstallment/:id` | ✅ |
+| **Owner** | ✅ `POST /createInstallmentPlan` |  | ✅ `PUT /updateInstallment/:id` | ✅ | ✅ | ✅ `DELETE /deleteInstallment/:id` | ✅ |
 | **Contributor** | ❌ | ✅ select product + `POST /installment/:id/add-plan` | ❌ (UI locked) | ✅ | ✅ `PUT` merge + `partnerPricing` | ❌ **403** | ✅ `DELETE /installment/:id/payment-plan/:planId` |
 
 > **Contributor** = partner who added their own `paymentPlans`, `partnerPricing`, or partner-owned variants on **another company’s** catalog product (`partnerRole: "contributor"` / `isProductOwner: false`).
 
 ### 10.1 Is the Contributor row actually possible? (backend check)
 
-**Yes — mostly implemented today.** Verified against `backend-Nodejs-Express` and `partner-panel`.
+**Yes  mostly implemented today.** Verified against `backend-Nodejs-Express` and `partner-panel`.
 
 | Capability | Possible? | How it works today | API / file |
 |------------|-----------|-------------------|------------|
-| Create **new** catalog listing as contributor | ❌ No | Contributor does not call `createInstallmentPlan` for someone else’s product | — |
+| Create **new** catalog listing as contributor | ❌ No | Contributor does not call `createInstallmentPlan` for someone else’s product |  |
 | **Join** existing product (add plans) | ✅ Yes | Pick product in create flow → `POST /installment/:id/add-plan` | `addPaymentPlanToInstallment.js` |
 | Edit product name, images, description | ❌ Intended no | Partner panel locks fields when `isAttachedProduct` (contributor on shared product) | `EditInstallmentPlan.jsx` → `fieldsLocked` |
 | Add own payment plan | ✅ Yes | Plan stamped with `partnerId`; no owner check on add-plan | `POST /installment/:id/add-plan` |
@@ -930,7 +930,7 @@ flowchart TD
 
     subgraph ContributorCannot["Contributor CANNOT"]
         B1[POST /createInstallmentPlan<br/>as owner of others product]
-        B2[DELETE /deleteInstallment/:id<br/>whole listing — 403]
+        B2[DELETE /deleteInstallment/:id<br/>whole listing  403]
         B3[Edit productName / productImages<br/>in partner panel UI]
     end
 ```
@@ -947,10 +947,10 @@ sequenceDiagram
     PP->>API: POST /installment/:id/add-plan
     API-->>PP: plan added with partnerId=B
 
-    P->>PP: Installments list → badge "Shared — your plans"
+    P->>PP: Installments list → badge "Shared  your plans"
     P->>PP: Edit → fieldsLocked (name/images read-only)
     PP->>API: PUT /updateInstallment/:id (plans + partnerPricing only)
-    API->>API: paymentPlanMerge — keep other partners plans
+    API->>API: paymentPlanMerge  keep other partners plans
 
     P->>PP: Delete one plan
     PP->>API: DELETE /installment/:id/payment-plan/:planId
@@ -958,7 +958,7 @@ sequenceDiagram
 
     P->>PP: Try delete whole listing
     PP->>API: DELETE /deleteInstallment/:id
-    API-->>PP: 403 — only owner can delete listing
+    API-->>PP: 403  only owner can delete listing
 ```
 
 #### ⚠️ Gaps before Partner API keys (must fix)
@@ -981,9 +981,9 @@ sequenceDiagram
 
 ## 11. Full API surface (`/api/v1/partner`)
 
-> **Quick reference:** See [§0 — API paths quick reference](#0-api-paths-quick-reference-create-key--where-to-use-it) for full URLs and curl examples.
+> **Quick reference:** See [§0  API paths quick reference](#0-api-paths-quick-reference-create-key--where-to-use-it) for full URLs and curl examples.
 
-### 11.1 API key management — `/api/v1/partner/keys` (JWT only)
+### 11.1 API key management  `/api/v1/partner/keys` (JWT only)
 
 | Method | Relative path | Full URL | Auth |
 |--------|---------------|----------|------|
@@ -996,7 +996,7 @@ sequenceDiagram
 **Panel UI:** `https://partner.madadgaar.com.pk/settings/api-keys`  
 **Docs UI:** `https://partner.madadgaar.com.pk/settings/api-keys/docs`
 
-### 11.2 Installments — `/api/v1/partner/installments` (API key)
+### 11.2 Installments  `/api/v1/partner/installments` (API key)
 
 | Method | Path | Scope | Maps to existing |
 |--------|------|-------|------------------|
@@ -1010,7 +1010,7 @@ sequenceDiagram
 
 All installment routes use base `https://api.madadgaar.com.pk/api/v1/partner/installments` and require API key.
 
-### 11.3 Applications — `/api/v1/partner/applications` (API key)
+### 11.3 Applications  `/api/v1/partner/applications` (API key)
 
 | Method | Path | Scope | Maps to existing |
 |--------|------|-------|------------------|
@@ -1018,7 +1018,7 @@ All installment routes use base `https://api.madadgaar.com.pk/api/v1/partner/ins
 | `GET` | `/applications/:id` | `applications:read` | `getApplicationById` + ownership fix |
 | `PATCH` | `/applications/:id/status` | `applications:write` | `updateApplicationStatus` + ownership fix |
 
-### 11.4 Dashboard & profile — `/api/v1/partner` (API key)
+### 11.4 Dashboard & profile  `/api/v1/partner` (API key)
 
 | Method | Full URL | Scope | Maps to existing |
 |--------|----------|-------|------------------|
@@ -1027,7 +1027,7 @@ All installment routes use base `https://api.madadgaar.com.pk/api/v1/partner/ins
 
 Use `GET /me` to verify the API key works after creation.
 
-### 11.5 Public routes (no API key — partner website embed)
+### 11.5 Public routes (no API key  partner website embed)
 
 | Method | Path | Use |
 |--------|------|-----|
@@ -1049,7 +1049,7 @@ Use `GET /me` to verify the API key works after creation.
 | `applications:write` | Update application status |
 | `dashboard:read` | Dashboard stats |
 | `profile:read` | Partner company profile |
-| `*` (admin-granted) | All partner scopes — use sparingly |
+| `*` (admin-granted) | All partner scopes  use sparingly |
 
 **Default key on creation:** `installments:read`, `applications:read`, `dashboard:read`  
 Partner must explicitly enable `installments:write` and `applications:write`.
@@ -1093,7 +1093,7 @@ flowchart LR
 | Per API key | 100 req/min |
 | Per partner (all keys) | 500 req/min |
 | Create/update installment | 20 req/min |
-| Public catalog | existing cache — unchanged |
+| Public catalog | existing cache  unchanged |
 
 ### 13.3 Audit log (proposed model)
 
@@ -1119,8 +1119,8 @@ These exist in the **current** backend and must be fixed **before** exposing API
 
 | # | Issue | Risk | Fix |
 |---|-------|------|-----|
-| 1 | `GET /getApplication/:id` — no `createdBy` check | Any verified user can read any application | Add `assertApplicationOwner(partnerId)` |
-| 2 | `PUT /updateApplicationStatus` — no ownership check | Partner could change another partner's leads | Require `createdBy === req.partner.userId` |
+| 1 | `GET /getApplication/:id`  no `createdBy` check | Any verified user can read any application | Add `assertApplicationOwner(partnerId)` |
+| 2 | `PUT /updateApplicationStatus`  no ownership check | Partner could change another partner's leads | Require `createdBy === req.partner.userId` |
 | 3 | `createInstallmentPlan` accepts `userId` in body | Spoof another partner | Force `userId = req.user.userId` or `req.partner.userId` |
 | 4 | No API key model | Cannot launch feature | Add `PartnerApiKey` schema |
 | 5 | `LoginWithToken` calls `/api/auth/partnerSession` | Broken deep link | Use `/api/partnerSession` |
@@ -1134,43 +1134,43 @@ These exist in the **current** backend and must be fixed **before** exposing API
 gantt
     title Partner API rollout
     dateFormat  YYYY-MM-DD
-    section Phase 1 — Foundation
+    section Phase 1  Foundation
     PartnerApiKey model + middleware     :p1a, 2026-01-01, 7d
     Ownership fixes on applications      :p1b, after p1a, 5d
-    section Phase 2 — Core API
+    section Phase 2  Core API
     v1 installments endpoints            :p2a, after p1b, 10d
     v1 applications endpoints              :p2b, after p2a, 7d
     v1 dashboard + me                      :p2c, after p2b, 3d
-    section Phase 3 — Partner panel UI
+    section Phase 3  Partner panel UI
     Settings API Keys page                 :p3a, after p2c, 7d
     Docs page + copy examples              :p3b, after p3a, 5d
-    section Phase 4 — Hardening
+    section Phase 4  Hardening
     Rate limits per key                    :p4a, after p3b, 5d
     Audit logs + usage dashboard           :p4b, after p4a, 7d
-    section Phase 5 — Optional
+    section Phase 5  Optional
     Public apply from partner site         :p5a, after p4b, 14d
     Sandbox mg_test keys                   :p5b, after p5a, 7d
 ```
 
-### Phase 1 — Foundation (week 1–2)
+### Phase 1  Foundation (week 1–2)
 - [ ] `models/PartnerApiKey.js`
 - [ ] `Middelware/verifyPartnerApiKey.js`
 - [ ] Fix application ownership checks
 - [ ] Force `partnerId` from auth context on create/update
 
-### Phase 2 — Core API (week 3–4)
+### Phase 2  Core API (week 3–4)
 - [ ] Router `routes/partnerApiV1.js`
 - [ ] Wrap existing controllers (thin adapters)
 - [ ] OpenAPI / Postman collection
 
-### Phase 3 — Partner panel UI (week 5)
+### Phase 3  Partner panel UI (week 5)
 - [ ] `partner-panel/src/pages/settings/ApiKeys.jsx` → route `/settings/api-keys`
 - [ ] `partner-panel/src/pages/settings/ApiKeysDocs.jsx` → route `/settings/api-keys/docs`
 - [ ] Generate / revoke / scope picker (calls `POST /api/v1/partner/keys`)
 - [ ] Link from Navbar → Settings → API Keys
 - [ ] Docs page: full endpoint table from §0.2 + copy curl buttons
 
-### Phase 4 — Production hardening (week 6–7)
+### Phase 4  Production hardening (week 6–7)
 - [ ] Per-key rate limiting
 - [ ] `PartnerApiAuditLog` + usage UI
 - [ ] Admin revoke all keys for blocked partner
@@ -1220,12 +1220,12 @@ flowchart TD
     S --> E[Optional expiry date]
     E --> G[Click Generate]
     G --> SHOW[Show mg_live_... + Copy]
-    SHOW --> DONE[Close — key listed by prefix only]
+    SHOW --> DONE[Close  key listed by prefix only]
 ```
 
 ---
 
-## Appendix A — End-to-end partner integration example
+## Appendix A  End-to-end partner integration example
 
 ```mermaid
 sequenceDiagram
@@ -1252,12 +1252,12 @@ sequenceDiagram
 
     CRM->>API: PATCH /api/v1/partner/applications/:id/status { approved }
     API-->>CRM: OK
-    API->>C: notification — approved
+    API->>C: notification  approved
 ```
 
 ---
 
-## Appendix B — Key backend files reference
+## Appendix B  Key backend files reference
 
 | File | Purpose |
 |------|---------|
@@ -1278,14 +1278,14 @@ sequenceDiagram
 
 ---
 
-## Appendix C — Suggested `PartnerApiKey` schema
+## Appendix C  Suggested `PartnerApiKey` schema
 
 ```js
 {
   keyId: String,           // uuid
   partnerId: String,       // User.userId
   name: String,            // "Production ERP"
-  keyPrefix: String,       // "mg_live_a8f2" — indexed
+  keyPrefix: String,       // "mg_live_a8f2"  indexed
   keyHash: String,         // bcrypt
   scopes: [String],        // ["installments:read", "applications:write"]
   status: String,          // active | revoked | expired
@@ -1300,4 +1300,4 @@ sequenceDiagram
 
 ---
 
-*Document version: 1.0 — aligned with backend audit of `backend-Nodejs-Express` and `partner-panel` as of project review.*
+*Document version: 1.0  aligned with backend audit of `backend-Nodejs-Express` and `partner-panel` as of project review.*

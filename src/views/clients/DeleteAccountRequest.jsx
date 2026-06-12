@@ -5,7 +5,7 @@ export default function DeleteAccountRequest() {
   return (
     <>
       <SEO
-        title="Madadgaar Expert — Account Deletion Request"
+        title="Madadgaar Expert  Account Deletion Request"
         description="Public instructions for requesting account deletion for Madadgaar Expert users."
       />
 
@@ -13,7 +13,7 @@ export default function DeleteAccountRequest() {
         <div className="mx-auto max-w-4xl">
           <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
             <h1 className="text-2xl font-bold text-[#D32F2F] sm:text-3xl">
-              Madadgaar Expert — Account Deletion Request
+              Madadgaar Expert  Account Deletion Request
             </h1>
 
             <section className="mt-8">

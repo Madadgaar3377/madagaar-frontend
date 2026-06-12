@@ -498,7 +498,7 @@ const ApplyInstallment = () => {
                     >
                       {variantCashOffers.map((o) => (
                         <option key={cashOfferKey(o)} value={cashOfferKey(o)}>
-                          {o.companyName} — PKR {Number(o.price).toLocaleString()}
+                          {o.companyName}  PKR {Number(o.price).toLocaleString()}
                         </option>
                       ))}
                     </select>

@@ -184,7 +184,7 @@ export default function LoansPage() {
     <>
       <SEO
         title="Madadgaar Financing | Get the funds you need, faster and smarter"
-        description="Explore Financing – Compare, Select & Apply. Madadgaar helps you compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan — all in one easy-to-use platform."
+        description="Explore Financing – Compare, Select & Apply. Madadgaar helps you compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan  all in one easy-to-use platform."
         keywords="loans pakistan, personal loan pakistan, home loan pakistan, car loan pakistan, business loan pakistan, bank loans pakistan, loan interest rates pakistan, financing pakistan, loan comparison pakistan, islamic financing, car financing, house financing, sme loans pakistan"
         canonicalUrl="https://madadgaar.com.pk/loans"
         structuredData={structuredData}
@@ -198,7 +198,7 @@ export default function LoansPage() {
           <div className="flex-1">
             <h1 className="text-responsive-xl font-extrabold text-gray-800">Madadgaar Financing | Get the funds you need, faster and smarter</h1>
             <p className="mt-1 sm:mt-2 text-gray-600 max-w-2xl text-responsive-sm">
-              Explore loan offerings — home, personal, auto and business plans. Click details for eligibility, rates & repayment
+              Explore loan offerings  home, personal, auto and business plans. Click details for eligibility, rates & repayment
               options, or click Apply to start. <a href="/faq#loan" className="text-red-600 hover:text-red-700 font-semibold">View loan FAQs</a> or <a href="/properties" className="text-red-600 hover:text-red-700 font-semibold">explore property solutions</a>.
             </p>
           </div>
@@ -324,7 +324,7 @@ export default function LoansPage() {
               ? `${plan.minTenure}+ ${plan.tenureUnit || 'Months'}`
               : plan.maxTenure
               ? `Up to ${plan.maxTenure} ${plan.tenureUnit || 'Months'}`
-              : "—";
+              : "";
 
             const amountDisplay = plan.minFinancingAmount && plan.maxFinancingAmount
               ? `PKR ${(plan.minFinancingAmount / 1000).toFixed(0)}K - ${(plan.maxFinancingAmount / 1000000).toFixed(1)}M`
@@ -332,7 +332,7 @@ export default function LoansPage() {
               ? `From PKR ${(plan.minFinancingAmount / 1000).toFixed(0)}K`
               : plan.maxFinancingAmount
               ? `Up to PKR ${(plan.maxFinancingAmount / 1000000).toFixed(1)}M`
-              : "—";
+              : "";
 
             return (
               <AnimatedSection key={plan._id || plan.planId} animation="fadeInUp" delay={index * 80} className="w-full">
@@ -366,7 +366,7 @@ export default function LoansPage() {
                         {plan.productName || "Loan Plan"}
                       </h3>
                       <div className="text-[10px] sm:text-xs text-gray-500 mt-1 truncate">
-                        {plan.bankName || plan.createrinformation?.name || "—"}
+                        {plan.bankName || plan.createrinformation?.name || ""}
                       </div>
                       {plan.majorCategory && (
                         <div className="text-[10px] sm:text-xs text-blue-600 mt-1 font-medium truncate">
@@ -401,7 +401,7 @@ export default function LoansPage() {
                     <div className="flex-shrink-0">
                       <div className="text-[10px] sm:text-xs text-gray-500">Rate</div>
                       <div className="font-semibold text-gray-800 text-xs sm:text-sm">
-                        {plan.indicativeRate || "—"}
+                        {plan.indicativeRate || ""}
                       </div>
                       {plan.rateType && (
                         <div className="text-[10px] text-gray-500">({plan.rateType})</div>

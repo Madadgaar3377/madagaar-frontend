@@ -35,9 +35,9 @@ const CATEGORY_OPTIONS = [
     { value: "UPS (Uninterruptible Power Supply)", label: "UPS (Uninterruptible Power Supply)" },
     { value: "Cars", label: "Cars" },
     { value: "Motorcycles (Bikes / Scooters) - Mechanical", label: "Motorcycles (Bikes / Scooters) - Mechanical" },
-    { value: "bikes_mechanical", label: "Bikes — Mechanical" }, // Legacy support
+    { value: "bikes_mechanical", label: "Bikes  Mechanical" }, // Legacy support
     { value: "Motorcycles (Bikes / Scooters) - Electrical", label: "Motorcycles (Bikes / Scooters) - Electrical" },
-    { value: "bikes_electric", label: "Bikes — Electric" }, // Legacy support
+    { value: "bikes_electric", label: "Bikes  Electric" }, // Legacy support
     { value: "Tyres", label: "Tyres" },
     { value: "Office Furniture", label: "Office Furniture" },
     { value: "Home Furniture", label: "Home Furniture" },

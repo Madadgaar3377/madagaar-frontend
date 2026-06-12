@@ -6,7 +6,7 @@ import { APP_BANNER_SESSION_KEY } from "../constants/mobileApp";
 
 const ACCENT = "#b7242a";
 
-/** Pages with their own download-app content — skip the floating promo banner */
+/** Pages with their own download-app content  skip the floating promo banner */
 const BANNER_HIDDEN_PATHS = ["/about", "/download-app"];
 
 export default function AppDownloadBanner() {

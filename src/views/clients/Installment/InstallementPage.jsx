@@ -9,7 +9,6 @@ import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
-import CashPriceDisplay from "../../../components/CashPriceDisplay";
 import {
   getBestPaymentPlan,
   getInstallmentCardPricing,
@@ -56,7 +55,7 @@ export default function InstallmentPlans() {
     }
   };
 
-  // UI state — searchDraft types in bar; appliedSearch triggers API (not every keystroke)
+  // UI state  searchDraft types in bar; appliedSearch triggers API (not every keystroke)
   const [searchDraft, setSearchDraft] = useState("");
   const [appliedSearch, setAppliedSearch] = useState("");
   const [searchLoading, setSearchLoading] = useState(false);
@@ -95,7 +94,7 @@ export default function InstallmentPlans() {
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("Network error — could not fetch installment plans.");
+      setError("Network error  could not fetch installment plans.");
     } finally {
       setLoading(false);
     }
@@ -142,7 +141,7 @@ export default function InstallmentPlans() {
       }
     } catch (err) {
       console.error("Search error:", err);
-      setError("Network error — could not search installment plans.");
+      setError("Network error  could not search installment plans.");
     } finally {
       setSearchLoading(false);
     }
@@ -187,7 +186,7 @@ export default function InstallmentPlans() {
       setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
     } catch (err) {
       console.error("Next page fetch error:", err);
-      setError("Network error — could not load next page.");
+      setError("Network error  could not load next page.");
     } finally {
       setLoadingMore(false);
     }
@@ -221,7 +220,7 @@ export default function InstallmentPlans() {
       setApiTotalCount(Number(extractedPagination?.total || apiTotalCount || 0));
     } catch (err) {
       console.error("Previous page fetch error:", err);
-      setError("Network error — could not load previous page.");
+      setError("Network error  could not load previous page.");
     } finally {
       setLoadingMore(false);
     }
@@ -288,9 +287,9 @@ export default function InstallmentPlans() {
         const categoryMap = {
           "phones": ["phones", "smartphones / mobile", "smartphones", "mobile"],
           "smartphones": ["phones", "smartphones / mobile", "smartphones", "mobile"],
-          "e_bikes": ["e_bikes", "e-bikes", "e bikes", "bikes_electric", "motorcycles (bikes / scooters) - electrical", "bikes — electric"],
-          "bikes_mechanical": ["bikes_mechanical", "motorcycles (bikes / scooters) - mechanical", "bikes — mechanical"],
-          "bikes_electric": ["bikes_electric", "e_bikes", "e-bikes", "motorcycles (bikes / scooters) - electrical", "bikes — electric"],
+          "e_bikes": ["e_bikes", "e-bikes", "e bikes", "bikes_electric", "motorcycles (bikes / scooters) - electrical", "bikes  electric"],
+          "bikes_mechanical": ["bikes_mechanical", "motorcycles (bikes / scooters) - mechanical", "bikes  mechanical"],
+          "bikes_electric": ["bikes_electric", "e_bikes", "e-bikes", "motorcycles (bikes / scooters) - electrical", "bikes  electric"],
           "air_conditioner": ["air_conditioner", "air conditioners", "air conditioner"],
           "appliances": ["appliances", "home appliances / other"]
         };
@@ -353,7 +352,7 @@ export default function InstallmentPlans() {
     <>
     <SEO
       title="Madadgaar Installment Plans | Big dreams? Pay small, with flexible plans that fit your budget"
-      description="Explore Installment Products – Compare, Select & Apply. Madadgaar helps you compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods — all on one easy-to-use platform."
+      description="Explore Installment Products – Compare, Select & Apply. Madadgaar helps you compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods  all on one easy-to-use platform."
       keywords="installment plans pakistan, buy on installments, monthly payments pakistan, installment shopping, zero markup, low interest installments, electronics on installment, furniture installment, appliances installment pakistan, EMI plans pakistan, buy now pay later pakistan"
       canonicalUrl="https://madadgaar.com.pk/installments"
       structuredData={structuredData}
@@ -377,7 +376,7 @@ export default function InstallmentPlans() {
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-              {/* Main Search Bar — API search on button / Enter only */}
+              {/* Main Search Bar  API search on button / Enter only */}
               <div className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
@@ -686,13 +685,13 @@ export default function InstallmentPlans() {
         {loading || searchLoading ? (
           <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4 lg:gap-6 items-stretch">
             {[...Array(12)].map((_, idx) => (
-              <div key={idx} className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse flex flex-col min-h-0">
-                <div className="aspect-[4/3] sm:aspect-[5/4] shrink-0 bg-gray-200"></div>
+              <div key={idx} className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-100 overflow-hidden animate-pulse flex flex-col h-full min-h-0">
+                <div className="h-36 sm:h-44 lg:h-48 shrink-0 bg-gray-200"></div>
                 <div className="p-3 sm:p-4 lg:p-5 space-y-3 flex-1 flex flex-col">
                   <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                   <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-20 bg-gray-200 rounded"></div>
-                  <div className="h-8 bg-gray-200 rounded"></div>
+                  <div className="h-16 sm:h-20 bg-gray-200 rounded flex-1"></div>
+                  <div className="h-10 bg-gray-200 rounded mt-auto"></div>
                 </div>
               </div>
             ))}
@@ -709,101 +708,71 @@ export default function InstallmentPlans() {
                 const pricing = getInstallmentCardPricing(plan, bestPlan);
                 const hasMultiplePlans = plan.paymentPlans && Array.isArray(plan.paymentPlans) && plan.paymentPlans.length > 1;
                 const hasFinance = plan.finance && (plan.finance.bankName || plan.finance.financeInfo);
+                const cardPriceLabel = pricing.cashOnly ? "Starting price" : "Monthly from";
+                const cardPriceAmount = pricing.cashOnly
+                  ? (pricing.cashDisplay?.displayPrice || pricing.primaryAmount)
+                  : pricing.primaryAmount;
                 
                 return (
-                <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full h-full min-h-0 flex">
-                <article className="group bg-white rounded-lg sm:rounded-xl shadow-soft card-hover-lift overflow-hidden border border-gray-100 flex flex-col w-full min-h-0 min-w-0">
-                  <div className="relative shrink-0 w-full aspect-[4/3] sm:aspect-[5/4] bg-gray-100 overflow-hidden">
-                    <img
-                      src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
-                      alt={`${plan.productName} - Installment Plan in ${plan.city || "Pakistan"}`}
-                      className="absolute inset-0 w-full h-full object-contain object-center group-hover:scale-[1.03] transition-transform duration-300"
-                      onError={(e) => (e.currentTarget.src = "/placeholder.png")}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col gap-1.5 sm:gap-2">
+                <AnimatedSection key={plan._id} animation="fadeInUp" delay={index * 80} className="w-full h-full flex">
+                <article className="group bg-white rounded-lg sm:rounded-xl shadow-soft card-hover-lift overflow-hidden border border-gray-100 flex flex-col flex-1 w-full min-h-0 min-w-0 h-full">
+                  <div className="relative shrink-0 w-full h-36 sm:h-44 lg:h-48 bg-gray-50 border-b border-gray-100">
+                    <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4">
+                      <img
+                        src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
+                        alt={`${plan.productName} - Installment Plan in ${plan.city || "Pakistan"}`}
+                        className="max-w-full max-h-full w-auto h-auto object-contain group-hover:scale-[1.03] transition-transform duration-300"
+                        onError={(e) => (e.currentTarget.src = "/placeholder.png")}
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+                    <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-14 sm:right-16 z-10 flex flex-wrap gap-1 sm:gap-1.5 max-w-[calc(100%-3.5rem)]">
                       {hasMultiplePlans && (
-                        <div className="bg-[rgb(183,36,42)]/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
-                          ⭐ Best Plan
-                        </div>
+                        <span className="bg-[rgb(183,36,42)]/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm whitespace-nowrap">
+                          Best Plan
+                        </span>
                       )}
                       {hasFinance && (
-                        <div className="bg-blue-600/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm">
-                          🏦 Bank Finance
-                        </div>
+                        <span className="bg-blue-600/95 backdrop-blur-sm text-white text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full font-bold shadow-sm whitespace-nowrap">
+                          Bank Finance
+                        </span>
                       )}
                     </div>
-                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
-                      <span className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm ${plan.status === "approved" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"}`}>
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3 z-10">
+                      <span className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-semibold shadow-sm capitalize ${plan.status === "approved" ? "bg-green-500 text-white" : "bg-yellow-500 text-white"}`}>
                         {plan.status}
                       </span>
                     </div>
                   </div>
 
-                  <div className="p-2 sm:p-4 lg:p-5 flex flex-col gap-1.5 sm:gap-3 flex-1 min-h-0 min-w-0">
-                    <h3 className="text-xs sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.25rem] sm:min-h-[3rem] leading-snug">{plan.productName}</h3>
+                  <div className="p-2 sm:p-4 lg:p-5 flex flex-col flex-1 min-h-0 min-w-0 gap-2">
+                    <h3 className="text-xs sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] leading-snug">{plan.productName}</h3>
 
-                    <div className="flex items-center justify-between gap-2 text-xs sm:text-sm min-w-0">
-                      <div className="flex items-center gap-1 sm:gap-2 text-gray-600 min-w-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="size-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        <span className="font-medium truncate">{plan.city || "N/A"}</span>
-                      </div>
+                    <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-w-0 min-h-[1.25rem]">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="size-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      <span className="font-medium truncate capitalize">{plan.city || "N/A"}</span>
                     </div>
 
-                    <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100">
-                      <div className="flex items-start sm:items-center justify-between gap-2 mb-1 sm:mb-2">
-                        <div className="text-[10px] sm:text-xs text-gray-600 font-medium min-w-0 line-clamp-2">
-                          {hasMultiplePlans ? `Best: ${bestPlan.planName}` : pricing.primaryLabel}
-                        </div>
-                        {pricing.downPayment > 0 && (
-                        <div className="text-[10px] sm:text-xs text-gray-500 flex-shrink-0 text-right">
-                          Down: {currency(pricing.downPayment)}
-                        </div>
-                        )}
+                    <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100 flex flex-col flex-1 min-h-[4.5rem] sm:min-h-[5rem]">
+                      <div className="text-[10px] sm:text-xs text-gray-600 font-medium mb-1 sm:mb-1.5">
+                        {cardPriceLabel}
                       </div>
-                      <div className="flex items-baseline gap-1 sm:gap-2 flex-wrap">
-                        {pricing.cashOnly ? (
-                          <CashPriceDisplay display={pricing.cashDisplay} size="md" inline />
-                        ) : (
-                          <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums break-all">
-                            {currency(pricing.primaryAmount)}
-                          </span>
-                        )}
+                      <div className="flex items-baseline gap-1 sm:gap-2">
+                        <span className="text-base sm:text-xl lg:text-2xl font-bold text-[rgb(183,36,42)] tabular-nums truncate">
+                          {currency(cardPriceAmount)}
+                        </span>
                         {pricing.showPerMonth && (
-                        <span className="text-[11px] sm:text-sm text-gray-500">/month</span>
+                          <span className="text-[11px] sm:text-sm text-gray-500 shrink-0">/month</span>
                         )}
                       </div>
-                      {(pricing.showCashLine || pricing.tenureLabel) && (
-                      <div className="flex flex-row flex-wrap items-center justify-between gap-x-1 gap-y-0.5 mt-1.5 pt-1 border-t border-red-100/60">
-                        {pricing.showCashLine && (
-                        <div className="text-[11px] sm:text-xs text-gray-700 min-w-0 flex flex-wrap items-center gap-x-1">
-                          <span className="font-extrabold text-gray-900">Cash:</span>
-                          <CashPriceDisplay display={pricing.cashDisplay} size="sm" inline />
-                        </div>
-                        )}
-                        {pricing.tenureLabel && (
-                          <div className="text-[11px] sm:text-xs text-gray-900 font-semibold whitespace-nowrap">
-                            {pricing.tenureLabel}
-                          </div>
-                        )}
-                      </div>
-                      )}
                       {hasMultiplePlans && (
-                        <div className="text-[9px] sm:text-[10px] text-gray-500 mt-1 pt-1 border-t border-red-200">
-                          {plan.paymentPlans.length} plan{plan.paymentPlans.length > 1 ? 's' : ''} available
-                        </div>
-                      )}
-                      {hasFinance && (
-                        <div className="text-[9px] sm:text-[10px] text-blue-600 mt-1 pt-1 border-t border-blue-200 flex items-center gap-1">
-                          <svg className="size-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                          <span className="font-semibold">Bank Finance Available</span>
-                        </div>
+                        <p className="text-[10px] sm:text-xs text-gray-500 mt-auto pt-2 leading-snug">
+                          View details for all plans
+                        </p>
                       )}
                     </div>
 
-                    <div className="mt-auto pt-2 grid grid-cols-2 gap-1.5 sm:gap-2 items-stretch min-h-0">
+                    <div className="mt-auto pt-2 grid grid-cols-2 gap-1.5 sm:gap-2 items-stretch shrink-0">
                       <Link
                         href={`/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}`}
                         className="min-w-0 min-h-[40px] px-1.5 sm:px-3 lg:px-4 py-2 rounded-lg bg-gradient-to-r from-[rgb(183,36,42)] to-red-600 text-white text-[11px] sm:text-sm font-semibold hover:shadow-lg transition text-center inline-flex items-center justify-center leading-tight"

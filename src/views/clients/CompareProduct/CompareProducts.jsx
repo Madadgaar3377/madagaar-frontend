@@ -269,15 +269,15 @@ export default function CompareProducts() {
     if (key.startsWith("__spec_")) {
       const fieldName = key.replace(/^__spec_/, "");
       const specs = product.productSpecifications?.specifications;
-      if (!Array.isArray(specs)) return <span className="text-xs text-gray-400">—</span>;
+      if (!Array.isArray(specs)) return <span className="text-xs text-gray-400"></span>;
       const spec = specs.find((s) => (s.field || s.label || "").toString().trim() === fieldName);
       const v = spec?.value;
-      return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400">—</span>}</div>;
+      return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400"></span>}</div>;
     }
     const v = getByPath(product, key);
     if (key === "productImages") {
       const imgs = Array.isArray(product.productImages) ? product.productImages : [];
-      if (!imgs.length) return <span className="text-xs text-gray-400">—</span>;
+      if (!imgs.length) return <span className="text-xs text-gray-400"></span>;
       return (
         <div className="flex gap-2 flex-wrap">
           {imgs.slice(0, 3).map((s, i) => (
@@ -290,18 +290,18 @@ export default function CompareProducts() {
     }
     if (key === "price") {
       const display = getProductPriceDisplay(product);
-      if (!display.displayPrice) return <span className="text-xs text-gray-400">—</span>;
+      if (!display.displayPrice) return <span className="text-xs text-gray-400"></span>;
       return <CashPriceDisplay display={display} size="sm" prefix="Rs." inline className="font-semibold" />;
     }
     if (["downpayment", "installment"].includes(key)) {
-      if (v == null || v === "") return <span className="text-xs text-gray-400">—</span>;
+      if (v == null || v === "") return <span className="text-xs text-gray-400"></span>;
       return <span className="font-semibold">Rs. {Number(v).toLocaleString("en-PK")}</span>;
     }
     if (key === "description") {
       const txt = typeof v === "string" ? v.replace(/<\/?[^>]+(>|$)/g, "").slice(0, 140) : "";
-      return <div className="text-sm text-gray-700">{txt || <span className="text-xs text-gray-400">—</span>}</div>;
+      return <div className="text-sm text-gray-700">{txt || <span className="text-xs text-gray-400"></span>}</div>;
     }
-    return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400">—</span>}</div>;
+    return <div className="text-sm text-gray-700">{v ?? <span className="text-xs text-gray-400"></span>}</div>;
   }
 
   const showComparison = compareList.length > 1;
@@ -356,7 +356,7 @@ export default function CompareProducts() {
                         <h2 className="text-lg sm:text-xl font-bold text-gray-900 break-words">{baseProduct.productName}</h2>
                         <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-red-50 text-red-700 border border-red-100">Base product</span>
                       </div>
-                      <p className="text-sm text-gray-500 mt-1">{[baseProduct.companyName, baseProduct.category, baseProduct.city].filter(Boolean).join(" • ") || "—"}</p>
+                      <p className="text-sm text-gray-500 mt-1">{[baseProduct.companyName, baseProduct.category, baseProduct.city].filter(Boolean).join(" • ") || ""}</p>
                       <div className="mt-2">
                         <CashPriceDisplay display={getProductPriceDisplay(baseProduct)} size="md" prefix="Rs." />
                       </div>
@@ -382,11 +382,11 @@ export default function CompareProducts() {
                     </div>
                     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                       <div className="text-xs text-gray-500 font-medium">Tenure</div>
-                      <div className="text-sm font-semibold text-gray-800">{baseProduct.tenure || "—"}</div>
+                      <div className="text-sm font-semibold text-gray-800">{baseProduct.tenure || ""}</div>
                     </div>
                     <div className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                       <div className="text-xs text-gray-500 font-medium">City</div>
-                      <div className="text-sm font-semibold text-gray-800">{baseProduct.city || "—"}</div>
+                      <div className="text-sm font-semibold text-gray-800">{baseProduct.city || ""}</div>
                     </div>
                   </div>
                 </>

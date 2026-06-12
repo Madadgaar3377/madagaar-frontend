@@ -1,4 +1,4 @@
-/** Monthly installment is absent or zero — treat as cash / pay-in-full pricing. */
+/** Monthly installment is absent or zero  treat as cash / pay-in-full pricing. */
 
 export function isCashOnlyInstallment(monthly) {
 
@@ -460,7 +460,7 @@ export function formatTenureDisplay(tenureMonths) {
 
   const raw = String(tenureMonths).trim();
 
-  if (!raw || raw === "—" || raw === "-" || raw === "0") return null;
+  if (!raw || raw === "" || raw === "-" || raw === "0") return null;
 
   const num = Number(raw);
 

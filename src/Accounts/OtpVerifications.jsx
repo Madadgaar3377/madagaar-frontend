@@ -79,7 +79,7 @@ export default function OtpVerifyPage() {
       }
     } catch (err) {
       console.error("Resend OTP error:", err);
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setResendLoading(false);
     }
@@ -109,7 +109,7 @@ export default function OtpVerifyPage() {
       toast.success("OTP sent. Enter the code below.");
       setResendCooldown(60);
     } catch (err) {
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setResendLoading(false);
     }
@@ -187,7 +187,7 @@ export default function OtpVerifyPage() {
     } catch (err) {
       console.error("OTP verify error:", err);
       autoVerifyDisabled.current = true;
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setLoading(false);
     }

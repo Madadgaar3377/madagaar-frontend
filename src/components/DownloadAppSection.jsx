@@ -30,7 +30,7 @@ export default function DownloadAppSection({ delay = 140, className = "w-full" }
             </h2>
             <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
               Take Madadgaar with you on Android. Browse property listings, compare installment plans, explore
-              loans and insurance, submit applications, and track updates — all from one free mobile app built
+              loans and insurance, submit applications, and track updates  all from one free mobile app built
               for users in Pakistan.
             </p>
             <ul className="space-y-2 text-sm sm:text-base text-gray-600">

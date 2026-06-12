@@ -184,7 +184,7 @@ export default function AboutPage() {
                 <h3 className="text-xl sm:text-2xl font-bold ml-4 text-gray-900">Mission</h3>
               </div>
               <p className="text-gray-700 text-sm sm:text-base leading-relaxed">
-                To simplify life by offering trusted property solutions, insurance support, loans, and flexible installment plans through a single, reliable platform — while partnering with service-providing companies and connecting them with verified local agents across Pakistan. Our goal is to ensure transparency, convenience, and peace of mind for individuals, businesses, and partners alike.
+                To simplify life by offering trusted property solutions, insurance support, loans, and flexible installment plans through a single, reliable platform  while partnering with service-providing companies and connecting them with verified local agents across Pakistan. Our goal is to ensure transparency, convenience, and peace of mind for individuals, businesses, and partners alike.
               </p>
             </div>
 
@@ -213,7 +213,7 @@ export default function AboutPage() {
               Our Goals
             </h2>
             <p className="text-gray-600 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto">
-              To simplify and improve people's lives by offering a trusted marketplace where they can easily access the best options in property, insurance, loans, and installment plans—all with transparency, convenience, and expert guidance.
+              To simplify and improve people's lives by offering a trusted marketplace where they can easily access the best options in property, insurance, loans, and installment plansall with transparency, convenience, and expert guidance.
             </p>
           </div>
 

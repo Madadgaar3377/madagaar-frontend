@@ -74,7 +74,7 @@ export default function InsuranceInfo() {
         console.error("Fetch error:", err);
         if (mounted) {
           // Show user-friendly error message
-          const errorMsg = err.message || "Network error — could not fetch insurance plans.";
+          const errorMsg = err.message || "Network error  could not fetch insurance plans.";
           setError(errorMsg);
         }
       } finally {
@@ -171,7 +171,7 @@ export default function InsuranceInfo() {
     "@type": "Service",
     "serviceType": "Insurance Services",
     "name": "Madadgaar Insurance Support",
-    "description": "Claim with confidence—Pakistan's most trusted insurance support. Compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support.",
+    "description": "Claim with confidencePakistan's most trusted insurance support. Compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support.",
     "url": "https://madadgaar.com.pk/insurance",
     "provider": {
       "@type": "LocalBusiness",
@@ -197,8 +197,8 @@ export default function InsuranceInfo() {
   return (
     <div className="bg-gray-50">
       <SEO
-        title="Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support"
-        description="Explore Insurance Services – Compare, Select & Apply. Madadgaar helps you compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support — all on one easy-to-use platform."
+        title="Madadgaar Insurance Support | Claim with confidencePakistan's most trusted insurance support"
+        description="Explore Insurance Services – Compare, Select & Apply. Madadgaar helps you compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support  all on one easy-to-use platform."
         keywords="insurance pakistan, car insurance pakistan, life insurance, health insurance, property insurance, insurance claims, insurance companies pakistan, motor insurance, family insurance, takaful pakistan, insurance support pakistan"
         canonicalUrl="https://madadgaar.com.pk/insurance"
         structuredData={structuredData}
@@ -210,7 +210,7 @@ export default function InsuranceInfo() {
         <div className="container-content max-w-6xl section-padding flex flex-col sm:flex-row gap-3 sm:gap-4 items-start sm:items-center justify-between">
           <div className="flex-1">
             <h1 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800">
-              Madadgaar Insurance Support | Claim with confidence—Pakistan's most trusted insurance support
+              Madadgaar Insurance Support | Claim with confidencePakistan's most trusted insurance support
             </h1>
             <p className="text-xs sm:text-sm md:text-base text-gray-500 mt-1">
               Protect your life, health, and assets with tailored insurance plans. <a href="/faq#insurance" className="text-red-600 hover:text-red-700 font-semibold">View insurance FAQs</a> or <a href="/contact" className="text-red-600 hover:text-red-700 font-semibold">contact our support team</a>.
