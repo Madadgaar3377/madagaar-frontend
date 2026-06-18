@@ -10,7 +10,7 @@ const teamMembers = [
     title: "Founder & CEO",
     designation: "Founder & Chief Executive Officer",
     bio: "Visionary entrepreneur and Founder of Madadgaar Expert Partner, Pakistan's most trusted marketplace for property, insurance, loans, and installment solutions. With over a decade of experience in business development and strategic planning, Raja Afzal revolutionizes how Pakistanis access essential financial services. Under his leadership, Madadgaar connects users with verified service providers nationwide, offering seamless property solutions, easy installment plans, flexible loan options, and reliable insurance support. His strategic vision and commitment to excellence have positioned Madadgaar as a market leader in Pakistan's service aggregation industry.",
-    image: "/Media/card/rajaAfzal.jpeg",
+    image: "/Media/card/rajaAfzal.webp",
     email: "ceo@madadgaar.com.pk",
     phone: "+92 310 4179363",
     socialLinks: {
@@ -71,7 +71,7 @@ const teamMembers = [
     title: "Director & CEO",
     designation: "Director & Chief Executive Officer",
     bio: "Dynamic Director at Madadgaar Expert Partner specializing in operational management, strategic execution, and business scaling. Saud Ch oversees day-to-day operations ensuring service quality across property, insurance, loans, and installment verticals. His expertise in process optimization and customer relationship management has been instrumental in Madadgaar's rapid growth. With a strong focus on operational excellence and customer-first approach, Saud ensures seamless coordination between partner companies and users, maintaining the highest standards of service delivery while efficiently scaling operations nationwide.",
-    image: "/Media/card/sadu.jpeg",
+    image: "/Media/card/sadu.webp",
     email: "saud.ch@madadgaar.com.pk",
     phone: "+92 307 111 333 0",
     socialLinks: {
@@ -193,7 +193,7 @@ const teamMembers = [
     title: "IT & Innovation | Software Engineer",
     designation: "Head of IT & Innovation | Lead Software Engineer",
     bio: "Accomplished Full-Stack Software Engineer and IT Team Lead specializing in backend development, VPS management, database architecture, and mobile app development. Abubakkar drives digital innovation at Madadgaar Expert Partner, leading the technical team in building scalable, secure solutions. With expertise in Node.js, React, MongoDB, and cloud infrastructure, he ensures the platform delivers exceptional user experiences. His technical leadership powers Pakistan's most trusted marketplace, managing server infrastructure, API development, database optimization, and cross-platform mobile applications that serve property, insurance, loan, and installment services nationwide.",
-    image: "/Media/card/abubakkar.jpg",
+    image: "/Media/card/abubakkar.webp",
     email: "abubakkarsajid4@gmail.com",
     phone: "+92 324 185 147 6",
     socialLinks: {

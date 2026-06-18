@@ -1,31 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
+import OptimizedImage from './OptimizedImage';
 
 /**
  * TeamMemberCard Component
  * Displays team member information with contact button
  */
 const TeamMemberCard = ({ member }) => {
+  const [imageError, setImageError] = useState(false);
   const contactEmail = member.email || 'support@madadgaar.com.pk';
   const subject = `Inquiry for ${member.name} - ${member.title}`;
   const body = `Dear ${member.name},\n\nI would like to get in touch with you regarding...\n\nBest regards`;
   const mailtoLink = `mailto:${contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
+  const placeholderIcons = ['/Media/man 1.png', '/Media/man 2.png', '/Media/man 3.png', '/Media/Agent-1.png'];
+  const showPhoto = member.image && !placeholderIcons.includes(member.image) && !imageError;
+
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg interactive-card card-hover-lift group">
       {/* Image Section */}
       <div className={`h-48 bg-gradient-to-br ${member.color} flex items-center justify-center relative overflow-hidden`}>
-        {member.image && member.image !== '/Media/man 1.png' && member.image !== '/Media/man 2.png' && member.image !== '/Media/man 3.png' && member.image !== '/Media/Agent-1.png' ? (
-          <img 
-            src={member.image} 
+        {showPhoto ? (
+          <OptimizedImage
+            src={member.image}
             alt={member.name}
+            width={512}
+            height={512}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px"
             className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
+            onError={() => setImageError(true)}
           />
         ) : null}
-        <div className={`${member.image && member.image !== '/Media/man 1.png' && member.image !== '/Media/man 2.png' && member.image !== '/Media/man 3.png' && member.image !== '/Media/Agent-1.png' ? 'hidden' : 'flex'} size-32 rounded-full bg-white items-center justify-center text-6xl shadow-lg`}>
+        <div className={`${showPhoto ? 'hidden' : 'flex'} size-32 rounded-full bg-white items-center justify-center text-6xl shadow-lg`}>
           {member.icon}
         </div>
       </div>

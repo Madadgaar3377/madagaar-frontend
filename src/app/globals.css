@@ -231,6 +231,7 @@
 
   .page-media {
     @apply w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl mx-auto object-cover;
+    height: auto;
   }
   
   .safe-margin {

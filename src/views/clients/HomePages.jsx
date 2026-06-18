@@ -1,12 +1,7 @@
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
 import FeatureCards from "./Cards";
-import Services from "./Services";
-import SecondCards from "./SecondCards";
-// import MobileAppPage from "./MadadghaarAppPage"; // Commented out as per user preference
-import VideoPage from "./youtube/YoutubeVide";
-import InfoBoxes from "./ChosewhyPAge";
-import OurPartners from "./OverPartener";
 import SEO from "../../components/SEO";
 import TeamMemberCard from "../../components/TeamMemberCard";
 import teamMembers from "../../constants/teamMembers";
@@ -14,7 +9,14 @@ import { Toast, useToast } from "../../components/Toast";
 import { backendBaseUrl } from "../../constants/apiUrl";
 import AnimatedSection from "../../components/AnimatedSection";
 import StaggerReveal from "../../components/StaggerReveal";
-import DownloadAppSection from "../../components/DownloadAppSection";
+import OptimizedImage from "../../components/OptimizedImage";
+
+const Services = dynamic(() => import("./Services"));
+const SecondCards = dynamic(() => import("./SecondCards"));
+const VideoPage = dynamic(() => import("./youtube/YoutubeVide"));
+const InfoBoxes = dynamic(() => import("./ChosewhyPAge"));
+const OurPartners = dynamic(() => import("./OverPartener"));
+const DownloadAppSection = dynamic(() => import("../../components/DownloadAppSection"));
 
 const heroEase = [0.16, 1, 0.3, 1];
 
@@ -356,12 +358,14 @@ export default function HomePage() {
             initial={motionInitial}
             animate={motionAnimate}
           >
-            <img
-              src="/Media/inshero.png"
+            <OptimizedImage
+              src="/Media/inshero.webp"
               alt="Madadgaar Expert Partner - Property, Financing, Installments & Insurance Services in Pakistan"
+              width={851}
+              height={506}
+              sizes="(max-width: 1024px) 90vw, 576px"
+              priority
               className="rounded-xl sm:rounded-2xl page-media interactive-image float-gentle"
-              loading="eager"
-              fetchPriority="high"
             />
           </motion.div>
         </div>

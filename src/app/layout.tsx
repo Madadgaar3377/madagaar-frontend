@@ -93,7 +93,6 @@ export const viewport = {
   themeColor: "#B7242A",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -110,9 +109,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppProviders>{children}</AppProviders>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-D1B1F0YFCD"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -123,10 +122,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script
           id="adsense"
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6076284388585235"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           crossOrigin="anonymous"
         />
-        <Script id="apitestlab-config" strategy="afterInteractive">
+        <Script id="apitestlab-config" strategy="lazyOnload">
           {`
             window.aptest = {
               trackingId: 'aptest-cf6ff4e65632df8ab92d',
@@ -137,7 +136,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </Script>
         <Script
           src="https://www.apitestlab.org/tracking-script.js"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
       </body>
     </html>

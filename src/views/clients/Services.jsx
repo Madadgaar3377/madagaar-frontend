@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import OptimizedImage from "../../components/OptimizedImage";
 
 const Services = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -78,11 +79,13 @@ const Services = () => {
         }`}
         style={imageVisible ? { animationDelay: '200ms' } : {}}
       >
-        <img
-            src="/Media/Support%20service.png"
-            alt="Madadgaar Free Support Services - Property, Insurance, Loans and Installment Solutions in Pakistan"
+        <OptimizedImage
+          src="/Media/Support service.webp"
+          alt="Madadgaar Free Support Services - Property, Insurance, Loans and Installment Solutions in Pakistan"
+          width={800}
+          height={600}
+          sizes="(max-width: 1024px) 90vw, 576px"
           className="rounded-xl sm:rounded-2xl page-media interactive-image"
-          loading="lazy"
         />
       </div>
       </div>
