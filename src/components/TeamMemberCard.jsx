@@ -17,22 +17,24 @@ const TeamMemberCard = ({ member }) => {
 
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg interactive-card card-hover-lift group">
-      {/* Image Section */}
-      <div className={`h-48 bg-gradient-to-br ${member.color} flex items-center justify-center relative overflow-hidden`}>
+      {/* Image — square frame, face anchored top, fills card on mobile & desktop */}
+      <div className="relative w-full aspect-square overflow-hidden bg-gray-100">
         {showPhoto ? (
           <OptimizedImage
             src={member.image}
             alt={member.name}
-            width={512}
-            height={512}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 320px"
-            className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 280px"
+            className="object-cover object-top"
             onError={() => setImageError(true)}
           />
-        ) : null}
-        <div className={`${showPhoto ? 'hidden' : 'flex'} size-32 rounded-full bg-white items-center justify-center text-6xl shadow-lg`}>
-          {member.icon}
-        </div>
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${member.color} flex items-center justify-center`}>
+            <div className="size-24 sm:size-28 lg:size-32 rounded-full bg-white flex items-center justify-center text-5xl sm:text-6xl shadow-lg">
+              {member.icon}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Info Section */}
