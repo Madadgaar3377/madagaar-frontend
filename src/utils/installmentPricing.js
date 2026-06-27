@@ -110,6 +110,26 @@ export function resolvePriceDisplay({ price, cashPrice, discountedPrice, discoun
 
     if (discounted > 0 && discounted < cash) {
 
+      const savings = cash - discounted;
+
+      const savingsPct = cash > 0 ? (savings / cash) * 100 : 0;
+
+      if (savingsPct < 0.5 || savings < 2) {
+
+        return {
+
+          displayPrice: cash,
+
+          cashPrice: cash,
+
+          discountPercent: 0,
+
+          hasDiscount: false,
+
+        };
+
+      }
+
       return {
 
         displayPrice: discounted,
@@ -246,6 +266,18 @@ export function getProductPriceDisplay(plan, variantIndex = null) {
 
 
 
+  const rootDisplay = resolvePriceDisplay({
+
+    price: plan.price,
+
+    discountedPrice: plan.discountedPrice,
+
+    discountPercent: plan.discountPercent,
+
+  });
+
+
+
   const catalogDisplays = (plan.variants || [])
 
     .filter((v) => !isPartnerOwnedVariant(v))
@@ -268,21 +300,37 @@ export function getProductPriceDisplay(plan, variantIndex = null) {
 
 
 
-  if (catalogDisplays.length) {
+  const candidates = [...catalogDisplays];
 
-    return catalogDisplays.reduce((a, b) => (a.displayPrice < b.displayPrice ? a : b));
-
-  }
+  if (rootDisplay.displayPrice > 0) candidates.push(rootDisplay);
 
 
 
-  return resolvePriceDisplay({
+  if (!candidates.length) return rootDisplay;
 
-    price: plan.price,
 
-    discountedPrice: plan.discountedPrice,
 
-    discountPercent: plan.discountPercent,
+  return candidates.reduce((best, cur) => {
+
+    if (!best) return cur;
+
+    if (!cur.hasDiscount && best.hasDiscount) {
+
+      const ref = Math.max(best.cashPrice, best.displayPrice, 1);
+
+      if (Math.abs(cur.displayPrice - best.displayPrice) / ref < 0.02) return cur;
+
+    }
+
+    if (cur.hasDiscount && !best.hasDiscount) {
+
+      const ref = Math.max(cur.cashPrice, cur.displayPrice, 1);
+
+      if (Math.abs(cur.displayPrice - best.displayPrice) / ref < 0.02) return best;
+
+    }
+
+    return cur.displayPrice < best.displayPrice ? cur : best;
 
   });
 
