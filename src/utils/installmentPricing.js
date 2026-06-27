@@ -6,6 +6,20 @@ export function isCashOnlyInstallment(monthly) {
 
 }
 
+function planHasFinanceDetails(plan) {
+  if (!plan?.finance) return false;
+  const bank = String(plan.finance.bankName || "").trim();
+  const info = String(plan.finance.financeInfo || "").replace(/<[^>]*>/g, " ").trim();
+  return Boolean(bank || info);
+}
+
+/** True when partner configured a real installment/finance plan (not an empty row). */
+export function isRealInstallmentPlan(plan) {
+  if (!plan || !String(plan.planName || "").trim()) return false;
+  if (planHasFinanceDetails(plan)) return true;
+  return Number(plan.monthlyInstallment) > 0 || Number(plan.installmentPrice) > 0;
+}
+
 
 
 export function resolveMonthlyInstallment(paymentPlan, plan) {
@@ -1203,10 +1217,9 @@ export function buildPlanEntries(plan, selectedVariantIndex) {
     const variantPlans = plan.variants[selectedVariantIndex].paymentPlans || [];
 
     const plansToShow =
-
       variantPlans.length > 0 ? variantPlans : plan.paymentPlans || [];
 
-    return plansToShow.map((p, planIndex) => ({
+    return plansToShow.filter(isRealInstallmentPlan).map((p, planIndex) => ({
 
       plan: p,
 
@@ -1223,19 +1236,15 @@ export function buildPlanEntries(plan, selectedVariantIndex) {
   const entries = [];
 
   (plan.paymentPlans || []).forEach((p, planIndex) => {
-
+    if (!isRealInstallmentPlan(p)) return;
     entries.push({ plan: p, variantIndex: null, planIndex });
-
   });
 
   (plan.variants || []).forEach((v, variantIndex) => {
-
     (v.paymentPlans || []).forEach((p, planIndex) => {
-
+      if (!isRealInstallmentPlan(p)) return;
       entries.push({ plan: p, variantIndex, planIndex });
-
     });
-
   });
 
   return entries;

@@ -11,6 +11,7 @@ import {
   getBestPaymentPlan,
   buildInstallmentShareLines,
   isCashOnlyInstallment,
+  isRealInstallmentPlan,
   formatTenureDisplay,
   buildPlanEntries,
   collectAllPaymentPlans,
@@ -250,6 +251,28 @@ export default function InstallmentDetail() {
       }),
     [plan, currentPlans, priceVariantIndex]
   );
+
+  const hasCashPricing = useMemo(() => {
+    if (!plan) return false;
+    if (getLowestPublicCashPrice(plan, priceVariantIndex) > 0) return true;
+    if (cashOffers.length > 0) return true;
+    if (Number(plan.price) > 0) return true;
+    return (plan.variants || []).some((v) => Number(v.price) > 0);
+  }, [plan, priceVariantIndex, cashOffers]);
+
+  const hasInstallmentPricing = useMemo(() => {
+    if (!plan) return false;
+    return collectAllPaymentPlans(plan).some(isRealInstallmentPlan);
+  }, [plan]);
+
+  useEffect(() => {
+    if (!plan) return;
+    if (hasInstallmentPricing && !hasCashPricing) {
+      setPricingView("installments");
+    } else if (hasCashPricing && !hasInstallmentPricing) {
+      setPricingView("cash");
+    }
+  }, [id, plan, hasCashPricing, hasInstallmentPricing]);
 
 
 
@@ -553,7 +576,15 @@ export default function InstallmentDetail() {
                     Back to List
                   </Link>
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                {(hasCashPricing || hasInstallmentPricing) && (
+                <div
+                  className={
+                    hasCashPricing && hasInstallmentPricing
+                      ? "grid grid-cols-2 gap-3"
+                      : "grid grid-cols-1 gap-3"
+                  }
+                >
+                  {hasCashPricing && (
                   <button
                     type="button"
                     onClick={() => setPricingView("cash")}
@@ -565,6 +596,8 @@ export default function InstallmentDetail() {
                   >
                     Cash
                   </button>
+                  )}
+                  {hasInstallmentPricing && (
                   <button
                     type="button"
                     onClick={() => setPricingView("installments")}
@@ -576,7 +609,9 @@ export default function InstallmentDetail() {
                   >
                     Installments
                   </button>
+                  )}
                 </div>
+                )}
                 <ShareButtons
                   url={id ? `https://madadgaar.com.pk/installment/${encodeURIComponent(id)}` : ""}
                   title={plan.productName || "Installment plan"}
