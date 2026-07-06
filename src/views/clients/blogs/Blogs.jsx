@@ -15,7 +15,7 @@ function stripHtml(html = "") {
   return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export default function BlogsPage({ initialBlogs = null }) {
+export default function BlogsPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -32,9 +32,9 @@ export default function BlogsPage({ initialBlogs = null }) {
     }
   };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [blogs, setBlogs] = useState(initialBlogs || []);
-  const [totalBlog, setTotalBlog] = useState(initialBlogs?.length || 0);
-  const [loading, setLoading] = useState(initialBlogs == null);
+  const [blogs, setBlogs] = useState([]);
+  const [totalBlog, setTotalBlog] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
@@ -42,7 +42,6 @@ export default function BlogsPage({ initialBlogs = null }) {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (initialBlogs != null) return;
     let mounted = true;
 
     async function fetchBlogs() {
@@ -82,7 +81,7 @@ export default function BlogsPage({ initialBlogs = null }) {
     return () => {
       mounted = false;
     };
-  }, [apiUrl, initialBlogs]);
+  }, [apiUrl]);
 
   const categories = useMemo(() => {
     const s = new Set();

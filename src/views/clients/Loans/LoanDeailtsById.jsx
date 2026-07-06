@@ -41,17 +41,16 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function LoanDetails({ initialLoan = null, loanId: loanIdProp = null }) {
-  const { id: routeId } = useParams();
-  const id = loanIdProp || routeId;
+export default function LoanDetails() {
+  const { id } = useParams();
   const router = useRouter();
 
-  const [plan, setPlan] = useState(initialLoan);
-  const [loading, setLoading] = useState(initialLoan == null);
+  const [plan, setPlan] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id || initialLoan != null) return;
+    if (!id) return;
     
     let cancelled = false;
     
@@ -102,7 +101,7 @@ export default function LoanDetails({ initialLoan = null, loanId: loanIdProp = n
     return () => {
       cancelled = true;
     };
-  }, [id, initialLoan]);
+  }, [id]);
 
   if (loading) {
     return <LoadingPage />;

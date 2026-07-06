@@ -18,17 +18,16 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function InsurancePlanDetails({ initialPlan = null, planId: planIdProp = null }) {
-  const { id: routeId } = useParams();
-  const id = planIdProp || routeId;
+export default function InsurancePlanDetails() {
+  const { id } = useParams();
   const router = useRouter();
 
-  const [plan, setPlan] = useState(initialPlan);
-  const [loading, setLoading] = useState(initialPlan == null);
+  const [plan, setPlan] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id || initialPlan != null) return;
+    if (!id) return;
     
     let cancelled = false;
     
@@ -65,7 +64,7 @@ export default function InsurancePlanDetails({ initialPlan = null, planId: planI
     return () => {
       cancelled = true;
     };
-  }, [id, initialPlan]);
+  }, [id]);
 
   if (loading) {
     return <LoadingPage />;

@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/metadata";
 import {
   fetchProperties,
   fetchPropertyById,
 } from "../../../lib/api-server";
 import { sanitizePublicDescription, stripHtml } from "../../../lib/description";
-import { SITE_URL } from "../../../lib/site";
 import PropertyDetails from "../../../views/clients/Properties/PropertyDetails";
-
-export const revalidate = 3600;
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -70,9 +66,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function Page({ params }: Props) {
-  const { id } = await params;
-  const property = await fetchPropertyById(id);
-  if (!property) notFound();
-  return <PropertyDetails initialProperty={property} propertyId={id} />;
+export default function Page() {
+  return <PropertyDetails />;
 }

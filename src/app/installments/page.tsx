@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/metadata";
-import { fetchInstallmentsPage } from "../../lib/api-server";
 import InstallmentPlans from "../../views/clients/Installment/InstallementPage";
-
-export const revalidate = 3600;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Installment Plans in Pakistan",
@@ -12,12 +9,6 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/installments",
 });
 
-export default async function Page() {
-  const { items, totalPages, total } = await fetchInstallmentsPage(1, 100);
-  return (
-    <InstallmentPlans
-      initialPlans={items}
-      initialPagination={{ page: 1, totalPages, total }}
-    />
-  );
+export default function Page() {
+  return <InstallmentPlans />;
 }

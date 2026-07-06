@@ -22,10 +22,10 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function InsuranceInfo({ initialPlans = null }) {
+export default function InsuranceInfo() {
   const router = useRouter();
-  const [plans, setPlans] = useState(initialPlans || []);
-  const [loading, setLoading] = useState(initialPlans == null);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   
   // Filter and search state
@@ -36,7 +36,6 @@ export default function InsuranceInfo({ initialPlans = null }) {
   const pageSize = 12;
 
   useEffect(() => {
-    if (initialPlans != null) return;
     let mounted = true;
     const fetchPlans = async () => {
       setLoading(true);
@@ -89,7 +88,7 @@ export default function InsuranceInfo({ initialPlans = null }) {
     
     fetchPlans();
     return () => { mounted = false; };
-  }, [initialPlans]);
+  }, []);
 
   // Filter plans
   const filteredPlans = useMemo(() => {

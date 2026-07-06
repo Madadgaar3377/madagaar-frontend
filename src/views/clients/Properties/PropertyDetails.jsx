@@ -81,34 +81,30 @@ function extractPropertyData(property) {
     return null;
 }
 
-const PropertyDetails = ({ initialProperty = null, propertyId: propertyIdProp = null }) => {
-    const { id: routeId } = useParams();
-    const id = propertyIdProp || routeId;
+const PropertyDetails = () => {
+    const { id } = useParams();
     const router = useRouter();
     const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
     
-    const [property, setProperty] = useState(initialProperty ? extractPropertyData(initialProperty) : null);
+    const [property, setProperty] = useState(null);
     const [relatedProperties, setRelatedProperties] = useState([]);
-    const [loading, setLoading] = useState(initialProperty == null);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selectedImage, setSelectedImage] = useState(0);
 
     useEffect(() => {
         const fetchPropertyDetails = async () => {
-            const needsProperty = initialProperty == null;
-            if (needsProperty) setLoading(true);
+            setLoading(true);
             try {
                 const res = await fetch(`${apiUrl}/getAllProperties`);
                 const payload = await res.json();
 
                 if (payload.success && payload.properties) {
-                    const current =
-                        needsProperty
-                            ? extractPropertyData(payload.properties.find((p) => p._id === id))
-                            : property;
+                    const foundProperty = payload.properties.find((p) => p._id === id);
 
-                    if (current) {
-                        if (needsProperty) setProperty(current);
+                    if (foundProperty) {
+                        const extracted = extractPropertyData(foundProperty);
+                        setProperty(extracted);
 
                         const related = payload.properties
                             .filter((p) => p._id !== id)
@@ -116,28 +112,28 @@ const PropertyDetails = ({ initialProperty = null, propertyId: propertyIdProp = 
                             .filter(Boolean)
                             .filter(
                                 (p) =>
-                                    p.city === current.city ||
-                                    p.propertyType === current.propertyType
+                                    p.city === extracted.city ||
+                                    p.propertyType === extracted.propertyType
                             )
                             .slice(0, 6);
 
                         setRelatedProperties(related);
-                    } else if (needsProperty) {
+                    } else {
                         setError("Property not found");
                     }
-                } else if (needsProperty) {
+                } else {
                     setError(payload.message || "Failed to load property");
                 }
             } catch (err) {
                 console.error("Fetch error:", err);
-                if (needsProperty) setError("Failed to load property details");
+                setError("Failed to load property details");
             } finally {
-                if (needsProperty) setLoading(false);
+                setLoading(false);
             }
         };
 
         fetchPropertyDetails();
-    }, [id, apiUrl, initialProperty]);
+    }, [id, apiUrl]);
 
     if (loading) return <LoadingPage />;
 

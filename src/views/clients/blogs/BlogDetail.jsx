@@ -11,11 +11,10 @@ import { SITE_URL } from "../../../lib/site";
 
 const BRAND = "rgb(183,36,42)";
 
-export default function BlogDetail({ initialBlog = null, slug: slugProp = null }) {
-  const { slug: routeSlug } = useParams();
-  const slug = slugProp || routeSlug;
-  const [blog, setBlog] = useState(initialBlog);
-  const [loading, setLoading] = useState(initialBlog == null);
+export default function BlogDetail() {
+  const { slug } = useParams();
+  const [blog, setBlog] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -25,7 +24,6 @@ export default function BlogDetail({ initialBlog = null, slug: slugProp = null }
   const shareText = blog ? (blog.excerpt || blog.title) : "";
 
   useEffect(() => {
-    if (initialBlog != null) return;
     let mounted = true;
 
     async function fetchBlog() {
@@ -72,7 +70,7 @@ export default function BlogDetail({ initialBlog = null, slug: slugProp = null }
     return () => {
       mounted = false;
     };
-  }, [slug, apiUrl, initialBlog]);
+  }, [slug, apiUrl]);
 
   const handleCopyLink = () => {
     if (!shareUrl) return;

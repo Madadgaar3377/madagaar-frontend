@@ -22,18 +22,15 @@ import SORT_OPTIONS from "../../../constants/sortOption";
 
 const API_PAGE_LIMIT = 100;
 
-export default function InstallmentPlans({
-  initialPlans = null,
-  initialPagination = null,
-}) {
+export default function InstallmentPlans() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [plans, setPlans] = useState(initialPlans || []);
-  const [loading, setLoading] = useState(initialPlans == null);
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
-  const [apiPage, setApiPage] = useState(initialPagination?.page || 1);
-  const [apiTotalPages, setApiTotalPages] = useState(initialPagination?.totalPages || 1);
-  const [apiTotalCount, setApiTotalCount] = useState(initialPagination?.total || 0);
+  const [apiPage, setApiPage] = useState(1);
+  const [apiTotalPages, setApiTotalPages] = useState(1);
+  const [apiTotalCount, setApiTotalCount] = useState(0);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -159,9 +156,8 @@ export default function InstallmentPlans({
   };
 
   useEffect(() => {
-    if (initialPlans != null) return;
     fetchCatalogPlans(1);
-  }, [apiUrl, initialPlans]);
+  }, [apiUrl]);
 
   const goToNextApiPage = async () => {
     if (isSearchMode || loadingMore || apiPage >= apiTotalPages) return;

@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/metadata";
 import {
   fetchAllInstallments,
@@ -7,8 +6,6 @@ import {
 } from "../../../lib/api-server";
 import { stripHtml } from "../../../lib/description";
 import InstallmentOverview from "../../../views/clients/Installment/installmentoverview";
-
-export const revalidate = 3600;
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -45,9 +42,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function Page({ params }: Props) {
-  const { id } = await params;
-  const plan = await fetchInstallmentById(id);
-  if (!plan) notFound();
-  return <InstallmentOverview initialPlan={plan} planId={id} />;
+export default function Page() {
+  return <InstallmentOverview />;
 }

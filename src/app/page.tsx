@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { buildPageMetadata } from "../lib/metadata";
 import HomePage from "../views/clients/HomePages";
 
-export const revalidate = 3600;
-
 export const metadata: Metadata = buildPageMetadata({
   title: "Madadgaar Expert Partner - Property, Insurance, Loans & Installment Plans in Pakistan",
   description:

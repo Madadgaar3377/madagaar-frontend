@@ -100,14 +100,13 @@ function safe(obj, path, fallback = "-") {
 }
 
 /* ---------- component ---------- */
-export default function InstallmentDetail({ initialPlan = null, planId: planIdProp = null }) {
-  const { id: routeId } = useParams();
-  const id = planIdProp || routeId;
+export default function InstallmentDetail() {
+  const { id } = useParams();
   const router = useRouter();
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
-  const [plan, setPlan] = useState(initialPlan);
-  const [loading, setLoading] = useState(initialPlan == null);
+  const [plan, setPlan] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -123,7 +122,6 @@ export default function InstallmentDetail({ initialPlan = null, planId: planIdPr
 
   // fetch plan
   useEffect(() => {
-    if (initialPlan != null) return;
     let mounted = true;
     async function fetchPlan() {
       setLoading(true);
@@ -151,7 +149,7 @@ export default function InstallmentDetail({ initialPlan = null, planId: planIdPr
     }
     fetchPlan();
     return () => (mounted = false);
-  }, [apiUrl, id, initialPlan]);
+  }, [apiUrl, id]);
 
   useEffect(() => {
     setDescriptionExpanded(false);

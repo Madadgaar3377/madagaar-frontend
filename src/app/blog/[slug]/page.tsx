@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/metadata";
 import {
   fetchBlogBySlug,
@@ -11,8 +10,6 @@ import {
   stripHtml,
 } from "../../../lib/description";
 import BlogDetail from "../../../views/clients/blogs/BlogDetail";
-
-export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -62,14 +59,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function Page({ params }: Props) {
-  const { slug } = await params;
-  const decodedSlug = decodeURIComponent(slug);
-
-  if (isSeedBlogSlug(decodedSlug)) notFound();
-
-  const blog = await fetchBlogBySlug(decodedSlug);
-  if (!blog || isSeedBlogContent(blog)) notFound();
-
-  return <BlogDetail initialBlog={blog} slug={decodedSlug} />;
+export default function Page() {
+  return <BlogDetail />;
 }

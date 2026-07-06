@@ -15,7 +15,7 @@ import { SITE_URL } from "../../../lib/site";
 
 const PAGE_SIZE = 50;
 
-function PropertiesPage({ initialProperties = null }) {
+function PropertiesPage() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Service",
@@ -40,8 +40,8 @@ function PropertiesPage({ initialProperties = null }) {
     }
   };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [properties, setProperties] = useState(initialProperties || []);
-  const [loading, setLoading] = useState(initialProperties == null);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   // Filters
@@ -115,7 +115,6 @@ function PropertiesPage({ initialProperties = null }) {
   };
 
   useEffect(() => {
-    if (initialProperties != null) return;
     let mounted = true;
     async function fetchProperties() {
       setLoading(true);
@@ -144,7 +143,7 @@ function PropertiesPage({ initialProperties = null }) {
     }
     fetchProperties();
     return () => (mounted = false);
-  }, [apiUrl, initialProperties]);
+  }, [apiUrl]);
 
   // Apply client-side filtering
   const filteredProperties = useMemo(() => {

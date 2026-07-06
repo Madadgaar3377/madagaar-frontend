@@ -25,7 +25,7 @@ const extractPlainText = (html, maxLength = 150) => {
   return text || "No description available";
 };
 
-export default function LoansPage({ initialLoans = null }) {
+export default function LoansPage() {
   const router = useRouter();
 
   const structuredData = {
@@ -52,8 +52,8 @@ export default function LoansPage({ initialLoans = null }) {
     }
   };
 
-  const [loanPlans, setLoanPlans] = useState(initialLoans || []);
-  const [loading, setLoading] = useState(initialLoans == null);
+  const [loanPlans, setLoanPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const [query, setQuery] = useState("");
@@ -72,7 +72,6 @@ export default function LoansPage({ initialLoans = null }) {
   }, [query]);
 
   useEffect(() => {
-    if (initialLoans != null) return;
     let ignore = false;
     const controller = new AbortController();
 
@@ -102,7 +101,7 @@ export default function LoansPage({ initialLoans = null }) {
       ignore = true;
       controller.abort();
     };
-  }, [initialLoans]);
+  }, []);
 
   // reset to first page when search changes
   useEffect(() => setCurrentPage(1), [debouncedQuery]);

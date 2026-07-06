@@ -1,11 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { buildPageMetadata } from "../../../lib/metadata";
 import { fetchLoans, fetchLoanById } from "../../../lib/api-server";
 import { stripHtml } from "../../../lib/description";
 import LoanDetails from "../../../views/clients/Loans/LoanDeailtsById";
-
-export const revalidate = 3600;
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -27,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       noIndex: true,
     });
   }
-  const name = String(loan.loanName || loan.name || "Loan");
+  const name = String(loan.loanName || loan.name || loan.productName || "Loan");
   const description = stripHtml(
     String(loan.description || loan.shortDescription || `${name} — compare loan details on Madadgaar.`),
     155
@@ -40,9 +37,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   });
 }
 
-export default async function Page({ params }: Props) {
-  const { id } = await params;
-  const loan = await fetchLoanById(id);
-  if (!loan) notFound();
-  return <LoanDetails initialLoan={loan} loanId={id} />;
+export default function Page() {
+  return <LoanDetails />;
 }
