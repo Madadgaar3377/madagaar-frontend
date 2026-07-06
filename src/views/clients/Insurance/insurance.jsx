@@ -1,4 +1,6 @@
 // src/pages/InsuranceInfo.jsx
+"use client";
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
@@ -20,10 +22,10 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function InsuranceInfo() {
+export default function InsuranceInfo({ initialPlans = null }) {
   const router = useRouter();
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState(initialPlans || []);
+  const [loading, setLoading] = useState(initialPlans == null);
   const [error, setError] = useState("");
   
   // Filter and search state
@@ -34,6 +36,7 @@ export default function InsuranceInfo() {
   const pageSize = 12;
 
   useEffect(() => {
+    if (initialPlans != null) return;
     let mounted = true;
     const fetchPlans = async () => {
       setLoading(true);
@@ -86,7 +89,7 @@ export default function InsuranceInfo() {
     
     fetchPlans();
     return () => { mounted = false; };
-  }, []);
+  }, [initialPlans]);
 
   // Filter plans
   const filteredPlans = useMemo(() => {
@@ -196,13 +199,7 @@ export default function InsuranceInfo() {
 
   return (
     <div className="bg-gray-50">
-      <SEO
-        title="Madadgaar Insurance Support | Claim with confidencePakistan's most trusted insurance support"
-        description="Explore Insurance Services – Compare, Select & Apply. Madadgaar helps you compare life insurance, health insurance, motor insurance, travel insurance, property insurance, and Takaful plans, along with fast and transparent claim support  all on one easy-to-use platform."
-        keywords="insurance pakistan, car insurance pakistan, life insurance, health insurance, property insurance, insurance claims, insurance companies pakistan, motor insurance, family insurance, takaful pakistan, insurance support pakistan"
-        canonicalUrl="https://madadgaar.com.pk/insurance"
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
       
       {/* top banner */}
       <AnimatedSection animation="fadeInUp" delay={0} className="w-full">

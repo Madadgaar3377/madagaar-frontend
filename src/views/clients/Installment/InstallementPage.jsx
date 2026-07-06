@@ -1,8 +1,8 @@
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import Link from 'next/link';
-import VideoPage from "../youtube/YoutubeVide";
-import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import citiesList from "../../../constants/cities";
@@ -15,21 +15,25 @@ import {
   buildInstallmentShareLines,
   collectAllPaymentPlans,
 } from "../../../utils/installmentPricing";
+import OurPartners from "../OverPartener";
+import { SITE_URL } from "../../../lib/site";
 import CATEGORY_OPTIONS from "../../../constants/category";
 import SORT_OPTIONS from "../../../constants/sortOption";
 
-
 const API_PAGE_LIMIT = 100;
 
-export default function InstallmentPlans() {
+export default function InstallmentPlans({
+  initialPlans = null,
+  initialPagination = null,
+}) {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState(initialPlans || []);
+  const [loading, setLoading] = useState(initialPlans == null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
-  const [apiPage, setApiPage] = useState(1);
-  const [apiTotalPages, setApiTotalPages] = useState(1);
-  const [apiTotalCount, setApiTotalCount] = useState(0);
+  const [apiPage, setApiPage] = useState(initialPagination?.page || 1);
+  const [apiTotalPages, setApiTotalPages] = useState(initialPagination?.totalPages || 1);
+  const [apiTotalCount, setApiTotalCount] = useState(initialPagination?.total || 0);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -37,11 +41,11 @@ export default function InstallmentPlans() {
     "serviceType": "Installment Plans & EMI Services",
     "name": "Madadgaar Installment Plans",
     "description": "Big dreams? Pay small, with flexible plans that fit your budget. Compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods.",
-    "url": "https://madadgaar.com.pk/installments",
+    "url": `${SITE_URL}/installments`,
     "provider": {
       "@type": "LocalBusiness",
       "name": "Madadgaar Expert Partner",
-      "url": "https://madadgaar.com.pk"
+      "url": SITE_URL
     },
     "areaServed": {
       "@type": "Country",
@@ -155,8 +159,9 @@ export default function InstallmentPlans() {
   };
 
   useEffect(() => {
+    if (initialPlans != null) return;
     fetchCatalogPlans(1);
-  }, [apiUrl]);
+  }, [apiUrl, initialPlans]);
 
   const goToNextApiPage = async () => {
     if (isSearchMode || loadingMore || apiPage >= apiTotalPages) return;
@@ -350,13 +355,7 @@ export default function InstallmentPlans() {
 
   return (
     <>
-    <SEO
-      title="Madadgaar Installment Plans | Big dreams? Pay small, with flexible plans that fit your budget"
-      description="Explore Installment Products – Compare, Select & Apply. Madadgaar helps you compare EMI plans, interest rates, and tenure options for electronics, home appliances, furniture, machinery, and consumer goods  all on one easy-to-use platform."
-      keywords="installment plans pakistan, buy on installments, monthly payments pakistan, installment shopping, zero markup, low interest installments, electronics on installment, furniture installment, appliances installment pakistan, EMI plans pakistan, buy now pay later pakistan"
-      canonicalUrl="https://madadgaar.com.pk/installments"
-      structuredData={structuredData}
-    />
+    <SEO structuredData={structuredData} />
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <OfferBanner />
       <div className="container-content">
@@ -828,7 +827,6 @@ export default function InstallmentPlans() {
       </div>
     </div>
           <OurPartners />
-    <VideoPage />
     </>
   );
 }

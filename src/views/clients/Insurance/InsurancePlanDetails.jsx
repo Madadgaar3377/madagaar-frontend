@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
@@ -16,16 +18,17 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function InsurancePlanDetails() {
-  const { id } = useParams();
+export default function InsurancePlanDetails({ initialPlan = null, planId: planIdProp = null }) {
+  const { id: routeId } = useParams();
+  const id = planIdProp || routeId;
   const router = useRouter();
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(initialPlan);
+  const [loading, setLoading] = useState(initialPlan == null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || initialPlan != null) return;
     
     let cancelled = false;
     
@@ -62,7 +65,7 @@ export default function InsurancePlanDetails() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, initialPlan]);
 
   if (loading) {
     return <LoadingPage />;
@@ -127,13 +130,7 @@ export default function InsurancePlanDetails() {
 
   return (
     <>
-      <SEO
-        title={`${plan.planName || 'Insurance Plan'} | Madadgaar`}
-        description={[plan.planName, plan.policyType, plan.registeredCompanyName, "View coverage & apply on Madadgaar."].filter(Boolean).join(" · ")}
-        canonicalUrl={`https://madadgaar.com.pk/insurance/${id}`}
-        ogImage={plan.planImage || plan.planDocuments?.productBrochure}
-        noIndex={false}
-      />
+      <SEO />
 
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding">
         <div className="container-content">

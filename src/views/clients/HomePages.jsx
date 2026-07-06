@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { motion, useReducedMotion } from "framer-motion";
@@ -301,13 +303,7 @@ export default function HomePage() {
   return (
     <>
       <Toast toasts={toasts} onClose={removeToast} />
-      <SEO
-        title="Madadgaar Expert Partner | Property, Financing, Installments & Insurance Services"
-        description="Let's make things easier  and make them happen together. Whether you are looking for property, loans, installment plans, or insurance support, Madadgaar helps you compare multiple options across Pakistan to find what truly fits your needs."
-        keywords="madadgaar, property solutions pakistan, real estate pakistan, insurance pakistan, loans pakistan, installment plans, verified agents, property dealers, car insurance, life insurance, home loans, financing pakistan, EMI plans, property buy rent pakistan, download madadgaar app, madadgaar mobile app"
-        canonicalUrl="https://madadgaar.com.pk"
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
       <section className="w-full bg-gray-50 section-padding overflow-hidden">
         <div className="container-content page-hero">
           <motion.div

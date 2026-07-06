@@ -12,12 +12,34 @@ const nextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000,
+    remotePatterns: [
+      { protocol: "https", hostname: "image.madadgaar.com.pk" },
+      { protocol: "https", hostname: "**.r2.dev" },
+      { protocol: "https", hostname: "**.cloudflarestorage.com" },
+    ],
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "framer-motion", "recharts"],
   },
   async headers() {
     return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(self)",
+          },
+          {
+            key: "Content-Security-Policy-Report-Only",
+            value:
+              "frame-ancestors 'self'; default-src 'self' 'unsafe-inline' *.googletagmanager.com *.googlesyndication.com *.doubleclick.net *.google-analytics.com data: blob: https:;",
+          },
+        ],
+      },
       {
         source: "/Media/:path*",
         headers: [

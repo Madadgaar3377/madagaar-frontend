@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
@@ -5,23 +7,25 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import SEO from "../../../components/SEO";
 import BlogAdSenseInArticle from "../../../components/BlogAdSenseInArticle";
+import { SITE_URL } from "../../../lib/site";
 
 const BRAND = "rgb(183,36,42)";
-const BLOG_BASE_URL = "https://madadgaar.com.pk";
 
-export default function BlogDetail() {
-  const { slug } = useParams();
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function BlogDetail({ initialBlog = null, slug: slugProp = null }) {
+  const { slug: routeSlug } = useParams();
+  const slug = slugProp || routeSlug;
+  const [blog, setBlog] = useState(initialBlog);
+  const [loading, setLoading] = useState(initialBlog == null);
   const [error, setError] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
-  const shareUrl = blog ? `${BLOG_BASE_URL}/blog/${blog.slug || slug}` : "";
+  const shareUrl = blog ? `${SITE_URL}/blog/${encodeURIComponent(blog.slug || slug)}` : "";
   const shareTitle = blog ? blog.title : "";
   const shareText = blog ? (blog.excerpt || blog.title) : "";
 
   useEffect(() => {
+    if (initialBlog != null) return;
     let mounted = true;
 
     async function fetchBlog() {
@@ -68,7 +72,7 @@ export default function BlogDetail() {
     return () => {
       mounted = false;
     };
-  }, [slug, apiUrl]);
+  }, [slug, apiUrl, initialBlog]);
 
   const handleCopyLink = () => {
     if (!shareUrl) return;
@@ -117,7 +121,7 @@ export default function BlogDetail() {
     "@type": "BlogPosting",
     "headline": blog.title,
     "description": blog.excerpt || blog.metaDescription,
-    "image": blog.featuredImage || "https://madadgaar.com.pk/Media/Group%2033.png",
+    "image": blog.featuredImage || `${SITE_URL}/Media/Group%2033.png`,
     "datePublished": blog.publishedAt || blog.createdAt,
     "dateModified": blog.updatedAt,
     "author": {
@@ -129,25 +133,18 @@ export default function BlogDetail() {
       "name": "Madadgaar Expert Partner",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://madadgaar.com.pk/Media/Group%2033.png"
+        "url": `${SITE_URL}/Media/Group%2033.png`
       }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://madadgaar.com.pk/blog/${blog.slug}`
+      "@id": `${SITE_URL}/blog/${encodeURIComponent(blog.slug)}`
     }
   };
 
   return (
     <div className="bg-gradient-to-b from-gray-50 via-white to-gray-100 min-h-screen">
-      <SEO
-        title={`${blog.title} | Madadgaar Blog`}
-        description={blog.excerpt || blog.metaDescription || (blog.title + (blog.category ? ` · ${blog.category}` : "") + " · Madadgaar Blog")}
-        keywords={blog.seoKeywords?.join(", ") || blog.category || "madadgaar blog"}
-        canonicalUrl={`https://madadgaar.com.pk/blog/${blog.slug}`}
-        ogImage={blog.featuredImage}
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
 
       {/* Header */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[rgb(183,36,42)] via-rose-500 to-orange-400 text-white">

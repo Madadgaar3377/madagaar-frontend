@@ -1,67 +1,90 @@
-import { MetadataRoute } from 'next';
-import { backendBaseUrl } from '../constants/apiUrl';
+import { MetadataRoute } from "next";
+import { SITE_URL } from "../lib/site";
+import { isSeedBlogSlug } from "../lib/description";
+import {
+  fetchProperties,
+  fetchLoans,
+  fetchAllInstallments,
+  fetchPublishedBlogs,
+} from "../lib/api-server";
 
-// Helper function to fetch dynamic data (e.g., properties, installments)
-async function fetchDynamicRoutes() {
-  try {
-    const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-
-    // Fetch all active properties
-    const propertiesRes = await fetch(`${apiUrl}/getAllProperties`);
-    const propertiesData = await propertiesRes.json();
-    const properties = (propertiesData.success && propertiesData.properties) ? propertiesData.properties : (propertiesData.data || []);
-    
-    // Fetch active installments
-    const installmentsRes = await fetch(`${apiUrl}/getAllInstallments?page=1&limit=500`);
-    const installmentsData = await installmentsRes.json();
-    const installments = (installmentsData.success && installmentsData.data) ? installmentsData.data : (Array.isArray(installmentsData) ? installmentsData : []);
-
-    return { properties, installments };
-  } catch (error) {
-    console.error("Error fetching dynamic routes for sitemap", error);
-    return { properties: [], installments: [] };
-  }
-}
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://madadgaar.com.pk';
-  const { properties, installments } = await fetchDynamicRoutes();
+  const [properties, loans, installments, blogs] = await Promise.all([
+    fetchProperties(),
+    fetchLoans(),
+    fetchAllInstallments(),
+    fetchPublishedBlogs(),
+  ]);
 
-  // Core static routes
-  const staticRoutes = [
-    '',
-    '/about',
-    '/properties',
-    '/loans',
-    '/installments',
-    '/insurance',
-    '/offers',
-    '/blog',
-    '/contact',
-    '/faq',
-    '/download-app',
+  const staticRoutes: MetadataRoute.Sitemap = [
+    "",
+    "/about",
+    "/properties",
+    "/loans",
+    "/installments",
+    "/insurance",
+    "/offers",
+    "/blog",
+    "/contact",
+    "/faq",
+    "/download-app",
+    "/submit-claim",
+    "/terms-and-conditions",
+    "/privacy-policy",
   ].map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: `${SITE_URL}${route || "/"}`,
     lastModified: new Date(),
-    changeFrequency: 'daily' as const,
-    priority: route === '' ? 1 : 0.8,
+    changeFrequency: route === "" ? "daily" : "weekly",
+    priority: route === "" ? 1 : 0.8,
   }));
 
-  // Map dynamic property routes
-  const propertyRoutes = (properties || []).map((prop: any) => ({
-    url: `${baseUrl}/property/${prop.slug || prop._id}`,
-    lastModified: new Date(prop.updatedAt || new Date()),
-    changeFrequency: 'weekly' as const,
+  const propertyRoutes: MetadataRoute.Sitemap = (properties as { _id?: string; updatedAt?: string }[]).map(
+    (prop) => ({
+      url: `${SITE_URL}/property/${prop._id}`,
+      lastModified: prop.updatedAt ? new Date(prop.updatedAt) : new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })
+  );
+
+  const loanRoutes: MetadataRoute.Sitemap = (loans as { _id?: string; updatedAt?: string }[]).map(
+    (loan) => ({
+      url: `${SITE_URL}/loans/${loan._id}`,
+      lastModified: loan.updatedAt ? new Date(loan.updatedAt) : new Date(),
+      changeFrequency: "weekly",
+      priority: 0.7,
+    })
+  );
+
+  const installmentRoutes: MetadataRoute.Sitemap = (
+    installments as { _id?: string; installmentPlanId?: string; updatedAt?: string }[]
+  ).map((inst) => ({
+    url: `${SITE_URL}/installment/${inst._id || inst.installmentPlanId}`,
+    lastModified: inst.updatedAt ? new Date(inst.updatedAt) : new Date(),
+    changeFrequency: "weekly",
     priority: 0.7,
   }));
 
-  // Map dynamic installment routes
-  const installmentRoutes = (installments || []).map((inst: any) => ({
-    url: `${baseUrl}/installment/${inst.slug || inst._id}`,
-    lastModified: new Date(inst.updatedAt || new Date()),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const blogRoutes: MetadataRoute.Sitemap = blogs
+    .filter((b) => b.slug && !isSeedBlogSlug(b.slug))
+    .map((blog) => ({
+      url: `${SITE_URL}/blog/${encodeURIComponent(blog.slug!)}`,
+      lastModified: blog.updatedAt
+        ? new Date(blog.updatedAt)
+        : blog.createdAt
+          ? new Date(blog.createdAt)
+          : new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    }));
 
-  return [...staticRoutes, ...propertyRoutes, ...installmentRoutes];
+  return [
+    ...staticRoutes,
+    ...propertyRoutes,
+    ...loanRoutes,
+    ...installmentRoutes,
+    ...blogRoutes,
+  ];
 }

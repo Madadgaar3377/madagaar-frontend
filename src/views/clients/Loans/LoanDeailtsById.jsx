@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
@@ -5,6 +7,7 @@ import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
 import SEO from "../../../components/SEO";
 import ShareButtons from "../../../components/ShareButtons";
+import { SITE_URL } from "../../../lib/site";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -23,13 +26,10 @@ const sanitizeHtml = (html) => {
   return cleaned;
 };
 
-// Helper to extract plain text for SEO
+// Helper to extract plain text for SEO (SSR-safe)
 const extractPlainText = (html) => {
   if (!html) return "";
-  
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return (div.textContent || div.innerText || "").trim();
+  return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 };
 
 const formatCurrency = (amount) => {
@@ -41,16 +41,17 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function LoanDetails() {
-  const { id } = useParams();
+export default function LoanDetails({ initialLoan = null, loanId: loanIdProp = null }) {
+  const { id: routeId } = useParams();
+  const id = loanIdProp || routeId;
   const router = useRouter();
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(initialLoan);
+  const [loading, setLoading] = useState(initialLoan == null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || initialLoan != null) return;
     
     let cancelled = false;
     
@@ -101,7 +102,7 @@ export default function LoanDetails() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, initialLoan]);
 
   if (loading) {
     return <LoadingPage />;
@@ -157,15 +158,52 @@ export default function LoanDetails() {
     ? `Up to ${formatCurrency(plan.maxFinancingAmount)}`
     : "Not specified";
 
+  const loanUrl = `${SITE_URL}/loans/${id}`;
+  const loanStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LoanOrCredit",
+        "@id": loanUrl,
+        url: loanUrl,
+        name: plan.productName || plan.loanName || "Loan",
+        description: extractPlainText(plan.description) || `${plan.productName || "Loan"} from ${plan.bankName || "verified provider"}.`,
+        amount: {
+          "@type": "MonetaryAmount",
+          currency: "PKR",
+          minValue: plan.minFinancingAmount || undefined,
+          maxValue: plan.maxFinancingAmount || undefined,
+        },
+        interestRate: plan.indicativeRate
+          ? { "@type": "QuantitativeValue", value: plan.indicativeRate, unitText: "PERCENT" }
+          : undefined,
+        loanTerm: plan.minTenure || plan.maxTenure
+          ? {
+              "@type": "QuantitativeValue",
+              minValue: plan.minTenure,
+              maxValue: plan.maxTenure,
+              unitText: plan.tenureUnit || "ANN",
+            }
+          : undefined,
+        provider: plan.bankName
+          ? { "@type": "FinancialService", name: plan.bankName }
+          : undefined,
+        areaServed: { "@type": "Country", name: "Pakistan" },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+          { "@type": "ListItem", position: 2, name: "Loans", item: `${SITE_URL}/loans` },
+          { "@type": "ListItem", position: 3, name: plan.productName || "Loan" },
+        ],
+      },
+    ],
+  };
+
   return (
     <>
-      <SEO
-        title={`${plan.productName || 'Loan Details'} | Madadgaar`}
-        description={extractPlainText(plan.description) || [plan.productName, plan.bankName, plan.majorCategory, plan.indicativeRate && `Rate: ${plan.indicativeRate}`, 'View details & apply on Madadgaar.'].filter(Boolean).join(' · ')}
-        canonicalUrl={`https://madadgaar.com.pk/loans/${id}`}
-        ogImage={plan.planImage}
-        noIndex={false}
-      />
+      <SEO structuredData={loanStructuredData} />
 
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding">
         <div className="container-content">

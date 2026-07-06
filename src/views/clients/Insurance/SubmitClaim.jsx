@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAuthToken, getUser, isAuthenticated } from '../../../utils/auth';

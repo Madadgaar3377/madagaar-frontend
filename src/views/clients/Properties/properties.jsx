@@ -1,4 +1,6 @@
 // src/pages/PropertiesPage.jsx
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { motion } from "framer-motion";
@@ -9,21 +11,22 @@ import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
+import { SITE_URL } from "../../../lib/site";
 
 const PAGE_SIZE = 50;
 
-function PropertiesPage() {
+function PropertiesPage({ initialProperties = null }) {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Service",
     "serviceType": "Real Estate Services",
     "name": "Madadgaar Property Solutions",
     "description": "Find, compare, and secure your perfect propertystress-free. Compare properties for sale, rent, and investment across Pakistan.",
-    "url": "https://madadgaar.com.pk/properties",
+    "url": `${SITE_URL}/properties`,
     "provider": {
       "@type": "LocalBusiness",
       "name": "Madadgaar Expert Partner",
-      "url": "https://madadgaar.com.pk"
+      "url": SITE_URL
     },
     "areaServed": {
       "@type": "Country",
@@ -37,8 +40,8 @@ function PropertiesPage() {
     }
   };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [properties, setProperties] = useState(initialProperties || []);
+  const [loading, setLoading] = useState(initialProperties == null);
   const [error, setError] = useState("");
 
   // Filters
@@ -112,6 +115,7 @@ function PropertiesPage() {
   };
 
   useEffect(() => {
+    if (initialProperties != null) return;
     let mounted = true;
     async function fetchProperties() {
       setLoading(true);
@@ -140,7 +144,7 @@ function PropertiesPage() {
     }
     fetchProperties();
     return () => (mounted = false);
-  }, [apiUrl]);
+  }, [apiUrl, initialProperties]);
 
   // Apply client-side filtering
   const filteredProperties = useMemo(() => {
@@ -210,13 +214,7 @@ function PropertiesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEO
-        title="Madadgaar Properties | Buy, Rent & Invest Easily"
-        description="Find, compare, and secure your perfect propertystress-free. Madadgaar helps you compare properties for sale, rent, and investment across Pakistan to find what truly fits your needs."
-        keywords="property pakistan, real estate pakistan, buy property pakistan, sell property pakistan, rent property pakistan, property lahore, property karachi, property islamabad, residential property, commercial property, houses for sale, apartments for rent, property investment pakistan"
-        canonicalUrl="https://madadgaar.com.pk/properties"
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}

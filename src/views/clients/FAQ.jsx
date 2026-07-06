@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import SEO from "../../components/SEO";
 import Link from 'next/link';
@@ -202,13 +204,7 @@ const FAQPage = () => {
 
   return (
     <>
-      <SEO
-        title="FAQs"
-        description="Have questions about property, loans, installments, or insurance in Pakistan? Find clear answers in Madadgaar's comprehensive FAQ section."
-        keywords="madadgaar faq, frequently asked questions, property faq pakistan, loan faq pakistan, installment faq pakistan, insurance faq pakistan, madadgaar help"
-        canonicalUrl="https://madadgaar.com.pk/faq"
-        faqSchema={faqSchema}
-      />
+      <SEO faqSchema={faqSchema} />
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white section-padding">
         <div className="container-content max-w-4xl">
           {/* Header */}

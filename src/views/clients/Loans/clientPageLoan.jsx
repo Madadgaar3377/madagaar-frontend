@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -9,29 +11,21 @@ import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
+import { SITE_URL } from "../../../lib/site";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "") || "";
 
-// Helper to extract plain text from HTML for preview
+// Helper to extract plain text from HTML for preview (SSR-safe)
 const extractPlainText = (html, maxLength = 150) => {
   if (!html) return "No description available";
-  
-  // Create a temporary div to parse HTML
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  
-  // Get text content
-  let text = (div.textContent || div.innerText || "").trim();
-  
-  // Truncate to maxLength
+  let text = String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
   if (text.length > maxLength) {
-    text = text.substring(0, maxLength) + '...';
+    text = text.substring(0, maxLength) + "...";
   }
-  
   return text || "No description available";
 };
 
-export default function LoansPage() {
+export default function LoansPage({ initialLoans = null }) {
   const router = useRouter();
 
   const structuredData = {
@@ -40,11 +34,11 @@ export default function LoansPage() {
     "serviceType": "Financial Services",
     "name": "Madadgaar Financing",
     "description": "Get the funds you need, faster and smarter. Compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan.",
-    "url": "https://madadgaar.com.pk/loans",
+    "url": `${SITE_URL}/loans`,
     "provider": {
       "@type": "LocalBusiness",
       "name": "Madadgaar Expert Partner",
-      "url": "https://madadgaar.com.pk"
+      "url": SITE_URL
     },
     "areaServed": {
       "@type": "Country",
@@ -58,8 +52,8 @@ export default function LoansPage() {
     }
   };
 
-  const [loanPlans, setLoanPlans] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loanPlans, setLoanPlans] = useState(initialLoans || []);
+  const [loading, setLoading] = useState(initialLoans == null);
   const [error, setError] = useState("");
 
   const [query, setQuery] = useState("");
@@ -78,6 +72,7 @@ export default function LoansPage() {
   }, [query]);
 
   useEffect(() => {
+    if (initialLoans != null) return;
     let ignore = false;
     const controller = new AbortController();
 
@@ -107,7 +102,7 @@ export default function LoansPage() {
       ignore = true;
       controller.abort();
     };
-  }, []);
+  }, [initialLoans]);
 
   // reset to first page when search changes
   useEffect(() => setCurrentPage(1), [debouncedQuery]);
@@ -182,13 +177,7 @@ export default function LoansPage() {
 
   return (
     <>
-      <SEO
-        title="Madadgaar Financing | Get the funds you need, faster and smarter"
-        description="Explore Financing – Compare, Select & Apply. Madadgaar helps you compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan  all in one easy-to-use platform."
-        keywords="loans pakistan, personal loan pakistan, home loan pakistan, car loan pakistan, business loan pakistan, bank loans pakistan, loan interest rates pakistan, financing pakistan, loan comparison pakistan, islamic financing, car financing, house financing, sme loans pakistan"
-        canonicalUrl="https://madadgaar.com.pk/loans"
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding-sm">
         <OfferBanner />
         <div className="container-content space-y-4 sm:space-y-6">

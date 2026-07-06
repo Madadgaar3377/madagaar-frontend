@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -5,133 +7,137 @@ import { backendBaseUrl } from '../../../constants/apiUrl';
 import LoadingPage from '../../../compontents/Loader';
 import ShareButtons from '../../../components/ShareButtons';
 import SEO from '../../../components/SEO';
+import { sanitizePublicDescription, stripHtml } from '../../../lib/description';
+import { SITE_URL } from '../../../lib/site';
 
-const PropertyDetails = () => {
-    const { id } = useParams();
+function extractPropertyData(property) {
+    if (property.type === "Individual") {
+        const individual = property.individualProperty || {};
+        return {
+            _id: property._id,
+            type: "Individual",
+            title: individual.title,
+            description: sanitizePublicDescription(individual.description),
+            propertyType: individual.propertyType,
+            propertyId: individual.propertyId,
+            city: individual.city,
+            location: individual.location,
+            price: individual.transaction?.price || individual.transaction?.monthlyRent,
+            transactionType: individual.transaction?.type,
+            transaction: individual.transaction,
+            areaSize: individual.areaSize,
+            areaUnit: individual.areaUnit,
+            bedrooms: individual.bedrooms,
+            bathrooms: individual.bathrooms,
+            kitchenType: individual.kitchenType,
+            furnishingStatus: individual.furnishingStatus,
+            floor: individual.floor,
+            totalFloors: individual.totalFloors,
+            possessionStatus: individual.possessionStatus,
+            zoningType: individual.zoningType,
+            images: individual.images || [],
+            video: individual.video,
+            documents: individual.documents || [],
+            amenities: individual.amenities,
+            utilities: individual.utilities,
+            contact: individual.contact,
+            nearbyLandmarks: individual.nearbyLandmarks,
+        };
+    }
+    if (property.type === "Project") {
+        const project = property.project || {};
+        return {
+            _id: property._id,
+            type: "Project",
+            title: project.projectName,
+            description: sanitizePublicDescription(project.description),
+            propertyType: project.projectType,
+            propertyId: project.propertyId,
+            city: project.city,
+            location: project.area || project.address,
+            address: project.address,
+            price: project.transaction?.priceRange || project.transaction?.price,
+            transactionType: project.transaction?.type,
+            transaction: project.transaction,
+            areaSize: project.totalLandArea,
+            areaUnit: project.landAreaUnit,
+            totalUnits: project.totalUnits,
+            units: project.units || [],
+            images: project.images || [],
+            video: project.video,
+            documents: project.documents || [],
+            amenities: project.amenities,
+            utilities: project.utilities,
+            contact: project.contact,
+            nearbyLandmarks: project.nearbyLandmarks,
+            projectStage: project.projectStage,
+            infrastructureStatus: project.infrastructureStatus,
+            developerBuilder: project.developerBuilder,
+            highlights: project.highlights || [],
+            expectedCompletionDate: project.expectedCompletionDate,
+            possessionDate: project.possessionDate,
+        };
+    }
+    return null;
+}
+
+const PropertyDetails = ({ initialProperty = null, propertyId: propertyIdProp = null }) => {
+    const { id: routeId } = useParams();
+    const id = propertyIdProp || routeId;
     const router = useRouter();
     const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
     
-    const [property, setProperty] = useState(null);
+    const [property, setProperty] = useState(initialProperty ? extractPropertyData(initialProperty) : null);
     const [relatedProperties, setRelatedProperties] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(initialProperty == null);
     const [error, setError] = useState("");
     const [selectedImage, setSelectedImage] = useState(0);
 
-    // Helper function to extract property data
-    const extractPropertyData = (property) => {
-        if (property.type === "Individual") {
-            const individual = property.individualProperty || {};
-            return {
-                _id: property._id,
-                type: "Individual",
-                title: individual.title,
-                description: individual.description,
-                propertyType: individual.propertyType,
-                propertyId: individual.propertyId,
-                city: individual.city,
-                location: individual.location,
-                price: individual.transaction?.price || individual.transaction?.monthlyRent,
-                transactionType: individual.transaction?.type,
-                transaction: individual.transaction,
-                areaSize: individual.areaSize,
-                areaUnit: individual.areaUnit,
-                bedrooms: individual.bedrooms,
-                bathrooms: individual.bathrooms,
-                kitchenType: individual.kitchenType,
-                furnishingStatus: individual.furnishingStatus,
-                floor: individual.floor,
-                totalFloors: individual.totalFloors,
-                possessionStatus: individual.possessionStatus,
-                zoningType: individual.zoningType,
-                images: individual.images || [],
-                video: individual.video,
-                documents: individual.documents || [],
-                amenities: individual.amenities,
-                utilities: individual.utilities,
-                contact: individual.contact,
-                nearbyLandmarks: individual.nearbyLandmarks,
-            };
-        } else if (property.type === "Project") {
-            const project = property.project || {};
-            return {
-                _id: property._id,
-                type: "Project",
-                title: project.projectName,
-                description: project.description,
-                propertyType: project.projectType,
-                propertyId: project.propertyId,
-                city: project.city,
-                location: project.area || project.address,
-                address: project.address,
-                price: project.transaction?.priceRange || project.transaction?.price,
-                transactionType: project.transaction?.type,
-                transaction: project.transaction,
-                areaSize: project.totalLandArea,
-                areaUnit: project.landAreaUnit,
-                totalUnits: project.totalUnits,
-                units: project.units || [],
-                images: project.images || [],
-                video: project.video,
-                documents: project.documents || [],
-                amenities: project.amenities,
-                utilities: project.utilities,
-                contact: project.contact,
-                nearbyLandmarks: project.nearbyLandmarks,
-                projectStage: project.projectStage,
-                infrastructureStatus: project.infrastructureStatus,
-                developerBuilder: project.developerBuilder,
-                highlights: project.highlights || [],
-                expectedCompletionDate: project.expectedCompletionDate,
-                possessionDate: project.possessionDate,
-            };
-        }
-        return null;
-    };
-
     useEffect(() => {
         const fetchPropertyDetails = async () => {
-            setLoading(true);
+            const needsProperty = initialProperty == null;
+            if (needsProperty) setLoading(true);
             try {
-                // Fetch all properties
                 const res = await fetch(`${apiUrl}/getAllProperties`);
                 const payload = await res.json();
 
                 if (payload.success && payload.properties) {
-                    // Find the specific property
-                    const foundProperty = payload.properties.find(p => p._id === id);
-                    
-                    if (foundProperty) {
-                        const extracted = extractPropertyData(foundProperty);
-                        setProperty(extracted);
+                    const current =
+                        needsProperty
+                            ? extractPropertyData(payload.properties.find((p) => p._id === id))
+                            : property;
 
-                        // Get related properties (same city or property type, excluding current)
+                    if (current) {
+                        if (needsProperty) setProperty(current);
+
                         const related = payload.properties
-                            .filter(p => p._id !== id)
+                            .filter((p) => p._id !== id)
                             .map(extractPropertyData)
                             .filter(Boolean)
-                            .filter(p => 
-                                p.city === extracted.city || 
-                                p.propertyType === extracted.propertyType
+                            .filter(
+                                (p) =>
+                                    p.city === current.city ||
+                                    p.propertyType === current.propertyType
                             )
                             .slice(0, 6);
-                        
+
                         setRelatedProperties(related);
-                    } else {
+                    } else if (needsProperty) {
                         setError("Property not found");
                     }
-                } else {
+                } else if (needsProperty) {
                     setError(payload.message || "Failed to load property");
                 }
             } catch (err) {
                 console.error("Fetch error:", err);
-                setError("Failed to load property details");
+                if (needsProperty) setError("Failed to load property details");
             } finally {
-                setLoading(false);
+                if (needsProperty) setLoading(false);
             }
         };
 
         fetchPropertyDetails();
-    }, [id, apiUrl]);
+    }, [id, apiUrl, initialProperty]);
 
     if (loading) return <LoadingPage />;
 
@@ -153,8 +159,7 @@ const PropertyDetails = () => {
 
     if (!property) return null;
 
-    const plainDesc = property.description ? String(property.description).replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
-    const metaDesc = plainDesc || (() => {
+    const metaDesc = stripHtml(property.description, 160) || (() => {
         const parts = [property.title, property.type, property.transactionType, property.city, property.location];
         const price = property.transaction?.price || property.transaction?.monthlyRent;
         if (price) parts.push(`PKR ${Number(price).toLocaleString()}`);
@@ -162,34 +167,53 @@ const PropertyDetails = () => {
         return parts.filter(Boolean).join(" · ");
     })();
 
+    const propertyUrl = `${SITE_URL}/property/${property._id}`;
     const structuredData = {
         "@context": "https://schema.org",
-        "@type": property.type === "Project" ? "RealEstateListing" : "Product",
-        "name": property.title,
-        "description": metaDesc,
-        "image": property.images?.[0] || "https://madadgaar.com.pk/Media/Group%2033.png",
-        "offers": {
-            "@type": "Offer",
-            "priceCurrency": "PKR",
-            "price": property.transaction?.price || property.transaction?.monthlyRent || 0,
-            "availability": "https://schema.org/InStock",
-            "url": `https://madadgaar.com.pk/property/${property._id}`,
-            "seller": {
-                "@type": "Organization",
-                "name": "Madadgaar Expert Partner"
-            }
-        }
+        "@graph": [
+            {
+                "@type": "RealEstateListing",
+                name: property.title,
+                description: metaDesc,
+                url: propertyUrl,
+                datePosted: new Date().toISOString().slice(0, 10),
+                image: property.images?.[0] || `${SITE_URL}/Media/Group%2033.png`,
+                about: {
+                    "@type": property.propertyType === "Commercial" ? "Place" : "House",
+                    numberOfRooms: property.bedrooms,
+                    numberOfBathroomsTotal: property.bathrooms,
+                    floorSize: property.areaSize
+                        ? { "@type": "QuantitativeValue", value: property.areaSize, unitText: property.areaUnit || "sqft" }
+                        : undefined,
+                    address: {
+                        "@type": "PostalAddress",
+                        streetAddress: property.location || "",
+                        addressLocality: property.city || "",
+                        addressCountry: "PK",
+                    },
+                },
+                offers: {
+                    "@type": "Offer",
+                    priceCurrency: "PKR",
+                    price: property.transaction?.price || property.transaction?.monthlyRent || 0,
+                    availability: "https://schema.org/InStock",
+                    url: propertyUrl,
+                },
+            },
+            {
+                "@type": "BreadcrumbList",
+                itemListElement: [
+                    { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+                    { "@type": "ListItem", position: 2, name: "Properties", item: `${SITE_URL}/properties` },
+                    { "@type": "ListItem", position: 3, name: property.title },
+                ],
+            },
+        ],
     };
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <SEO
-                title={`${property.title} | Madadgaar Properties`}
-                description={metaDesc}
-                canonicalUrl={`https://madadgaar.com.pk/property/${property._id}`}
-                ogImage={property.images?.[0]}
-                structuredData={structuredData}
-            />
+            <SEO structuredData={structuredData} />
             {/* Breadcrumb */}
             <div className="bg-white border-b">
                 <div className="container-content py-3 sm:py-4">

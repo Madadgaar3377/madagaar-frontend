@@ -10,17 +10,14 @@ Disallow: /api/
 Disallow: /*?*utm_
 Disallow: /*?*sessionid=
 
-# Crawl-delay for specific bots
 User-agent: Googlebot
 Crawl-delay: 0
 
 User-agent: Bingbot
 Crawl-delay: 1
 
-# Sitemap location
-Sitemap: https://madadgaar.com.pk/sitemap.xml
+Sitemap: https://www.madadgaar.com.pk/sitemap.xml
 
-# AI and LLM Bots (Generative Engine Optimization)
 User-agent: GPTBot
 Allow: /
 User-agent: CCBot
@@ -32,5 +29,4 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-# Host
-Host: https://madadgaar.com.pk
+Host: https://www.madadgaar.com.pk

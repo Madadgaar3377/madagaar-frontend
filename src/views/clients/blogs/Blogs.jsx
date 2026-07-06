@@ -1,4 +1,6 @@
 // src/pages/BlogsPage.jsx
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { backendBaseUrl } from "../../../constants/apiUrl";
@@ -10,15 +12,10 @@ import BlogAdSenseInArticle from "../../../components/BlogAdSenseInArticle";
 const PAGE_SIZE = 9;
 
 function stripHtml(html = "") {
-  try {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
-  } catch {
-    return html.replace(/<\/?[^>]+(>|$)/g, "");
-  }
+  return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export default function BlogsPage() {
+export default function BlogsPage({ initialBlogs = null }) {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -35,9 +32,9 @@ export default function BlogsPage() {
     }
   };
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [blogs, setBlogs] = useState([]);
-  const [totalBlog, setTotalBlog] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState(initialBlogs || []);
+  const [totalBlog, setTotalBlog] = useState(initialBlogs?.length || 0);
+  const [loading, setLoading] = useState(initialBlogs == null);
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
@@ -45,6 +42,7 @@ export default function BlogsPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
+    if (initialBlogs != null) return;
     let mounted = true;
 
     async function fetchBlogs() {
@@ -84,7 +82,7 @@ export default function BlogsPage() {
     return () => {
       mounted = false;
     };
-  }, [apiUrl]);
+  }, [apiUrl, initialBlogs]);
 
   const categories = useMemo(() => {
     const s = new Set();
@@ -128,13 +126,7 @@ export default function BlogsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <SEO
-        title="Blog - Property, Insurance & Loan Tips | Madadgaar Expert Partner"
-        description="Stay updated with the latest news, expert tips, and insights about property solutions, insurance, loans, and installment plans in Pakistan. Read our comprehensive guides and industry updates."
-        keywords="madadgaar blog, property tips pakistan, insurance guide, loan advice, real estate news pakistan, financial tips pakistan, installment guide"
-        canonicalUrl="https://madadgaar.com.pk/blog"
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
 
       {/* Modern Hero Section */}
       <AnimatedSection animation="fadeInUp" delay={0} className="w-full">

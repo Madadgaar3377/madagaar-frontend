@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -23,6 +25,26 @@ import {
   getLowestPublicCashPrice,
   isPartnerOwnedVariant,
 } from "../../../utils/installmentPricing";
+import { SITE_URL } from "../../../lib/site";
+
+const MADADGAAR_CONTACT = {
+  email: "help.madadgaar@gmail.com",
+  phone: "+92-307-111-333-0",
+  whatsappNumber: "923071113330",
+};
+
+function isSyndicatedRetailerContact(email) {
+  if (!email || typeof email !== "string") return false;
+  const lower = email.toLowerCase();
+  return ["priceoye", "lukaxyjuqulo", "maxyruquleworid"].some((d) => lower.includes(d));
+}
+
+function formatSpecValue(value) {
+  if (value == null || value === "") return null;
+  const text = String(value).trim();
+  if (!text || text.toLowerCase() === "null" || text.toLowerCase() === "undefined") return null;
+  return text;
+}
 
 const findBestPlanIndex = (paymentPlans, plan = {}) => {
   if (!paymentPlans?.length) return 0;
@@ -78,13 +100,14 @@ function safe(obj, path, fallback = "-") {
 }
 
 /* ---------- component ---------- */
-export default function InstallmentDetail() {
-  const { id } = useParams();
+export default function InstallmentDetail({ initialPlan = null, planId: planIdProp = null }) {
+  const { id: routeId } = useParams();
+  const id = planIdProp || routeId;
   const router = useRouter();
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(initialPlan);
+  const [loading, setLoading] = useState(initialPlan == null);
   const [error, setError] = useState("");
   const [index, setIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -100,6 +123,7 @@ export default function InstallmentDetail() {
 
   // fetch plan
   useEffect(() => {
+    if (initialPlan != null) return;
     let mounted = true;
     async function fetchPlan() {
       setLoading(true);
@@ -127,7 +151,7 @@ export default function InstallmentDetail() {
     }
     fetchPlan();
     return () => (mounted = false);
-  }, [apiUrl, id]);
+  }, [apiUrl, id, initialPlan]);
 
   useEffect(() => {
     setDescriptionExpanded(false);
@@ -352,13 +376,7 @@ export default function InstallmentDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
-      <SEO
-        title={`${plan.productName || "Installment Plan"} | Madadgaar`}
-        description={seoDescription}
-        canonicalUrl={`https://madadgaar.com.pk/installment/${encodeURIComponent(id)}`}
-        ogImage={firstImage}
-        structuredData={structuredData}
-      />
+      <SEO structuredData={structuredData} />
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
           {/* Main Content: Left (Images) + Right (Details) */}
@@ -1309,21 +1327,27 @@ export default function InstallmentDetail() {
                 <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl sm:rounded-2xl border-2 border-gray-200 shadow-sm overflow-hidden">
                   <div className="p-4 sm:p-6 lg:p-8">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 lg:gap-6">
-                      {plan.productSpecifications.specifications.map((spec, idx) => (
+                      {plan.productSpecifications.specifications
+                        .map((spec, idx) => {
+                          const label = spec.label || spec.field || "";
+                          const value = formatSpecValue(spec.value);
+                          if (!value) return null;
+                          return (
                         <div 
                           key={idx} 
                           className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200 hover:border-[rgb(183,36,42)] hover:shadow-md transition-all group"
                         >
                           <div className="flex flex-col gap-2">
                             <div className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wider">
-                              {spec.label || spec.field || ""}
+                              {label}
                             </div>
                             <div className="text-sm sm:text-base lg:text-lg font-semibold text-gray-900 group-hover:text-[rgb(183,36,42)] transition-colors">
-                              {spec.value ?? ""}
+                              {value}
                             </div>
                           </div>
                         </div>
-                      ))}
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
@@ -1337,6 +1361,8 @@ export default function InstallmentDetail() {
                 const seller = plan.createdBy && Array.isArray(plan.createdBy) && plan.createdBy.length > 0 
                   ? plan.createdBy[0] 
                   : null;
+                const useMadadgaarContact = seller && isSyndicatedRetailerContact(seller.email);
+                const contact = useMadadgaarContact ? MADADGAAR_CONTACT : seller;
                 const sellerName = seller?.name || (plan.user && plan.user.fullName) || plan.user?.businessName || plan.postedBy || "Seller";
                 const sellerImage = seller?.profileImage || null;
                 const sellerInitial = sellerName?.charAt(0)?.toUpperCase() || "S";
@@ -1410,38 +1436,38 @@ export default function InstallmentDetail() {
                       }`}
                     >
                       <div className="px-4 sm:px-6 pb-4 sm:pb-6 border-t border-gray-200 pt-4 sm:pt-6">
-                        {seller ? (
+                        {contact ? (
                           <div className="space-y-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                              {seller.email && (
+                              {contact.email && (
                                 <div>
                                   <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Email</div>
-                                  <a href={`mailto:${seller.email}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline break-all">
-                                    {seller.email}
+                                  <a href={`mailto:${contact.email}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline break-all">
+                                    {contact.email}
                                   </a>
                                 </div>
                               )}
-                              {(seller.phone || seller.phoneNumber) && (
+                              {(contact.phone || contact.phoneNumber) && (
                                 <div>
                                   <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Phone</div>
-                                  <a href={`tel:${seller.phone || seller.phoneNumber}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline">
-                                    {seller.phone || seller.phoneNumber}
+                                  <a href={`tel:${contact.phone || contact.phoneNumber}`} className="text-sm sm:text-base text-[rgb(183,36,42)] hover:underline">
+                                    {contact.phone || contact.phoneNumber}
                                   </a>
                                 </div>
                               )}
-                              {seller.whatsappNumber && (
+                              {contact.whatsappNumber && (
                                 <div>
                                   <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">WhatsApp</div>
-                                  <a href={`https://wa.me/${seller.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base text-green-600 hover:underline">
-                                    {seller.whatsappNumber}
+                                  <a href={`https://wa.me/${contact.whatsappNumber.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm sm:text-base text-green-600 hover:underline">
+                                    {contact.whatsappNumber}
                                   </a>
                                 </div>
                               )}
-                              {(seller.address || seller.city) && (
+                              {(contact.address || contact.city) && (
                                 <div>
                                   <div className="text-xs sm:text-sm text-gray-500 font-semibold uppercase mb-1">Location</div>
                                   <div className="text-sm sm:text-base text-gray-900">
-                                    {seller.address && seller.city ? `${seller.address}, ${seller.city}` : (seller.address || seller.city)}
+                                    {contact.address && contact.city ? `${contact.address}, ${contact.city}` : (contact.address || contact.city)}
                                   </div>
                                 </div>
                               )}
