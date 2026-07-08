@@ -1,3 +1,5 @@
+"use client";
+
 // src/pages/admin/InsuranceRequests.jsx
 import React, { useEffect, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed

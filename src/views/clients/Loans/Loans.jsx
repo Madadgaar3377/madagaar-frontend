@@ -1,3 +1,5 @@
+"use client";
+
 // src/pages/dashboard/LoansPage.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { backendBaseUrl } from "../../../constants/apiUrl";

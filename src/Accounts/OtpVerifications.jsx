@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import Link from 'next/link';

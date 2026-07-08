@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from 'next/link';
-import SEO from "../../components/SEO";
 import AnimatedSection from "../../components/AnimatedSection";
 import { PLAY_STORE_URL } from "../../constants/mobileApp";
 
@@ -35,7 +34,7 @@ const FEATURES = [
   },
 ];
 
-const FAQ_ITEMS = [
+export const FAQ_ITEMS = [
   {
     q: "How do I download the Madadgaar app?",
     a: "Tap Download on Google Play on this page to install Madadgaar from the official Google Play Store on your Android device.",
@@ -55,62 +54,8 @@ const FAQ_ITEMS = [
 ];
 
 export default function DownloadAppPage() {
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((item) => ({
-      "@type": "Question",
-      name: item.q,
-      acceptedAnswer: { "@type": "Answer", text: item.a },
-    })),
-  };
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "MobileApplication",
-        name: "Madadgaar",
-        operatingSystem: "Android",
-        applicationCategory: "BusinessApplication",
-        offers: { "@type": "Offer", price: "0", priceCurrency: "PKR" },
-        description:
-          "Madadgaar helps users explore property listings, installment plans, insurance support, and financing services in Pakistan.",
-        downloadUrl: PLAY_STORE_URL,
-        installUrl: PLAY_STORE_URL,
-        url: "https://madadgaar.com.pk/download-app",
-        publisher: {
-          "@type": "Organization",
-          name: "Madadgaar Expert Partner (SMC-Private) Limited",
-          url: "https://madadgaar.com.pk",
-        },
-        aggregateRating: {
-          "@type": "AggregateRating",
-          ratingValue: "5",
-          ratingCount: "1",
-        },
-      },
-      {
-        "@type": "WebPage",
-        name: "Download Madadgaar App",
-        description: "Download the official Madadgaar Android app from Google Play.",
-        url: "https://madadgaar.com.pk/download-app",
-        isPartOf: { "@type": "WebSite", name: "Madadgaar", url: "https://madadgaar.com.pk" },
-      },
-    ],
-  };
-
   return (
     <>
-      <SEO
-        title="Download Madadgaar App | Android App for Property, Loans, Installments & Insurance"
-        description="Download the official Madadgaar mobile app on Google Play. Browse property listings, installment plans, loans, and insurance in Pakistan. Free Android app  compare options and apply from your phone."
-        keywords="download madadgaar app, madadgaar app download, madadgaar android app, download app pakistan, property app pakistan, installment app pakistan, loan app pakistan, insurance app pakistan, madadgaar google play, madadgaar mobile app, get madadgaar app"
-        canonicalUrl="https://madadgaar.com.pk/download-app"
-        structuredData={structuredData}
-        faqSchema={faqSchema}
-      />
-
       {/* Hero */}
       <AnimatedSection animation="fadeInUp" className="w-full">
         <section className="w-full bg-gradient-to-br from-red-50 via-white to-gray-50 section-padding">

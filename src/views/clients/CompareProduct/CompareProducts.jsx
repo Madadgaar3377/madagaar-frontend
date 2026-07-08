@@ -1,3 +1,5 @@
+"use client";
+
 // src/pages/CompareProducts.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';

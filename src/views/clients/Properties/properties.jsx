@@ -1,13 +1,10 @@
-// src/pages/PropertiesPage.jsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { motion } from "framer-motion";
 import { backendBaseUrl } from "../../../constants/apiUrl";
-import LoadingPage from "../../../compontents/Loader";
 import cities from "../../../constants/cities";
-import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
@@ -15,35 +12,11 @@ import { SITE_URL } from "../../../lib/site";
 
 const PAGE_SIZE = 50;
 
-function PropertiesPage() {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "serviceType": "Real Estate Services",
-    "name": "Madadgaar Property Solutions",
-    "description": "Find, compare, and secure your perfect propertystress-free. Compare properties for sale, rent, and investment across Pakistan.",
-    "url": `${SITE_URL}/properties`,
-    "provider": {
-      "@type": "LocalBusiness",
-      "name": "Madadgaar Expert Partner",
-      "url": SITE_URL
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "Pakistan"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "PKR",
-      "description": "Free property comparison and listing services"
-    }
-  };
-  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // Helper function to extract property data based on type
+  
 
+
+function PropertiesPage({ properties = [], fetchError = false }) {
   // Filters
   const [typeFilter, setTypeFilter] = useState("All"); // Individual/Project filter
   const [city, setCity] = useState("All");
@@ -57,93 +30,6 @@ function PropertiesPage() {
 
   // Filter visibility for mobile
   const [showFilters, setShowFilters] = useState(false);
-
-  // Helper function to extract property data based on type
-  const extractPropertyData = (property) => {
-    if (property.type === "Individual") {
-      const individual = property.individualProperty || {};
-      return {
-        _id: property._id,
-        type: "Individual",
-        title: individual.title,
-        description: individual.description,
-        propertyType: individual.propertyType,
-        propertyId: individual.propertyId,
-        city: individual.city,
-        location: individual.location,
-        price: individual.transaction?.price || individual.transaction?.monthlyRent,
-        transactionType: individual.transaction?.type,
-        areaSize: individual.areaSize,
-        areaUnit: individual.areaUnit,
-        bedrooms: individual.bedrooms,
-        bathrooms: individual.bathrooms,
-        images: individual.images || [],
-        amenities: individual.amenities,
-        utilities: individual.utilities,
-        contact: individual.contact,
-        nearbyLandmarks: individual.nearbyLandmarks,
-        furnishingStatus: individual.furnishingStatus,
-        possessionStatus: individual.possessionStatus,
-      };
-    } else if (property.type === "Project") {
-      const project = property.project || {};
-      return {
-        _id: property._id,
-        type: "Project",
-        title: project.projectName,
-        description: project.description,
-        propertyType: project.projectType,
-        propertyId: project.propertyId,
-        city: project.city,
-        location: project.area || project.address,
-        price: project.transaction?.priceRange || project.transaction?.price,
-        transactionType: project.transaction?.type,
-        areaSize: project.totalLandArea,
-        areaUnit: project.landAreaUnit,
-        totalUnits: project.totalUnits,
-        images: project.images || [],
-        amenities: project.amenities,
-        utilities: project.utilities,
-        contact: project.contact,
-        nearbyLandmarks: project.nearbyLandmarks,
-        projectStage: project.projectStage,
-        developerBuilder: project.developerBuilder,
-        highlights: project.highlights,
-      };
-    }
-    return null;
-  };
-
-  useEffect(() => {
-    let mounted = true;
-    async function fetchProperties() {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(`${apiUrl}/getAllProperties`);
-        const payload = await res.json().catch(() => null);
-
-        if (!res.ok || (payload && payload.success === false)) {
-          setError(payload?.message || `Failed to load (${res.status})`);
-        } else {
-          if (mounted) {
-            const rawProperties = payload?.properties || [];
-            const extractedProperties = rawProperties
-              .map(extractPropertyData)
-              .filter(Boolean);
-            setProperties(extractedProperties);
-          }
-        }
-      } catch (err) {
-        console.error("Fetch properties error:", err);
-        setError("Network error  could not fetch properties.");
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    }
-    fetchProperties();
-    return () => (mounted = false);
-  }, [apiUrl]);
 
   // Apply client-side filtering
   const filteredProperties = useMemo(() => {
@@ -196,12 +82,6 @@ function PropertiesPage() {
     return filteredProperties.slice(start, start + PAGE_SIZE);
   }, [filteredProperties, page]);
 
-  if (loading) {
-    return (
-      <LoadingPage />
-    );
-  }
-
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i) => ({
@@ -213,7 +93,6 @@ function PropertiesPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEO structuredData={structuredData} />
       <motion.header
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -388,10 +267,10 @@ function PropertiesPage() {
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">
-        {loading ? (
-          <p className="text-center text-sm sm:text-base text-gray-500 py-12 sm:py-20">Loading properties…</p>
-        ) : error ? (
-          <p className="text-center text-sm sm:text-base text-red-600 py-12 sm:py-20">{error}</p>
+        {fetchError ? (
+          <p className="text-center text-sm sm:text-base text-red-600 py-12 sm:py-20">
+            Failed to load properties. Please try again later.
+          </p>
         ) : filteredProperties.length === 0 ? (
           <p className="text-center text-sm sm:text-base text-gray-500 py-12 sm:py-20">
             No properties found matching your filters.
@@ -498,7 +377,7 @@ function PropertiesPage() {
                       </Link>
                       <ShareButtons
                         compact
-                        url={p._id ? `https://madadgaar.com.pk/property/${p._id}` : ""}
+                        url={p._id ? `https://www.madadgaar.com.pk/property/${p._id}` : ""}
                         title={p.title || "Property"}
                         details={[
                           [p.city, p.location].filter(Boolean).join(", "),

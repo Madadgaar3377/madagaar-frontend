@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 
 // Toast component for displaying notifications

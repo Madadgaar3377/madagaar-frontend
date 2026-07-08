@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl"; // adjust path if needed
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
-import SEO from "../../../components/SEO";
+
 import OfferBanner from "../../../components/OfferBanner";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
@@ -25,36 +25,9 @@ const extractPlainText = (html, maxLength = 150) => {
   return text || "No description available";
 };
 
-export default function LoansPage() {
+export default function LoansPage({ loans = [], fetchError = false }) {
   const router = useRouter();
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "serviceType": "Financial Services",
-    "name": "Madadgaar Financing",
-    "description": "Get the funds you need, faster and smarter. Compare top bank loans, personal loans, home loans, car loans, business loans, and online loan offers from verified financial providers across Pakistan.",
-    "url": `${SITE_URL}/loans`,
-    "provider": {
-      "@type": "LocalBusiness",
-      "name": "Madadgaar Expert Partner",
-      "url": SITE_URL
-    },
-    "areaServed": {
-      "@type": "Country",
-      "name": "Pakistan"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "PKR",
-      "description": "Free loan comparison and application services"
-    }
-  };
-
-  const [loanPlans, setLoanPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -71,44 +44,14 @@ export default function LoansPage() {
     return () => clearTimeout(t);
   }, [query]);
 
-  useEffect(() => {
-    let ignore = false;
-    const controller = new AbortController();
 
-    (async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(`${API}/getAllLoans`, { signal: controller.signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const body = await res.json().catch(() => null);
-        
-        if (!body || !body.success) {
-          throw new Error(body?.message || 'Failed to fetch loans');
-        }
-        
-        const items = body.data || [];
-        if (!ignore) setLoanPlans(Array.isArray(items) ? items : []);
-      } catch (err) {
-        console.error('Loan fetch error:', err);
-        if (!ignore) setError(err.message || "Failed to load loan plans.");
-      } finally {
-        if (!ignore) setLoading(false);
-      }
-    })();
-
-    return () => {
-      ignore = true;
-      controller.abort();
-    };
-  }, []);
 
   // reset to first page when search changes
   useEffect(() => setCurrentPage(1), [debouncedQuery]);
 
   const filtered = useMemo(() => {
     const q = (debouncedQuery || "").toLowerCase();
-    return loanPlans.filter((p) => {
+    return loans.filter((p) => {
       // Category filter
       if (selectedCategory && p.majorCategory !== selectedCategory) {
         return false;
@@ -134,24 +77,24 @@ export default function LoansPage() {
 
       return true;
     });
-  }, [debouncedQuery, loanPlans, selectedCategory, selectedFinancingType]);
+  }, [debouncedQuery, loans, selectedCategory, selectedFinancingType]);
 
   // Get unique categories and financing types
   const categories = useMemo(() => {
     const cats = new Set();
-    loanPlans.forEach((p) => {
+    loans.forEach((p) => {
       if (p.majorCategory) cats.add(p.majorCategory);
     });
     return Array.from(cats).sort();
-  }, [loanPlans]);
+  }, [loans]);
 
   const financingTypes = useMemo(() => {
     const types = new Set();
-    loanPlans.forEach((p) => {
+    loans.forEach((p) => {
       if (p.financingType) types.add(p.financingType);
     });
     return Array.from(types).sort();
-  }, [loanPlans]);
+  }, [loans]);
 
   const totalItems = filtered.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
@@ -172,11 +115,8 @@ export default function LoansPage() {
     e.currentTarget.src = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=60";
   };
 
-  if (loading) return <LoadingPage />;
-
   return (
     <>
-      <SEO structuredData={structuredData} />
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding-sm">
         <OfferBanner />
         <div className="container-content space-y-4 sm:space-y-6">
@@ -293,9 +233,9 @@ export default function LoansPage() {
         <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
         {/* Error */}
-        {error && (
+        {fetchError && (
           <div className="rounded-lg bg-white border p-4 text-center text-red-600 shadow-sm">
-            {error}
+            Failed to load loan plans. Please try again later.
           </div>
         )}
 
@@ -406,7 +346,7 @@ export default function LoansPage() {
                       </Link>
                       <ShareButtons
                         compact
-                        url={plan._id || plan.planId ? `https://madadgaar.com.pk/loans/${plan._id || plan.planId}` : ""}
+                        url={plan._id || plan.planId ? `${SITE_URL}/loans/${plan._id || plan.planId}` : ""}
                         title={plan.productName || "Loan plan"}
                         label="Share this loan"
                       />
