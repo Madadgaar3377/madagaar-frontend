@@ -34,7 +34,7 @@ const nextConfig = {
             value: "camera=(), microphone=(), geolocation=(self)",
           },
           {
-            key: "Content-Security-Policy-Report-Only",
+            key: "Content-Security-Policy",
             value:
               "frame-ancestors 'self'; default-src 'self' 'unsafe-inline' *.googletagmanager.com *.googlesyndication.com *.doubleclick.net *.google-analytics.com data: blob: https:;",
           },

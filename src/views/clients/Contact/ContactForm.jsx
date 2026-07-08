@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { backendBaseUrl } from '../../../constants/apiUrl';
-import SEO from '../../../components/SEO';
 import { Toast, useToast } from '../../../components/Toast';
 import AnimatedSection from '../../../components/AnimatedSection';
 
@@ -98,12 +97,6 @@ const ContactForm = () => {
   return (
     <>
       <Toast toasts={toasts} onClose={removeToast} />
-      <SEO
-        title="Contact Madadgaar Expert Partner"
-        description="Reach out to Madadgaar for property, loan, installment, and insurance support in Pakistan. Get expert guidance and assistance easily."
-        keywords="contact madadgaar, madadgaar support, customer service madadgaar, help madadgaar, madadgaar contact number, madadgaar email"
-      />
-
       <div className="min-h-screen bg-gray-50 section-padding">
         <div className="container-content max-w-4xl">
           {/* Header */}
@@ -182,7 +175,7 @@ const ContactForm = () => {
                     <div>
                       <h3 className="font-semibold text-gray-900 mb-1">Website</h3>
                       <a 
-                        href="https://madadgaar.com.pk" 
+                        href="https://www.madadgaar.com.pk" 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-red-600 hover:text-red-700 text-sm"

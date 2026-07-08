@@ -11,10 +11,10 @@ import { SITE_URL } from "../../../lib/site";
 
 const BRAND = "rgb(183,36,42)";
 
-export default function BlogDetail() {
+export default function BlogDetail({ initialBlog }) {
   const { slug } = useParams();
-  const [blog, setBlog] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [blog, setBlog] = useState(initialBlog);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -142,7 +142,7 @@ export default function BlogDetail() {
 
   return (
     <div className="bg-gradient-to-b from-gray-50 via-white to-gray-100 min-h-screen">
-      <SEO structuredData={structuredData} />
+
 
       {/* Header */}
       <section className="relative overflow-hidden bg-gradient-to-r from-[rgb(183,36,42)] via-rose-500 to-orange-400 text-white">

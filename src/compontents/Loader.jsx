@@ -1,3 +1,4 @@
+"use client";
 // src/components/LoadingPage.jsx
 import React from "react";
 

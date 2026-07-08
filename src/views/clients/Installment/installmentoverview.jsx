@@ -374,7 +374,7 @@ export default function InstallmentDetail() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
-      <SEO structuredData={structuredData} />
+
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
           {/* Main Content: Left (Images) + Right (Details) */}

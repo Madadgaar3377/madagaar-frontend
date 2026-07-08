@@ -22,15 +22,15 @@ import SORT_OPTIONS from "../../../constants/sortOption";
 
 const API_PAGE_LIMIT = 100;
 
-export default function InstallmentPlans() {
+export default function InstallmentPlans({ initialPlans = [], initialApiTotalPages = 1, initialApiTotalCount = 0, fetchError = false }) {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState(initialPlans);
+  const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState("");
   const [apiPage, setApiPage] = useState(1);
-  const [apiTotalPages, setApiTotalPages] = useState(1);
-  const [apiTotalCount, setApiTotalCount] = useState(0);
+  const [apiTotalPages, setApiTotalPages] = useState(initialApiTotalPages);
+  const [apiTotalCount, setApiTotalCount] = useState(initialApiTotalCount);
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -351,7 +351,7 @@ export default function InstallmentPlans() {
 
   return (
     <>
-    <SEO structuredData={structuredData} />
+
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
       <OfferBanner />
       <div className="container-content">
@@ -777,7 +777,7 @@ export default function InstallmentPlans() {
                       <ShareButtons
                         compact
                         fullWidth
-                        url={(plan.installmentPlanId || plan._id) ? `https://madadgaar.com.pk/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}` : ""}
+                        url={(plan.installmentPlanId || plan._id) ? `${SITE_URL}/installment/${encodeURIComponent(plan.installmentPlanId || plan._id)}` : ""}
                         title={plan.productName || "Installment plan"}
                         details={buildInstallmentShareLines(plan, bestPlan)}
                         label="Share this plan"

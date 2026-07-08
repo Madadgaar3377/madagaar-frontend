@@ -22,10 +22,10 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function InsuranceInfo() {
+export default function InsuranceInfo({ initialPlans = [], fetchError = false }) {
   const router = useRouter();
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState(initialPlans);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   
   // Filter and search state
@@ -198,7 +198,7 @@ export default function InsuranceInfo() {
 
   return (
     <div className="bg-gray-50">
-      <SEO structuredData={structuredData} />
+
       
       {/* top banner */}
       <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
@@ -350,11 +350,11 @@ export default function InsuranceInfo() {
         )}
 
         {/* Insurance Plans Grid */}
-        {error ? (
+        {(fetchError || error) ? (
           <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
             <div className="text-red-500 text-4xl mb-4">⚠️</div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Error Loading Plans</h3>
-            <p className="text-sm text-gray-600">{error}</p>
+            <p className="text-sm text-gray-600">{error || "Failed to load insurance plans. Please try again later."}</p>
           </div>
         ) : filteredPlans.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-6 text-center">

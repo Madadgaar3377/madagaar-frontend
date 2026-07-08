@@ -3,7 +3,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from 'next/link';
 import { backendBaseUrl } from "../../constants/apiUrl";
-import SEO from "../../components/SEO";
 import OfferBanner from "../../components/OfferBanner";
 import AnimatedSection from "../../components/AnimatedSection";
 
@@ -55,12 +54,6 @@ export default function OffersPage() {
 
   return (
     <>
-      <SEO
-        title="Offers & Sale"
-        description="Current offers and sale – installment plans, loans, properties, and insurance on special. Sale ending countdown."
-        keywords="offers, sale, madadgaar, installments, loans, properties, insurance, Pakistan"
-        canonicalUrl="https://madadgaar.com.pk/offers"
-      />
       <div className="min-h-screen bg-gray-50">
         <div className="section-padding container-content py-8 sm:py-12">
           <div className="max-w-5xl mx-auto">

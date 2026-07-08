@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
-import SEO from "../../../components/SEO";
+
 import AnimatedSection from "../../../components/AnimatedSection";
 import BlogAdSenseInArticle from "../../../components/BlogAdSenseInArticle";
 
@@ -15,26 +15,12 @@ function stripHtml(html = "") {
   return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-export default function BlogsPage() {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Madadgaar Blog",
-    "description": "Stay updated with the latest news, tips, and insights about property, insurance, loans, and installment plans in Pakistan",
-    "url": "https://madadgaar.com.pk/blog",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Madadgaar Expert Partner",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://madadgaar.com.pk/Media/Group%2033.png"
-      }
-    }
-  };
+export default function BlogsPage({ initialBlogs = [], initialTotalBlog = 0, fetchError = false }) {
+
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
-  const [blogs, setBlogs] = useState([]);
-  const [totalBlog, setTotalBlog] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [blogs, setBlogs] = useState(initialBlogs);
+  const [totalBlog, setTotalBlog] = useState(initialTotalBlog);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
@@ -125,7 +111,7 @@ export default function BlogsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <SEO structuredData={structuredData} />
+
 
       {/* Modern Hero Section */}
       <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
@@ -281,14 +267,14 @@ export default function BlogsPage() {
 
       {/* Modern Blog Grid */}
       <main className="container-content max-w-7xl py-8 sm:py-12">
-        {error ? (
+        {(fetchError || error) ? (
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center size-16 bg-red-100 rounded-full mb-4">
               <svg className="size-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <p className="text-red-600 font-semibold mb-3 text-lg">{error}</p>
+            <p className="text-red-600 font-semibold mb-3 text-lg">{error || "Failed to load blogs. Please try again later."}</p>
             <button type="button"
               onClick={() => window.location.reload()}
               className="btn-primary px-6 py-3 rounded-xl font-semibold"

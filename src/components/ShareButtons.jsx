@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+"use client";
 
-const BASE_URL = "https://madadgaar.com.pk";
+import React, { useState } from "react";
 
 /**
  * Single "Share" button; on click opens a popup with WhatsApp, Facebook, X, LinkedIn, etc.
@@ -164,5 +164,3 @@ export default function ShareButtons({ url, title = "", details = "", label = "S
     </div>
   );
 }
-
-export { BASE_URL };
