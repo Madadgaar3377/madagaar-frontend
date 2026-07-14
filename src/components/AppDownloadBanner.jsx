@@ -82,7 +82,7 @@ export default function AppDownloadBanner() {
               background: `linear-gradient(135deg, ${ACCENT} 0%, #8b1a1f 55%, #6d1418 100%)`,
             }}
           >
-            {/* Close — top-right, always visible */}
+            {/* Close  top-right, always visible */}
             <button
               type="button"
               onClick={handleClose}

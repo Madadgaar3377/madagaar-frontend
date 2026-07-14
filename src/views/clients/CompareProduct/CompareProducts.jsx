@@ -1,10 +1,10 @@
 // src/pages/CompareProducts.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import CashPriceDisplay from "../../../components/CashPriceDisplay";
-import { getProductPriceDisplay } from "../../../utils/installmentPricing";
+import { getHeroCashPriceDisplay } from "../../../utils/installmentPricing";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 const MAX_COMPARE = 4;
@@ -12,6 +12,7 @@ const MAX_COMPARE = 4;
 export default function CompareProducts() {
   const { id: routeId } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -89,7 +90,18 @@ export default function CompareProducts() {
     }
   }
 
-  // load base product from route param
+  // Parse ?ids= from URL (partner profile / shared compare links)
+  const extraIdsFromQuery = useMemo(() => {
+    const raw = searchParams?.get("ids") || "";
+    if (!raw.trim()) return [];
+    return raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .slice(0, MAX_COMPARE - 1);
+  }, [searchParams]);
+
+  // load base product from route param + optional ids from query
   useEffect(() => {
     if (!routeId) {
       setBaseProduct(null);
@@ -97,23 +109,53 @@ export default function CompareProducts() {
     }
     let cancelled = false;
     (async () => {
-      const p = await fetchProduct(routeId);
-      if (!cancelled && p) {
-        setBaseProduct(p);
-      }
+      const base = await fetchProduct(routeId);
+      if (cancelled) return;
+      if (base) setBaseProduct(base);
+
+      const baseKey = base ? getId(base) : null;
+      const want = extraIdsFromQuery.filter((eid) => {
+        const k = String(eid);
+        return k && k !== String(routeId) && k !== String(baseKey || "");
+      });
+
+      if (!want.length) return;
+
+      const settled = await Promise.allSettled(
+        want.map((eid) => fetchProduct(eid))
+      );
+      if (cancelled) return;
+
+      const extras = settled
+        .filter((r) => r.status === "fulfilled" && r.value)
+        .map((r) => r.value);
+
+      setCompareList(() => {
+        const next = [];
+        const seen = new Set();
+        const push = (p) => {
+          if (!p) return;
+          const id = getId(p);
+          if (!id || seen.has(id)) return;
+          seen.add(id);
+          next.push(p);
+        };
+        push(base);
+        extras.forEach(push);
+        return next.slice(0, MAX_COMPARE);
+      });
     })();
     return () => (cancelled = true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeId]);
+  }, [routeId, extraIdsFromQuery.join(",")]);
 
   // whenever baseProduct changes ensure compareList contains base as first and unique
   useEffect(() => {
+    if (!baseProduct) return;
     setCompareList((prev) => {
       const baseId = getId(baseProduct);
-      // start with base if exists
       const next = [];
       if (baseProduct && baseId) next.push(baseProduct);
-      // append previous items that are not base and dedupe
       const added = new Set(next.map(getId));
       for (const p of prev) {
         const id = getId(p);
@@ -122,7 +164,6 @@ export default function CompareProducts() {
           next.push(p);
         }
       }
-      // ensure length limit and return
       return next.slice(0, MAX_COMPARE);
     });
   }, [baseProduct]);
@@ -289,7 +330,7 @@ export default function CompareProducts() {
       );
     }
     if (key === "price") {
-      const display = getProductPriceDisplay(product);
+      const display = getHeroCashPriceDisplay(product);
       if (!display.displayPrice) return <span className="text-xs text-gray-400"></span>;
       return <CashPriceDisplay display={display} size="sm" prefix="Rs." inline className="font-semibold" />;
     }
@@ -358,7 +399,7 @@ export default function CompareProducts() {
                       </div>
                       <p className="text-sm text-gray-500 mt-1">{[baseProduct.companyName, baseProduct.category, baseProduct.city].filter(Boolean).join(" • ") || ""}</p>
                       <div className="mt-2">
-                        <CashPriceDisplay display={getProductPriceDisplay(baseProduct)} size="md" prefix="Rs." />
+                        <CashPriceDisplay display={getHeroCashPriceDisplay(baseProduct)} size="md" prefix="Rs." />
                       </div>
                       <p className="mt-1 text-sm text-gray-600 line-clamp-2">{(baseProduct.description || "").replace(/<[^>]+>/g, "").slice(0, 180)}</p>
                     </div>
@@ -438,7 +479,7 @@ export default function CompareProducts() {
                     <p className="font-medium text-sm text-gray-900 truncate">{s.productName}</p>
                     <p className="text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-x-1">
                       <span>{s.companyName} •</span>
-                      <CashPriceDisplay display={getProductPriceDisplay(s)} size="sm" prefix="Rs." inline />
+                      <CashPriceDisplay display={getHeroCashPriceDisplay(s)} size="sm" prefix="Rs." inline />
                     </p>
                     <div className="mt-2 flex gap-2 flex-wrap">
                       <button type="button"
@@ -482,7 +523,7 @@ export default function CompareProducts() {
                     </div>
                     <div className="p-2.5">
                       <p className="text-xs font-medium text-gray-900 line-clamp-2 min-h-[2rem]">{r.productName}</p>
-                      <CashPriceDisplay display={getProductPriceDisplay(r)} size="sm" prefix="Rs." className="mt-0.5" />
+                      <CashPriceDisplay display={getHeroCashPriceDisplay(r)} size="sm" prefix="Rs." className="mt-0.5" />
                       <div className="mt-2 flex gap-1.5">
                         <button type="button" onClick={() => addToCompare(r)} className="flex-1 text-xs py-1.5 rounded-lg bg-red-600 text-white font-medium">Add</button>
                         <button type="button" onClick={() => router.push(`/installment/product/CompareProduct/${encodeURIComponent(getId(r))}`)} className="flex-1 text-xs py-1.5 rounded-lg border border-gray-300 font-medium">Open</button>

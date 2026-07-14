@@ -42,6 +42,7 @@ function extractPropertyData(property) {
             utilities: individual.utilities,
             contact: individual.contact,
             nearbyLandmarks: individual.nearbyLandmarks,
+            createdBy: property.createdBy,
         };
     }
     if (property.type === "Project") {
@@ -76,6 +77,7 @@ function extractPropertyData(property) {
             highlights: project.highlights || [],
             expectedCompletionDate: project.expectedCompletionDate,
             possessionDate: project.possessionDate,
+            createdBy: property.createdBy,
         };
     }
     return null;
@@ -714,7 +716,25 @@ const PropertyDetails = () => {
                                     >
                                         Apply Now
                                     </Link>
+                                    {property.createdBy && (
+                                        <Link
+                                            href={`/partner/${encodeURIComponent(property.createdBy)}`}
+                                            className="w-full mt-2 px-4 py-3 border-2 border-red-600 text-red-600 rounded-lg font-bold hover:bg-red-50 transition-colors text-center block"
+                                        >
+                                            View Partner Profile
+                                        </Link>
+                                    )}
                                 </div>
+                            </div>
+                        )}
+                        {!property.contact && property.createdBy && (
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <Link
+                                    href={`/partner/${encodeURIComponent(property.createdBy)}`}
+                                    className="w-full px-4 py-3 border-2 border-red-600 text-red-600 rounded-lg font-bold hover:bg-red-50 transition-colors text-center block"
+                                >
+                                    View Partner Profile
+                                </Link>
                             </div>
                         )}
                     </div>

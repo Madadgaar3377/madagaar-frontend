@@ -5,7 +5,7 @@ import React, { useState } from "react";
 const YOUTUBE_ID = "FlRyziWo56U";
 const THUMB = `https://i.ytimg.com/vi/${YOUTUBE_ID}/hqdefault.jpg`;
 
-/** Click-to-play YouTube embed — avoids continuous network activity until user opts in. */
+/** Click-to-play YouTube embed  avoids continuous network activity until user opts in. */
 export default function VideoPage() {
   const [playing, setPlaying] = useState(false);
 

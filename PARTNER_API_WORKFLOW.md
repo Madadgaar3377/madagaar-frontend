@@ -1,4 +1,4 @@
-# Partner API Key — Complete Workflow & Architecture
+# Partner API Key  Complete Workflow & Architecture
 
 > **Purpose:** Let verified Madadgaar partners connect their **own website / panel / ERP** to Madadgaar using an **API key**, so they can manage installments, applications, and dashboard data without logging into `partner.madadgaar.com.pk` for every action.
 
@@ -1132,8 +1132,8 @@ flowchart LR
 
 | # | Issue | Risk | Fix | Status |
 |---|-------|------|-----|--------|
-| 1 | `GET /getApplication/:id` — no `createdBy` check | Cross-partner read | Add ownership assert | ⏳ Before applications v1 |
-| 2 | `PUT /updateApplicationStatus` — no ownership check | Cross-partner write | Require `createdBy === partnerId` | ⏳ Before applications v1 |
+| 1 | `GET /getApplication/:id`  no `createdBy` check | Cross-partner read | Add ownership assert | ⏳ Before applications v1 |
+| 2 | `PUT /updateApplicationStatus`  no ownership check | Cross-partner write | Require `createdBy === partnerId` | ⏳ Before applications v1 |
 | 3 | `createInstallmentPlan` accepts `userId` in body | Spoof partner | `forcePartnerBody` on v1 routes | ✅ Done |
 | 4 | No API key model | Cannot launch | `PartnerApiKey` schema | ✅ Done |
 | 5 | `deleteInstallmentPlan` wrong R2 import path | Delete fails | Fixed `../../ImagesUploadR2/...` | ✅ Done |
@@ -1165,29 +1165,29 @@ gantt
     Sandbox mg_test keys                   :p5b, after p5a, 7d
 ```
 
-### Phase 1 — Foundation ✅
+### Phase 1  Foundation ✅
 - [x] `models/PartnerApiKey.js`
 - [x] `Middelware/verifyPartnerApiKey.js`
 - [x] `Middelware/requirePartner.js`
 - [x] Force `partnerId` from auth context on create/update (`forcePartnerBody.js`)
 
-### Phase 2 — Core API ✅
+### Phase 2  Core API ✅
 - [x] `thirdPartyApis/` routers
 - [x] Wrap existing installment + dashboard controllers
 - [x] Applications router on v1
 - [x] OpenAPI spec + Postman collection
 
-### Phase 3 — Partner panel UI ✅
+### Phase 3  Partner panel UI ✅
 - [x] `partner-panel/src/pages/settings/ApiKeys.jsx`
 - [x] `partner-panel/src/pages/settings/ApiKeysDocs.jsx`
 - [x] Navbar links to API Keys + docs.madadgaar.com.pk
 - [x] Public docs site `docs-madadgaar/` → docs.madadgaar.com.pk
 
-### Phase 4 — Production hardening ✅ (API layer)
+### Phase 4  Production hardening ✅ (API layer)
 - [x] Per-key rate limiting (100/min + 20 writes/min)
 - [x] `PartnerApiAuditLog` + admin usage API
 - [ ] Admin panel UI charts for API usage
-- [ ] Application ownership fixes on legacy JWT routes (partial — partner checks added)
+- [ ] Application ownership fixes on legacy JWT routes (partial  partner checks added)
 
 ---
 
@@ -1314,4 +1314,4 @@ sequenceDiagram
 
 ---
 
-*Document version: 2.0 — aligned with `thirdPartyApis/`, `docs-madadgaar/`, and partner panel as of implementation review.*
+*Document version: 2.0  aligned with `thirdPartyApis/`, `docs-madadgaar/`, and partner panel as of implementation review.*

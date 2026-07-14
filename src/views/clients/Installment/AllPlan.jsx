@@ -4,7 +4,12 @@ import Link from 'next/link';
 import LoadingPage from "../../../compontents/Loader";
 import NavbarDashboard from "../../../components/DashboardNavbar";
 import CashPriceDisplay from "../../../components/CashPriceDisplay";
-import { getProductPriceDisplay } from "../../../utils/installmentPricing";
+import { getHeroCashPriceDisplay } from "../../../utils/installmentPricing";
+import {
+  parseInstallmentCities,
+  formatInstallmentCityDisplay,
+  installmentMatchesCityFilter,
+} from "../../../lib/installmentCities";
 
 /**
  * InstallmentPlans.jsx
@@ -77,9 +82,11 @@ export default function AdminInstallment() {
   const cities = useMemo(() => {
     const setCity = new Set();
     plans.forEach((p) => {
-      if (p.city) setCity.add(p.city);
+      const parsed = parseInstallmentCities(p);
+      if (parsed.isAllCities) return;
+      parsed.cities.forEach((c) => setCity.add(c));
     });
-    return Array.from(setCity).filter(Boolean);
+    return Array.from(setCity).filter(Boolean).sort();
   }, [plans]);
 
   // filtered data
@@ -91,13 +98,14 @@ export default function AdminInstallment() {
         if (cat !== selectedCategory.toLowerCase()) return false;
       }
       if (selectedCity) {
-        if ((p.city || "").toLowerCase() !== selectedCity.toLowerCase()) return false;
+        if (!installmentMatchesCityFilter(p, selectedCity)) return false;
       }
       if (!q) return true;
+      const cityLabel = formatInstallmentCityDisplay(p).toLowerCase();
       return (
         (p.productName || "").toLowerCase().includes(q) ||
         (p.description || "").toLowerCase().includes(q) ||
-        (p.city || "").toLowerCase().includes(q) ||
+        cityLabel.includes(q) ||
         (p.companyName || "").toLowerCase().includes(q)
       );
     });
@@ -210,7 +218,7 @@ export default function AdminInstallment() {
                     <div className="flex items-center justify-between text-sm text-gray-600">
                       <div className="flex items-center gap-2">
                         <svg xmlns="http://www.w3.org/2000/svg" className="size-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 7v4a1 1 0 001 1h16M3 7a2 2 0 012-2h14a2 2 0 012 2M7 11V7m10 4V7M8 21h8" /></svg>
-                        <span>{plan.city || "N/A"}</span>
+                        <span>{formatInstallmentCityDisplay(plan) || "N/A"}</span>
                       </div>
 
                       <div className="text-right">
@@ -226,7 +234,7 @@ export default function AdminInstallment() {
                       </div>
 
                       <div className="text-right">
-                        <CashPriceDisplay display={getProductPriceDisplay(plan)} size="sm" label="Price" />
+                        <CashPriceDisplay display={getHeroCashPriceDisplay(plan)} size="sm" label="Price" />
                       </div>
                     </div>
 
@@ -272,7 +280,7 @@ export default function AdminInstallment() {
                     {openPlan.productImages && openPlan.productImages.length ? (
                       <img
                         src={openPlan.productImages[carouselIndex]}
-                        alt={`${openPlan.productName || "Product"} - Installment Plan Image ${carouselIndex + 1} in ${openPlan.city || "Pakistan"}`}
+                        alt={`${openPlan.productName || "Product"} - Installment Plan Image ${carouselIndex + 1} in ${formatInstallmentCityDisplay(openPlan) || "Pakistan"}`}
                         className="w-full h-72 lg:h-full object-contain bg-white"
                         onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                       />
@@ -323,7 +331,7 @@ export default function AdminInstallment() {
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">Location</div>
-                        <div className="font-semibold">{openPlan.city}</div>
+                        <div className="font-semibold">{formatInstallmentCityDisplay(openPlan)}</div>
                       </div>
                     </div>
 

@@ -29,7 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const name = String(plan.planName || plan.name || "Insurance Plan");
   const description = stripHtml(
-    String(plan.description || plan.summary || `${name} — compare insurance on Madadgaar.`),
+    String(plan.description || plan.summary || `${name}  compare insurance on Madadgaar.`),
     155
   );
   return buildPageMetadata({

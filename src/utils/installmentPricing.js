@@ -1114,6 +1114,24 @@ export function getLowestPublicCashPrice(plan, variantIndex = null) {
 
 
 
+/** Hero / card price: lowest partner-aware cash offer, not stale catalog-only price. */
+export function getHeroCashPriceDisplay(plan, variantIndex = null, cashOffers = null) {
+
+  if (!plan) return resolvePriceDisplay({});
+
+  const offers =
+    cashOffers ?? buildPartnerCashOffers(plan, { variantIndex });
+
+  if (offers.length > 0) {
+    return getOfferPriceDisplay(plan, offers[0]);
+  }
+
+  return getProductPriceDisplay(plan, variantIndex);
+
+}
+
+
+
 export function getBestPaymentPlan(paymentPlans, plan = {}) {
 
   const allPlans =
@@ -1222,7 +1240,7 @@ export function getInstallmentCardPricing(plan, paymentPlan) {
 
 
 
-  const cashDisplay = getProductPriceDisplay(plan);
+  const cashDisplay = getHeroCashPriceDisplay(plan);
 
 
 

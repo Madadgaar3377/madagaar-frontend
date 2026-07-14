@@ -22,6 +22,22 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react", "framer-motion", "recharts"],
   },
   async headers() {
+    // Never pin immutable long-cache on static chunks in development —
+    // it traps stale Fast Refresh / HMR bundles in the browser.
+    if (process.env.NODE_ENV !== "production") {
+      return [
+        {
+          source: "/_next/static/:path*",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "no-store, must-revalidate",
+            },
+          ],
+        },
+      ];
+    }
+
     return [
       {
         source: "/:path*",

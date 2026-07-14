@@ -7,7 +7,7 @@ const LOREM_PATTERN =
   /\b(lorem ipsum|dolor sit amet|tempora ea|ullam duc|aliquip ex ea|molesti)\b/i;
 
 const NEUTRAL_PROPERTY_DESCRIPTION =
-  "View property details, pricing, and location on Madadgaar — Pakistan's trusted property marketplace.";
+  "View property details, pricing, and location on Madadgaar  Pakistan's trusted property marketplace.";
 
 /**
  * Strip HTML and collapse whitespace for meta / JSON-LD descriptions.

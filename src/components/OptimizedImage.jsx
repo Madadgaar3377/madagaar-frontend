@@ -4,7 +4,7 @@ import Image from "next/image";
 
 /**
  * Drop-in replacement for <img> with Next.js image optimization (WebP/AVIF, responsive sizes).
- * Preserves existing className styling — no visual change.
+ * Preserves existing className styling  no visual change.
  */
 export default function OptimizedImage({
   src,
