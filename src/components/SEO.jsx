@@ -56,7 +56,7 @@ const defaultStructuredData = {
 };
 
 /**
- * JSON-LD structured data only — page title/description/canonical are set
+ * JSON-LD structured data only  page title/description/canonical are set
  * server-side via Next.js generateMetadata() in each route segment.
  */
 const SEO = ({ structuredData = null, faqSchema = null }) => (

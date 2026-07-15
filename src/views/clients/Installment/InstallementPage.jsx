@@ -5,6 +5,11 @@ import { backendBaseUrl } from "../../../constants/apiUrl";
 import Link from 'next/link';
 import SEO from "../../../components/SEO";
 import OfferBanner from "../../../components/OfferBanner";
+import {
+  parseInstallmentCities,
+  formatInstallmentCityDisplay,
+  installmentMatchesCityFilter,
+} from "../../../lib/installmentCities";
 import citiesList from "../../../constants/cities";
 import ShareButtons from "../../../components/ShareButtons";
 import AnimatedSection from "../../../components/AnimatedSection";
@@ -240,12 +245,14 @@ export default function InstallmentPlans({ initialPlans = [], initialApiTotalPag
 
   // Cities: Use predefined list, but also include any custom cities from plans
   const cities = useMemo(() => {
-    const predefinedCities = Array.isArray(citiesList) 
-      ? citiesList.map(c => typeof c === 'string' ? c : (c.value || c.title || c))
+    const predefinedCities = Array.isArray(citiesList)
+      ? citiesList.map((c) => (typeof c === "string" ? c : c.value || c.title || c))
       : [];
     const setCity = new Set(predefinedCities);
     plans.forEach((p) => {
-      if (p.city) setCity.add(p.city);
+      const parsed = parseInstallmentCities(p);
+      if (parsed.isAllCities) return;
+      parsed.cities.forEach((c) => setCity.add(c));
     });
     return Array.from(setCity).filter(Boolean).sort();
   }, [plans]);
@@ -299,7 +306,7 @@ export default function InstallmentPlans({ initialPlans = [], initialApiTotalPag
       }
       // City filter
       if (selectedCity) {
-        if ((p.city || "").toLowerCase() !== selectedCity.toLowerCase()) return false;
+        if (!installmentMatchesCityFilter(p, selectedCity)) return false;
       }
       // Price range filter
       const price = Number(p.price || 0);
@@ -715,7 +722,7 @@ export default function InstallmentPlans({ initialPlans = [], initialApiTotalPag
                     <div className="absolute inset-0 flex items-center justify-center p-3 sm:p-4">
                       <img
                         src={plan.productImages && plan.productImages.length ? plan.productImages[0] : "/placeholder.png"}
-                        alt={`${plan.productName} - Installment Plan in ${plan.city || "Pakistan"}`}
+                        alt={`${plan.productName} - Installment Plan in ${formatInstallmentCityDisplay(plan) || "Pakistan"}`}
                         className="max-w-full max-h-full w-auto h-auto object-contain group-hover:scale-[1.03] transition-transform duration-300"
                         onError={(e) => (e.currentTarget.src = "/placeholder.png")}
                       />
@@ -743,9 +750,25 @@ export default function InstallmentPlans({ initialPlans = [], initialApiTotalPag
                   <div className="p-2 sm:p-4 lg:p-5 flex flex-col flex-1 min-h-0 min-w-0 gap-2">
                     <h3 className="text-xs sm:text-base font-bold text-gray-900 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem] leading-snug">{plan.productName}</h3>
 
+                    {(plan.companyName || plan.createdBy?.[0]?.name) && (
+                      <div className="text-[11px] sm:text-xs text-gray-600 min-h-[1.1rem] truncate">
+                        {plan.createdBy?.[0]?.userId ? (
+                          <Link
+                            href={`/partner/${encodeURIComponent(plan.createdBy[0].userId)}`}
+                            className="font-semibold text-[rgb(183,36,42)] hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {plan.companyName || plan.createdBy[0].name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium">{plan.companyName || plan.createdBy?.[0]?.name}</span>
+                        )}
+                      </div>
+                    )}
+
                     <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm min-w-0 min-h-[1.25rem]">
                       <svg xmlns="http://www.w3.org/2000/svg" className="size-3 sm:h-4 sm:w-4 text-[rgb(183,36,42)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      <span className="font-medium truncate capitalize">{plan.city || "N/A"}</span>
+                      <span className="font-medium truncate capitalize">{formatInstallmentCityDisplay(plan) || "N/A"}</span>
                     </div>
 
                     <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-2 sm:p-3 border border-red-100 flex flex-col flex-1 min-h-[4.5rem] sm:min-h-[5rem]">

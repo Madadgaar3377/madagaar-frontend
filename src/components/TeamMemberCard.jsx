@@ -19,7 +19,7 @@ const TeamMemberCard = ({ member }) => {
 
   return (
     <div className="bg-white rounded-xl overflow-hidden shadow-lg interactive-card card-hover-lift group">
-      {/* Image — square frame, face anchored top, fills card on mobile & desktop */}
+      {/* Image  square frame, face anchored top, fills card on mobile & desktop */}
       <div className="relative w-full aspect-square overflow-hidden bg-gray-100">
         {showPhoto ? (
           <OptimizedImage

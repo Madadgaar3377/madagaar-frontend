@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
@@ -387,7 +388,26 @@ export default function InsurancePlanDetails() {
                         )}
                       </div>
                     )}
+                    {(plan.createdBy || plan.insuranceCompanyId) && (
+                      <Link
+                        href={`/partner/${encodeURIComponent(plan.createdBy || plan.insuranceCompanyId)}`}
+                        className="mt-3 inline-flex w-full items-center justify-center px-4 py-2.5 rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-red-50 transition text-sm"
+                      >
+                        View Partner Profile
+                      </Link>
+                    )}
                   </div>
+                </div>
+              )}
+
+              {!plan.creatorInformation && (plan.createdBy || plan.insuranceCompanyId) && (
+                <div className="bg-white rounded-xl shadow-md p-6">
+                  <Link
+                    href={`/partner/${encodeURIComponent(plan.createdBy || plan.insuranceCompanyId)}`}
+                    className="inline-flex w-full items-center justify-center px-4 py-2.5 rounded-lg border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] font-semibold hover:bg-red-50 transition text-sm"
+                  >
+                    View Partner Profile
+                  </Link>
                 </div>
               )}
 

@@ -7,7 +7,7 @@ export const revalidate = 3600;
 export const metadata: Metadata = buildPageMetadata({
   title: "About Madadgaar",
   description:
-    "Learn about Madadgaar Expert Partner — Pakistan's trusted marketplace for property, loans, installments, and insurance.",
+    "Learn about Madadgaar Expert Partner  Pakistan's trusted marketplace for property, loans, installments, and insurance.",
   path: "/about",
 });
 

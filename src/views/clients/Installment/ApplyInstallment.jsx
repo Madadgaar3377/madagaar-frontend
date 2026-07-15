@@ -12,8 +12,8 @@ import {
   buildPartnerCashOffers,
   resolveEntryCashPrice,
   resolveEntryPriceDisplay,
+  getHeroCashPriceDisplay,
   getOfferPriceDisplay,
-  getProductPriceDisplay,
   formatApplyEntryLabel,
   findApplyEntryIndex,
   cashOfferKey,
@@ -193,9 +193,7 @@ const ApplyInstallment = () => {
     ? resolveEntryPriceDisplay(plan, selectedEntry)
     : selectedCashOffer
     ? getOfferPriceDisplay(plan, selectedCashOffer)
-    : selectedVariantIndex !== null
-    ? getProductPriceDisplay(plan, selectedVariantIndex)
-    : getProductPriceDisplay(plan);
+    : getHeroCashPriceDisplay(plan, selectedVariantIndex);
   const resolvedPartnerName = selectedPlan?.companyName
     || selectedCashOffer?.companyName
     || plan?.companyName

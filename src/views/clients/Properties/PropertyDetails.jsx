@@ -3,12 +3,10 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { backendBaseUrl } from '../../../constants/apiUrl';
 import ShareButtons from '../../../components/ShareButtons';
 
 const PropertyDetails = ({ initialProperty, initialRelated, fetchError }) => {
     const router = useRouter();
-    const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
     
     const [property, setProperty] = useState(initialProperty);
     const [relatedProperties, setRelatedProperties] = useState(initialRelated);
@@ -538,7 +536,25 @@ const PropertyDetails = ({ initialProperty, initialRelated, fetchError }) => {
                                     >
                                         Apply Now
                                     </Link>
+                                    {property.createdBy && (
+                                        <Link
+                                            href={`/partner/${encodeURIComponent(property.createdBy)}`}
+                                            className="w-full mt-2 px-4 py-3 border-2 border-red-600 text-red-600 rounded-lg font-bold hover:bg-red-50 transition-colors text-center block"
+                                        >
+                                            View Partner Profile
+                                        </Link>
+                                    )}
                                 </div>
+                            </div>
+                        )}
+                        {!property.contact && property.createdBy && (
+                            <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm p-4 sm:p-6">
+                                <Link
+                                    href={`/partner/${encodeURIComponent(property.createdBy)}`}
+                                    className="w-full px-4 py-3 border-2 border-red-600 text-red-600 rounded-lg font-bold hover:bg-red-50 transition-colors text-center block"
+                                >
+                                    View Partner Profile
+                                </Link>
                             </div>
                         )}
                     </div>

@@ -22,7 +22,7 @@ async function main() {
   try {
     sharp = (await import("sharp")).default;
   } catch {
-    console.log("sharp not installed — skipping static image optimization");
+    console.log("sharp not installed  skipping static image optimization");
     return;
   }
 

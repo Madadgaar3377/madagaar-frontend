@@ -1,4 +1,4 @@
-/** Canonical public site origin — always use www (apex 308-redirects here). */
+/** Canonical public site origin  always use www (apex 308-redirects here). */
 export const SITE_URL = "https://www.madadgaar.com.pk";
 
 export const SITE_NAME = "Madadgaar Expert Partner";

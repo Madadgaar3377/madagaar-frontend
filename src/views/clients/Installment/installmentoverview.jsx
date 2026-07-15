@@ -1,5 +1,6 @@
 "use client";
 
+/* Installment detail module v4 — price display alias restore */
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -20,12 +21,13 @@ import {
   buildPartnerCashOffers,
   resolveEntryCashPrice,
   resolveEntryPriceDisplay,
-  getProductPriceDisplay,
+  getHeroCashPriceDisplay,
   getOfferPriceDisplay,
   getLowestPublicCashPrice,
   isPartnerOwnedVariant,
 } from "../../../utils/installmentPricing";
 import { SITE_URL } from "../../../lib/site";
+import { formatInstallmentCityDisplay } from "../../../lib/installmentCities";
 
 const MADADGAAR_CONTACT = {
   email: "help.madadgaar@gmail.com",
@@ -100,7 +102,7 @@ function safe(obj, path, fallback = "-") {
 }
 
 /* ---------- component ---------- */
-export default function InstallmentDetail() {
+export default function InstallmentDetailView() {
   const { id } = useParams();
   const router = useRouter();
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -260,11 +262,6 @@ export default function InstallmentDetail() {
     [plan, priceVariantIndex]
   );
 
-  const productPriceDisplay = useMemo(
-    () => getProductPriceDisplay(plan, priceVariantIndex),
-    [plan, priceVariantIndex]
-  );
-
   const cashOffers = useMemo(
     () =>
       buildPartnerCashOffers(plan, {
@@ -273,6 +270,81 @@ export default function InstallmentDetail() {
       }),
     [plan, currentPlans, priceVariantIndex]
   );
+
+  const heroPriceDisplay = useMemo(
+    () => getHeroCashPriceDisplay(plan, priceVariantIndex, cashOffers),
+    [plan, priceVariantIndex, cashOffers]
+  );
+
+  const seoBundle = useMemo(() => {
+    if (!plan) {
+      return { seoDescription: "", structuredData: null, firstImage: null };
+    }
+    const display =
+      heroPriceDisplay ||
+      getHeroCashPriceDisplay(plan, priceVariantIndex, cashOffers);
+    const displayPrice = Number(display?.displayPrice) || 0;
+    const cashListPrice = Number(display?.cashPrice) || 0;
+    const discountPercent = Number(display?.discountPercent) || 0;
+    const hasDiscount = Boolean(display?.hasDiscount);
+    const firstImage =
+      Array.isArray(plan.productImages) && plan.productImages.length
+        ? plan.productImages[0]
+        : null;
+    const plainDesc =
+      plan.description && typeof plan.description === "string"
+        ? plan.description
+            .replace(/<[^>]*>/g, "")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 160)
+        : "";
+    const detailDesc = [
+      plan.productName,
+      plan.category,
+      formatInstallmentCityDisplay(plan),
+      plan.companyName || plan.companyNameOther,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const priceInfo =
+      displayPrice > 0
+        ? `From PKR ${displayPrice.toLocaleString()}${
+            hasDiscount
+              ? ` (was PKR ${cashListPrice.toLocaleString()}, ${discountPercent}% off)`
+              : ""
+          }`
+        : plan.paymentPlans?.[0]?.monthlyInstallment
+          ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo`
+          : "";
+    const seoDescription =
+      plainDesc ||
+      [detailDesc, priceInfo, "Compare & apply on Madadgaar."]
+        .filter(Boolean)
+        .join(" ");
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: plan.productName || "Installment Plan",
+      description: seoDescription,
+      image: firstImage || "https://madadgaar.com.pk/Media/Group%2033.png",
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "PKR",
+        price:
+          displayPrice > 0
+            ? displayPrice
+            : plan.paymentPlans?.[0]?.monthlyInstallment || 0,
+        availability: "https://schema.org/InStock",
+        url: `https://madadgaar.com.pk/installment/${encodeURIComponent(id || "")}`,
+        seller: {
+          "@type": "Organization",
+          name: plan.companyName || plan.companyNameOther || "Madadgaar Partner",
+        },
+      },
+    };
+    return { seoDescription, structuredData, firstImage, display };
+  }, [plan, heroPriceDisplay, priceVariantIndex, cashOffers, id]);
 
   const hasCashPricing = useMemo(() => {
     if (!plan) return false;
@@ -344,37 +416,9 @@ export default function InstallmentDetail() {
       </div>
     );
 
-
-  const firstImage = Array.isArray(plan.productImages) && plan.productImages.length ? plan.productImages[0] : null;
-  const plainDesc = plan.description && typeof plan.description === "string" ? plan.description.replace(/<[^>]*>/g, "").replace(/\s+/g, " ").trim().slice(0, 160) : "";
-  const detailDesc = [plan.productName, plan.category, plan.city, plan.companyName || plan.companyNameOther].filter(Boolean).join(" · ");
-  const priceInfo = productPriceDisplay.displayPrice > 0
-    ? `From PKR ${productPriceDisplay.displayPrice.toLocaleString()}${productPriceDisplay.hasDiscount ? ` (was PKR ${productPriceDisplay.cashPrice.toLocaleString()}, ${productPriceDisplay.discountPercent}% off)` : ""}`
-    : (plan.paymentPlans?.[0]?.monthlyInstallment ? `From PKR ${Number(plan.paymentPlans[0].monthlyInstallment).toLocaleString()}/mo` : "");
-  const seoDescription = plainDesc || [detailDesc, priceInfo, "Compare & apply on Madadgaar."].filter(Boolean).join(" ");
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": plan.productName || "Installment Plan",
-    "description": seoDescription,
-    "image": firstImage || "https://madadgaar.com.pk/Media/Group%2033.png",
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "PKR",
-      "price": productPriceDisplay.displayPrice > 0 ? productPriceDisplay.displayPrice : (plan.paymentPlans?.[0]?.monthlyInstallment || 0),
-      "availability": "https://schema.org/InStock",
-      "url": `https://madadgaar.com.pk/installment/${encodeURIComponent(id)}`,
-      "seller": {
-        "@type": "Organization",
-        "name": plan.companyName || plan.companyNameOther || "Madadgaar Partner"
-      }
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 section-padding-sm">
-
+      <SEO structuredData={seoBundle.structuredData} />
       <div className="container-content">
         <div className="bg-white rounded-lg sm:rounded-2xl shadow-xl overflow-hidden">
           {/* Main Content: Left (Images) + Right (Details) */}
@@ -393,7 +437,7 @@ export default function InstallmentDetail() {
                       key={imgIdx}
                       src={imgSrc}
                       onError={(e) => (e.currentTarget.src = PLACEHOLDER)}
-                      alt={`${plan.productName || "Product"} - Installment Plan in ${plan.city || "Pakistan"}`}
+                      alt={`${plan.productName || "Product"} - Installment Plan in ${formatInstallmentCityDisplay(plan) || "Pakistan"}`}
                       className={`absolute inset-0 w-full h-full object-contain p-2 sm:p-4 transition-opacity duration-700 ${
                         imgIdx === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
                       }`}
@@ -492,13 +536,13 @@ export default function InstallmentDetail() {
                 <div className="flex flex-wrap items-center gap-2 mb-4 text-sm text-gray-600">
                   <span>{plan.companyName || plan.companyNameOther || plan.category}</span>
                   <span className="text-gray-400">•</span>
-                  <span>{plan.city || "Pakistan"}</span>
+                  <span>{formatInstallmentCityDisplay(plan) || "Pakistan"}</span>
                 </div>
                 
                 <div className="space-y-3 pt-4 border-t border-gray-200">
                   <div>
                     <CashPriceDisplay
-                      display={productPriceDisplay}
+                      display={heroPriceDisplay}
                       size="lg"
                       label={cashOffers.length > 1 ? "From (lowest cash)" : "Cash Price"}
                     />
@@ -1213,7 +1257,7 @@ export default function InstallmentDetail() {
                 <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
-                    <CashPriceDisplay display={productPriceDisplay} size="md" label="Cash Price" />
+                    <CashPriceDisplay display={heroPriceDisplay} size="md" label="Cash Price" />
                   </div>
                   {downPayment > 0 && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
@@ -1501,6 +1545,14 @@ export default function InstallmentDetail() {
                                   WhatsApp
                                 </a>
                               )}
+                              {seller.userId && (
+                                <Link
+                                  href={`/partner/${encodeURIComponent(seller.userId)}`}
+                                  className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-2.5 bg-white border-2 border-[rgb(183,36,42)] text-[rgb(183,36,42)] rounded-lg font-semibold hover:bg-red-50 transition text-sm sm:text-base"
+                                >
+                                  View Partner Profile
+                                </Link>
+                              )}
                             </div>
                           </div>
                         ) : (
@@ -1610,14 +1662,14 @@ export default function InstallmentDetail() {
                         <svg xmlns="http://www.w3.org/2000/svg" className="size-3" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
-                        {product.city}
+                        {formatInstallmentCityDisplay(product)}
                       </span>
                     </div>
 
                     <div className="border-t pt-2 mt-2">
                       <div className="flex items-center justify-between">
                         <CashPriceDisplay
-                          display={getProductPriceDisplay(product)}
+                          display={getHeroCashPriceDisplay(product)}
                           size="md"
                           label="Cash Price"
                         />

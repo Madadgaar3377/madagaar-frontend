@@ -9,7 +9,7 @@ import AppDownloadBanner from "./AppDownloadBanner";
 import useAdSenseRouteRefresh from "../hooks/useAdSenseRouteRefresh";
 
 export default function LayoutWrapper({ children }) {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
   useAdSenseRouteRefresh();
 
   const hideLayout =
@@ -19,7 +19,8 @@ export default function LayoutWrapper({ children }) {
     pathname.startsWith("/dashboard/*") ||
     pathname.startsWith("/client/dashboard") ||
     pathname.startsWith("/client/loans") ||
-    pathname.startsWith("/client/insurance");
+    pathname.startsWith("/client/insurance") ||
+    pathname.startsWith("/partner/");
 
   return (
     <>

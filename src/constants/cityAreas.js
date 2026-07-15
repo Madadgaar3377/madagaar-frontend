@@ -1,4 +1,4 @@
-/** Common delivery areas per city — fallback to free-text when city is not listed */
+/** Common delivery areas per city  fallback to free-text when city is not listed */
 const cityAreas = {
   Lahore: [
     'DHA', 'Gulberg', 'Model Town', 'Johar Town', 'Bahria Town', 'Cantt', 'Faisal Town',

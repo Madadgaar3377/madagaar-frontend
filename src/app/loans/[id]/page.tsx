@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const name = String(loan.loanName || loan.name || loan.productName || "Loan");
   const description = stripHtml(
-    String(loan.description || loan.shortDescription || `${name} — compare loan details on Madadgaar.`),
+    String(loan.description || loan.shortDescription || `${name}  compare loan details on Madadgaar.`),
     155
   );
   return buildPageMetadata({
