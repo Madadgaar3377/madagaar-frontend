@@ -1,3 +1,5 @@
+"use client";
+
 // src/pages/NotFound.jsx
 import React from "react";
 import { useRouter } from 'next/navigation';

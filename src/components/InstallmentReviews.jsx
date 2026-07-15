@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import { isAuthenticated, getAuthToken, getUser } from "../utils/auth";

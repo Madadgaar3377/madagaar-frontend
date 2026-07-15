@@ -15,49 +15,9 @@ import AnimatedSection from "../../components/AnimatedSection";
  */
 
 export default function AboutPage() {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About Madadgaar Expert Partner",
-    "description": "Learn about Madadgaar Expert Partner's mission, vision, team, and strategy for providing trusted property, insurance, loan, and installment solutions in Pakistan",
-    "url": "https://madadgaar.com.pk/about",
-    "mainEntity": {
-      "@type": "Organization",
-      "name": "Madadgaar Expert Partner",
-      "employee": [
-        {
-          "@type": "Person",
-          "name": "Raja Afzal",
-          "jobTitle": "Founder & CEO"
-        },
-        {
-          "@type": "Person",
-          "name": "Saud Ch",
-          "jobTitle": "Director & CEO"
-        },
-        {
-          "@type": "Person",
-          "name": "Ayesha",
-          "jobTitle": "Marketing & Operations"
-        },
-        {
-          "@type": "Person",
-          "name": "Abubaker",
-          "jobTitle": "IT & Innovation"
-        }
-      ]
-    }
-  };
-
   return (
    <>
-     <SEO
-       title="How Madadgaar Works | Compare, Select & Apply"
-       description="Learn how Madadgaar helps you compare options, choose wisely, and move forward confidently with property, loans, installments, and insurance."
-       keywords="how madadgaar works, madadgaar process, compare options pakistan, property comparison, loan comparison, installment comparison, insurance comparison, madadgaar guide, download madadgaar app, madadgaar mobile app"
-       canonicalUrl="https://madadgaar.com.pk/about"
-       structuredData={structuredData}
-     />
+     
    {/* About Company Section */}
    <AnimatedSection animation="fadeInUp" delay={0} className="w-full">
    <section className="w-full bg-gray-50 section-padding">
@@ -494,7 +454,7 @@ export default function AboutPage() {
                   🌐
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Website</h3>
-                <a href="https://madadgaar.com.pk" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: "rgb(183, 36, 42)" }}>
+                <a href="https://www.madadgaar.com.pk" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: "rgb(183, 36, 42)" }}>
                   madadgaar.com.pk
                 </a>
               </div>

@@ -6,9 +6,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { backendBaseUrl } from "../../../constants/apiUrl";
 import LoadingPage from "../../../compontents/Loader";
 import OurPartners from "../OverPartener";
-import SEO from "../../../components/SEO";
 import ShareButtons from "../../../components/ShareButtons";
-import { SITE_URL } from "../../../lib/site";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -28,11 +26,6 @@ const sanitizeHtml = (html) => {
 };
 
 // Helper to extract plain text for SEO (SSR-safe)
-const extractPlainText = (html) => {
-  if (!html) return "";
-  return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
-};
-
 const formatCurrency = (amount) => {
   if (!amount) return 'N/A';
   return new Intl.NumberFormat('en-PK', {
@@ -42,79 +35,22 @@ const formatCurrency = (amount) => {
   }).format(amount);
 };
 
-export default function LoanDetails() {
+export default function LoanDetails({ initialPlan, fetchError }) {
   const { id } = useParams();
   const router = useRouter();
 
-  const [plan, setPlan] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(initialPlan);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!id) return;
-    
-    let cancelled = false;
-    
-    const fetchLoanDetails = async () => {
-      setLoading(true);
-      setError("");
-      
-      try {
-        // Fetch all loans
-        const res = await fetch(`${API}/getAllLoans`);
-        const body = await res.json();
-        
-        if (!res.ok || !body.success) {
-          throw new Error(body.message || 'Failed to load loan plans');
-        }
-        
-        const allLoans = body.data || [];
-        
-        // Find the loan with matching ID (check both _id and planId)
-        const foundLoan = allLoans.find(loan => 
-          loan._id === id || 
-          loan.planId === id ||
-          loan._id?.toString() === id ||
-          loan.planId?.toString() === id
-        );
-        
-        if (!foundLoan) {
-          throw new Error("Loan plan not found");
-        }
-        
-        if (!cancelled) {
-          setPlan(foundLoan);
-        }
-      } catch (err) {
-        console.error('Loan fetch error:', err);
-        if (!cancelled) {
-          setError(err.message || "Failed to load loan plan");
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
 
-    fetchLoanDetails();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  if (loading) {
-    return <LoadingPage />;
-  }
-
-  if (error) {
+  if (fetchError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
         <div className="max-w-xl w-full bg-white rounded-2xl p-6 border shadow-sm text-center">
           <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <div className="text-xl font-semibold text-gray-800 mb-2">Error Loading Loan</div>
-          <div className="text-sm text-gray-600 mb-6">{error}</div>
+          <div className="text-xl font-semibold text-gray-800 mb-2">Failed to load loan plan</div>
+          <div className="text-sm text-gray-600 mb-6">Could not load details from the server.</div>
           <div className="flex gap-3 justify-center">
             <button type="button"
               onClick={() => router.back()}
@@ -158,53 +94,8 @@ export default function LoanDetails() {
     ? `Up to ${formatCurrency(plan.maxFinancingAmount)}`
     : "Not specified";
 
-  const loanUrl = `${SITE_URL}/loans/${id}`;
-  const loanStructuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "LoanOrCredit",
-        "@id": loanUrl,
-        url: loanUrl,
-        name: plan.productName || plan.loanName || "Loan",
-        description: extractPlainText(plan.description) || `${plan.productName || "Loan"} from ${plan.bankName || "verified provider"}.`,
-        amount: {
-          "@type": "MonetaryAmount",
-          currency: "PKR",
-          minValue: plan.minFinancingAmount || undefined,
-          maxValue: plan.maxFinancingAmount || undefined,
-        },
-        interestRate: plan.indicativeRate
-          ? { "@type": "QuantitativeValue", value: plan.indicativeRate, unitText: "PERCENT" }
-          : undefined,
-        loanTerm: plan.minTenure || plan.maxTenure
-          ? {
-              "@type": "QuantitativeValue",
-              minValue: plan.minTenure,
-              maxValue: plan.maxTenure,
-              unitText: plan.tenureUnit || "ANN",
-            }
-          : undefined,
-        provider: plan.bankName
-          ? { "@type": "FinancialService", name: plan.bankName }
-          : undefined,
-        areaServed: { "@type": "Country", name: "Pakistan" },
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
-          { "@type": "ListItem", position: 2, name: "Loans", item: `${SITE_URL}/loans` },
-          { "@type": "ListItem", position: 3, name: plan.productName || "Loan" },
-        ],
-      },
-    ],
-  };
-
   return (
     <>
-      <SEO structuredData={loanStructuredData} />
-
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 section-padding">
         <div className="container-content">
           {/* Back Button */}
