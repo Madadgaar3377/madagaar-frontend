@@ -44,8 +44,8 @@ export default async function Page() {
     const res = await fetch(`${apiUrl}/getAllLoans`, { next: { revalidate: 300 } });
     const payload = await res.json();
     if (res.ok && payload?.success !== false) {
-      loans = payload?.data || [];
-    } else {
+      loans = Array.isArray(payload?.data) ? payload.data : [];
+    } else if (!res.ok) {
       fetchError = true;
     }
   } catch (err) {

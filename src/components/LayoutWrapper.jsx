@@ -12,6 +12,8 @@ export default function LayoutWrapper({ children }) {
   const pathname = usePathname() || "";
   useAdSenseRouteRefresh();
 
+  const isPartnerPublic = pathname.startsWith("/partner/");
+
   const hideLayout =
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/dashboard/Installments/create") ||
@@ -19,16 +21,20 @@ export default function LayoutWrapper({ children }) {
     pathname.startsWith("/dashboard/*") ||
     pathname.startsWith("/client/dashboard") ||
     pathname.startsWith("/client/loans") ||
-    pathname.startsWith("/client/insurance") ||
-    pathname.startsWith("/partner/");
+    pathname.startsWith("/client/insurance");
+
+  // Partner storefront: show main site Navbar only (not footer / app banner / WhatsApp widget)
+  const showNavbar = !hideLayout || isPartnerPublic;
+  const showExtraChrome = !hideLayout && !isPartnerPublic;
+  const useNavbarOffset = showNavbar;
 
   return (
     <>
-      {!hideLayout && <Navbar />}
+      {showNavbar && <Navbar />}
 
       <main
         className={
-          !hideLayout
+          useNavbarOffset
             ? "min-h-screen w-full max-w-[100vw] pt-[5.25rem] sm:pt-[5.5rem] overflow-x-hidden"
             : "w-full max-w-[100vw] overflow-x-hidden"
         }
@@ -38,9 +44,9 @@ export default function LayoutWrapper({ children }) {
         </div>
       </main>
 
-      {!hideLayout && <Footer />}
-      {!hideLayout && <AppDownloadBanner />}
-      {!hideLayout && <WhatsAppButton />}
+      {showExtraChrome && <Footer />}
+      {showExtraChrome && <AppDownloadBanner />}
+      {showExtraChrome && <WhatsAppButton />}
 
       <Toaster
         position="top-center"
@@ -53,9 +59,9 @@ export default function LayoutWrapper({ children }) {
         }}
         containerStyle={{
           zIndex: 2147483000,
-          top: hideLayout
-            ? "max(1rem, env(safe-area-inset-top, 0px))"
-            : "max(5.75rem, calc(5.25rem + env(safe-area-inset-top, 0px)))",
+          top: useNavbarOffset
+            ? "max(5.75rem, calc(5.25rem + env(safe-area-inset-top, 0px)))"
+            : "max(1rem, env(safe-area-inset-top, 0px))",
         }}
         containerClassName="madadgaar-hot-toast"
       />

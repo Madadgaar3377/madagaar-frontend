@@ -49,12 +49,15 @@ function VerifiedTick({ className = "w-4 h-4" }) {
   );
 }
 
-/** Stable SSR/client shell — plain Tailwind only to avoid CSS-module hydration churn */
+/** Same shell as page.tsx PartnerLoadingShell — keep in sync */
 function SkeletonPage() {
   return (
-    <div className="min-h-screen bg-[#f3f1ef]" suppressHydrationWarning>
-      <div className="h-[42vh] min-h-[280px] bg-gradient-to-br from-[rgb(183,36,42)] to-red-900 animate-pulse" />
-      <div className="max-w-6xl mx-auto px-4 -mt-8 space-y-4 pb-10">
+    <div className="min-h-screen bg-[#f3f1ef]" aria-busy="true" aria-label="Loading partner">
+      <div
+        className="h-[42vh] min-h-[280px] animate-pulse"
+        style={{ backgroundColor: "rgb(183, 36, 42)" }}
+      />
+      <div className="container-content -mt-8 space-y-4 pb-10">
         <div className="h-16 rounded-2xl bg-white/80 border border-gray-100 animate-pulse" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -416,11 +419,8 @@ export default function PartnerPublicProfile() {
   return (
     <div className={`${styles.pp} ${styles.ppFade}`}>
       <section className={styles.ppHero}>
-        <div className={styles.ppHeroMark} aria-hidden>
-          {heroLetter}
-        </div>
         <div
-          className={`${styles.ppHeroInner} relative max-w-6xl mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-10 sm:pb-14`}
+          className={`${styles.ppHeroInner} container-content pt-8 sm:pt-12 pb-10 sm:pb-14`}
         >
           <div className="flex items-center justify-between gap-3 mb-4">
             <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.18em] text-white/70">
@@ -536,7 +536,7 @@ export default function PartnerPublicProfile() {
 
       {(profile.offeredTypes || []).length > 0 && (
         <div className="bg-white border-b border-[var(--pp-line)]">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="container-content">
             <div className="flex divide-x divide-[var(--pp-line)] overflow-x-auto">
               {(profile.offeredTypes || []).map((t) => (
                 <button
@@ -568,7 +568,7 @@ export default function PartnerPublicProfile() {
         </div>
       )}
 
-      <main className="max-w-6xl mx-auto px-3 sm:px-6 pt-5 sm:pt-8 pb-8">
+      <main className="container-content pt-5 sm:pt-8 pb-8">
         <div className="mb-4 sm:mb-5">
           <label className="sr-only" htmlFor="partner-product-search">
             Search this partner’s products
@@ -790,7 +790,7 @@ export default function PartnerPublicProfile() {
 
       {activeType === "installments" && selectedIds.length > 0 ? (
         <div className={styles.ppCompareBar}>
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+          <div className="container-content flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
             <div className="flex-1 text-sm text-[var(--pp-muted)]">
               <span className="font-extrabold text-[rgb(183,36,42)]">
                 {selectedIds.length}

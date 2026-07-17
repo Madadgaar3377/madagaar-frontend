@@ -25,8 +25,10 @@ const formatCurrency = (amount) => {
 export default function InsuranceInfo({ initialPlans = [], fetchError = false }) {
   const router = useRouter();
   const [plans, setPlans] = useState(initialPlans);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(initialPlans.length === 0);
+  const [error, setError] = useState(
+    fetchError && initialPlans.length === 0 ? "Failed to load insurance plans. Please try again later." : ""
+  );
   
   // Filter and search state
   const [search, setSearch] = useState("");
@@ -38,21 +40,19 @@ export default function InsuranceInfo({ initialPlans = [], fetchError = false })
   useEffect(() => {
     let mounted = true;
     const fetchPlans = async () => {
-      setLoading(true);
+      if (initialPlans.length === 0) setLoading(true);
       setError("");
       try {
         const res = await fetch(`${API}/getAllInsurancePlansPublic?limit=1000`, {
           method: "GET",
           headers: { 
             "Content-Type": "application/json",
-            // Don't send Authorization header for public endpoint
           },
         });
         
         const payload = await res.json().catch(() => ({ success: false, message: 'Invalid response from server' }));
         
         if (!res.ok) {
-          // Handle different error status codes
           if (res.status === 401 || res.status === 403) {
             throw new Error('Access denied. Please try refreshing the page.');
           } else if (res.status === 404) {
@@ -64,18 +64,18 @@ export default function InsuranceInfo({ initialPlans = [], fetchError = false })
           }
         }
         
-        if (!payload.success) {
+        if (payload?.success === false) {
           throw new Error(payload?.message || 'Failed to load insurance plans');
         }
         
         if (mounted) {
           const data = payload.data || [];
           setPlans(Array.isArray(data) ? data : []);
+          setError("");
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        if (mounted) {
-          // Show user-friendly error message
+        if (mounted && initialPlans.length === 0) {
           const errorMsg = err.message || "Network error  could not fetch insurance plans.";
           setError(errorMsg);
         }
@@ -88,7 +88,7 @@ export default function InsuranceInfo({ initialPlans = [], fetchError = false })
     
     fetchPlans();
     return () => { mounted = false; };
-  }, []);
+  }, [initialPlans.length]);
 
   // Filter plans
   const filteredPlans = useMemo(() => {
@@ -349,8 +349,8 @@ export default function InsuranceInfo({ initialPlans = [], fetchError = false })
           </AnimatedSection>
         )}
 
-        {/* Insurance Plans Grid */}
-        {(fetchError || error) ? (
+        {/* Insurance Plans Grid — only block when we have no plans to show */}
+        {error && plans.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
             <div className="text-red-500 text-4xl mb-4">⚠️</div>
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Error Loading Plans</h3>

@@ -36,7 +36,7 @@ const structuredData = {
 };
 
 export default async function Page() {
-  const apiUrl = (backendBaseUrl || "").replace(/\/\$/, "") || "";
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "") || "";
   let plans = [];
   let fetchError = false;
 
@@ -46,7 +46,7 @@ export default async function Page() {
     if (res.ok && payload?.success !== false) {
       const data = payload?.data || [];
       plans = Array.isArray(data) ? data : [];
-    } else {
+    } else if (!res.ok) {
       fetchError = true;
     }
   } catch (err) {

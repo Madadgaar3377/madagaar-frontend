@@ -36,7 +36,7 @@ const structuredData = {
 };
 
 export default async function Page() {
-  const apiUrl = (backendBaseUrl || "").replace(/\/\$/, "") || "";
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "") || "";
   let plans = [];
   let apiTotalPages = 1;
   let apiTotalCount = 0;

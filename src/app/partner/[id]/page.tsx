@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/metadata";
-import PartnerPublicProfile from "../../../views/clients/Partner/PartnerPublicProfile";
 import { backendBaseUrl } from "../../../constants/apiUrl";
+import PartnerProfileClient from "./PartnerProfileClient";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -43,5 +43,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default function Page() {
-  return <PartnerPublicProfile />;
+  return <PartnerProfileClient />;
 }

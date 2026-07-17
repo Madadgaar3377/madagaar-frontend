@@ -42,7 +42,9 @@ export default function BlogsPage({ initialBlogs = [], initialTotalBlog = 0, fet
         const payload = await res.json().catch(() => null);
 
         if (!res.ok || (payload && payload.success === false)) {
-          setError(payload?.message || `Failed to load (${res.status})`);
+          if (initialBlogs.length === 0) {
+            setError(payload?.message || `Failed to load (${res.status})`);
+          }
         } else {
           const data = payload?.data ?? [];
           if (mounted) {
@@ -53,12 +55,14 @@ export default function BlogsPage({ initialBlogs = [], initialTotalBlog = 0, fet
                   (Array.isArray(data) ? data.length : 0)
               )
             );
+            setError("");
           }
         }
       } catch (err) {
         console.error("Fetch blogs error:", err);
-        setError("Network error  could not fetch blogs.");
-      } finally {
+        if (initialBlogs.length === 0) {
+          setError("Network error  could not fetch blogs.");
+        } finally {
         if (mounted) setLoading(false);
       }
     }
@@ -267,7 +271,7 @@ export default function BlogsPage({ initialBlogs = [], initialTotalBlog = 0, fet
 
       {/* Modern Blog Grid */}
       <main className="container-content max-w-7xl py-8 sm:py-12">
-        {(fetchError || error) ? (
+        {error && blogs.length === 0 ? (
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center size-16 bg-red-100 rounded-full mb-4">
               <svg className="size-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
