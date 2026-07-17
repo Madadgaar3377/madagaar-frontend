@@ -62,7 +62,8 @@ export default function BlogsPage({ initialBlogs = [], initialTotalBlog = 0, fet
         console.error("Fetch blogs error:", err);
         if (initialBlogs.length === 0) {
           setError("Network error  could not fetch blogs.");
-        } finally {
+        }
+      } finally {
         if (mounted) setLoading(false);
       }
     }
