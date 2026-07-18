@@ -28,7 +28,7 @@ export default async function Page() {
       }
     }
   };
-  const apiUrl = (backendBaseUrl || "").replace(/\/\$/, "") || "";
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "") || "";
   let blogs = [];
   let totalBlog = 0;
   let fetchError = false;

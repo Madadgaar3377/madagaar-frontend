@@ -11,12 +11,69 @@ import AdSenseDisplayAuto from "../../../components/AdSenseDisplayAuto";
 import { SITE_URL } from "../../../lib/site";
 
 const PAGE_SIZE = 50;
+const API = (backendBaseUrl || "").replace(/\/$/, "");
 
-  // Helper function to extract property data based on type
-  
+function extractPropertyData(property) {
+  if (property.type === "Individual") {
+    const individual = property.individualProperty || {};
+    return {
+      _id: property._id,
+      type: "Individual",
+      title: individual.title,
+      description: individual.description,
+      propertyType: individual.propertyType,
+      propertyId: individual.propertyId,
+      city: individual.city,
+      location: individual.location,
+      price: individual.transaction?.price || individual.transaction?.monthlyRent,
+      transactionType: individual.transaction?.type,
+      areaSize: individual.areaSize,
+      areaUnit: individual.areaUnit,
+      bedrooms: individual.bedrooms,
+      bathrooms: individual.bathrooms,
+      images: individual.images || [],
+      amenities: individual.amenities,
+      utilities: individual.utilities,
+      contact: individual.contact,
+      nearbyLandmarks: individual.nearbyLandmarks,
+      furnishingStatus: individual.furnishingStatus,
+      possessionStatus: individual.possessionStatus,
+    };
+  }
+  if (property.type === "Project") {
+    const project = property.project || {};
+    return {
+      _id: property._id,
+      type: "Project",
+      title: project.projectName,
+      description: project.description,
+      propertyType: project.projectType,
+      propertyId: project.propertyId,
+      city: project.city,
+      location: project.area || project.address,
+      price: project.transaction?.priceRange || project.transaction?.price,
+      transactionType: project.transaction?.type,
+      areaSize: project.totalLandArea,
+      areaUnit: project.landAreaUnit,
+      totalUnits: project.totalUnits,
+      images: project.images || [],
+      amenities: project.amenities,
+      utilities: project.utilities,
+      contact: project.contact,
+      nearbyLandmarks: project.nearbyLandmarks,
+      projectStage: project.projectStage,
+      developerBuilder: project.developerBuilder,
+      highlights: project.highlights,
+    };
+  }
+  return null;
+}
 
+function PropertiesPage({ properties: initialProperties = [], fetchError: initialFetchError = false }) {
+  const [properties, setProperties] = useState(initialProperties);
+  const [fetchError, setFetchError] = useState(initialFetchError && initialProperties.length === 0);
+  const [loading, setLoading] = useState(initialProperties.length === 0);
 
-function PropertiesPage({ properties = [], fetchError = false }) {
   // Filters
   const [typeFilter, setTypeFilter] = useState("All"); // Individual/Project filter
   const [city, setCity] = useState("All");
@@ -30,6 +87,42 @@ function PropertiesPage({ properties = [], fetchError = false }) {
 
   // Filter visibility for mobile
   const [showFilters, setShowFilters] = useState(false);
+
+  // Client fetch recovers when SSR fails (same pattern as installments)
+  useEffect(() => {
+    let mounted = true;
+    const loadProperties = async () => {
+      if (initialProperties.length === 0) setLoading(true);
+      try {
+        const res = await fetch(`${API}/getAllProperties`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        const payload = await res.json().catch(() => null);
+        if (!res.ok || payload?.success === false) {
+          if (mounted && initialProperties.length === 0) setFetchError(true);
+          return;
+        }
+        const raw = payload?.properties || payload?.data || [];
+        const mapped = (Array.isArray(raw) ? raw : [])
+          .map(extractPropertyData)
+          .filter(Boolean);
+        if (mounted) {
+          setProperties(mapped);
+          setFetchError(false);
+        }
+      } catch (err) {
+        console.error("Fetch properties error:", err);
+        if (mounted && initialProperties.length === 0) setFetchError(true);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadProperties();
+    return () => {
+      mounted = false;
+    };
+  }, [initialProperties.length]);
 
   // Apply client-side filtering
   const filteredProperties = useMemo(() => {
@@ -267,7 +360,11 @@ function PropertiesPage({ properties = [], fetchError = false }) {
 
       {/* Content */}
       <main className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 lg:py-6">
-        {fetchError ? (
+        {loading && properties.length === 0 ? (
+          <p className="text-center text-sm sm:text-base text-gray-500 py-12 sm:py-20">
+            Loading properties...
+          </p>
+        ) : fetchError && properties.length === 0 ? (
           <p className="text-center text-sm sm:text-base text-red-600 py-12 sm:py-20">
             Failed to load properties. Please try again later.
           </p>

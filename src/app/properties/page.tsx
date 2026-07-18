@@ -91,7 +91,7 @@ export const metadata: Metadata = buildPageMetadata({
   };
 
 export default async function Page() {
-  const apiUrl = (backendBaseUrl || "").replace(/\/\$/, "");
+  const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   let properties = [];
   let fetchError = false;
   
@@ -99,9 +99,9 @@ export default async function Page() {
     const res = await fetch(`${apiUrl}/getAllProperties`, { next: { revalidate: 300 } });
     const payload = await res.json();
     if (res.ok && payload?.success !== false) {
-      const rawProperties = payload?.properties || [];
+      const rawProperties = payload?.properties || payload?.data || [];
       properties = rawProperties.map(extractPropertyData).filter(Boolean);
-    } else {
+    } else if (!res.ok) {
       fetchError = true;
     }
   } catch (err) {

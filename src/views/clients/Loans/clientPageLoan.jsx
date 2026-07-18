@@ -25,9 +25,12 @@ const extractPlainText = (html, maxLength = 150) => {
   return text || "No description available";
 };
 
-export default function LoansPage({ loans = [], fetchError = false }) {
+export default function LoansPage({ loans: initialLoans = [], fetchError: initialFetchError = false }) {
   const router = useRouter();
 
+  const [loans, setLoans] = useState(initialLoans);
+  const [fetchError, setFetchError] = useState(initialFetchError && initialLoans.length === 0);
+  const [loading, setLoading] = useState(initialLoans.length === 0);
 
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -38,13 +41,48 @@ export default function LoansPage({ loans = [], fetchError = false }) {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9; // show 9 plans per page
 
+  // Client fetch (same pattern as installments) — recovers when SSR fails
+  useEffect(() => {
+    let mounted = true;
+    const loadLoans = async () => {
+      if (initialLoans.length === 0) setLoading(true);
+      try {
+        const res = await fetch(`${API}/getAllLoans`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        const payload = await res.json().catch(() => null);
+        if (!res.ok || payload?.success === false) {
+          if (mounted && initialLoans.length === 0) {
+            setFetchError(true);
+          }
+          return;
+        }
+        const data = Array.isArray(payload?.data) ? payload.data : [];
+        if (mounted) {
+          setLoans(data);
+          setFetchError(false);
+        }
+      } catch (err) {
+        console.error("Fetch loans error:", err);
+        if (mounted && initialLoans.length === 0) {
+          setFetchError(true);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadLoans();
+    return () => {
+      mounted = false;
+    };
+  }, [initialLoans.length]);
+
   // debounce search input (300ms)
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query.trim()), 300);
     return () => clearTimeout(t);
   }, [query]);
-
-
 
   // reset to first page when search changes
   useEffect(() => setCurrentPage(1), [debouncedQuery]);
@@ -114,6 +152,10 @@ export default function LoansPage({ loans = [], fetchError = false }) {
     e.currentTarget.onerror = null;
     e.currentTarget.src = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=60";
   };
+
+  if (loading && loans.length === 0) {
+    return <LoadingPage />;
+  }
 
   return (
     <>
@@ -232,8 +274,8 @@ export default function LoansPage({ loans = [], fetchError = false }) {
 
         <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
-        {/* Error */}
-        {fetchError && (
+        {/* Error — only when client + SSR both have nothing */}
+        {fetchError && loans.length === 0 && (
           <div className="rounded-lg bg-white border p-4 text-center text-red-600 shadow-sm">
             Failed to load loan plans. Please try again later.
           </div>
