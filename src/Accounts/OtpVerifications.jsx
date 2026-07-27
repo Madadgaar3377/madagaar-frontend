@@ -1,19 +1,26 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
+import AuthSplitLayout from "./AuthSplitLayout";
 
 const OTP_LENGTH = 6;
 
-export default function OtpVerifyPage() {
+function OtpVerifyPageInner() {
   const apiUrl = backendBaseUrl.replace(/\/$/, "");
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [navState] = useState(() => consumeNavigationState() || {});
-  const prefilledEmail = navState?.email || "";
+
+  const urlEmail = (searchParams.get("email") || "").trim().toLowerCase();
+  const urlOtp = (searchParams.get("otp") || "").replace(/\D/g, "").slice(0, OTP_LENGTH);
+
+  const prefilledEmail = navState?.email || urlEmail || "";
   const previousFormData = navState?.previousFormData || null;
   const fromUnverified = navState?.fromUnverified === true;
   const verifyMessage =
@@ -21,22 +28,29 @@ export default function OtpVerifyPage() {
     "Please verify your email before logging in. We've sent you a verification code.";
 
   const [email, setEmail] = useState(prefilledEmail);
-  const [emailForResend, setEmailForResend] = useState(""); // when no email in state, user types here first
-  const [otpDigits, setOtpDigits] = useState(Array(OTP_LENGTH).fill(""));
+  const [emailForResend, setEmailForResend] = useState("");
+  const [otpDigits, setOtpDigits] = useState(() =>
+    urlOtp.length === OTP_LENGTH ? urlOtp.split("") : Array(OTP_LENGTH).fill("")
+  );
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef([]);
   const formRef = useRef(null);
   const hasAutoSubmitted = useRef(false);
-  /** After "Invalid OTP" (or any verify error), auto-verify is disabled; only button click will submit */
   const autoVerifyDisabled = useRef(false);
 
   const effectiveEmail = email || emailForResend.trim();
-
   const otp = otpDigits.join("");
 
-  // Auto-verify when all 6 digits are entered (or pasted) – only once; after error, only button click
+  useEffect(() => {
+    if (!email && urlEmail) setEmail(urlEmail);
+  }, [urlEmail, email]);
+
+  useEffect(() => {
+    if (urlOtp.length === OTP_LENGTH) setOtpDigits(urlOtp.split(""));
+  }, [urlOtp]);
+
   useEffect(() => {
     if (otp.length < OTP_LENGTH) {
       hasAutoSubmitted.current = false;
@@ -50,7 +64,6 @@ export default function OtpVerifyPage() {
     return () => clearTimeout(timer);
   }, [otp, effectiveEmail, loading]);
 
-  // Resend cooldown timer
   useEffect(() => {
     if (resendCooldown <= 0) return;
     const t = setInterval(() => setResendCooldown((c) => c - 1), 1000);
@@ -142,11 +155,20 @@ export default function OtpVerifyPage() {
     const chars = pasted.split("");
     setOtpDigits((prev) => {
       const next = [...prev];
-      chars.forEach((c, i) => { next[i] = c; });
+      chars.forEach((c, i) => {
+        next[i] = c;
+      });
       return next;
     });
     const nextFocus = Math.min(chars.length, OTP_LENGTH - 1);
     inputRefs.current[nextFocus]?.focus();
+  };
+
+  const handleChangeEmail = () => {
+    pushWithState(router, "/account/register", {
+      previousFormData: previousFormData || { email: effectiveEmail },
+      currentUnverifiedEmail: effectiveEmail,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -195,114 +217,176 @@ export default function OtpVerifyPage() {
     }
   };
 
-  // No email: show "Enter email" to request OTP first (e.g. user opened verify-otp in new tab)
+  const otpInputs = (
+    <div className="w-full max-w-[320px] mx-auto">
+      <div className="grid grid-cols-6 gap-1.5 sm:gap-2" onPaste={handlePaste}>
+        {otpDigits.map((digit, index) => (
+          <input
+            key={index}
+            ref={(el) => {
+              inputRefs.current[index] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            autoComplete={index === 0 ? "one-time-code" : "off"}
+            maxLength={1}
+            value={digit}
+            onChange={(e) => setDigit(index, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(index, e)}
+            onPaste={handlePaste}
+            className="w-full aspect-square min-w-0 text-center text-base sm:text-lg font-bold border-2 border-stone-200 rounded-xl bg-white text-stone-900 focus:border-[rgb(183,36,42)] focus:ring-2 focus:ring-[rgb(183,36,42)]/20 outline-none transition-all"
+            aria-label={`Digit ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+
   if (!effectiveEmail) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
-          <h2 className="text-xl font-semibold mb-2 text-center">Verify Your Account</h2>
-          <p className="text-center text-gray-600 text-sm mb-4">
-            Enter the email you used to sign up. We&apos;ll send you an OTP to verify.
+      <AuthSplitLayout
+        eyebrow="Email verification"
+        title="Confirm it’s really you"
+        subtitle="Enter the email you used to sign up. We’ll send a one-time code."
+      >
+        <div className="mb-6">
+          <h2
+            className="text-2xl font-extrabold text-stone-900 tracking-tight"
+            style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
+          >
+            Verify your account
+          </h2>
+          <p className="mt-1.5 text-sm text-stone-500">
+            We’ll email you a 6-digit OTP to continue.
           </p>
-          <form onSubmit={handleRequestOtpForEmail} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+        </div>
+
+        <form onSubmit={handleRequestOtpForEmail} className="space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-stone-600 mb-1.5">Email</label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
               <input
                 type="email"
                 value={emailForResend}
                 onChange={(e) => setEmailForResend(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-[rgb(183,36,42)] focus:ring-1 focus:ring-[rgb(183,36,42)] outline-none"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]/25 focus:border-[rgb(183,36,42)]"
                 required
               />
             </div>
-            <button
-              type="submit"
-              disabled={resendLoading}
-              className="w-full py-2.5 rounded-md text-white font-medium bg-[rgb(183,36,42)] hover:opacity-95 disabled:opacity-70"
-            >
-              {resendLoading ? "Sending OTP..." : "Send OTP"}
-            </button>
-          </form>
-          <p className="mt-4 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link href="/account" className="text-[rgb(183,36,42)] font-semibold hover:underline">Sign In</Link>
-          </p>
-        </div>
-      </div>
+          </div>
+          <button
+            type="submit"
+            disabled={resendLoading}
+            className="w-full py-3 rounded-xl text-white text-sm font-bold bg-[rgb(183,36,42)] hover:bg-red-700 disabled:opacity-70 transition-all"
+          >
+            {resendLoading ? "Sending OTP…" : "Send OTP"}
+          </button>
+        </form>
+
+        <p className="mt-5 text-center text-sm text-stone-500">
+          Already have an account?{" "}
+          <Link href="/account" className="text-[rgb(183,36,42)] font-bold hover:underline">
+            Sign in
+          </Link>
+        </p>
+      </AuthSplitLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 section-padding">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-4 sm:p-6 mx-auto safe-margin">
-        <h2 className="text-xl font-semibold mb-4 text-center">OTP Verification</h2>
-        {(fromUnverified || navState?.message) && (
-          <p className="text-center text-amber-700 text-sm mb-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            {verifyMessage}
-          </p>
-        )}
-
-        <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
-          {/* Email – display with option to change */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <div className="flex items-center gap-2">
-              <div className="flex-1 px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700 font-medium">
-                {effectiveEmail}
-              </div>
-              <Link
-                href="/account/register"
-                state={{
-                  previousFormData: previousFormData || { email: effectiveEmail },
-                  currentUnverifiedEmail: effectiveEmail,
-                }}
-                className="shrink-0 text-sm font-semibold text-[rgb(183,36,42)] hover:underline whitespace-nowrap"
-              >
-                Change email
-              </Link>
-            </div>
-          </div>
-
-          {/* OTP – one digit per box */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Enter 6-digit OTP</label>
-            <div className="flex justify-center gap-2" onPaste={handlePaste}>
-              {otpDigits.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => setDigit(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
-                  onPaste={handlePaste}
-                  className="w-11 h-12 text-center text-lg font-bold border-2 border-gray-300 rounded-lg focus:border-[rgb(183,36,42)] focus:ring-2 focus:ring-[rgb(183,36,42)]/20 outline-none"
-                  aria-label={`Digit ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-
-          <button type="submit" disabled={loading} className={`w-full py-2 rounded-md text-white font-medium ${loading ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed" : "bg-[rgb(183,36,42)] hover:opacity-95"}`}>
-            {loading ? "Verifying..." : "Verify OTP"}
-          </button>
-        </form>
-
-        <div className="mt-4 text-center text-sm text-gray-500">
-          Didn&apos;t get OTP?{" "}
-          <button
-            type="button"
-            onClick={handleResendOtp}
-            disabled={resendLoading || resendCooldown > 0}
-            className="text-[rgb(183,36,42)] font-semibold underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
-          >
-            {resendLoading ? "Sending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend OTP"}
-          </button>
-        </div>
+    <AuthSplitLayout
+      eyebrow="Email verification"
+      title="Almost there"
+      subtitle="Enter the code we sent to your inbox to activate your Madadgaar account."
+    >
+      <div className="mb-6">
+        <h2
+          className="text-2xl font-extrabold text-stone-900 tracking-tight"
+          style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
+        >
+          Enter OTP
+        </h2>
+        <p className="mt-1.5 text-sm text-stone-500">
+          Check your email for a 6-digit verification code.
+        </p>
       </div>
-    </div>
+
+      {(fromUnverified || navState?.message || urlEmail) && (
+        <p className="mb-4 text-center text-amber-800 text-xs bg-amber-50 border border-amber-200/80 rounded-xl px-3 py-2.5 leading-relaxed">
+          {urlEmail
+            ? "Opened from your verification email. Confirming your account…"
+            : verifyMessage}
+        </p>
+      )}
+
+      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+        <div>
+          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Email</label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 min-w-0 px-3 py-2.5 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 text-sm font-medium truncate">
+              {effectiveEmail}
+            </div>
+            <button
+              type="button"
+              onClick={handleChangeEmail}
+              className="shrink-0 text-xs font-bold text-[rgb(183,36,42)] hover:underline px-1"
+            >
+              Change
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-stone-600 mb-3 text-center">
+            Enter 6-digit OTP
+          </label>
+          {otpInputs}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full py-3 rounded-xl text-white text-sm font-bold transition-all ${
+            loading
+              ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed"
+              : "bg-[rgb(183,36,42)] hover:bg-red-700 shadow-lg shadow-red-900/15"
+          }`}
+        >
+          {loading ? "Verifying…" : "Verify OTP"}
+        </button>
+      </form>
+
+      <div className="mt-5 text-center text-sm text-stone-500">
+        Didn&apos;t get OTP?{" "}
+        <button
+          type="button"
+          onClick={handleResendOtp}
+          disabled={resendLoading || resendCooldown > 0}
+          className="text-[rgb(183,36,42)] font-bold underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+        >
+          {resendLoading
+            ? "Sending…"
+            : resendCooldown > 0
+              ? `Resend in ${resendCooldown}s`
+              : "Resend OTP"}
+        </button>
+      </div>
+    </AuthSplitLayout>
+  );
+}
+
+export default function OtpVerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[#faf8f6]">
+          <p className="text-stone-500 text-sm">Loading verification…</p>
+        </div>
+      }
+    >
+      <OtpVerifyPageInner />
+    </Suspense>
   );
 }
