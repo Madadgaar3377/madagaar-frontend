@@ -2,9 +2,16 @@
 
 import React, { useState } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { pushWithState } from "../utils/navigationState";
+import AuthSplitLayout, {
+  AuthFormCard,
+  authInputClass,
+  authLabelClass,
+  authPrimaryBtnClass,
+} from "./AuthSplitLayout";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -56,47 +63,55 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center section-padding">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow p-4 sm:p-6 mx-auto safe-margin">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Forgot Password</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Enter the email tied to your account. We'll send a one-time code (OTP) to reset your password.
+    <AuthSplitLayout
+      tagline="SECURE · RESET · CONTINUE"
+      title="Forgot your password? We’ve got you."
+      subtitle="Enter your email and we’ll send a one-time code to reset your Madadgaar password."
+      footLinks={["Secure OTP", "Fast recovery", "Account safety"]}
+    >
+      <div className="mb-6">
+        <h2
+          className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
+          style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
+        >
+          Forgot password
+        </h2>
+        <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
+          Enter the email tied to your account. We’ll send a reset OTP.
         </p>
+      </div>
 
+      <AuthFormCard>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <label className="block text-sm text-gray-600">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]"
-            required
-          />
-
-          <div className="flex items-center justify-between gap-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 rounded-lg bg-[rgb(183,36,42)] text-white font-medium hover:opacity-95 disabled:opacity-60"
-            >
-              {loading ? "Sending..." : "Send OTP"}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => router.push("/account")}
-              className="px-4 py-2 rounded-lg border text-sm text-gray-700"
-            >
-              Back
-            </button>
+          <div>
+            <label className={authLabelClass}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className={authInputClass}
+              required
+              autoComplete="email"
+            />
           </div>
+
+          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+            {loading ? "Sending…" : "Send OTP"}
+          </button>
         </form>
 
-        <div className="text-xs text-gray-400 mt-4">
-          If you don't receive an email in a few minutes, check your spam folder or try again.
-        </div>
-      </div>
-    </div>
+        <p className="mt-5 text-center text-[13px] text-slate-500">
+          Remembered it?{" "}
+          <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+            Back to login
+          </Link>
+        </p>
+      </AuthFormCard>
+
+      <p className="mt-8 text-center text-[11px] text-slate-400 leading-relaxed">
+        If you don’t get an email in a few minutes, check spam or try again.
+      </p>
+    </AuthSplitLayout>
   );
 }

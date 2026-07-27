@@ -2,9 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { consumeNavigationState } from "../utils/navigationState";
+import AuthSplitLayout, {
+  AuthFormCard,
+  authInputClass,
+  authLabelClass,
+  authPrimaryBtnClass,
+} from "./AuthSplitLayout";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
 
@@ -17,6 +24,7 @@ export default function ResetPassword() {
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -52,10 +60,10 @@ export default function ResetPassword() {
       const res = await fetch(`${API}/newPassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email: email.trim(), 
-          otp: otp.trim(), 
-          newPassword: password 
+        body: JSON.stringify({
+          email: email.trim(),
+          otp: otp.trim(),
+          newPassword: password,
         }),
       });
 
@@ -76,85 +84,100 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center section-padding">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow p-4 sm:p-6 mx-auto safe-margin">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Reset Password</h2>
-        <p className="text-sm text-gray-500 mb-4">
-          Enter the OTP we sent to your email and choose a new password.
+    <AuthSplitLayout
+      tagline="SECURE · RESET · CONTINUE"
+      title="Choose a new password and get back in."
+      subtitle="Enter the OTP from your email, then set a strong new Madadgaar password."
+      footLinks={["Secure OTP", "Fast recovery", "Account safety"]}
+    >
+      <div className="mb-6">
+        <h2
+          className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
+          style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
+        >
+          Reset password
+        </h2>
+        <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
+          Enter the OTP we sent and choose a new password.
         </p>
+      </div>
 
+      <AuthFormCard>
         <form onSubmit={handleReset} className="space-y-4">
           <div>
-            <label className="block text-xs text-gray-600">Email</label>
+            <label className={authLabelClass}>Email</label>
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              className={authInputClass}
               placeholder="you@example.com"
               required
+              autoComplete="email"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-gray-600">OTP (6 digits)</label>
+            <label className={authLabelClass}>OTP (6 digits)</label>
             <input
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className={authInputClass}
               placeholder="Enter 6-digit OTP"
-              maxLength="6"
+              maxLength={6}
               required
+              inputMode="numeric"
+              autoComplete="one-time-code"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-gray-600">New Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[13px] font-medium text-slate-700">New password</label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              type={showPassword ? "text" : "password"}
+              className={authInputClass}
               placeholder="At least 8 characters"
               required
+              autoComplete="new-password"
             />
           </div>
 
           <div>
-            <label className="block text-xs text-gray-600">Confirm Password</label>
+            <label className={authLabelClass}>Confirm password</label>
             <input
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
-              type="password"
-              className="mt-1 w-full px-4 py-2 border rounded-lg"
+              type={showPassword ? "text" : "password"}
+              className={authInputClass}
               placeholder="Repeat new password"
               required
+              autoComplete="new-password"
             />
           </div>
 
-          <div className="flex items-center justify-between gap-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 rounded-lg bg-[rgb(183,36,42)] text-white font-medium disabled:opacity-60"
-            >
-              {loading ? "Resetting..." : "Reset Password"}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => router.push("/account")}
-              className="px-4 py-2 rounded-lg border text-sm text-gray-700"
-            >
-              Cancel
-            </button>
-          </div>
+          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+            {loading ? "Resetting…" : "Reset password"}
+          </button>
         </form>
 
-        <div className="text-xs text-gray-400 mt-4">
-          If your OTP expired, go back to Forgot Password and request a new one.
-        </div>
-      </div>
-    </div>
+        <p className="mt-5 text-center text-[13px] text-slate-500">
+          OTP expired?{" "}
+          <Link href="/account/forgot" className="font-semibold text-[#b7242a] hover:underline">
+            Request a new one
+          </Link>
+        </p>
+      </AuthFormCard>
+    </AuthSplitLayout>
   );
 }

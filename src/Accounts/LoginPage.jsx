@@ -5,10 +5,14 @@ import { backendBaseUrl } from "../constants/apiUrl";
 import { getUser } from "../utils/auth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
-import AuthSplitLayout from "./AuthSplitLayout";
+import AuthSplitLayout, {
+  AuthFormCard,
+  authInputClass,
+  authLabelClass,
+  authPrimaryBtnClass,
+} from "./AuthSplitLayout";
 
 export default function LoginPage() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
@@ -18,18 +22,19 @@ export default function LoginPage() {
     navState?.message || (navState?.verified ? "Account verified. Please sign in." : null);
 
   useEffect(() => {
-    // Check if user is already logged in
     if (getUser()) {
       const userType = getUser().userType || getUser().UserType;
       if (userType === "user") {
         window.location.href = "/dashboard";
       } else {
-        window.location.href = "/"; // Admin/other types can use same dashboard for now
+        window.location.href = "/";
       }
     }
   }, []);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
 
@@ -98,7 +103,6 @@ export default function LoginPage() {
       const token = data?.token;
       const userType = (data?.user?.UserType || data?.user?.userType || "user").toLowerCase();
 
-      // If agent, redirect to agent panel with token for auto-login
       if (userType === "agent" && token) {
         const agentPanelUrl = "https://agent.madadgaar.com.pk";
         const url = `${agentPanelUrl}/login?token=${encodeURIComponent(token)}`;
@@ -107,7 +111,6 @@ export default function LoginPage() {
         return;
       }
 
-      // If partner, redirect to partner panel with token for auto-login
       if (userType === "partner" && token) {
         const partnerPanelUrl = "https://partner.madadgaar.com.pk";
         const url = `${partnerPanelUrl}?token=${encodeURIComponent(token)}`;
@@ -116,7 +119,6 @@ export default function LoginPage() {
         return;
       }
 
-      // Store token and user for non-partner
       if (token) {
         localStorage.setItem("authToken", token);
         localStorage.setItem("access_token", token);
@@ -141,107 +143,105 @@ export default function LoginPage() {
     }
   };
 
-  const inputBase =
-    "w-full pl-10 pr-4 py-2.5 bg-white border rounded-xl text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]/25 focus:border-[rgb(183,36,42)] transition-all";
-
   return (
     <AuthSplitLayout
-      eyebrow="Welcome back"
-      title="Sign in to Madadgaar"
-      subtitle="Access loans, insurance, installments and property — all from one account."
+      tagline="DISCOVER · COMPARE · GROW"
+      title="The platform people use to get financial help."
+      subtitle="Sign in to browse loans, insurance, installments and property from trusted Madadgaar partners."
+      footLinks={["Secure login", "Verified partners", "OTP protected"]}
     >
       <div className="mb-6">
         <h2
-          className="text-2xl font-extrabold text-stone-900 tracking-tight"
+          className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
           style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
         >
-          Sign in
+          Welcome back
         </h2>
-        <p className="mt-1.5 text-sm text-stone-500">Enter your credentials to continue</p>
+        <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
+          Enter your email and password to continue to Madadgaar.
+        </p>
       </div>
 
-      {verifiedMessage && (
-        <div className="mb-4 text-sm text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2.5 rounded-xl">
-          {verifiedMessage}
-        </div>
-      )}
+      <AuthFormCard>
+        {verifiedMessage && (
+          <div className="mb-5 text-[13px] text-emerald-800 bg-emerald-50 border border-emerald-100 px-3.5 py-2.5 rounded-xl">
+            {verifiedMessage}
+          </div>
+        )}
 
-      <form onSubmit={handleSubmit} noValidate className="space-y-4">
-        <div>
-          <label htmlFor="email" className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Email
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div>
+            <label htmlFor="email" className={authLabelClass}>
+              Email
+            </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`${inputBase} ${
-                fieldErrors.email ? "border-red-300" : "border-stone-200"
-              }`}
+              className={`${authInputClass} ${fieldErrors.email ? "ring-2 ring-red-200" : ""}`}
               placeholder="you@example.com"
               autoComplete="email"
             />
+            {fieldErrors.email && (
+              <p className="mt-1.5 text-[12px] text-red-600">{fieldErrors.email}</p>
+            )}
           </div>
-          {fieldErrors.email && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.email}</p>
-          )}
-        </div>
 
-        <div>
-          <label htmlFor="password" className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Password
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="password" className="text-[13px] font-medium text-slate-700">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
             <input
               id="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className={`${inputBase} ${
-                fieldErrors.password ? "border-red-300" : "border-stone-200"
-              }`}
+              className={`${authInputClass} ${fieldErrors.password ? "ring-2 ring-red-200" : ""}`}
               placeholder="Enter your password"
               autoComplete="current-password"
             />
+            {fieldErrors.password && (
+              <p className="mt-1.5 text-[12px] text-red-600">{fieldErrors.password}</p>
+            )}
+            <div className="mt-2 flex justify-end">
+              <Link
+                href="/account/forgot"
+                className="text-[12px] text-slate-500 hover:text-[#b7242a]"
+              >
+                Forgot password?
+              </Link>
+            </div>
           </div>
-          {fieldErrors.password && (
-            <p className="mt-1 text-xs text-red-600">{fieldErrors.password}</p>
-          )}
-        </div>
 
-        <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" className="size-4 rounded border-stone-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)]" />
-            <span className="text-stone-600 text-xs sm:text-sm">Remember me</span>
-          </label>
+          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+            {loading ? "Signing in…" : "Log in"}
+          </button>
+        </form>
 
-          <Link
-            href="/account/forgot"
-            className="text-xs sm:text-sm font-semibold text-[rgb(183,36,42)] hover:underline"
-          >
-            Forgot?
+        <p className="mt-5 text-center text-[13px] text-slate-500">
+          No account yet?{" "}
+          <Link href="/account/register" className="font-semibold text-[#b7242a] hover:underline">
+            Sign up free
           </Link>
-        </div>
+        </p>
+      </AuthFormCard>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-3 rounded-xl bg-[rgb(183,36,42)] text-white text-sm font-bold shadow-lg shadow-red-900/15 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:ring-offset-2 disabled:opacity-70 disabled:cursor-not-allowed transition-all"
-        >
-          {loading ? "Signing in…" : "Sign In"}
-        </button>
-      </form>
-
-      <div className="relative my-5">
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-stone-200" />
+          <div className="w-full border-t border-slate-200" />
         </div>
-        <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-          <span className="bg-[#faf8f6] px-3 text-stone-400 font-semibold">Or continue with</span>
+        <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
+          <span className="bg-[#f7f8fa] px-3 text-slate-400 font-medium">Or</span>
         </div>
       </div>
 
@@ -250,7 +250,7 @@ export default function LoginPage() {
         onClick={() => {
           window.location.href = `${apiUrl.replace(/\/api$/, "")}/auth/google`;
         }}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 border border-stone-200 rounded-xl bg-white text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-all"
+        className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white border border-slate-200 text-slate-700 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
           <path
@@ -270,14 +270,19 @@ export default function LoginPage() {
             fill="#EA4335"
           />
         </svg>
-        Google
+        Continue with Google
       </button>
 
-      <p className="mt-5 text-center text-sm text-stone-500">
-        Don&apos;t have an account?{" "}
-        <Link href="/account/register" className="text-[rgb(183,36,42)] font-bold hover:underline">
-          Sign up
+      <p className="mt-8 text-center text-[11px] text-slate-400 leading-relaxed">
+        By continuing you agree to Madadgaar{" "}
+        <Link href="/terms-and-conditions" className="underline hover:text-slate-600">
+          Terms
+        </Link>{" "}
+        and{" "}
+        <Link href="/privacy-policy" className="underline hover:text-slate-600">
+          Privacy Policy
         </Link>
+        .
       </p>
     </AuthSplitLayout>
   );

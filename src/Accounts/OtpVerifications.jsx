@@ -4,10 +4,14 @@ import React, { useState, useEffect, useRef, Suspense } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
-import AuthSplitLayout from "./AuthSplitLayout";
+import AuthSplitLayout, {
+  AuthFormCard,
+  authInputClass,
+  authLabelClass,
+  authPrimaryBtnClass,
+} from "./AuthSplitLayout";
 
 const OTP_LENGTH = 6;
 
@@ -255,20 +259,22 @@ function OtpVerifyPageInner() {
             textAlign: "center",
             fontSize: "18px",
             fontWeight: 700,
-            border: "2px solid #e7e5e4",
-            borderRadius: "10px",
-            background: "#fff",
-            color: "#1c1917",
+            border: "1px solid transparent",
+            borderRadius: "12px",
+            background: "#eef2f6",
+            color: "#0f172a",
             outline: "none",
             lineHeight: "1",
             padding: 0,
           }}
           onFocus={(e) => {
-            e.target.style.borderColor = "rgb(183,36,42)";
-            e.target.style.boxShadow = "0 0 0 3px rgba(183,36,42,0.15)";
+            e.target.style.background = "#fff";
+            e.target.style.borderColor = "rgba(183,36,42,0.35)";
+            e.target.style.boxShadow = "0 0 0 4px rgba(183,36,42,0.10)";
           }}
           onBlur={(e) => {
-            e.target.style.borderColor = "#e7e5e4";
+            e.target.style.background = "#eef2f6";
+            e.target.style.borderColor = "transparent";
             e.target.style.boxShadow = "none";
           }}
         />
@@ -279,134 +285,127 @@ function OtpVerifyPageInner() {
   if (!effectiveEmail) {
     return (
       <AuthSplitLayout
-        eyebrow="Email verification"
-        title="Confirm it’s really you"
-        subtitle="Enter the email you used to sign up. We’ll send a one-time code."
+        tagline="SECURE · VERIFY · CONTINUE"
+        title="Confirm it’s really you."
+        subtitle="Enter the email you used to sign up. We’ll send a one-time Madadgaar code."
+        footLinks={["Secure OTP", "Expires quickly", "Inbox delivery"]}
       >
         <div className="mb-6">
           <h2
-            className="text-2xl font-extrabold text-stone-900 tracking-tight"
+            className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
             style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
           >
             Verify your account
           </h2>
-          <p className="mt-1.5 text-sm text-stone-500">
+          <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
             We’ll email you a 6-digit OTP to continue.
           </p>
         </div>
 
-        <form onSubmit={handleRequestOtpForEmail} className="space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-stone-600 mb-1.5">Email</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+        <AuthFormCard>
+          <form onSubmit={handleRequestOtpForEmail} className="space-y-4">
+            <div>
+              <label className={authLabelClass}>Email</label>
               <input
                 type="email"
                 value={emailForResend}
                 onChange={(e) => setEmailForResend(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]/25 focus:border-[rgb(183,36,42)]"
+                className={authInputClass}
                 required
+                autoComplete="email"
               />
             </div>
-          </div>
-          <button
-            type="submit"
-            disabled={resendLoading}
-            className="w-full py-3 rounded-xl text-white text-sm font-bold bg-[rgb(183,36,42)] hover:bg-red-700 disabled:opacity-70 transition-all"
-          >
-            {resendLoading ? "Sending OTP…" : "Send OTP"}
-          </button>
-        </form>
+            <button type="submit" disabled={resendLoading} className={authPrimaryBtnClass}>
+              {resendLoading ? "Sending OTP…" : "Send OTP"}
+            </button>
+          </form>
 
-        <p className="mt-5 text-center text-sm text-stone-500">
-          Already have an account?{" "}
-          <Link href="/account" className="text-[rgb(183,36,42)] font-bold hover:underline">
-            Sign in
-          </Link>
-        </p>
+          <p className="mt-5 text-center text-[13px] text-slate-500">
+            Already have an account?{" "}
+            <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+              Log in
+            </Link>
+          </p>
+        </AuthFormCard>
       </AuthSplitLayout>
     );
   }
 
   return (
     <AuthSplitLayout
-      eyebrow="Email verification"
-      title="Almost there"
-      subtitle="Enter the code we sent to your inbox to activate your Madadgaar account."
+      tagline="SECURE · VERIFY · CONTINUE"
+      title="Almost there — activate your account."
+      subtitle="Enter the code we sent to your inbox to unlock Madadgaar."
+      footLinks={["Secure OTP", "Expires quickly", "Inbox delivery"]}
     >
       <div className="mb-6">
         <h2
-          className="text-2xl font-extrabold text-stone-900 tracking-tight"
+          className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
           style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
         >
           Enter OTP
         </h2>
-        <p className="mt-1.5 text-sm text-stone-500">
+        <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
           Check your email for a 6-digit verification code.
         </p>
       </div>
 
-      {(fromUnverified || navState?.message || urlEmail) && (
-        <p className="mb-4 text-center text-amber-800 text-xs bg-amber-50 border border-amber-200/80 rounded-xl px-3 py-2.5 leading-relaxed">
-          {urlEmail
-            ? "Opened from your verification email. Confirming your account…"
-            : verifyMessage}
-        </p>
-      )}
-
-      <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Email</label>
-          <div className="flex items-center gap-2">
-            <div className="flex-1 min-w-0 px-3 py-2.5 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 text-sm font-medium truncate">
-              {effectiveEmail}
-            </div>
-            <button
-              type="button"
-              onClick={handleChangeEmail}
-              className="shrink-0 text-xs font-bold text-[rgb(183,36,42)] hover:underline px-1"
-            >
-              Change
-            </button>
+      <AuthFormCard>
+        {(fromUnverified || navState?.message || urlEmail) && (
+          <div className="mb-5 text-[13px] text-amber-900 bg-amber-50 border border-amber-100 px-3.5 py-2.5 rounded-xl leading-relaxed">
+            {urlEmail
+              ? "Opened from your verification email. Confirming your account…"
+              : verifyMessage}
           </div>
-        </div>
+        )}
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-3 text-center">
-            Enter 6-digit OTP
-          </label>
-          {otpInputs}
-        </div>
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className={authLabelClass}>Email</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={effectiveEmail}
+                readOnly
+                className={`${authInputClass} pr-16 truncate`}
+              />
+              <button
+                type="button"
+                onClick={handleChangeEmail}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#b7242a] hover:underline"
+              >
+                Change
+              </button>
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full py-3 rounded-xl text-white text-sm font-bold transition-all ${
-            loading
-              ? "bg-[rgb(183,36,42)]/70 cursor-not-allowed"
-              : "bg-[rgb(183,36,42)] hover:bg-red-700 shadow-lg shadow-red-900/15"
-          }`}
-        >
-          {loading ? "Verifying…" : "Verify OTP"}
-        </button>
-      </form>
+          <div>
+            <label className={`${authLabelClass} text-center`}>Enter 6-digit OTP</label>
+            {otpInputs}
+          </div>
 
-      <div className="mt-5 text-center text-sm text-stone-500">
-        Didn&apos;t get OTP?{" "}
-        <button
-          type="button"
-          onClick={handleResendOtp}
-          disabled={resendLoading || resendCooldown > 0}
-          className="text-[rgb(183,36,42)] font-bold underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
-        >
-          {resendLoading
-            ? "Sending…"
-            : resendCooldown > 0
-              ? `Resend in ${resendCooldown}s`
-              : "Resend OTP"}
-        </button>
-      </div>
+          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+            {loading ? "Verifying…" : "Verify OTP"}
+          </button>
+        </form>
+
+        <p className="mt-5 text-center text-[13px] text-slate-500">
+          Didn&apos;t get OTP?{" "}
+          <button
+            type="button"
+            onClick={handleResendOtp}
+            disabled={resendLoading || resendCooldown > 0}
+            className="font-semibold text-[#b7242a] hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+          >
+            {resendLoading
+              ? "Sending…"
+              : resendCooldown > 0
+                ? `Resend in ${resendCooldown}s`
+                : "Resend OTP"}
+          </button>
+        </p>
+      </AuthFormCard>
     </AuthSplitLayout>
   );
 }
@@ -415,8 +414,8 @@ export default function OtpVerifyPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-[#faf8f6]">
-          <p className="text-stone-500 text-sm">Loading verification…</p>
+        <div className="min-h-screen flex items-center justify-center bg-[#f7f8fa]">
+          <p className="text-slate-500 text-sm">Loading verification…</p>
         </div>
       }
     >

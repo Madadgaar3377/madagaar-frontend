@@ -4,11 +4,16 @@ import React, { useState, useMemo } from "react";
 import { backendBaseUrl } from "../constants/apiUrl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, User, Mail, Lock, UserCircle, Upload, X, Phone } from "lucide-react";
+import { UserCircle, Upload, X } from "lucide-react";
 import { SIGNUP_DECLARATIONS } from "../constants/signupDeclarations";
 import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
-import AuthSplitLayout from "./AuthSplitLayout";
+import AuthSplitLayout, {
+  AuthFormCard,
+  authInputClass,
+  authLabelClass,
+  authPrimaryBtnClass,
+} from "./AuthSplitLayout";
 
 const getInitialDeclarations = () => {
   const obj = {};
@@ -221,80 +226,76 @@ export default function SignupPage() {
     }
   };
 
-  const inputBase =
-    "w-full pl-10 pr-4 py-2.5 bg-white border border-stone-200 rounded-xl text-stone-900 placeholder-stone-400 text-sm focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)]/25 focus:border-[rgb(183,36,42)] transition-all";
-
   return (
     <AuthSplitLayout
-      eyebrow="Create account"
-      title="Join Madadgaar today"
-      subtitle="Sign up once — then explore loans, insurance, installments and more."
+      tagline="JOIN · COMPARE · GROW"
+      title="One account for loans, insurance and more."
+      subtitle="Create your Madadgaar profile as a user, agent, or business partner — then explore trusted plans."
+      footLinks={["Free to join", "Secure OTP", "Users · Agents · Partners"]}
     >
       <div className="mb-6">
         <h2
-          className="text-2xl font-extrabold text-stone-900 tracking-tight"
+          className="text-[1.75rem] font-semibold text-slate-900 tracking-tight"
           style={{ fontFamily: "var(--font-auth-display), Syne, sans-serif" }}
         >
           Create account
         </h2>
-        <p className="mt-1.5 text-sm text-stone-500">
+        <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
           Users, agents and partners — one simple signup.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Profile */}
-        <div className="flex items-center gap-4">
-          <div className="relative shrink-0">
-            {formData.profilePic ? (
-              <>
-                <img
-                  src={formData.profilePic}
-                  alt="Profile"
-                  className="size-14 rounded-full object-cover ring-2 ring-stone-100"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemoveImage}
-                  className="absolute -top-1 -right-1 size-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow"
-                >
-                  <X className="w-3 h-3" />
-                </button>
-              </>
-            ) : (
-              <div className="size-14 rounded-full bg-stone-100 border border-dashed border-stone-300 flex items-center justify-center">
-                <UserCircle className="size-7 text-stone-400" />
-              </div>
-            )}
+      <AuthFormCard>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="relative shrink-0">
+              {formData.profilePic ? (
+                <>
+                  <img
+                    src={formData.profilePic}
+                    alt="Profile"
+                    className="size-14 rounded-full object-cover ring-2 ring-slate-100"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute -top-1 -right-1 size-5 bg-[#b7242a] text-white rounded-full flex items-center justify-center shadow"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </>
+              ) : (
+                <div className="size-14 rounded-full bg-[#eef2f6] border border-dashed border-slate-300 flex items-center justify-center">
+                  <UserCircle className="size-7 text-slate-400" />
+                </div>
+              )}
+            </div>
+            <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-[#eef2f6] hover:bg-slate-200 text-slate-700 text-[12px] font-semibold transition-colors">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                disabled={uploadingImage}
+              />
+              {uploadingImage ? (
+                <span className="flex items-center gap-2">
+                  <span className="size-3.5 border-2 border-[#b7242a] border-t-transparent rounded-full animate-spin" />
+                  Uploading…
+                </span>
+              ) : (
+                <>
+                  <Upload className="size-3.5" />
+                  {formData.profilePic ? "Change photo" : "Upload photo"}
+                </>
+              )}
+            </label>
           </div>
-          <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-semibold transition-colors">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-              disabled={uploadingImage}
-            />
-            {uploadingImage ? (
-              <span className="flex items-center gap-2">
-                <span className="size-3.5 border-2 border-[rgb(183,36,42)] border-t-transparent rounded-full animate-spin" />
-                Uploading…
-              </span>
-            ) : (
-              <>
-                <Upload className="size-3.5" />
-                {formData.profilePic ? "Change photo" : "Upload photo"}
-              </>
-            )}
-          </label>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Full name <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <label className={authLabelClass}>
+              Full name <span className="text-[#b7242a]">*</span>
+            </label>
             <input
               name="name"
               type="text"
@@ -302,49 +303,40 @@ export default function SignupPage() {
               value={formData.name}
               onChange={updateFormField}
               required
-              className={inputBase}
+              className={authInputClass}
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Username <span className="text-stone-400 font-normal">(optional)</span>
-          </label>
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <label className={authLabelClass}>
+              Username <span className="text-slate-400 font-normal">(optional)</span>
+            </label>
             <input
               name="userName"
               type="text"
               placeholder="Choose a username"
               value={formData.userName}
               onChange={updateFormField}
-              className={inputBase}
+              className={authInputClass}
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">Phone number</label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <label className={authLabelClass}>Phone number</label>
             <input
               name="phoneNumber"
               type="tel"
               placeholder="e.g. 03001234567"
               value={formData.phoneNumber}
               onChange={updateFormField}
-              className={inputBase}
+              className={authInputClass}
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Email address <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <label className={authLabelClass}>
+              Email <span className="text-[#b7242a]">*</span>
+            </label>
             <input
               name="email"
               type="email"
@@ -352,17 +344,24 @@ export default function SignupPage() {
               value={formData.email}
               onChange={updateFormField}
               required
-              className={inputBase}
+              className={authInputClass}
+              autoComplete="email"
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-1.5">
-            Password <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-stone-400 pointer-events-none" />
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-[13px] font-medium text-slate-700">
+                Password <span className="text-[#b7242a]">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
             <input
               name="password"
               type={showPassword ? "text" : "password"}
@@ -371,125 +370,126 @@ export default function SignupPage() {
               onChange={updateFormField}
               required
               minLength={8}
-              className={`${inputBase} pr-11`}
+              className={authInputClass}
+              autoComplete="new-password"
             />
-            <button
-              type="button"
-              onClick={() => setShowPassword((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 text-stone-400 hover:text-stone-600"
-            >
-              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-            </button>
+            <p className="mt-1.5 text-[11px] text-slate-400">Must be at least 8 characters</p>
           </div>
-          <p className="mt-1 text-[11px] text-stone-400">Must be at least 8 characters</p>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-stone-600 mb-2">
-            I am signing up as <span className="text-red-500">*</span>
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            {USER_TYPES.map((opt) => (
-              <label
-                key={opt.value}
-                className={`relative flex flex-col items-center text-center p-2.5 rounded-xl border-2 cursor-pointer transition-all ${
-                  formData.userType === opt.value
-                    ? "border-[rgb(183,36,42)] bg-red-50/70"
-                    : "border-stone-200 bg-white hover:border-stone-300"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="userType"
-                  value={opt.value}
-                  checked={formData.userType === opt.value}
-                  onChange={updateFormField}
-                  className="sr-only"
-                />
-                <span
-                  className={`text-sm font-bold ${
-                    formData.userType === opt.value ? "text-[rgb(183,36,42)]" : "text-stone-800"
+          <div>
+            <label className={`${authLabelClass} mb-2`}>
+              I am signing up as <span className="text-[#b7242a]">*</span>
+            </label>
+            <div className="grid grid-cols-3 gap-2">
+              {USER_TYPES.map((opt) => (
+                <label
+                  key={opt.value}
+                  className={`relative flex flex-col items-center text-center p-2.5 rounded-xl border cursor-pointer transition-all ${
+                    formData.userType === opt.value
+                      ? "border-[#b7242a] bg-[#b7242a]/5"
+                      : "border-transparent bg-[#eef2f6] hover:bg-slate-200/70"
                   }`}
                 >
-                  {opt.label}
-                </span>
-                <span className="text-[10px] text-stone-500 mt-0.5 leading-tight">{opt.desc}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-2.5 rounded-xl border border-stone-200 bg-white p-3.5">
-          {SIGNUP_DECLARATIONS.map((sec) =>
-            sec.items.map((label, idx) => {
-              const key = `${sec.section}-${idx}`;
-              const isTerms = idx === 0;
-              const isPrivacy = idx === 1;
-              return (
-                <div key={key} className="flex items-start gap-2.5">
                   <input
-                    type="checkbox"
-                    id={key}
-                    checked={declarationsChecked[key] || false}
-                    onChange={(e) => setDeclaration(key, e.target.checked)}
-                    className="mt-0.5 size-4 rounded border-stone-300 text-[rgb(183,36,42)] focus:ring-[rgb(183,36,42)] shrink-0"
+                    type="radio"
+                    name="userType"
+                    value={opt.value}
+                    checked={formData.userType === opt.value}
+                    onChange={updateFormField}
+                    className="sr-only"
                   />
-                  <label htmlFor={key} className="text-xs text-stone-600 cursor-pointer leading-snug">
-                    {isTerms && (
-                      <>
-                        I agree to the{" "}
-                        <Link
-                          href="/terms-and-conditions"
-                          className="text-[rgb(183,36,42)] font-semibold hover:underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Terms & Conditions
-                        </Link>
-                      </>
-                    )}
-                    {isPrivacy && (
-                      <>
-                        I agree to the{" "}
-                        <Link
-                          href="/privacy-policy"
-                          className="text-[rgb(183,36,42)] font-semibold hover:underline"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Privacy Policy
-                        </Link>
-                      </>
-                    )}
-                  </label>
-                </div>
-              );
-            })
-          )}
-        </div>
+                  <span
+                    className={`text-[13px] font-semibold ${
+                      formData.userType === opt.value ? "text-[#b7242a]" : "text-slate-800"
+                    }`}
+                  >
+                    {opt.label}
+                  </span>
+                  <span className="text-[10px] text-slate-500 mt-0.5 leading-tight">{opt.desc}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading || uploadingImage || !allDeclarationsAccepted}
-          className="w-full py-3 rounded-xl bg-[rgb(183,36,42)] text-white text-sm font-bold shadow-lg shadow-red-900/15 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-[rgb(183,36,42)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-        >
-          {loading ? (
-            <span className="flex items-center justify-center gap-2">
-              <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              Creating account…
-            </span>
-          ) : (
-            "Create account"
-          )}
-        </button>
-      </form>
+          <div className="space-y-2.5 rounded-xl bg-[#eef2f6]/80 p-3.5">
+            {SIGNUP_DECLARATIONS.map((sec) =>
+              sec.items.map((label, idx) => {
+                const key = `${sec.section}-${idx}`;
+                const isTerms = idx === 0;
+                const isPrivacy = idx === 1;
+                return (
+                  <div key={key} className="flex items-start gap-2.5">
+                    <input
+                      type="checkbox"
+                      id={key}
+                      checked={declarationsChecked[key] || false}
+                      onChange={(e) => setDeclaration(key, e.target.checked)}
+                      className="mt-0.5 size-4 rounded border-slate-300 text-[#b7242a] focus:ring-[#b7242a] shrink-0"
+                    />
+                    <label htmlFor={key} className="text-[12px] text-slate-600 cursor-pointer leading-snug">
+                      {isTerms && (
+                        <>
+                          I agree to the{" "}
+                          <Link
+                            href="/terms-and-conditions"
+                            className="text-[#b7242a] font-semibold hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Terms & Conditions
+                          </Link>
+                        </>
+                      )}
+                      {isPrivacy && (
+                        <>
+                          I agree to the{" "}
+                          <Link
+                            href="/privacy-policy"
+                            className="text-[#b7242a] font-semibold hover:underline"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Privacy Policy
+                          </Link>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                );
+              })
+            )}
+          </div>
 
-      <div className="relative my-5">
+          <button
+            type="submit"
+            disabled={loading || uploadingImage || !allDeclarationsAccepted}
+            className={authPrimaryBtnClass}
+          >
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Creating account…
+              </span>
+            ) : (
+              "Create account"
+            )}
+          </button>
+        </form>
+
+        <p className="mt-5 text-center text-[13px] text-slate-500">
+          Already have an account?{" "}
+          <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+            Log in
+          </Link>
+        </p>
+      </AuthFormCard>
+
+      <div className="relative my-6">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-stone-200" />
+          <div className="w-full border-t border-slate-200" />
         </div>
-        <div className="relative flex justify-center text-[10px] uppercase tracking-wider">
-          <span className="bg-[#faf8f6] px-3 text-stone-400 font-semibold">Or continue with</span>
+        <div className="relative flex justify-center text-[11px] uppercase tracking-wider">
+          <span className="bg-[#f7f8fa] px-3 text-slate-400 font-medium">Or</span>
         </div>
       </div>
 
@@ -498,7 +498,7 @@ export default function SignupPage() {
         onClick={() => {
           window.location.href = `${apiUrl.replace(/\/api$/, "")}/auth/google`;
         }}
-        className="w-full flex items-center justify-center gap-2.5 py-2.5 px-4 border border-stone-200 rounded-xl bg-white text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-all"
+        className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl bg-white border border-slate-200 text-slate-700 text-[14px] font-medium hover:bg-slate-50 transition-colors shadow-sm"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
           <path
@@ -518,14 +518,11 @@ export default function SignupPage() {
             fill="#EA4335"
           />
         </svg>
-        Google
+        Continue with Google
       </button>
 
-      <p className="mt-5 text-center text-sm text-stone-500">
-        Already have an account?{" "}
-        <Link href="/account" className="text-[rgb(183,36,42)] font-bold hover:underline">
-          Sign in
-        </Link>
+      <p className="mt-8 text-center text-[11px] text-slate-400 leading-relaxed">
+        By continuing you agree to Madadgaar Terms and Privacy Policy.
       </p>
     </AuthSplitLayout>
   );
