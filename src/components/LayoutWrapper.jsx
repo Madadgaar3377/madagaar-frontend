@@ -22,7 +22,8 @@ export default function LayoutWrapper({ children }) {
     pathname.startsWith("/client/dashboard") ||
     pathname.startsWith("/client/loans") ||
     pathname.startsWith("/client/insurance") ||
-    pathname.startsWith("/partner/");
+    pathname.startsWith("/partner/") ||
+    pathname.startsWith("/account");
 
   // Partner storefront: show main site Navbar only (not footer / app banner / WhatsApp widget)
   const showNavbar = !hideLayout || isPartnerPublic;

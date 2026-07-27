@@ -218,27 +218,61 @@ function OtpVerifyPageInner() {
   };
 
   const otpInputs = (
-    <div className="w-full max-w-[320px] mx-auto">
-      <div className="grid grid-cols-6 gap-1.5 sm:gap-2" onPaste={handlePaste}>
-        {otpDigits.map((digit, index) => (
-          <input
-            key={index}
-            ref={(el) => {
-              inputRefs.current[index] = el;
-            }}
-            type="text"
-            inputMode="numeric"
-            autoComplete={index === 0 ? "one-time-code" : "off"}
-            maxLength={1}
-            value={digit}
-            onChange={(e) => setDigit(index, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(index, e)}
-            onPaste={handlePaste}
-            className="w-full aspect-square min-w-0 text-center text-base sm:text-lg font-bold border-2 border-stone-200 rounded-xl bg-white text-stone-900 focus:border-[rgb(183,36,42)] focus:ring-2 focus:ring-[rgb(183,36,42)]/20 outline-none transition-all"
-            aria-label={`Digit ${index + 1}`}
-          />
-        ))}
-      </div>
+    <div
+      onPaste={handlePaste}
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "nowrap",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: "8px",
+        width: "100%",
+        maxWidth: "288px",
+        margin: "0 auto",
+      }}
+    >
+      {otpDigits.map((digit, index) => (
+        <input
+          key={index}
+          ref={(el) => {
+            inputRefs.current[index] = el;
+          }}
+          type="text"
+          inputMode="numeric"
+          autoComplete={index === 0 ? "one-time-code" : "off"}
+          maxLength={1}
+          value={digit}
+          onChange={(e) => setDigit(index, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(index, e)}
+          onPaste={handlePaste}
+          aria-label={`Digit ${index + 1}`}
+          style={{
+            width: "42px",
+            height: "48px",
+            flex: "0 0 42px",
+            boxSizing: "border-box",
+            textAlign: "center",
+            fontSize: "18px",
+            fontWeight: 700,
+            border: "2px solid #e7e5e4",
+            borderRadius: "10px",
+            background: "#fff",
+            color: "#1c1917",
+            outline: "none",
+            lineHeight: "1",
+            padding: 0,
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = "rgb(183,36,42)";
+            e.target.style.boxShadow = "0 0 0 3px rgba(183,36,42,0.15)";
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "#e7e5e4";
+            e.target.style.boxShadow = "none";
+          }}
+        />
+      ))}
     </div>
   );
 
