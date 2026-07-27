@@ -10,9 +10,10 @@ import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 import AuthSplitLayout, {
   AuthFormCard,
+  AuthPrimaryButton,
   authInputClass,
   authLabelClass,
-  authPrimaryBtnClass,
+  authLinkClass,
 } from "./AuthSplitLayout";
 
 const getInitialDeclarations = () => {
@@ -259,7 +260,7 @@ export default function SignupPage() {
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="absolute -top-1 -right-1 size-5 bg-[#b7242a] text-white rounded-full flex items-center justify-center shadow"
+                    className="absolute -top-1 -right-1 size-5 bg-primary text-white rounded-full flex items-center justify-center shadow"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -280,7 +281,7 @@ export default function SignupPage() {
               />
               {uploadingImage ? (
                 <span className="flex items-center gap-2">
-                  <span className="size-3.5 border-2 border-[#b7242a] border-t-transparent rounded-full animate-spin" />
+                  <span className="size-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                   Uploading…
                 </span>
               ) : (
@@ -294,7 +295,7 @@ export default function SignupPage() {
 
           <div>
             <label className={authLabelClass}>
-              Full name <span className="text-[#b7242a]">*</span>
+              Full name <span className="text-primary">*</span>
             </label>
             <input
               name="name"
@@ -335,7 +336,7 @@ export default function SignupPage() {
 
           <div>
             <label className={authLabelClass}>
-              Email <span className="text-[#b7242a]">*</span>
+              Email <span className="text-primary">*</span>
             </label>
             <input
               name="email"
@@ -352,12 +353,12 @@ export default function SignupPage() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-[13px] font-medium text-slate-700">
-                Password <span className="text-[#b7242a]">*</span>
+                Password <span className="text-primary">*</span>
               </label>
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+                className="text-[12px] font-medium text-slate-500 hover:text-primary"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -378,7 +379,7 @@ export default function SignupPage() {
 
           <div>
             <label className={`${authLabelClass} mb-2`}>
-              I am signing up as <span className="text-[#b7242a]">*</span>
+              I am signing up as <span className="text-primary">*</span>
             </label>
             <div className="grid grid-cols-3 gap-2">
               {USER_TYPES.map((opt) => (
@@ -386,7 +387,7 @@ export default function SignupPage() {
                   key={opt.value}
                   className={`relative flex flex-col items-center text-center p-2.5 rounded-xl border cursor-pointer transition-all ${
                     formData.userType === opt.value
-                      ? "border-[#b7242a] bg-[#b7242a]/5"
+                      ? "border-primary bg-primary-50"
                       : "border-transparent bg-[#eef2f6] hover:bg-slate-200/70"
                   }`}
                 >
@@ -400,7 +401,7 @@ export default function SignupPage() {
                   />
                   <span
                     className={`text-[13px] font-semibold ${
-                      formData.userType === opt.value ? "text-[#b7242a]" : "text-slate-800"
+                      formData.userType === opt.value ? "text-primary" : "text-slate-800"
                     }`}
                   >
                     {opt.label}
@@ -424,7 +425,7 @@ export default function SignupPage() {
                       id={key}
                       checked={declarationsChecked[key] || false}
                       onChange={(e) => setDeclaration(key, e.target.checked)}
-                      className="mt-0.5 size-4 rounded border-slate-300 text-[#b7242a] focus:ring-[#b7242a] shrink-0"
+                      className="mt-0.5 size-4 rounded border-slate-300 text-primary focus:ring-primary shrink-0"
                     />
                     <label htmlFor={key} className="text-[12px] text-slate-600 cursor-pointer leading-snug">
                       {isTerms && (
@@ -432,7 +433,7 @@ export default function SignupPage() {
                           I agree to the{" "}
                           <Link
                             href="/terms-and-conditions"
-                            className="text-[#b7242a] font-semibold hover:underline"
+                            className={authLinkClass}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -445,7 +446,7 @@ export default function SignupPage() {
                           I agree to the{" "}
                           <Link
                             href="/privacy-policy"
-                            className="text-[#b7242a] font-semibold hover:underline"
+                            className={authLinkClass}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
@@ -460,11 +461,7 @@ export default function SignupPage() {
             )}
           </div>
 
-          <button
-            type="submit"
-            disabled={loading || uploadingImage || !allDeclarationsAccepted}
-            className={authPrimaryBtnClass}
-          >
+          <AuthPrimaryButton disabled={loading || uploadingImage || !allDeclarationsAccepted}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <span className="size-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -473,12 +470,12 @@ export default function SignupPage() {
             ) : (
               "Create account"
             )}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
         <p className="mt-5 text-center text-[13px] text-slate-500">
           Already have an account?{" "}
-          <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+          <Link href="/account" className={authLinkClass}>
             Log in
           </Link>
         </p>

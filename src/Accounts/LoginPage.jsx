@@ -9,9 +9,10 @@ import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 import AuthSplitLayout, {
   AuthFormCard,
+  AuthPrimaryButton,
   authInputClass,
   authLabelClass,
-  authPrimaryBtnClass,
+  authLinkClass,
 } from "./AuthSplitLayout";
 
 export default function LoginPage() {
@@ -196,7 +197,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+                className="text-[12px] font-medium text-slate-500 hover:text-primary"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -216,21 +217,21 @@ export default function LoginPage() {
             <div className="mt-2 flex justify-end">
               <Link
                 href="/account/forgot"
-                className="text-[12px] text-slate-500 hover:text-[#b7242a]"
+                className="text-[12px] text-slate-500 hover:text-primary"
               >
                 Forgot password?
               </Link>
             </div>
           </div>
 
-          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+          <AuthPrimaryButton disabled={loading}>
             {loading ? "Signing in…" : "Log in"}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
         <p className="mt-5 text-center text-[13px] text-slate-500">
           No account yet?{" "}
-          <Link href="/account/register" className="font-semibold text-[#b7242a] hover:underline">
+          <Link href="/account/register" className={authLinkClass}>
             Sign up free
           </Link>
         </p>

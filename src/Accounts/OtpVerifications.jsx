@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import { consumeNavigationState, pushWithState } from "../utils/navigationState";
 import AuthSplitLayout, {
   AuthFormCard,
+  AuthPrimaryButton,
   authInputClass,
   authLabelClass,
-  authPrimaryBtnClass,
+  authLinkClass,
 } from "./AuthSplitLayout";
 
 const OTP_LENGTH = 6;
@@ -316,14 +317,14 @@ function OtpVerifyPageInner() {
                 autoComplete="email"
               />
             </div>
-            <button type="submit" disabled={resendLoading} className={authPrimaryBtnClass}>
+            <AuthPrimaryButton disabled={resendLoading}>
               {resendLoading ? "Sending OTP…" : "Send OTP"}
-            </button>
+            </AuthPrimaryButton>
           </form>
 
           <p className="mt-5 text-center text-[13px] text-slate-500">
             Already have an account?{" "}
-            <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+            <Link href="/account" className={authLinkClass}>
               Log in
             </Link>
           </p>
@@ -373,7 +374,7 @@ function OtpVerifyPageInner() {
               <button
                 type="button"
                 onClick={handleChangeEmail}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] font-semibold text-[#b7242a] hover:underline"
+                className={`absolute right-3 top-1/2 -translate-y-1/2 text-[12px] ${authLinkClass}`}
               >
                 Change
               </button>
@@ -385,9 +386,9 @@ function OtpVerifyPageInner() {
             {otpInputs}
           </div>
 
-          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+          <AuthPrimaryButton disabled={loading}>
             {loading ? "Verifying…" : "Verify OTP"}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
         <p className="mt-5 text-center text-[13px] text-slate-500">
@@ -396,7 +397,7 @@ function OtpVerifyPageInner() {
             type="button"
             onClick={handleResendOtp}
             disabled={resendLoading || resendCooldown > 0}
-            className="font-semibold text-[#b7242a] hover:underline disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline"
+            className={`${authLinkClass} disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline`}
           >
             {resendLoading
               ? "Sending…"

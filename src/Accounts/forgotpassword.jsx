@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import { pushWithState } from "../utils/navigationState";
 import AuthSplitLayout, {
   AuthFormCard,
+  AuthPrimaryButton,
   authInputClass,
   authLabelClass,
-  authPrimaryBtnClass,
+  authLinkClass,
 } from "./AuthSplitLayout";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
@@ -96,14 +97,14 @@ export default function ForgotPassword() {
             />
           </div>
 
-          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+          <AuthPrimaryButton disabled={loading}>
             {loading ? "Sending…" : "Send OTP"}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
         <p className="mt-5 text-center text-[13px] text-slate-500">
           Remembered it?{" "}
-          <Link href="/account" className="font-semibold text-[#b7242a] hover:underline">
+          <Link href="/account" className={authLinkClass}>
             Back to login
           </Link>
         </p>

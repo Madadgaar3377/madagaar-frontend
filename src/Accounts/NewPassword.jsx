@@ -8,9 +8,10 @@ import toast from "react-hot-toast";
 import { consumeNavigationState } from "../utils/navigationState";
 import AuthSplitLayout, {
   AuthFormCard,
+  AuthPrimaryButton,
   authInputClass,
   authLabelClass,
-  authPrimaryBtnClass,
+  authLinkClass,
 } from "./AuthSplitLayout";
 
 const API = (backendBaseUrl || "").replace(/\/$/, "");
@@ -137,7 +138,7 @@ export default function ResetPassword() {
               <button
                 type="button"
                 onClick={() => setShowPassword((s) => !s)}
-                className="text-[12px] font-medium text-slate-500 hover:text-[#b7242a]"
+                className="text-[12px] font-medium text-slate-500 hover:text-primary"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -166,14 +167,14 @@ export default function ResetPassword() {
             />
           </div>
 
-          <button type="submit" disabled={loading} className={authPrimaryBtnClass}>
+          <AuthPrimaryButton disabled={loading}>
             {loading ? "Resetting…" : "Reset password"}
-          </button>
+          </AuthPrimaryButton>
         </form>
 
         <p className="mt-5 text-center text-[13px] text-slate-500">
           OTP expired?{" "}
-          <Link href="/account/forgot" className="font-semibold text-[#b7242a] hover:underline">
+          <Link href="/account/forgot" className={authLinkClass}>
             Request a new one
           </Link>
         </p>
