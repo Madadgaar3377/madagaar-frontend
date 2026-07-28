@@ -135,7 +135,7 @@ export default function LoginPage() {
       }
 
       toast.success("Signed in successfully");
-      window.location.href = "/";
+      window.location.href = userType === "user" ? "/dashboard" : "/";
     } catch (err) {
       console.error("Login error:", err);
       toast.error("Network error  please try again.");
