@@ -86,7 +86,7 @@ export default function LoginPage() {
         if (data?.code === "EMAIL_NOT_VERIFIED" && data?.email) {
           const message =
             data?.message ||
-            "Please verify your email before logging in. We've sent you a verification code.";
+            "Please verify your email before logging in. We've sent you a verification link.";
           toast(message, { icon: "📧", duration: 5000 });
           pushWithState(router, "/account/verify-otp", {
             email: data.email,

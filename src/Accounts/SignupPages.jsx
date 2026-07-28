@@ -163,7 +163,7 @@ export default function SignupPage() {
           return;
         }
 
-        toast.success(data?.message || "Account updated. Check your email for OTP.");
+        toast.success(data?.message || "Account updated. Check your email for the verification link.");
         const emailToVerify = data?.email || formData.email;
         setTimeout(() => {
           pushWithState(router, "/account/verify-otp", {
@@ -199,7 +199,7 @@ export default function SignupPage() {
           data?.code === "USER_NOT_VERIFIED" ||
           (data?.message && String(data.message).toLowerCase().includes("not verified"));
         if (isUnverified) {
-          toast.error(data?.message || "Account not verified. Please verify with OTP.");
+          toast.error(data?.message || "Account not verified. Check your email for the verification link.");
           pushWithState(router, "/account/verify-otp", {
             email: formData.email,
             fromUnverified: true,
@@ -215,7 +215,7 @@ export default function SignupPage() {
         return;
       }
 
-      toast.success(data?.message || "Signup successful! Check your email for OTP.");
+      toast.success(data?.message || "Signup successful! Check your email for the verification link.");
       setTimeout(() => {
         pushWithState(router, "/account/verify-otp", { email: formData.email });
       }, 1500);
@@ -232,7 +232,7 @@ export default function SignupPage() {
       tagline="JOIN · COMPARE · GROW"
       title="One account for loans, insurance and more."
       subtitle="Create your Madadgaar profile as a user, agent, or business partner — then explore trusted plans."
-      footLinks={["Free to join", "Secure OTP", "Users · Agents · Partners"]}
+      footLinks={["Free to join", "Verify by email link", "Users · Agents · Partners"]}
     >
       <div className="mb-6">
         <h2
