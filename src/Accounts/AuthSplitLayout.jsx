@@ -124,7 +124,7 @@ export function AuthFormCard({ children, className = "" }) {
   );
 }
 
-/** Brand primary CTA — uses CSS class so color/visibility never depends on Tailwind purge. */
+/** Brand primary CTA  uses CSS class so color/visibility never depends on Tailwind purge. */
 export function AuthPrimaryButton({
   children,
   type = "submit",

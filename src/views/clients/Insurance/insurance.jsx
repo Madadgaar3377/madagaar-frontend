@@ -349,7 +349,7 @@ export default function InsuranceInfo({ initialPlans = [], fetchError = false })
           </AnimatedSection>
         )}
 
-        {/* Insurance Plans Grid — only block when we have no plans to show */}
+        {/* Insurance Plans Grid  only block when we have no plans to show */}
         {error && plans.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border p-6 text-center">
             <div className="text-red-500 text-4xl mb-4">⚠️</div>

@@ -1,4 +1,4 @@
-/* Partner public storefront — scoped look (fonts loaded via page) */
+/* Partner public storefront  scoped look (fonts loaded via page) */
 
 .pp {
   --pp-red: rgb(183, 36, 42);
@@ -60,7 +60,7 @@
   }
 }
 
-/* Flat Madadgaar red — no gradients, flares, or overlays */
+/* Flat Madadgaar red  no gradients, flares, or overlays */
 .ppHero {
   position: relative;
   overflow: hidden;

@@ -41,7 +41,7 @@ export default function LoansPage({ loans: initialLoans = [], fetchError: initia
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9; // show 9 plans per page
 
-  // Client fetch (same pattern as installments) — recovers when SSR fails
+  // Client fetch (same pattern as installments)  recovers when SSR fails
   useEffect(() => {
     let mounted = true;
     const loadLoans = async () => {
@@ -274,7 +274,7 @@ export default function LoansPage({ loans: initialLoans = [], fetchError: initia
 
         <AdSenseDisplayAuto className="my-4 sm:my-6 flex justify-center min-h-[90px]" />
 
-        {/* Error — only when client + SSR both have nothing */}
+        {/* Error  only when client + SSR both have nothing */}
         {fetchError && loans.length === 0 && (
           <div className="rounded-lg bg-white border p-4 text-center text-red-600 shadow-sm">
             Failed to load loan plans. Please try again later.

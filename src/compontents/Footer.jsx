@@ -65,7 +65,7 @@ const Footer = () => {
             >
               <img
                 src="https://www.pinstack.cc/api/badge/madadgaar-expert-partner-property-insurance-loans-installment-plans-in-pak?theme=light"
-                alt="Featured on Pinstack — Madadgaar Expert Partner - Property, Insurance, Loans & Installment Plans in Pak"
+                alt="Featured on Pinstack  Madadgaar Expert Partner - Property, Insurance, Loans & Installment Plans in Pak"
                 className="h-auto max-w-[220px] w-full"
               />
             </a>

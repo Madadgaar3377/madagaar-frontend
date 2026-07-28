@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   const name = String(plan.productName || "Installment Plan");
   const description = stripHtml(
-    String(plan.description || `${name} — compare installment options on Madadgaar.`),
+    String(plan.description || `${name}  compare installment options on Madadgaar.`),
     155
   );
   const images = plan.productImages as string[] | undefined;

@@ -69,7 +69,7 @@ function VerifyWaitingInner() {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Network error — please try again.");
+      toast.error("Network error  please try again.");
     } finally {
       setResendLoading(false);
     }
@@ -79,7 +79,7 @@ function VerifyWaitingInner() {
     <AuthSplitLayout
       tagline="SECURE · VERIFY · CONTINUE"
       title="Check your inbox to activate."
-      subtitle="We emailed you a secure Verify Account link. Open it on this device or any browser — no code to type."
+      subtitle="We emailed you a secure Verify Account link. Open it on this device or any browser  no code to type."
       footLinks={["Secure link", "No OTP in email", "Expires in 24h"]}
     >
       <div className="mb-6">
@@ -90,7 +90,7 @@ function VerifyWaitingInner() {
           Verify your email
         </h2>
         <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
-          Click <strong>Verify Account</strong> in the email — your account confirms automatically.
+          Click <strong>Verify Account</strong> in the email  your account confirms automatically.
         </p>
       </div>
 

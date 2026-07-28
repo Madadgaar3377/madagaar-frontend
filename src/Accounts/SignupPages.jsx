@@ -231,7 +231,7 @@ export default function SignupPage() {
     <AuthSplitLayout
       tagline="JOIN · COMPARE · GROW"
       title="One account for loans, insurance and more."
-      subtitle="Create your Madadgaar profile as a user, agent, or business partner — then explore trusted plans."
+      subtitle="Create your Madadgaar profile as a user, agent, or business partner  then explore trusted plans."
       footLinks={["Free to join", "Verify by email link", "Users · Agents · Partners"]}
     >
       <div className="mb-6">
@@ -242,7 +242,7 @@ export default function SignupPage() {
           Create account
         </h2>
         <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
-          Users, agents and partners — one simple signup.
+          Users, agents and partners  one simple signup.
         </p>
       </div>
 

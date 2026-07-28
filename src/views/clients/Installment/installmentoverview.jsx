@@ -1,6 +1,6 @@
 "use client";
 
-/* Installment detail module v4 — price display alias restore */
+/* Installment detail module v4  price display alias restore */
 import React, { useEffect, useMemo, useState } from "react";
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';

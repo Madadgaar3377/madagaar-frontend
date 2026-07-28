@@ -53,7 +53,7 @@
     box-shadow: var(--shadow-focus);
   }
 
-  /* Auth pages — purge-safe (do not rely on arbitrary Tailwind only) */
+  /* Auth pages  purge-safe (do not rely on arbitrary Tailwind only) */
   .auth-btn-primary {
     display: flex;
     width: 100%;
