@@ -58,7 +58,7 @@ const Footer = () => {
               Download Madadgaar App
             </Link>
             <a
-              href="https://www.pinstack.cc/product/madadgaar-expert-partner-property-insurance-loans-installment-plans-in-pak"
+              href="https://www.pinstack.cc/product/madadgaar-expert-partner-property-insurance-loans-installment-plans-in-pak?utm_source=pinstack&utm_medium=pinstack_badge&utm_campaign=badge&utm_content=madadgaar-expert-partner-property-insurance-loans-installment-plans-in-pak"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block mt-3 focus-visible:rounded focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
