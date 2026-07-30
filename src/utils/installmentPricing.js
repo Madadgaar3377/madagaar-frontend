@@ -47,7 +47,8 @@ export function isInstallmentsOnlyListing(plan) {
 /** Public cash purchase available (Cash button / Cash Price hero). */
 export function hasPublicCashListing(plan, variantIndex = null) {
   if (!plan || isInstallmentsOnlyListing(plan)) return false;
-  if (getLowestPublicCashPrice(plan, variantIndex) > 0) return true;
+  // Catalog / partner cash only — avoid getLowestPublicCashPrice (can recurse via offers).
+  void variantIndex;
   return hasCatalogOrPartnerCash(plan);
 }
 
@@ -693,7 +694,8 @@ export function resolveProductDisplayPrice(plan, variantIndex = null) {
 
 
 
-  return getLowestPublicCashPrice(plan, null);
+  // Do NOT call getLowestPublicCashPrice here — that falls back to this function (infinite loop).
+  return Number(plan.price) || 0;
 
 }
 
