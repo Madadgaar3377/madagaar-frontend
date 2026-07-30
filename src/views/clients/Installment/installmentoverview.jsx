@@ -25,6 +25,8 @@ import {
   getOfferPriceDisplay,
   getLowestPublicCashPrice,
   isPartnerOwnedVariant,
+  hasPublicCashListing,
+  isInstallmentsOnlyListing,
 } from "../../../utils/installmentPricing";
 import { SITE_URL } from "../../../lib/site";
 import { formatInstallmentCityDisplay } from "../../../lib/installmentCities";
@@ -348,11 +350,13 @@ export default function InstallmentDetailView() {
 
   const hasCashPricing = useMemo(() => {
     if (!plan) return false;
-    if (getLowestPublicCashPrice(plan, priceVariantIndex) > 0) return true;
-    if (cashOffers.length > 0) return true;
-    if (Number(plan.price) > 0) return true;
-    return (plan.variants || []).some((v) => Number(v.price) > 0);
-  }, [plan, priceVariantIndex, cashOffers]);
+    return hasPublicCashListing(plan, priceVariantIndex);
+  }, [plan, priceVariantIndex]);
+
+  const installmentsOnly = useMemo(
+    () => isInstallmentsOnlyListing(plan),
+    [plan]
+  );
 
   const hasInstallmentPricing = useMemo(() => {
     if (!plan) return false;
@@ -540,6 +544,7 @@ export default function InstallmentDetailView() {
                 </div>
                 
                 <div className="space-y-3 pt-4 border-t border-gray-200">
+                  {hasCashPricing ? (
                   <div>
                     <CashPriceDisplay
                       display={heroPriceDisplay}
@@ -552,6 +557,19 @@ export default function InstallmentDetailView() {
                       </p>
                     )}
                   </div>
+                  ) : hasInstallmentPricing ? (
+                  <div>
+                    <div className="text-xs text-gray-500 mb-1">Monthly from</div>
+                    <div className="text-2xl sm:text-3xl font-bold text-[rgb(183,36,42)]">
+                      PKR{" "}
+                      {Number(
+                        getBestPaymentPlan(collectAllPaymentPlans(plan), plan)
+                          ?.monthlyInstallment || 0
+                      ).toLocaleString()}
+                      <span className="text-sm font-medium text-gray-500 ml-1">/month</span>
+                    </div>
+                  </div>
+                  ) : null}
                   {Number(plan.downpayment || 0) > 0 && (
                   <div>
                     <div className="text-xs text-gray-500 mb-1">Down Payment:</div>
@@ -885,7 +903,9 @@ export default function InstallmentDetailView() {
                                 </>
                               )}
                             </div>
-                            {!isCashOnlyInstallment(p.monthlyInstallment) && (
+                            {!isCashOnlyInstallment(p.monthlyInstallment) &&
+                              !installmentsOnly &&
+                              Number(cashPriceDisplay?.displayPrice || p.cashPrice || 0) > 0 && (
                             <div className="mt-1 text-xs text-gray-600 flex flex-wrap items-center gap-x-1">
                               <span className="font-bold">Cash Price:</span>
                               <CashPriceDisplay display={cashPriceDisplay} size="sm" inline />
@@ -1106,10 +1126,13 @@ export default function InstallmentDetailView() {
                                     PKR {Number(p.monthlyInstallment || 0).toLocaleString()}
                                   </div>
                                   <div className="text-xs text-gray-500">/month</div>
+                                  {!installmentsOnly &&
+                                    Number(cashPriceDisplay?.displayPrice || p.cashPrice || 0) > 0 && (
                                   <div className="text-xs text-gray-600 mt-1 flex flex-wrap items-center justify-center gap-x-1">
                                     <span className="font-semibold">Cash:</span>
                                     <CashPriceDisplay display={cashPriceDisplay} size="sm" inline />
                                   </div>
+                                  )}
                                 </>
                               )}
                             </td>
@@ -1256,9 +1279,11 @@ export default function InstallmentDetailView() {
                 </h3>
                 <div className="bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 lg:p-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  {hasCashPricing && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <CashPriceDisplay display={heroPriceDisplay} size="md" label="Cash Price" />
                   </div>
+                  )}
                   {downPayment > 0 && (
                   <div className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200">
                     <div className="text-xs sm:text-sm text-gray-500 mb-1">Down Payment</div>
@@ -1668,11 +1693,25 @@ export default function InstallmentDetailView() {
 
                     <div className="border-t pt-2 mt-2">
                       <div className="flex items-center justify-between">
+                        {hasPublicCashListing(product) ? (
                         <CashPriceDisplay
                           display={getHeroCashPriceDisplay(product)}
                           size="md"
                           label="Cash Price"
                         />
+                        ) : (
+                        <div>
+                          <div className="text-xs text-gray-500">Monthly from</div>
+                          <div className="text-sm font-bold text-[rgb(183,36,42)]">
+                            PKR{" "}
+                            {Number(
+                              getBestPaymentPlan(collectAllPaymentPlans(product), product)
+                                ?.monthlyInstallment || 0
+                            ).toLocaleString()}
+                            /mo
+                          </div>
+                        </div>
+                        )}
                         {Number(product.downpayment || 0) > 0 && (
                         <div className="text-right">
                           <div className="text-xs text-gray-500">Down Payment</div>

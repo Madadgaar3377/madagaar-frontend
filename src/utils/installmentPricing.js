@@ -20,7 +20,36 @@ export function isRealInstallmentPlan(plan) {
   return Number(plan.monthlyInstallment) > 0 || Number(plan.installmentPrice) > 0;
 }
 
+/** Catalog / partner list cash (not paymentPlans[].cashPrice used only for markup math). */
+export function hasCatalogOrPartnerCash(plan) {
+  if (!plan) return false;
+  if (Number(plan.price) > 0) return true;
+  if ((plan.variants || []).some((v) => getVariantEffectivePrice(v) > 0)) return true;
+  return (plan.partnerPricing || []).some((pp) => {
+    if (Number(pp?.basePrice) > 0) return true;
+    return (pp?.variantOverrides || []).some((o) => getPartnerOverrideEffective(o) > 0);
+  });
+}
 
+/**
+ * Installments-only listings keep cashPrice on plans for math, but must not show Cash UI.
+ * Prefer explicit pricingMode; otherwise infer from zero catalog/partner cash + real plans.
+ */
+export function isInstallmentsOnlyListing(plan) {
+  if (!plan) return false;
+  const mode = String(plan.pricingMode || "").toLowerCase();
+  if (mode === "installments_only") return true;
+  if (mode === "cash" || mode === "cash_installments") return false;
+  const hasInstallments = collectAllPaymentPlans(plan).some(isRealInstallmentPlan);
+  return hasInstallments && !hasCatalogOrPartnerCash(plan);
+}
+
+/** Public cash purchase available (Cash button / Cash Price hero). */
+export function hasPublicCashListing(plan, variantIndex = null) {
+  if (!plan || isInstallmentsOnlyListing(plan)) return false;
+  if (getLowestPublicCashPrice(plan, variantIndex) > 0) return true;
+  return hasCatalogOrPartnerCash(plan);
+}
 
 export function resolveMonthlyInstallment(paymentPlan, plan) {
 
@@ -986,6 +1015,9 @@ export function buildPartnerCashOffers(plan, options = {}) {
 
   for (const p of plansToScan) {
 
+    // plan.cashPrice is calc reference for installments-only — not a public cash offer
+    if (isInstallmentsOnlyListing(plan)) continue;
+
     const cash = Number(p?.cashPrice) || 0;
 
     if (cash <= 0) continue;
@@ -1264,7 +1296,10 @@ export function getInstallmentCardPricing(plan, paymentPlan) {
 
     showPerMonth: !cashOnly,
 
-    showCashLine: !cashOnly && (cashDisplay.displayPrice > 0 || cashPrice > 0),
+    showCashLine:
+      !cashOnly &&
+      !isInstallmentsOnlyListing(plan) &&
+      (cashDisplay.displayPrice > 0 || cashPrice > 0),
 
   };
 
