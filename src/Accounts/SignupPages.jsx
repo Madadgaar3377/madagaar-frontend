@@ -129,6 +129,12 @@ export default function SignupPage() {
       setLoading(false);
       return;
     }
+    const phoneTrimmed = (formData.phoneNumber || "").trim();
+    if (!phoneTrimmed) {
+      toast.error("Phone number is required");
+      setLoading(false);
+      return;
+    }
     if (!allDeclarationsAccepted) {
       toast.error("You must accept Terms & Conditions and Privacy Policy to sign up");
       setLoading(false);
@@ -144,9 +150,10 @@ export default function SignupPage() {
           newEmail: formData.email.trim(),
           name: formData.name,
           userName: formData.userName || undefined,
-          phoneNumber: formData.phoneNumber || undefined,
+          phoneNumber: phoneTrimmed,
           password: formData.password,
           profilePic: formData.profilePic || undefined,
+          platform: "web",
         };
 
         const res = await fetch(`${apiUrl}/updateUnverifiedEmail`, {
@@ -166,7 +173,7 @@ export default function SignupPage() {
         toast.success(data?.message || "Account updated. Check your email for the verification link.");
         const emailToVerify = data?.email || formData.email;
         setTimeout(() => {
-          pushWithState(router, "/account/verify-otp", {
+          pushWithState(router, "/account/verify-email", {
             email: emailToVerify,
             previousFormData: { ...formData, email: emailToVerify },
           });
@@ -179,11 +186,12 @@ export default function SignupPage() {
         name: formData.name,
         userName: formData.userName || undefined,
         email: formData.email,
-        phoneNumber: (formData.phoneNumber || "").trim() || undefined,
+        phoneNumber: phoneTrimmed,
         password: formData.password,
         profilePic: formData.profilePic || undefined,
         UserType: formData.userType || "user",
         termsAccepted: true,
+        platform: "web",
       };
 
       const res = await fetch(`${apiUrl}/signup`, {
@@ -200,7 +208,7 @@ export default function SignupPage() {
           (data?.message && String(data.message).toLowerCase().includes("not verified"));
         if (isUnverified) {
           toast.error(data?.message || "Account not verified. Check your email for the verification link.");
-          pushWithState(router, "/account/verify-otp", {
+          pushWithState(router, "/account/verify-email", {
             email: formData.email,
             fromUnverified: true,
             previousFormData: { ...formData },
@@ -217,7 +225,7 @@ export default function SignupPage() {
 
       toast.success(data?.message || "Signup successful! Check your email for the verification link.");
       setTimeout(() => {
-        pushWithState(router, "/account/verify-otp", { email: formData.email });
+        pushWithState(router, "/account/verify-email", { email: formData.email });
       }, 1500);
     } catch (err) {
       console.error("Signup error:", err);
@@ -323,14 +331,18 @@ export default function SignupPage() {
           </div>
 
           <div>
-            <label className={authLabelClass}>Phone number</label>
+            <label className={authLabelClass}>
+              Phone number <span className="text-primary">*</span>
+            </label>
             <input
               name="phoneNumber"
               type="tel"
               placeholder="e.g. 03001234567"
               value={formData.phoneNumber}
               onChange={updateFormField}
+              required
               className={authInputClass}
+              autoComplete="tel"
             />
           </div>
 

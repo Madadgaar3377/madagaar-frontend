@@ -75,6 +75,7 @@ export default function LoginPage() {
           email,
           password,
           loginSource: "madadgaar",
+          platform: "web",
           ...(clientIp && { clientIp }),
         }),
         credentials: "include",
@@ -88,7 +89,7 @@ export default function LoginPage() {
             data?.message ||
             "Please verify your email before logging in. We've sent you a verification link.";
           toast(message, { icon: "📧", duration: 5000 });
-          pushWithState(router, "/account/verify-otp", {
+          pushWithState(router, "/account/verify-email", {
             email: data.email,
             fromUnverified: true,
             message,

@@ -14,7 +14,8 @@ import AuthSplitLayout, {
   authLinkClass,
 } from "./AuthSplitLayout";
 
-function VerifyWaitingInner() {
+/** Web-only: wait for magic-link email (no OTP entry). */
+function CheckEmailInner() {
   const apiUrl = (backendBaseUrl || "").replace(/\/$/, "");
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,7 +58,7 @@ function VerifyWaitingInner() {
       const res = await fetch(`${apiUrl}/reSendOtp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: toUse }),
+        body: JSON.stringify({ email: toUse, platform: "web" }),
       });
       const data = await res.json().catch(() => null);
       if (!res.ok || data?.success === false) {
@@ -79,8 +80,8 @@ function VerifyWaitingInner() {
     <AuthSplitLayout
       tagline="SECURE · VERIFY · CONTINUE"
       title="Check your inbox to activate."
-      subtitle="We emailed you a secure Verify Account link. Open it on this device or any browser  no code to type."
-      footLinks={["Secure link", "No OTP in email", "Expires in 24h"]}
+      subtitle="We emailed you a secure Verify Account link. Open it on this device or any browser — no code to type."
+      footLinks={["Secure link", "No OTP", "Expires in 24h"]}
     >
       <div className="mb-6">
         <h2
@@ -90,7 +91,7 @@ function VerifyWaitingInner() {
           Verify your email
         </h2>
         <p className="mt-2 text-[14px] text-slate-500 leading-relaxed">
-          Click <strong>Verify Account</strong> in the email  your account confirms automatically.
+          Click <strong>Verify Account</strong> in the email — your account confirms automatically.
         </p>
       </div>
 
@@ -153,7 +154,7 @@ function VerifyWaitingInner() {
   );
 }
 
-export default function OtpVerifyPage() {
+export default function CheckEmailVerificationPage() {
   return (
     <Suspense
       fallback={
@@ -162,7 +163,7 @@ export default function OtpVerifyPage() {
         </div>
       }
     >
-      <VerifyWaitingInner />
+      <CheckEmailInner />
     </Suspense>
   );
 }

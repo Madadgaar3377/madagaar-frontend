@@ -116,7 +116,7 @@ function VerifyEmailInner() {
             <AuthPrimaryButton
               type="button"
               onClick={() =>
-                pushWithState(router, "/account/verify-otp", {
+                pushWithState(router, "/account/verify-email", {
                   email: emailHint || undefined,
                   message: "Request a new verification link below.",
                 })
