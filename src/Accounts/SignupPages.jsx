@@ -170,10 +170,10 @@ export default function SignupPage() {
           return;
         }
 
-        toast.success(data?.message || "Account updated. Check your email for the verification link.");
+        toast.success(data?.message || "Account updated. Check your email for the OTP.");
         const emailToVerify = data?.email || formData.email;
         setTimeout(() => {
-          pushWithState(router, "/account/verify-email", {
+          pushWithState(router, "/account/verify-otp", {
             email: emailToVerify,
             previousFormData: { ...formData, email: emailToVerify },
           });
@@ -207,8 +207,8 @@ export default function SignupPage() {
           data?.code === "USER_NOT_VERIFIED" ||
           (data?.message && String(data.message).toLowerCase().includes("not verified"));
         if (isUnverified) {
-          toast.error(data?.message || "Account not verified. Check your email for the verification link.");
-          pushWithState(router, "/account/verify-email", {
+          toast.error(data?.message || "Account not verified. Check your email for the OTP.");
+          pushWithState(router, "/account/verify-otp", {
             email: formData.email,
             fromUnverified: true,
             previousFormData: { ...formData },
@@ -223,9 +223,9 @@ export default function SignupPage() {
         return;
       }
 
-      toast.success(data?.message || "Signup successful! Check your email for the verification link.");
+      toast.success(data?.message || "Signup successful! Check your email for the OTP.");
       setTimeout(() => {
-        pushWithState(router, "/account/verify-email", { email: formData.email });
+        pushWithState(router, "/account/verify-otp", { email: formData.email });
       }, 1500);
     } catch (err) {
       console.error("Signup error:", err);
@@ -240,7 +240,7 @@ export default function SignupPage() {
       tagline="JOIN · COMPARE · GROW"
       title="One account for loans, insurance and more."
       subtitle="Create your Madadgaar profile as a user, agent, or business partner  then explore trusted plans."
-      footLinks={["Free to join", "Verify by email link", "Users · Agents · Partners"]}
+      footLinks={["Free to join", "Verify with OTP", "Users · Agents · Partners"]}
     >
       <div className="mb-6">
         <h2
