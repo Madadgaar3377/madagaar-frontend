@@ -164,6 +164,9 @@ export default function Navbar({
             <Link href="/blog" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               Blog
             </Link>
+            <Link href="/careers" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
+              Careers
+            </Link>
             <Link href="/faq" className="px-3 py-2 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200 text-sm font-medium">
               FAQs
             </Link>
@@ -308,6 +311,7 @@ export default function Navbar({
               <Link href="/about" className="flex items-center mt-1 p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>About Us</Link>
               <Link href="/offers" className="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Offers</Link>
               <Link href="/blog" className="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Blog</Link>
+              <Link href="/careers" className="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Careers</Link>
               <Link href="/faq" className="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>FAQs</Link>
               <Link href="/contact" className="flex items-center p-3 rounded-lg text-gray-700 hover:bg-gray-50 min-h-touch" onClick={() => setMobileOpen(false)}>Contact</Link>
 

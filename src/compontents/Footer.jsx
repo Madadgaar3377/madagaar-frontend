@@ -8,6 +8,7 @@ const footerLinks = [
   { to: "/loans", label: "Loans" },
   { to: "/installments", label: "Installments" },
   { to: "/insurance", label: "Insurance" },
+  { to: "/careers", label: "Careers" },
   { to: "/about", label: "How It Works" },
   { to: "/faq", label: "FAQs" },
 ];
